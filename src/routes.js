@@ -29,9 +29,9 @@ const LeaveApplication = React.lazy(() => import('./views/base/ManageAttend/Leav
 const Manual = React.lazy(() => import('./views/base/ManageAttend/Manual'))
 const VisitShop = React.lazy(() => import('./views/base/ManageAttend/VistShop'))
 
-const InventoryManagment = React.lazy(() => import('./views/base/ManageOrder/InventoryManage'))
-const InvoiceForm = React.lazy(() => import('./views/base/ManageOrder/Invoice'))
-const Po = React.lazy(() => import('./views/base/ManageOrder/PO'))
+const InventoryManagment = React.lazy(() => import('./views/ManageOrder/InventoryManage'))
+const InvoiceForm = React.lazy(() => import('./views/ManageOrder/Invoice'))
+const Po = React.lazy(() => import('./views/ManageOrder/PO'))
 
 const TaskManagment = React.lazy(() => import('./views/base/Management/TaskMange'))
 const UserDetailsForm = React.lazy(() => import('./views/base/Management/UserMange'))
