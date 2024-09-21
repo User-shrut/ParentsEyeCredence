@@ -47,11 +47,7 @@ const _nav = [
       </div>
     ),
     items: [
-      {
-        component: CNavItem,
-        name: 'Notifications',
-        to: '/notifications',
-      },
+      
       {
         component: CNavItem,
         name: 'Devices',
@@ -59,8 +55,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Geofences',
-        to: '/geofences',
+        name: 'Users',
+        to: '/users',
       },
       {
         component: CNavItem,
@@ -69,8 +65,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Maintenance',
-        to: '/maintenance',
+        name: 'Geofences',
+        to: '/geofences',
       },
       {
         component: CNavItem,
@@ -79,9 +75,17 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Users',
-        to: '/users',
+        name: 'Notifications',
+        to: '/notifications',
       },
+      {
+        component: CNavItem,
+        name: 'Maintenance',
+        to: '/maintenance',
+      },
+      
+      
+      
       {
         component: CNavItem,
         name: 'Preferences',

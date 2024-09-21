@@ -1,14 +1,18 @@
 import React from 'react'
 const DashBoard = React.lazy(() => import('./views/theme/dashboard/DashBoard'))
 const LiveTrack = React.lazy(() => import('./views/theme/livetrack/LiveTrack'))
-const Notifications = React.lazy(() => import('./views/notifications/Notifications'))
+
+// master
 const Devices = React.lazy(() => import('./views/devices/Devices'))
-const Geofences = React.lazy(() => import('./views/geofences/Geofences'))
-const Group = React.lazy(() => import('./views/group/Group'))
-const Maintenance = React.lazy(() => import('./views/maintenance/Maintenance'))
-const Driver = React.lazy(() => import('./views/driver/Driver'))
 const Users = React.lazy(() => import('./views/users/Users'))
+const Group = React.lazy(() => import('./views/group/Group'))
+const Geofences = React.lazy(() => import('./views/geofences/Geofences'))
+const Driver = React.lazy(() => import('./views/driver/Driver'))
+const Notifications = React.lazy(() => import('./views/notifications/Notifications'))
+const Maintenance = React.lazy(() => import('./views/maintenance/Maintenance'))
 const Preferences = React.lazy(() => import('./views/preferences/Preferences'))
+
+// reports
 const Combine = React.lazy(() => import('./views/combinereports/Combine'))
 const Custom = React.lazy(() => import('./views/customreports/Custom'))
 const History = React.lazy(() => import('./views/history/History'))
@@ -19,9 +23,13 @@ const Schedules = React.lazy(() => import('./views/schedules-reports/Schedules')
 const Alerts = React.lazy(() => import('./views/alerts-events/Alerts'))
 const Summary = React.lazy(() => import('./views/summary/Summary'))
 const Customchart = React.lazy(() => import('./views/customchart/Customchart'))
+
+// expense management
 const InvoiceForm = React.lazy(() => import('./views/ManageOrder/Invoice'))
 const Po = React.lazy(() => import('./views/ManageOrder/PO'))
 const InventoryManagment = React.lazy(() => import('./views/ManageOrder/InventoryManage'))
+
+// additional
 const ChatBot = React.lazy(() => import('./views/theme/chatbot/ChatBot'))
 const HelpSupp = React.lazy(() => import('./views/forms/help-support/HelpSupp'))
 
