@@ -15,7 +15,8 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import axios from 'axios'
+import axios from 'axios';
+import loginImg from '../../../assets/loginImg.png'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -55,13 +56,14 @@ const Login = () => {
       <div className="loginContainer">
         <div className="row" style={{ height: '98vh', width: '100%' }}>
           <div className="col-12 col-md-6">
-            <img src="" alt="" />
+            <img src={loginImg} alt="" height='100%' width="100%" />
           </div>
           <div className="col-12 col-md-6 d-flex justify-content-center align-items-center">
-            <form>
+            <form className='w-50 border border-2 p-5 rounded-3'>
+            <h1>Login</h1>
               <div className="mb-3">
                 <label htmlFor="exampleInputEmail1" className="form-label">
-                  Email address
+                  Username
                 </label>
                 <div className="input-group mb-3">
                   <span className="input-group-text" id="basic-addon1">
