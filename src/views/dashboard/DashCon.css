@@ -1,0 +1,70 @@
+.countldel
+{
+  border-left-color: yellow !important;
+}
+.countOverSpeed
+{
+  border-left-color: #eb6009 !important;
+}
+.vehiclesTable
+{
+  height: 20rem !important;
+  width: 60% !important;
+  /* border: 1px solid white !important; */
+
+}
+
+
+.table-cell {
+  padding-right: 5rem !important; /* Adjust this value as needed */
+}
+.trans
+{
+  transition: height 0.2s ease-in-out;
+}
+.table-row {
+  overflow: hidden; /* Prevent overflow when transitioning */
+}
+
+.table-row.expanded {
+  transition: height 0.3s ease; /* Smooth transition for height */
+}
+
+.table-row.collapsed {
+  /* Adjust as needed for the collapsed state */
+  transition: 0.3s ease; /* Smooth transition for height */
+}
+
+.trans {
+  transition: 0.2s ease-in-out; /* Transition for opacity if needed */
+}
+
+.align{
+  /* display: flex; */
+  align-self: center;
+  justify-content: center;
+}
+.dashimg{
+  height: 40px;
+}
+.upperdata{
+  height: 45px;
+}
+.address, .last-update {
+  width: 25%; /* Adjust this value as per your requirement */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.status {
+  width: 15%; /* Adjust this value as per your requirement */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.speed {
+  width: 10%; /* Adjust this value as per your requirement */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
