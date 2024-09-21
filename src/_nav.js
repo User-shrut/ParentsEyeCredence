@@ -84,6 +84,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Add Devices',
+        to: '/addDevices',
+      },
+      {
+        component: CNavItem,
         name: 'Manual Attendance',
         to: '/manual-attendance',
       },

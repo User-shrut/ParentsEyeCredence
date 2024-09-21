@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import classNames from 'classnames'
 
 import {
@@ -20,6 +20,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import './DashCon.css'
 import {
   cibCcAmex,
   cibCcApplePay,
@@ -52,9 +53,183 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
-import MainMap from '../Map/MapComponent';
+import MainMap from '../Map/MapComponent'
+import { GlobalContext } from '../../Context/Context'
+import { PiEngineFill } from 'react-icons/pi'
+import { MdGpsFixed } from "react-icons/md";
+import { IoMdBatteryCharging } from "react-icons/io";
+
+
+// ================================CAR==================================
+import carGreen from "/public/vehicleList/Car/carGreen.svg";
+import carRed from "/public/vehicleList/Car/carRed.svg";
+import carYellow from "/public/vehicleList/Car/carYellow.svg";
+import carOrange from "/public/vehicleList/Car/carOrange.svg";
+import carGray from "/public/vehicleList/Car/carGray.svg";
+
+//==============================BIKE========================================
+import bikeGreen from "/public/vehicleList/Bike/bikeGreen.svg";
+import bikeRed from "/public/vehicleList/Bike/bikeRed.svg";
+import bikeYellow from "/public/vehicleList/Bike/bikeYellow.svg";
+import bikeOrange from "/public/vehicleList/Bike/bikeOrange.svg";
+import bikeGray from "/public/vehicleList/Bike/bikeGray.svg";
+
+
+import busGreen from "/public/vehicleList/Bus/busGreen.svg";
+import busRed from "/public/vehicleList/Bus/busRed.svg";
+import busOrange from "/public/vehicleList/Bus/busOrange.svg";
+import busYellow from "/public/vehicleList/Bus/busYellow.svg";
+import busGray from "/public/vehicleList/Bus/busGray.svg";
+
+//==============================TRUCK========================================
+import truckGreen from "/public/vehicleList/Truck/truckGreen.svg";
+import truckRed from "/public/vehicleList/Truck/truckRed.svg";
+import truckYellow from "/public/vehicleList/Truck/truckYellow.svg";
+import truckOrange from "/public/vehicleList/Truck/truckOrange.svg";
+import truckGray from "/public/vehicleList/Truck/truckGray.svg";
+
+//==============================CRANE========================================
+import craneGreen from "/public/vehicleList/Crane/craneGreen.svg";
+import craneRed from "/public/vehicleList/Crane/craneRed.svg";
+import craneYellow from "/public/vehicleList/Crane/craneYellow.svg";
+import craneOrange from "/public/vehicleList/Crane/craneOrange.svg";
+import craneGray from "/public/vehicleList/Crane/craneGray.svg";
+
+//==============================JCB========================================
+import jcbGreen from "/public/vehicleList/JCB/jcbGreen.svg";
+import jcbRed from "/public/vehicleList/JCB/jcbRed.svg";
+import jcbYellow from "/public/vehicleList/JCB/jcbYellow.svg";
+import jcbOrange from "/public/vehicleList/JCB/jcbOrange.svg";
+import jcbGray from "/public/vehicleList/JCB/jcbGray.svg";
+
+//==============================AUTO========================================
+import autoGreen from "/public/vehicleList/Auto/autoGreen.svg";
+import autoRed from "/public/vehicleList/Auto/autoRed.svg";
+import autoYellow from "/public/vehicleList/Auto/autoYellow.svg";
+import autoOrange from "/public/vehicleList/Auto/autoOrange.svg";
+import autoGray from "/public/vehicleList/Auto/autoGray.svg";
+
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+dayjs.extend(duration)
+
 
 const Dashboard = () => {
+  const { salesManList, salesman } = useContext(GlobalContext)
+  const [expandedRow, setExpandedRow] = useState(null)
+
+  const handleRowClick = (index) => {
+    setExpandedRow(expandedRow === index ? null : index)
+  }
+
+  const getCategory = (category) => {
+    switch (category) {
+      case "car":
+        return "car";
+      case "bus":
+        return "bus";
+      case "truck":
+        return "truck";
+      case "motorcycle":
+        return "bike"; // Adjusted to match the imageMap key
+      case "auto":
+        return "auto";
+      case "tractor":
+        return "crane";
+      case "jcb":
+        return "jcb";
+      default:
+        return "car"; // Default case
+    }
+  };
+  const selectImage = (category, item) => {
+    const cate = getCategory(category);
+    let image;
+
+    const imageMap = {
+      car: {
+        red: carRed,
+        green: carGreen,
+        yellow: carYellow,
+        orange: carOrange,
+        gray: carGray,
+      },
+      bike: {
+        red: bikeRed,
+        green: bikeGreen,
+        yellow: bikeYellow,
+        orange: bikeOrange,
+        gray: bikeGray,
+      },
+      truck: {
+        red: truckRed,
+        green: truckGreen,
+        yellow: truckYellow,
+        orange: truckOrange,
+        gray: truckGray,
+      },
+      auto: {
+        red: autoRed,
+        green: autoGreen,
+        yellow: autoYellow,
+        orange: autoOrange,
+        gray: autoGray,
+      },
+      jcb: {
+        red: jcbRed,
+        green: jcbGreen,
+        yellow: jcbYellow,
+        orange: jcbOrange,
+        gray: jcbGray,
+      },
+      crane: {
+        red: craneRed,
+        green: craneGreen,
+        yellow: craneYellow,
+        orange: craneOrange,
+        gray: craneGray,
+      },
+      tractor: {
+        red: craneRed,
+        green: craneGreen,
+        yellow: craneYellow,
+        orange: craneOrange,
+        gray: craneGray,
+      },
+      bus: {
+        red: busRed,
+        green: busGreen,
+        yellow: busYellow,
+        orange: busOrange,
+        gray: busGray,
+      },
+    };
+
+    // Safely handle undefined position or attributes
+    if (!item || !item.attributes) {
+      // Handle the case where position or attributes are undefined
+      return imageMap[cate]?.gray || car // Return a gray or default image
+    }
+
+    const ignition = item.attributes.ignition
+    const speed = item.speed || 0
+
+    if (!ignition && speed < 1) {
+      image = imageMap[cate].red
+    } else if (ignition && speed > 2 && speed < 60) {
+      image = imageMap[cate].green
+    } else if (ignition && speed < 2) {
+      image = imageMap[cate].yellow
+    } else if (ignition && speed > 60) {
+      image = imageMap[cate].orange
+    } else {
+      image = imageMap[cate].gray
+    }
+
+    return image || car // Return a default image if no match found
+  };
+
+
   const progressExample = [
     { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
     { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
@@ -211,153 +386,346 @@ const Dashboard = () => {
           </CRow>
         </CCardFooter>
       </CCard>
-      <WidgetsBrand className="mb-4" withCharts />
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader>Traffic {' & '} Sales</CCardHeader>
+            <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
             <CCardBody>
-              <CRow>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-info py-1 px-3">
-                        <div className="text-body-secondary text-truncate small">New Clients</div>
-                        <div className="fs-5 fw-semibold">9,123</div>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">
-                          Recurring Clients
-                        </div>
-                        <div className="fs-5 fw-semibold">22,643</div>
-                      </div>
-                    </CCol>
-                  </CRow>
-                  <hr className="mt-0" />
-                  {progressGroupExample1.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-prepend">
-                        <span className="text-body-secondary small">{item.title}</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="info" value={item.value1} />
-                        <CProgress thin color="danger" value={item.value2} />
-                      </div>
-                    </div>
-                  ))}
+              <CRow className="justify-content-center">
+                <CCol xs={12} md={2} xl={2}>
+                  <div className="border-start border-start-4 border-start-success py-1 px-3">
+                    <div className="text-body-secondary text-truncate small">Running</div>
+                    <div className="fs-5 fw-semibold">9,123</div>
+                  </div>
                 </CCol>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Pageviews</div>
-                        <div className="fs-5 fw-semibold">78,623</div>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Organic</div>
-                        <div className="fs-5 fw-semibold">49,123</div>
-                      </div>
-                    </CCol>
-                  </CRow>
 
-                  <hr className="mt-0" />
+                <CCol xs={12} md={2} xl={2}>
+                  <div className="border-start border-start-4 border-start py-1 px-3 mb-3 countldel">
+                    <div className="text-body-secondary text-truncate small">Idle</div>
+                    <div className="fs-5 fw-semibold">22,643</div>
+                  </div>
+                </CCol>
 
-                  {progressGroupExample2.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">{item.value}%</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="warning" value={item.value} />
-                      </div>
-                    </div>
-                  ))}
+                <CCol xs={12} md={2} xl={2}>
+                  <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
+                    <div className="text-body-secondary text-truncate small">Stopped</div>
+                    <div className="fs-5 fw-semibold">78,623</div>
+                  </div>
+                </CCol>
 
-                  <div className="mb-5"></div>
+                <CCol xs={12} md={2} xl={2}>
+                  <div className="border-start border-start-4 border-start countOverSpeed py-1 px-3 mb-3">
+                    <div className="text-body-secondary text-truncate small">Overspeed</div>
+                    <div className="fs-5 fw-semibold">49,123</div>
+                  </div>
+                </CCol>
 
-                  {progressGroupExample3.map((item, index) => (
-                    <div className="progress-group" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">
-                          {item.value}{' '}
-                          <span className="text-body-secondary small">({item.percent}%)</span>
-                        </span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="success" value={item.percent} />
-                      </div>
-                    </div>
-                  ))}
+                <CCol xs={12} md={2} xl={2}>
+                  <div className="border-start border-start-4 border-start-error countInactive py-1 px-3 mb-3">
+                    <div className="text-body-secondary text-truncate small">Inactive</div>
+                    <div className="fs-5 fw-semibold">49,123</div>
+                  </div>
                 </CCol>
               </CRow>
+              <hr className="mt-0" />
+
+              <div className="mb-5"></div>
 
               <br />
+              <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
+                <CTable className="my-3 border vehiclesTable" hover responsive>
+  <CTableHead
+    className="text-nowrap"
+    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
+  >
+    <CTableRow>
+      <CTableHeaderCell className="bg-body-tertiary text-center sr-no table-cell" style={{ position: 'sticky', top: 0 }}>
+        Sr No.
+      </CTableHeaderCell>
 
-              <CTable align="middle" className="mb-0 border" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      <CIcon icon={cilPeople} />
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">User</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Country
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Usage</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Payment Method
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Activity</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {tableExample.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
-                      <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
+      <CTableHeaderCell className="bg-body-tertiary text-center vehicle table-cell" style={{ position: 'sticky', top: 0 }}>
+        Vehicle
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center device-name table-cell" style={{ position: 'sticky', top: 0 }}>
+        Device Name
+      </CTableHeaderCell>
+
+      <CTableHeaderCell
+        className="bg-body-tertiary text-center address table-cell"
+        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+      >
+        Address
+      </CTableHeaderCell>
+
+      <CTableHeaderCell
+        className="bg-body-tertiary text-center last-update table-cell"
+        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+      >
+        Last Update
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center current-delay table-cell" style={{ position: 'sticky', top: 0 }}>
+        Current Delay
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center speed table-cell" style={{ position: 'sticky', top: 0 }}>
+        Speed
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center distance table-cell" style={{ position: 'sticky', top: 0 }}>
+        Distance
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center total-distance table-cell" style={{ position: 'sticky', top: 0 }}>
+        Total Distance
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center satelite table-cell" style={{ position: 'sticky', top: 0 }}>
+        Satelite
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center ignition table-cell" style={{ position: 'sticky', top: 0 }}>
+        Ignition
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center gps table-cell" style={{ position: 'sticky', top: 0 }}>
+        GPS
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center power table-cell" style={{ position: 'sticky', top: 0 }}>
+        Power
+      </CTableHeaderCell>
+
+      <CTableHeaderCell className="bg-body-tertiary text-center status table-cell" style={{ position: 'sticky', top: 0, width: '15%' }}>
+        Track
+      </CTableHeaderCell>
+    </CTableRow>
+  </CTableHead>
+
+  <CTableBody>
+    {salesManList?.map((item, index) => (
+      <CTableRow
+        key={index}
+        onClick={() => handleRowClick(index)}
+        className={`table-row ${expandedRow === index ? 'expanded' : 'collapsed'} trans`}
+      >
+        {/* Sr No. */}
+        <CTableDataCell className="text-center sr-no table-cell">
+          {index + 1}
+        </CTableDataCell>
+
+        {/* Vehicle */}
+        <CTableDataCell className="text-center vehicle table-cell">
+          <div>
+            {(() => {
+              const device = salesman.find((device) => device.id === item.deviceId);
+              return (
+                <img src={selectImage(device.category, item)} className="dashimg upperdata" alt="vehicle" />
+              );
+            })()}
+          </div>
+          {expandedRow === index && (
+            <>
+              <hr />
+              {(() => {
+                const device = salesman.find((device) => device.id === item.deviceId);
+                return (
+                  <div className="upperdata">
+                    {device ? device.category : 'Currently Not Available'}
+                  </div>
+                );
+              })()}
+            </>
+          )}
+        </CTableDataCell>
+
+        {/* Device Name */}
+        <CTableDataCell className="device-name table-cell">
+          {(() => {
+            const device = salesman.find((device) => device.id === item.deviceId);
+            return (
+              <>
+                <div className="upperdata">{device ? device.name : 'Unknown'}</div>
+                {expandedRow === index && (
+                  <>
+                    <hr />
+                    <div>
+                      <PiEngineFill />
+                    </div>
+                  </>
+                )}
+              </>
+            );
+          })()}
+        </CTableDataCell>
+
+        {/* Address */}
+        <CTableDataCell className="text-center address table-cell" style={{ width: '20rem' }}>
+          <div className="upperdata" style={{ fontSize: '1rem' }}>
+            shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
+          </div>
+        </CTableDataCell>
+
+        {/* Last Update */}
+        <CTableDataCell className="text-center last-update table-cell">
+          {(() => {
+            const device = salesman.find((device) => device.id === item.deviceId);
+            const lastUpdate = device ? dayjs(device.lastUpdate).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
+            return (
+              <div className="upperdata">
+                {lastUpdate}
+              </div>
+            );
+          })()}
+        </CTableDataCell>
+
+        {/* Current Delay */}
+        <CTableDataCell className="text-center current-delay table-cell">
+          {(() => {
+            const device = salesman.find((device) => device.id === item.deviceId);
+            if (device && device.lastUpdate) {
+              const now = dayjs();
+              const lastUpdate = dayjs(device.lastUpdate);
+              const duration = dayjs.duration(now.diff(lastUpdate));
+
+              const days = duration.days();
+              const hours = duration.hours();
+              const minutes = duration.minutes();
+              const seconds = duration.seconds();
+
+              // Conditional formatting based on duration values
+              if (days > 0) {
+                return `${days}d ${hours}h ${minutes}m`;
+              } else if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+              } else if (minutes > 0) {
+                return `${minutes}m`;
+              } else {
+                return `${seconds}s`; // Display seconds if all else is zero
+              }
+            }
+            return '0s'; // Default if no device or lastUpdate
+          })()}
+        </CTableDataCell>
+
+        {/* Speed */}
+        <CTableDataCell className="text-center speed table-cell">
+          <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
+          {expandedRow === index && (
+            <>
+              <hr />
+              <div>
+                <PiEngineFill />
+              </div>
+            </>
+          )}
+        </CTableDataCell>
+
+        {/* Distance */}
+        <CTableDataCell className="text-center distance table-cell">
+          {`${Math.round(item.attributes.distance)} km`}
+        </CTableDataCell>
+
+        {/* Total Distance */}
+        <CTableDataCell className="text-center total-distance table-cell">
+          {`${Math.round(item.attributes.totalDistance)} km`}
+        </CTableDataCell>
+
+        {/* Satelite */}
+        <CTableDataCell className="text-center satelite table-cell">
+          {item.attributes.sat}
+        </CTableDataCell>
+
+        {/* Ignition */}
+        <CTableDataCell className="text-center ignition table-cell">
+          {(() => {
+            const { ignition } = item.attributes;
+
+            let iconColor = 'gray'; // Default color
+            let iconText = 'N/A'; // Default text
+
+            if (ignition) {
+              iconColor = 'green';
+              iconText = 'On';
+            } else if (ignition === false) {
+              iconColor = 'red';
+              iconText = 'Off';
+            }
+
+            return (
+              <div style={{ color: iconColor }}>
+                <PiEngineFill />
+              </div>
+            );
+          })()}
+        </CTableDataCell>
+
+        {/* GPS */}
+        <CTableDataCell className="text-center gps table-cell">
+          {(() => {
+            const { valid } = item;
+
+            let iconColor = 'gray'; // Default color
+            let iconText = 'N/A'; // Default text
+
+            if (valid) {
+              iconColor = 'green';
+              iconText = 'On';
+            } else if (valid === false) {
+              iconColor = 'red';
+              iconText = 'Off';
+            }
+
+            return (
+              <div style={{ color: iconColor }}>
+                <PiEngineFill />
+              </div>
+            );
+          })()}
+        </CTableDataCell>
+
+        {/* Power */}
+        <CTableDataCell className="text-center power table-cell">
+          {(() => {
+            const power = item.attributes.battery;
+
+            let iconColor = 'gray'; // Default color
+            let iconText = 'N/A'; // Default text
+
+            if (power) {
+              iconColor = 'green';
+              iconText = 'On';
+            } else if (power === false) {
+              iconColor = 'red';
+              iconText = 'Off';
+            }
+
+            return (
+              <div style={{ color: iconColor, fontSize: "1.2rem" }}>
+                <IoMdBatteryCharging />
+              </div>
+            );
+          })()}
+        </CTableDataCell>
+
+        {/* Track */}
+        <CTableDataCell className="text-center status table-cell">
+                        <button className="btn btn-primary" onClick={() => handleClick(item)}>
+                          Live Track
+                        </button>
                       </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.user.name}</div>
-                        <div className="small text-body-secondary text-nowrap">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
-                        </div>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="d-flex justify-content-between text-nowrap">
-                          <div className="fw-semibold">{item.usage.value}%</div>
-                          <div className="ms-3">
-                            <small className="text-body-secondary">{item.usage.period}</small>
-                          </div>
-                        </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.payment.icon} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="small text-body-secondary text-nowrap">Last login</div>
-                        <div className="fw-semibold text-nowrap">{item.activity}</div>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
+      </CTableRow>
+    ))}
+  </CTableBody>
+</CTable>
+
+              </div>
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
+      <WidgetsBrand className="mb-4" withCharts />
     </>
   )
 }
