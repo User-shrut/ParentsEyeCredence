@@ -21,8 +21,9 @@
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",
-    "@coreui/coreui": "^5.0.2",
-    "@coreui/coreui-free-react-admin-template": "file:",
+
+    "@coreui/coreui": "^5.1.2",
+
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-react": "^2.2.1",
     "@coreui/react": "^5.1.0",
@@ -30,6 +31,7 @@
     "@coreui/utils": "^2.0.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.0.2",
     "@mui/x-date-pickers": "^7.16.0",
     "@popperjs/core": "^2.11.8",
@@ -65,7 +67,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "postcss": "^8.4.38",
     "prettier": "3.3.2",
-    "sass": "^1.77.5",
+    "sass": "^1.79.2",
     "vite": "^5.4.3"
   }
 }
