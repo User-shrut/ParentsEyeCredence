@@ -29,6 +29,7 @@
     "@coreui/utils": "^2.0.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.0.2",
     "@mui/x-date-pickers": "^7.16.0",
     "@popperjs/core": "^2.11.8",
