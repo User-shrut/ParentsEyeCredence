@@ -1,365 +1,1193 @@
-import React from 'react'
-import classNames from 'classnames'
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
-  CAvatar,
-  CButton,
-  CButtonGroup,
-  CCard,
-  CCardBody,
-  CCardFooter,
-  CCardHeader,
-  CCol,
-  CProgress,
-  CRow,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cibGoogle,
-  cibFacebook,
-  cibLinkedin,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-  cibTwitter,
-  cilCloudDownload,
-  cilPeople,
-  cilUser,
-  cilUserFemale,
-} from '@coreui/icons'
+  TableContainer,
+  Paper,
+  IconButton,
+  Dialog,
+  DialogContent,
+  Typography,
+  Button,
+  InputBase,
+  Modal,
+  Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri';
+import { AiFillDelete } from 'react-icons/ai';
+import SearchIcon from '@mui/icons-material/Search';
+import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { useNavigate } from 'react-router-dom';
+import Loader from "../../components/Loader/Loader";
+import CloseIcon from '@mui/icons-material/Close'; 
+// import "./table.css";
+// import { FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
+const getStatusColor = (status) => (status === 'online' ? 'green' : 'red');
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
+const Users = () => {
+  const [open, setOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false); 
+  const [editModalOpen, setEditModalOpen] = useState(false);// Modal for adding a new row
+  const [formData, setFormData] = useState({}); // Form data state
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [totalResponses, setTotalResponses] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+  const [filteredRows, setFilteredRows] = useState([]);
+  // const handleModalClose = () => setAddModalOpen(false);
+  const [filteredData, setFilteredData] = useState([]); // Your initial data
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [permissionOpen, setPermissionOpen] = useState(false);
 
-import WidgetsBrand from '../widgets/WidgetsBrand'
-import WidgetsDropdown from '../widgets/WidgetsDropdown'
-import MainMap from '../Map/MapComponent';
-
-const Dashboard = () => {
-  const progressExample = [
-    { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
-    { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
-    { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
-    { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
-    { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ]
-
-  const progressGroupExample1 = [
-    { title: 'Monday', value1: 34, value2: 78 },
-    { title: 'Tuesday', value1: 56, value2: 94 },
-    { title: 'Wednesday', value1: 12, value2: 67 },
-    { title: 'Thursday', value1: 43, value2: 91 },
-    { title: 'Friday', value1: 22, value2: 73 },
-    { title: 'Saturday', value1: 53, value2: 82 },
-    { title: 'Sunday', value1: 9, value2: 69 },
-  ]
-
-  const progressGroupExample2 = [
-    { title: 'Male', icon: cilUser, value: 53 },
-    { title: 'Female', icon: cilUserFemale, value: 43 },
-  ]
-
-  const progressGroupExample3 = [
-    { title: 'Organic Search', icon: cibGoogle, percent: 56, value: '191,235' },
-    { title: 'Facebook', icon: cibFacebook, percent: 15, value: '51,223' },
-    { title: 'Twitter', icon: cibTwitter, percent: 11, value: '37,564' },
-    { title: 'LinkedIn', icon: cibLinkedin, percent: 8, value: '27,319' },
-  ]
-
-  const tableExample = [
+  const [attributesOpen, setAttributesOpen] = useState(false); 
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setAddModalOpen(false);
+    // setFormData({});
+  };
+  // const [editModalOpen, setEditModalOpen] = useState(false);
+// const [formData, setFormData] = useState({});
+  const columns = [
     {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
+      Header: 'ID',
+      accessor: 'id',
     },
     {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
+      Header: 'Name',
+      accessor: 'name',
     },
     {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
+      Header: 'Password',
+      accessor: 'password',
     },
     {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
+      Header: 'Email',
+      accessor: 'email',
     },
     {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
+      Header: 'Custom Map',
+      accessor: 'attributes.custommap',
     },
     {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
+      Header: 'Custom Overlay',
+      accessor: 'attributes.customoverlay',
     },
-  ]
+    {
+      Header: 'Default Map',
+      accessor: 'map',
+    },
+    {
+      Header: 'Coordinate Format',
+      accessor: 'coordinateFormat',
+    },
+    {
+      Header: 'Speed Unit',
+      accessor: 'attributes.speedUnit',
+    },
+    {
+      Header: 'Altitude',
+      accessor: 'attributes.altitudeUnit',
+    },
+    {
+      Header: 'Volume',
+      accessor: 'attributes.volumeUnit',
+    },
+    {
+      Header: 'Time',
+      accessor: 'attributes.time',
+    },
+    {
+      Header: 'Default Map',
+      accessor: 'map',
+    },
+   
+    {
+      Header: 'Speed',
+      accessor: 'attributes.speed',
+    },
+    {
+      Header: 'Distance',
+      accessor: 'attributes.distance',
+    },
+   
+   
+    {
+      Header: 'Time',
+      accessor: 'attributes.time',
+    },
+    {
+      Header: 'Location',
+      accessor: 'attributes.loc',
+    },
+    {
+      Header: 'Permission',
+      accessor: 'attributes.per',
+    },
+    { Header: 'File', 
+      accessor: 'attributes.file' },
+    {
+      Header: 'All Attri',
+      accessor: 'attributes.attri'
+    },
+   
+    {
+      Header: 'Phone',
+      accessor: 'phone',
+    },
+    // {
+    //   Header: 'Timezone',
+    //   accessor: 'attributes.timezone',
+    // },
+    {
+      Header: 'POI Layer',
+      accessor: 'attributes.poi',
+    },
+    {
+      Header: 'Announcement',
+      accessor: 'attributes.announce',
+    },
+   
+   
+   
+    
+   
+    
+    
+    {
+      Header: 'Registration',
+      accessor: 'registration',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Read Only',
+      accessor: 'readonly',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Device Read Only',
+      accessor: 'deviceReadonly',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Map Type',
+      accessor: 'map',
+    },
+    {
+      Header: 'Latitude',
+      accessor: 'latitude',
+      Cell: ({ value }) => value.toFixed(5),
+    },
+    {
+      Header: 'Longitude',
+      accessor: 'longitude',
+      Cell: ({ value }) => value.toFixed(5),
+    },
+    {
+      Header: 'Zoom',
+      accessor: 'zoom',
+    },
+    {
+      Header: '12-Hour Format',
+      accessor: 'twelveHourFormat',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Force Settings',
+      accessor: 'forceSettings',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    
+    {
+      Header: 'Limit Commands',
+      accessor: 'limitCommands',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Disable Reports',
+      accessor: 'disableReports',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Fixed Email',
+      accessor: 'fixedEmail',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'POI Layer',
+      accessor: 'poiLayer',
+    },
+    {
+      Header: 'Announcement',
+      accessor: 'announcement',
+    },
+    {
+      Header: 'Email Enabled',
+      accessor: 'emailEnabled',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Geocoder Enabled',
+      accessor: 'geocoderEnabled',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Text Enabled',
+      accessor: 'textEnabled',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Storage Space',
+      accessor: 'storageSpace',
+      // Cell: ({ value }) => value.map(v => (v / (1024 ** 3)).toFixed(2) + ' GB').join(', '),
+      Cell: ({ value }) => Array.isArray(value) ? value.map(v => (v / (1024 ** 3)).toFixed(2) + ' GB').join(', ') : 'N/A',
+  
+    },
+    {
+      Header: 'New Server',
+      accessor: 'newServer',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Open ID Enabled',
+      accessor: 'openIdEnabled',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Open ID Force',
+      accessor: 'openIdForce',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Version',
+      accessor: 'version',
+    },
+   
+  
+     {
+      Header: 'Expiration Time',
+      accessor: 'expirationTime',
+      Cell: ({ value }) => {
+        if (!value) return 'N/A';
+        const date = new Date(value);
+        return date.toLocaleDateString(); // Format as MM/DD/YYYY or your locale's format
+      },
+    },
+   
+    {
+      Header: 'TOTP Key',
+      accessor: 'totpKey',
+    },
+     {
+      Header: 'Temporary',
+      accessor: 'temporary',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    // {
+    //   Header: 'Password',
+    //   accessor: 'password',
+    // },
+    {
+      Header: 'Address',
+      accessor: 'attributes.address',
+    },
+    // {
+    //   Header: 'Timezone',
+    //   accessor: 'attributes.timezone',
+    // },
+    {
+      Header: 'Company',
+      accessor: 'attributes.company',
+    },
+    {
+      Header: 'Map Follow',
+      accessor: 'attributes.mapFollow',
+      Cell: ({ value }) => (value ? 'Yes' : 'No'),
+    },
+    {
+      Header: 'Map Live Routes',
+      accessor: 'attributes.mapLiveRoutes',
+    },
+    {
+      Header: 'Map Direction',
+      accessor: 'attributes.mapDirection',
+    },
+    // {
+    //   Header: 'Speed Unit',
+    //   accessor: 'attributes.speedUnit',
+    // },
+     {
+      Header: 'Active Map Styles',
+      accessor: 'attributes.activeMapStyles',
+    },
+    {
+      Header: 'Device Secondary',
+      accessor: 'attributes.deviceSecondary',
+    },
+    {
+      Header: 'Sound Events',
+      accessor: 'attributes.soundEvents',
+    },
+    {
+      Header: 'Sound Alarms',
+      accessor: 'attributes.soundAlarms',
+    },
+    {
+      Header: 'Position Items',
+      accessor: 'attributes.positionItems',
+    },
+    // {
+    //   Header: 'Admin',
+    //   accessor: 'administrator',
+    //   Cell: ({ value }) => (value === true || value === "true" ? 'Yes' : 'No'),
+
+    // },
+    // {
+    //   Header: 'Disable',
+    //   accessor: 'disabled',
+    //   Cell: ({ value }) => (value === true || value === "true" ? 'Yes' : 'No'),
+
+    // }
+    {
+      Header: 'Admin',
+      accessor: 'administrator',
+      Cell: ({ value }) => {
+        console.log('Administrator value:', value); // Log to see if value exists
+        return value ? 'Yes' : 'No';
+      },
+    },
+    {
+      Header: 'Disable',
+      accessor: 'disabled',
+      Cell: ({ value }) => {
+        console.log('Disabled value:', value); // Log to see if value exists
+        return value ? 'Yes' : 'No';
+      },
+    }
+  ];
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "12%",
+    transform: "translate(-50%, -50%)",
+    width: "25%",
+    height: "101%",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    overflowY: "auto", // Enable vertical scrolling
+    display: "flex",
+    flexDirection: "column",
+    padding: "1rem",
+    margintop:'8px'
+  };
+  /* Replace -ms-high-contrast with forced-colors */
+
+
+  
+  const fetchData = async () => {
+    setLoading(true); // Start loading
+    try {
+      const username = 'hbtrack';
+      const password = '123456@';
+      const token = btoa(`${username}:${password}`);
+
+      const response = await axios.get('http://104.251.212.84/api/users', {
+        headers: {
+          Authorization: `Basic ${token}`,
+        },
+      });
+
+      if (Array.isArray(response.data)) {
+        setData(response.data);
+        setTotalResponses(response.data.length);
+      } else {
+        console.error('Expected an array but got:', response.data);
+        alert('Unexpected data format received.');
+      }
+    } catch (error) {
+      console.error('Fetch data error:', error);
+      alert('An error occurred while fetching data.');
+    } finally {
+      setLoading(false); // Stop loading once data is fetched
+    }
+  };
+  
+
+
+  useEffect(() => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    setFilteredData(data.filter(item =>
+      columns.some(column =>
+        item[column.accessor]?.toString().toLowerCase().includes(lowerCaseQuery)
+      )
+    ));
+  }, [data, searchQuery, columns]);
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+ 
+  const handleAddSubmit = async () => {
+    try {
+      // Define the API endpoint and credentials
+      const apiUrl = "https://rocketsalestracker.com/api/devices"; // Replace with actual API endpoint
+      const username = "school"; // Replace with your actual username
+      const password = "123456"; // Replace with your actual password
+      const token = btoa(`${username}:${password}`); // Encode credentials in Base64
+  
+      // Prepare the new row object based on the expected schema
+      const newRow = {
+        name: formData.name, // Ensure formData has 'name'
+        uniqueId: formData.uniqueId, // Ensure formData has 'uniqueId'
+        groupId: formData.groupId, // Ensure formData has 'groupId'
+        attributes: formData.attributes || {}, // Ensure formData has 'attributes' (empty object if not provided)
+        calendarId: formData.calendarId, // Ensure formData has 'calendarId'
+        status: formData.status, // Ensure formData has 'status'
+        phone: formData.phone, // Ensure formData has 'phone'
+        model: formData.model, // Ensure formData has 'model'
+        expirationTime: formData.expirationTime, // Ensure formData has 'expirationTime'
+        contact: formData.contact, // Ensure formData has 'contact'
+        category: formData.category, // Ensure formData has 'category'
+      };
+  
+      // POST request to the server with Basic Auth
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Basic ${token}`, // Add Basic Auth header
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRow),
+      });
+  
+      // Parse the JSON response
+      const result = await response.json();
+  
+      if (response.ok) {
+        // Update the state with the new row
+        setFilteredRows([...filteredRows, result]);
+  
+        // Close the modal and refresh data
+        handleModalClose();
+        fetchData();
+  
+        console.log("Record created successfully:", result);
+        alert("Record created successfully");
+      } else {
+        // Log and alert the specific server response in case of an error
+        console.error("Server responded with:", result);
+        alert(`Unable to create record: ${result.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error during POST request:", error);
+      alert("Unable to create record");
+      // Handle the error appropriately (e.g., show a notification to the user)
+    }
+    fetchData();
+  };
+  const [groups, setGroups] = useState([]);
+  // const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch('https://rocketsalestracker.com/api/groups', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Basic ' + btoa('school:123456') // Replace with actual credentials
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+  
+        const data = await response.json();
+        setGroups(data); // Assuming the API returns { groups: [...] }
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+  
+    fetchGroups();
+  }, []);
+  const [calendars, setCalendars] = useState([]); // State to store calendar data
+const [calendarError, setCalendarError] = useState(null); // State to store error
+
+useEffect(() => {
+  const fetchCalendars = async () => {
+    try {
+      const response = await fetch('https://rocketsalestracker.com/api/calendars', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Basic ' + btoa('school:123456') // Replace with actual credentials
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setCalendars(data); // Assuming the API returns { calendars: [...] }
+    } catch (error) {
+      setCalendarError(error.message);
+    }
+  };
+
+  fetchCalendars();
+}, []);
+
+
+
+const handleDeleteSelected = async (id) => {
+  if (window.confirm("Are you sure you want to delete this record?")) {
+    try {
+      const username = "school"; // Replace with your actual username
+      const password = "123456"; // Replace with your actual password
+      const token = btoa(`${username}:${password}`); // Encode credentials in Base64
+
+      const response = await fetch(`https://rocketsalestracker.com/api/devices/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Basic ${token}`
+        },
+      });
+
+      if (response.ok) {
+        // Update the state to remove the deleted row
+        setFilteredData(filteredData.filter((item) => item.id !== id));
+        alert("Record deleted successfully");
+      } else {
+        const result = await response.json();
+        console.error("Server responded with:", result);
+        alert(`Unable to delete record: ${result.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error during DELETE request:", error);
+      alert("Unable to delete record. Please check the console for more details.");
+    }
+  }
+};
+// const handleEditSubmit = () => {
+//   // setEditModalOpen(true);
+// };
+
+
+const handleEditIconClick = (row) => {
+  setSelectedRow(row); // Set the selected row to be edited
+  setFormData(row); // Populate form with the row's data
+  setEditModalOpen(true); // Open the modal
+};
+
+const handleEditSubmit = async () => {
+  if (!selectedRow) {
+    alert("No row selected for editing");
+    return;
+  }
+
+  const apiUrl = `https://rocketsalestracker.com/api/devices/${selectedRow.id}`;
+  const username = "school";
+  const password = "123456";
+  const token = btoa(`${username}:${password}`);
+
+  // Exclude the 'isSelected' field from formData
+  const { isSelected, ...updatedData } = formData;
+
+  try {
+    console.log("Sending request to:", apiUrl);
+    console.log("Request payload:", JSON.stringify(updatedData, null, 2));
+
+    const response = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Basic ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
+    if (!response.ok) {
+      const errorResult = await response.json();
+      console.error("Error response:", errorResult);
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`);
+    }
+
+    const result = await response.json();
+    console.log("Update successful:", result);
+    alert("Updated successfully");
+
+    // Update the local state with the modified row data
+    const updatedRows = filteredRows.map((row) =>
+      row.id === selectedRow.id ? { ...row, ...updatedData } : row
+    );
+    setFilteredRows(updatedRows);
+
+    handleModalClose();
+    fetchData(); // Refetch the data to ensure the UI is up-to-date
+  } catch (error) {
+    console.error("Error updating row:", error.message, error.stack);
+    alert("Error updating data");
+  }
+  handleModalClose();
+};
+
+
 
   return (
-    <>
-      <WidgetsDropdown className="mb-4" />
-      <CCard className="mb-4">
-        <CCardBody>
-          <CRow>
-            <CCol sm={7} className="d-none d-md-block"></CCol>
-          </CRow>
-          <MainMap />
-        </CCardBody>
-        <CCardFooter>
-          <CRow
-            xs={{ cols: 1, gutter: 4 }}
-            sm={{ cols: 2 }}
-            lg={{ cols: 4 }}
-            xl={{ cols: 5 }}
-            className="mb-2 text-center"
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '10px' }}>
+        <Typography variant="h6" gutterBottom>
+          Users Table
+        </Typography>
+        {/* <IconButton onClick={() => setAddModalOpen(true)}>
+          <RiAddBoxFill style={{ fontSize: '25px', color: 'orange' }} />
+        </IconButton>  */}
+
+       <div style={{display:'flex',gap:'15px'}}>
+       <InputBase
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ marginRight: '5px', backgroundColor: '#f0f0f0', borderRadius: '5px', padding: '5px 10px',border:'0.5px solid grey',marginTop:"7px" }}
+        />
+        {/* <IconButton onClick={() => setAddModalOpen(true)}>
+                        <RiAddBoxFill style={{ fontSize: '25px', color: 'orange' }} />
+        </IconButton> */}
+        <Button 
+  onClick={() => setAddModalOpen(true)} 
+  variant="contained" 
+  style={{ backgroundColor: '#52a052', color: 'white', fontSize: '12px',height:'43px',borderRadius:"5px",marginTop:'7px' }}
+>
+  Add
+</Button>
+       </div>
+        
+      </div>
+
+      
+
+ 
+    <TableContainer 
+  component={Paper}  
+  sx={{ 
+    height: '500px', // Set the desired height
+    overflow: 'auto', // Enable scrollbar when content overflows
+  }}
+>
+  {loading ? (
+    <Loader />
+  ) : (
+    // <CTable align="middle" className="mb-0 border" hover responsive>
+    //   <CTableHead className="text-nowrap">
+    //     <CTableRow>
+    //       {columns.map((column, index) => (
+    //         <CTableHeaderCell key={index} className="bg-body-tertiary text-center">
+    //           {column.Header}
+    //         </CTableHeaderCell>
+    //       ))}
+    //       <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
+    //     </CTableRow>
+    //   </CTableHead>
+    //   <CTableBody>
+    //     {filteredData.map((item, index) => (
+    //       <CTableRow key={index}>
+    //         {columns.map((column, i) => (
+    //           <CTableDataCell key={i} className="text-center">
+    //             {item[column.accessor]}
+    //           </CTableDataCell>
+    //         ))}
+    //         <CTableDataCell className="text-center d-flex">
+    //           <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
+    //             <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
+    //           </IconButton>
+    //           <IconButton
+    //             aria-label="delete"
+    //             onClick={() => handleDeleteSelected(item.id)} // Pass the item's unique ID to handleDeleteSelected
+    //             sx={{ marginRight: "10px", color: "brown" }}
+    //           >
+    //             <AiFillDelete style={{ fontSize: "25px" }} />
+    //           </IconButton>
+    //         </CTableDataCell>
+    //       </CTableRow>
+    //     ))}
+    //   </CTableBody>
+    // </CTable>
+    <CTable align="middle" className="mb-0 border" hover responsive>
+  <CTableHead className="text-nowrap">
+    <CTableRow>
+      {columns
+        .filter(column => 
+          ['id', 'name', 'email', 'administrator', 'disabled', 'expirationTime'].includes(column.accessor)
+        )
+        .map((column, index) => (
+          <CTableHeaderCell key={index} className="bg-body-tertiary text-center">
+            {column.Header}
+          </CTableHeaderCell>
+        ))}
+      <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
+    </CTableRow>
+  </CTableHead>
+  <CTableBody>
+    {filteredData.map((item, index) => (
+      <CTableRow key={index}>
+        {columns
+          .filter(column => 
+            ['id', 'name', 'email', 'administrator', 'disabled', 'expirationTime'].includes(column.accessor)
+          )
+          .map((column, i) => (
+            <CTableDataCell key={i} className="text-center">
+              {item[column.accessor]}
+            </CTableDataCell>
+          ))}
+        <CTableDataCell className="text-center d-flex">
+          <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
+            <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
+          </IconButton>
+          <IconButton
+            aria-label="delete"
+            onClick={() => handleDeleteSelected(item.id)}
+            sx={{ marginRight: "10px", color: "brown" }}
           >
-            {progressExample.map((item, index, items) => (
-              <CCol
-                className={classNames({
-                  'd-none d-xl-block': index + 1 === items.length,
-                })}
-                key={index}
+            <AiFillDelete style={{ fontSize: "25px" }} />
+          </IconButton>
+        </CTableDataCell>
+      </CTableRow>
+    ))}
+  </CTableBody>
+</CTable>
+
+  )}
+</TableContainer>
+
+
+
+
+
+
+
+
+   
+   {/* <Modal open={addModalOpen} onClose={handleModalClose}>
+  <Box sx={style}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
+      <Typography variant="h6">Add Device</Typography>
+      <IconButton onClick={handleModalClose}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+
+    {/* Group ID dropdown 
+    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+      <InputLabel>Group ID</InputLabel>
+      <Select
+        name="groupId"
+        value={formData.groupId || ''}
+        onChange={handleInputChange}
+        label="Group ID"
+      >
+        {groups.map((group) => (
+          <MenuItem key={group.id} value={group.id}>
+            {group.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+
+    {/* Calendar ID dropdown 
+    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+      <InputLabel>Calendar ID</InputLabel>
+      <Select
+        name="calendarId"
+        value={formData.calendarId || ''}
+        onChange={handleInputChange}
+        label="Calendar ID"
+      >
+        {calendars.map((calendar) => (
+          <MenuItem key={calendar.id} value={calendar.id}>
+            {calendar.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+
+    {/* Other fields like Name, Unique ID, etc 
+    {columns.slice(3, -1).map((col) => (
+      <TextField
+        key={col.accessor}
+        label={col.Header}
+        variant="outlined"
+        name={col.accessor}
+        value={formData[col.accessor] || ''}
+        onChange={handleInputChange}
+        fullWidth
+        sx={{ marginBottom: 2 }}
+      />
+    ))}
+
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleAddSubmit}
+      sx={{ marginTop: 2 }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal> */}
+<Modal open={addModalOpen} onClose={handleModalClose}>
+  <Box sx={style}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
+      <h2 style={{ flexGrow: 1 }}>Add Row</h2>
+      <IconButton onClick={handleModalClose}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+
+    {/* Mapping through columns and rendering specific inputs for each accessor */}
+    {columns.slice(0, -22).map((col) => (
+      col.accessor === 'map' && col.Header === 'Default Map' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="maps-select-label">Default Map</InputLabel>
+          <Select
+            labelId="maps-select-label"
+            label="Default Map"
+            name={col.accessor}
+            value={formData[col.accessor] || ''}
+            onChange={handleInputChange}
+          >
+            {/* Map options */}
+            <MenuItem value={"LocationIQ Streets"}>LocationIQ Streets</MenuItem>
+            <MenuItem value={"LocationIQ Dark"}>LocationIQ Dark</MenuItem>
+            <MenuItem value={"OpenStreet Map"}>OpenStreet Map</MenuItem>
+            <MenuItem value={"OpenTopoMap"}>OpenTopoMap</MenuItem>
+            <MenuItem value={"Carto Basemaps"}>Carto Basemaps</MenuItem>
+            <MenuItem value={"Google Road"}>Google Road</MenuItem>
+            <MenuItem value={"Google Satellite"}>Google Satellite</MenuItem>
+            <MenuItem value={"Google Hybrid"}>Google Hybrid</MenuItem>
+            <MenuItem value={"Auto Navi"}>Auto Navi</MenuItem>
+            <MenuItem value={"Ordnance Survey"}>Ordnance Survey</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'coordinateFormat' && col.Header === 'Coordinate Format' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="coordinates-select-label">Coordinate Format</InputLabel>
+          <Select
+            labelId="coordinates-select-label"
+            label="Coordinate Format"
+            name={col.accessor}
+            value={formData[col.accessor] || ''}
+            onChange={handleInputChange}
+          >
+            {/* Coordinate format options */}
+            <MenuItem value={"dd"}>Decimal Degrees</MenuItem>
+            <MenuItem value={"ddm"}>Degrees Decimal Minutes</MenuItem>
+            <MenuItem value={"dms"}>Degrees Minutes Seconds</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'attributes.speedUnit' && col.Header === 'Speed Unit' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="speed-select-label">Speed Unit</InputLabel>
+          <Select
+            labelId="speed-select-label"
+            label="Speed Unit"
+            name="attributes.speedUnit" // Directly access nested field
+            value={formData.attributes?.speedUnit || ''}
+            onChange={handleInputChange}
+          >
+            {/* Speed unit options */}
+            <MenuItem value={"kn"}>kn</MenuItem>
+            <MenuItem value={"km/h"}>km/h</MenuItem>
+            <MenuItem value={"mph"}>mph</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'attributes.distance' && col.Header === 'Distance' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="distance-select-label">Distance Unit</InputLabel>
+          <Select
+            labelId="distance-select-label"
+            label="Distance Unit"
+            name="attributes.distance"
+            value={formData.attributes?.distance || ''}
+            onChange={handleInputChange}
+          >
+            {/* Distance unit options */}
+            <MenuItem value={"km"}>km</MenuItem>
+            <MenuItem value={"mi"}>mi</MenuItem>
+            <MenuItem value={"nmi"}>nmi</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'attributes.altitudeUnit' && col.Header === 'Altitude' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="altitude-select-label">Altitude Unit</InputLabel>
+          <Select
+            labelId="altitude-select-label"
+            label="Altitude Unit"
+            name="attributes.altitudeUnit"
+            value={formData.attributes?.altitudeUnit || ''}
+            onChange={handleInputChange}
+          >
+            {/* Altitude unit options */}
+            <MenuItem value={"m"}>m</MenuItem>
+            <MenuItem value={"ft"}>ft</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'attributes.volumeUnit' && col.Header === 'Volume' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="volume-select-label">Volume Unit</InputLabel>
+          <Select
+            labelId="volume-select-label"
+            label="Volume Unit"
+            name="attributes.volumeUnit"
+            value={formData.attributes?.volumeUnit || ''}
+            onChange={handleInputChange}
+          >
+            {/* Volume unit options */}
+            <MenuItem value={"ltr"}>Liter</MenuItem>
+            <MenuItem value={"usGal"}>U.S. Gallon</MenuItem>
+            <MenuItem value={"impGal"}>Imp. Gallon</MenuItem>
+          </Select>
+        </FormControl>
+      ) : col.accessor === 'attributes.loc' && col.Header === 'Location' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="location-select-label">Location</InputLabel>
+          <Select
+            labelId="location-select-label"
+            label="Location"
+            name="attributes.loc"
+            value={formData.attributes?.loc || ''}
+            onChange={handleInputChange}
+            onClick={() => setLocationOpen(!locationOpen)}
+          >
+            <MenuItem value="Location Details">Location Details</MenuItem>
+          </Select>
+
+          {locationOpen && (
+            <Box mt={2}>
+              <TextField
+                label="Latitude"
+                variant="outlined"
+                name="latitude"
+                type="number"
+                value={formData.latitude || 0}
+                onChange={handleInputChange}
+                inputProps={{ step: 1 }}
+                sx={{ marginBottom: "10px" }}
+                fullWidth
+              />
+              <TextField
+                label="Longitude"
+                variant="outlined"
+                name="longitude"
+                type="number"
+                value={formData.longitude || 0}
+                onChange={handleInputChange}
+                inputProps={{ step: 1 }}
+                sx={{ marginBottom: "10px" }}
+                fullWidth
+              />
+              <TextField
+                label="Zoom"
+                variant="outlined"
+                name="zoom"
+                value={formData.zoom || ''}
+                onChange={handleInputChange}
+                sx={{ marginBottom: "10px" }}
+                fullWidth
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCurrentLocation}
+                sx={{ marginTop: "10px" }}
               >
-                <div className="text-body-secondary">{item.title}</div>
-                <div className="fw-semibold text-truncate">
-                  {item.value} ({item.percent}%)
-                </div>
-                <CProgress thin className="mt-2" color={item.color} value={item.percent} />
-              </CCol>
-            ))}
-          </CRow>
-        </CCardFooter>
-      </CCard>
-      <WidgetsBrand className="mb-4" withCharts />
-      <CRow>
-        <CCol xs>
-          <CCard className="mb-4">
-            <CCardHeader>Traffic {' & '} Sales</CCardHeader>
-            <CCardBody>
-              <CRow>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-info py-1 px-3">
-                        <div className="text-body-secondary text-truncate small">New Clients</div>
-                        <div className="fs-5 fw-semibold">9,123</div>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">
-                          Recurring Clients
-                        </div>
-                        <div className="fs-5 fw-semibold">22,643</div>
-                      </div>
-                    </CCol>
-                  </CRow>
-                  <hr className="mt-0" />
-                  {progressGroupExample1.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-prepend">
-                        <span className="text-body-secondary small">{item.title}</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="info" value={item.value1} />
-                        <CProgress thin color="danger" value={item.value2} />
-                      </div>
-                    </div>
-                  ))}
-                </CCol>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Pageviews</div>
-                        <div className="fs-5 fw-semibold">78,623</div>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Organic</div>
-                        <div className="fs-5 fw-semibold">49,123</div>
-                      </div>
-                    </CCol>
-                  </CRow>
+                Current Location
+              </Button>
+            </Box>
+          )}
+        </FormControl>
+      ) : col.accessor === 'attributes.per' && col.Header === 'Permission' ? (
+        <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
+          <InputLabel id="permission-select-label">Permission</InputLabel>
+          <Select
+            labelId="permission-select-label"
+            label="Permission"
+            name="attributes.per"
+            value={formData.attributes?.per || ''}
+            onChange={handleInputChange}
+            onClick={() => setPermissionOpen(!permissionOpen)}
+          >
+            <MenuItem value="Permission Details">Permission Details</MenuItem>
+          </Select>
 
-                  <hr className="mt-0" />
+          {permissionOpen && (
+            <Box mt={2}>
+              {[{ label: 'Registration', accessor: 'registration' }, { label: 'Readonly', accessor: 'readonly' }, { label: 'Device Readonly', accessor: 'deviceReadonly' }, { label: 'Limit Commands', accessor: 'limitCommands' }, { label: 'Disable Reports', accessor: 'disableReports' }, { label: 'No Email Change', accessor: 'fixedEmail' }].map(({ label, accessor }) => (
+                <TextField
+                  key={accessor}
+                  label={label}
+                  variant="outlined"
+                  name={accessor}
+                  value={formData[accessor] || ''}
+                  onChange={handleInputChange}
+                  sx={{ marginBottom: "10px" }}
+                  fullWidth
+                />
+              ))}
+            </Box>
+          )}
+        </FormControl>
+      ) : (
+        // Default TextField for other columns
+        <TextField
+          key={col.accessor}
+          label={col.Header}
+          variant="outlined"
+          name={col.accessor}
+          value={formData[col.accessor] || ''}
+          onChange={handleInputChange}
+          sx={{ marginBottom: "10px" }}
+          fullWidth
+        />
+      )
+    ))}
+    
+    {/* Submit button */}
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleAddSubmit}
+      sx={{ marginTop: "20px" }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal>
 
-                  {progressGroupExample2.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">{item.value}%</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="warning" value={item.value} />
-                      </div>
-                    </div>
-                  ))}
+<Modal open={editModalOpen} onClose={handleModalClose}>
+  <Box sx={style}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
+      <Typography variant="h6">Edit Row</Typography>
+      <IconButton onClick={handleModalClose}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
 
-                  <div className="mb-5"></div>
+    {/* Group ID dropdown */}
+    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+      <InputLabel>Group ID</InputLabel>
+      <Select
+        name="groupId"
+        value={formData.groupId || ''}
+        onChange={handleInputChange}
+        label="Group ID"
+      >
+        {groups.map((group) => (
+          <MenuItem key={group.id} value={group.id}>
+            {group.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
 
-                  {progressGroupExample3.map((item, index) => (
-                    <div className="progress-group" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">
-                          {item.value}{' '}
-                          <span className="text-body-secondary small">({item.percent}%)</span>
-                        </span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="success" value={item.percent} />
-                      </div>
-                    </div>
-                  ))}
-                </CCol>
-              </CRow>
+    {/* Calendar ID dropdown */}
+    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+      <InputLabel>Calendar ID</InputLabel>
+      <Select
+        name="calendarId"
+        value={formData.calendarId || ''}
+        onChange={handleInputChange}
+        label="Calendar ID"
+      >
+        {calendars.map((calendar) => (
+          <MenuItem key={calendar.id} value={calendar.id}>
+            {calendar.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
 
-              <br />
+    {/* Category dropdown */}
+    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+      <InputLabel>Category</InputLabel>
+      <Select
+        name="category"
+        value={formData.category || ''}
+        onChange={handleInputChange}
+        label="Category"
+      >
+        <MenuItem value="Default">Default</MenuItem>
+        <MenuItem value="Animal">Animal</MenuItem>
+        <MenuItem value="Bicycle">Bicycle</MenuItem>
+      </Select>
+    </FormControl>
 
-              <CTable align="middle" className="mb-0 border" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      <CIcon icon={cilPeople} />
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">User</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Country
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Usage</CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Payment Method
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Activity</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {tableExample.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
-                      <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.user.name}</div>
-                        <div className="small text-body-secondary text-nowrap">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
-                        </div>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="d-flex justify-content-between text-nowrap">
-                          <div className="fw-semibold">{item.usage.value}%</div>
-                          <div className="ms-3">
-                            <small className="text-body-secondary">{item.usage.period}</small>
-                          </div>
-                        </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.payment.icon} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="small text-body-secondary text-nowrap">Last login</div>
-                        <div className="fw-semibold text-nowrap">{item.activity}</div>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
-    </>
-  )
-}
+    {/* Other fields */}
+    {columns.slice(3, -1).map((col) => (
+      <TextField
+        key={col.accessor}
+        label={col.Header}
+        variant="outlined"
+        name={col.accessor}
+        value={formData[col.accessor] || ''}
+        onChange={handleInputChange}
+        fullWidth
+        sx={{ marginBottom: 2 }}
+      />
+    ))}
 
-export default Dashboard
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleEditSubmit}
+      sx={{ marginTop: 2 }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal>
+
+
+
+    </div>
+  );
+};
+
+export default Users;
