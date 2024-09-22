@@ -1,22 +1,8 @@
 import React, { useState } from 'react'
-import { Link, useNavigate, useNavigation } from 'react-router-dom'
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardGroup,
-  CCol,
-  CContainer,
-  CForm,
-  CFormInput,
-  CInputGroup,
-  CInputGroupText,
-  CRow,
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import { Link, useNavigate, useNavigation } from 'react-router-dom';
 import axios from 'axios';
 import loginImg from '../../../assets/loginImg.png'
+
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -31,28 +17,41 @@ const Login = () => {
   }
 
   const handleLogin = async (e) => {
-    console.log(username)
-    console.log(password)
-
-    e.preventDefault()
-
+    e.preventDefault();
+  
+    // Ensure username and password are provided before sending the request
+    if (!username || !password) {
+      alert('Please enter both username and password');
+      return;
+    }
+  
     try {
-      const res = await axios.post(`${process.env.VITE_APP_API}/api/auth/login`, {
+      const response = await axios.post(`http://63.142.251.13:4000/superadmin/login`, {
         username,
         password,
-      })
-
-      const token = res.data.token
-      localStorage.setItem('authToken', token)
-      alert('login successfull')
-      navigate('/dashboard')
+      });
+  
+      // Assuming the token is returned in response.data.token
+      const { token } = response.data;
+  
+      // Store the token and navigate on success
+      if (token) {
+        console.log(token);
+        localStorage.setItem('token', token);
+        alert("successfully logged in")
+        navigate('/dashboard');
+      } else {
+        throw new Error('Invalid login response');
+      }
+  
     } catch (error) {
-      alert('Invalid credentials')
-      navigate('/dashboard')
+      console.error('Login error:', error);
+      alert('Invalid credentials');
     }
-  }
+  };
   return (
     <>
+      
       <div className="loginContainer">
         <div className="row" style={{ height: '98vh', width: '100%' }}>
           <div className="col-12 col-md-6">

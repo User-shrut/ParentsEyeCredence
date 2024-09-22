@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -24,15 +30,16 @@ import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTabl
 import { useNavigate } from 'react-router-dom';
 import Loader from "../../components/Loader/Loader";
 import CloseIcon from '@mui/icons-material/Close'; 
-// import "./table.css";
-// import { FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
+
+
 const getStatusColor = (status) => (status === 'online' ? 'green' : 'red');
 
 const Devices = () => {
   const [open, setOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false); 
   const [editModalOpen, setEditModalOpen] = useState(false);// Modal for adding a new row
-  const [formData, setFormData] = useState({}); // Form data state
+  const [formData, setFormData] = useState({}); 
+  const [anchorEl, setAnchorEl] = useState(null);// Form data state
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [totalResponses, setTotalResponses] = useState(0);
@@ -42,28 +49,26 @@ const Devices = () => {
   // const handleModalClose = () => setAddModalOpen(false);
   const [filteredData, setFilteredData] = useState([]); // Your initial data
   const [selectedRow, setSelectedRow] = useState(null);
+  const [users, setUsers] = useState([]);
   const handleModalClose = () => {
     setEditModalOpen(false);
     setAddModalOpen(false);
     // setFormData({});
   };
-  // const [editModalOpen, setEditModalOpen] = useState(false);
-// const [formData, setFormData] = useState({});
+  const [areasValue, setAreasValue] = useState("");
+
   const columns = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Group ID', accessor: 'groupId' },
-    { Header: 'Calendar ID', accessor: 'calendarId' },
-    { Header: 'Name', accessor: 'name' },
-    { Header: 'Unique ID', accessor: 'uniqueId' },
-    { Header: 'Last Update', accessor: 'lastUpdate', Cell: ({ value }) => new Date(value).toLocaleString() },
-    { Header: 'Position ID', accessor: 'positionId' },
-    { Header: 'Phone', accessor: 'phone' },
-    { Header: 'Model', accessor: 'model' },
-    { Header: 'Contact', accessor: 'contact' },
-    { Header: 'Category', accessor: 'category' },
-    { Header: 'Disabled', accessor: 'disabled', Cell: ({ value }) => (value ? 'Yes' : 'No') },
-    { Header: 'Expiration Time', accessor: 'expirationTime', Cell: ({ value }) => value ? new Date(value).toLocaleString() : 'N/A' },
-    { Header: 'Status', accessor: 'status' },
+  
+      { Header: 'Device Name', accessor: 'name' },
+      { Header: 'Imei No.', accessor: 'uniqueId' },
+      { Header: 'Groups', accessor: 'groupId' },
+      { Header: 'User', accessor: 'User' },
+      { Header: 'Geofence', accessor: 'geofence' },
+      { Header: 'Sim', accessor: 'Sim' },
+      { Header: 'Model', accessor: 'model' },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Expiration', accessor: 'expiration' },
+      
   ];
 
   useEffect(() => {
@@ -93,11 +98,11 @@ const Devices = () => {
   const fetchData = async () => {
     setLoading(true); // Start loading
     try {
-      const username = 'hbtrack';
-      const password = '123456@';
+      const username = 'school';
+      const password = '123456';
       const token = btoa(`${username}:${password}`);
 
-      const response = await axios.get('http://104.251.212.84/api/devices', {
+      const response = await axios.get('https://rocketsalestracker.com/api/devices', {
         headers: {
           Authorization: `Basic ${token}`,
         },
@@ -279,9 +284,7 @@ const handleDeleteSelected = async (id) => {
     }
   }
 };
-// const handleEditSubmit = () => {
-//   // setEditModalOpen(true);
-// };
+
 
 
 const handleEditIconClick = (row) => {
@@ -345,7 +348,83 @@ const handleEditSubmit = async () => {
   handleModalClose();
 };
 
+const [dropdownOptions, setDropdownOptions] = useState([]);
+const [areas, setAreas] = useState([]);
+useEffect(() => {
+  const fetchAreasData = async () => {
+    try {
+      const username = 'hbtrack'; // Replace with your actual username
+      const password = '123456@'; // Replace with your actual password
+      const token = btoa(`${username}:${password}`); // Base64 encode the username and password
 
+      const response = await fetch('http://104.251.212.84/api/geofences', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Basic ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('Geofence data: ', data);
+
+      // Transform data to create dropdown options
+      setAreas(data.map((item) => item.name));
+    } catch (error) {
+      console.error('Error fetching areas data:', error);
+      setError(error.message);
+    }
+  };
+
+  fetchAreasData();
+}, []);
+
+const fetchUsers = async () => {
+  console.log('Fetching users...');
+  try {
+    const username = "hbtrack";
+    const password = "123456@";
+    const token = btoa(`${username}:${password}`);
+
+    const response = await axios.get("http://104.251.212.84/api/users", {
+      headers: {
+        Authorization: `Basic ${token}`,
+      },
+    });
+
+    console.log('Fetched users:', response.data);
+
+    if (Array.isArray(response.data)) {
+      setUsers(response.data.map(user => ({ id: user.id, name: user.name })));
+    } else {
+      console.error('Expected an array but got:', response.data);
+    }
+  } catch (error) {
+    console.error('Fetch users error:', error);
+    alert('An error occurred while fetching users.');
+  }
+};
+
+// Fetch users on component mount
+useEffect(() => {
+  fetchUsers();
+}, []);
+ // Handle year selection for expiration date
+
+
+ const [showExpirationDropdown, setShowExpirationDropdown] = useState(false);
+
+  // Handle year selection and calculate expiration date based on the number of years selected
+  const handleYearSelection = (years) => {
+    const currentDate = new Date();
+    const expirationDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + years))
+      .toISOString()
+      .split("T")[0]; // Format to yyyy-mm-dd
+    handleInputChange({ target: { name: "expiration", value: expirationDate } });
+  };
 
   return (
     <div>
@@ -353,9 +432,6 @@ const handleEditSubmit = async () => {
         <Typography variant="h6" gutterBottom>
           Devices Table
         </Typography>
-        {/* <IconButton onClick={() => setAddModalOpen(true)}>
-          <RiAddBoxFill style={{ fontSize: '25px', color: 'orange' }} />
-        </IconButton>  */}
 
        <div style={{display:'flex',gap:'15px'}}>
        <InputBase
@@ -364,9 +440,7 @@ const handleEditSubmit = async () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ marginRight: '5px', backgroundColor: '#f0f0f0', borderRadius: '5px', padding: '5px 10px',border:'0.5px solid grey',marginTop:"7px" }}
         />
-        {/* <IconButton onClick={() => setAddModalOpen(true)}>
-                        <RiAddBoxFill style={{ fontSize: '25px', color: 'orange' }} />
-        </IconButton> */}
+       
         <Button 
   onClick={() => setAddModalOpen(true)} 
   variant="contained" 
@@ -429,88 +503,191 @@ const handleEditSubmit = async () => {
   )}
 </TableContainer>
 
+ 
+  <Modal open={addModalOpen} onClose={handleModalClose}>
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <Typography variant="h6">Add Device</Typography>
+          <IconButton onClick={handleModalClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Conditional rendering based on col.accessor */}
+        {columns.map((col) => {
+          if (col.accessor === "groupId") {
+            // Group ID dropdown
+            return (
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                <InputLabel>Group ID</InputLabel>
+                <Select
+                  name="groupId"
+                  value={formData.groupId || ""}
+                  onChange={handleInputChange}
+                  label="Group ID"
+                >
+                  {groups.map((group) => (
+                    <MenuItem key={group.id} value={group.id}>
+                      {group.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            );
+          } else if (col.accessor === 'User') {
+            // User dropdown
+            return (
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                <InputLabel>User</InputLabel>
+                <Select
+                  name="user"
+                  value={formData.user || ''}
+                  onChange={handleInputChange}
+                  label="User"
+                >
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            );
+          } else if (col.accessor === "category") {
+            // Category dropdown
+            return (
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  name="category"
+                  value={formData.category || ""}
+                  onChange={handleInputChange}
+                  label="Category"
+                >
+                  <MenuItem value="Default">Default</MenuItem>
+                  <MenuItem value="Animal">Animal</MenuItem>
+                  <MenuItem value="Bicycle">Bicycle</MenuItem>
+                </Select>
+              </FormControl>
+            );
+          } else if (col.accessor === "geofence") {
+            // Geofence dropdown (Areas)
+            return (
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                <InputLabel id="areas-label-5">Areas</InputLabel>
+                <Select
+                  labelId="areas-label-5"
+                  id="areas-select-5"
+                  value={formData.areas || ""}
+                  onChange={handleInputChange}
+                  label="Select Areas"
+                >
+                  <MenuItem value="All Areas">All Areas</MenuItem>
+                  {areas.map((area, index) => (
+                    <MenuItem key={index} value={area}>
+                      {area}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            );
+          } else if (col.accessor === "model") {
+            // Model dropdown with options v1, v2, v3, v4, v5
+            return (
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                <InputLabel>Model</InputLabel>
+                <Select
+                  name="model"
+                  value={formData.model || ""}
+                  onChange={handleInputChange}
+                  label="Model"
+                >
+                  <MenuItem value="v1">v1</MenuItem>
+                  <MenuItem value="v2">v2</MenuItem>
+                  <MenuItem value="v3">v3</MenuItem>
+                  <MenuItem value="v4">v4</MenuItem>
+                  <MenuItem value="v5">v5</MenuItem>
+                </Select>
+              </FormControl>
+            );
+          } else if (col.accessor === "expiration") {
+            // Expiration Date field with dropdown for years (1, 2, 3 years)
+            return (
+              <Box key={col.accessor} sx={{ marginBottom: 2 }}>
+                {/* Expiration Date TextField */}
+                <TextField
+                  label="Expiration Date"
+                  type="date"
+                  name="expiration"
+                  value={formData.expiration || ""}
+                  onChange={handleInputChange}
+                  onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true, // Ensures the label is always visible
+                  }}
+                />
+
+                {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
+                {showExpirationDropdown && (
+                  <FormControl fullWidth sx={{ marginTop: 1 }}>
+                    <InputLabel>Expiration Options</InputLabel>
+                    <Select
+                      value=""
+                      onChange={(e) => {
+                        handleYearSelection(parseInt(e.target.value));
+                        setShowExpirationDropdown(false); // Hide dropdown after selection
+                      }}
+                      label="Expiration Options"
+                    >
+                      <MenuItem value={1}>1 Year</MenuItem>
+                      <MenuItem value={2}>2 Years</MenuItem>
+                      <MenuItem value={3}>3 Years</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              </Box>
+            );
+          } else {
+            // Default TextField for other columns
+            return (
+              <TextField
+                key={col.accessor}
+                label={col.Header}
+                variant="outlined"
+                name={col.accessor}
+                value={formData[col.accessor] || ""}
+                onChange={handleInputChange}
+                fullWidth
+                sx={{ marginBottom: 2 }}
+              />
+            );
+          }
+        })}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddSubmit}
+          sx={{ marginTop: 2 }}
+        >
+          Submit
+        </Button>
+      </Box>
+    </Modal>
 
 
 
 
 
 
-
-   
-   <Modal open={addModalOpen} onClose={handleModalClose}>
-  <Box sx={style}>
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "20px",
-      }}
-    >
-      <Typography variant="h6">Add Device</Typography>
-      <IconButton onClick={handleModalClose}>
-        <CloseIcon />
-      </IconButton>
-    </Box>
-
-    {/* Group ID dropdown */}
-    <FormControl fullWidth sx={{ marginBottom: 2 }}>
-      <InputLabel>Group ID</InputLabel>
-      <Select
-        name="groupId"
-        value={formData.groupId || ''}
-        onChange={handleInputChange}
-        label="Group ID"
-      >
-        {groups.map((group) => (
-          <MenuItem key={group.id} value={group.id}>
-            {group.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-
-    {/* Calendar ID dropdown */}
-    <FormControl fullWidth sx={{ marginBottom: 2 }}>
-      <InputLabel>Calendar ID</InputLabel>
-      <Select
-        name="calendarId"
-        value={formData.calendarId || ''}
-        onChange={handleInputChange}
-        label="Calendar ID"
-      >
-        {calendars.map((calendar) => (
-          <MenuItem key={calendar.id} value={calendar.id}>
-            {calendar.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-
-    {/* Other fields like Name, Unique ID, etc */}
-    {columns.slice(3, -1).map((col) => (
-      <TextField
-        key={col.accessor}
-        label={col.Header}
-        variant="outlined"
-        name={col.accessor}
-        value={formData[col.accessor] || ''}
-        onChange={handleInputChange}
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      />
-    ))}
-
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={handleAddSubmit}
-      sx={{ marginTop: 2 }}
-    >
-      Submit
-    </Button>
-  </Box>
-</Modal>
 <Modal open={editModalOpen} onClose={handleModalClose}>
   <Box sx={style}>
     <Box
@@ -527,68 +704,157 @@ const handleEditSubmit = async () => {
       </IconButton>
     </Box>
 
-    {/* Group ID dropdown */}
-    <FormControl fullWidth sx={{ marginBottom: 2 }}>
-      <InputLabel>Group ID</InputLabel>
-      <Select
-        name="groupId"
-        value={formData.groupId || ''}
-        onChange={handleInputChange}
-        label="Group ID"
-      >
-        {groups.map((group) => (
-          <MenuItem key={group.id} value={group.id}>
-            {group.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    {/* Conditional rendering based on col.accessor */}
+    {columns.map((col) => {
+       if (col.accessor === "groupId") {
+        // Group ID dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Group ID</InputLabel>
+            <Select
+              name="groupId"
+              value={formData.groupId || ""}
+              onChange={handleInputChange}
+              label="Group ID"
+            >
+              {groups.map((group) => (
+                <MenuItem key={group.id} value={group.id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === 'User') {
+        // User dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>User</InputLabel>
+            <Select
+              name="user"
+              value={formData.user || ''}
+              onChange={handleInputChange}
+              label="User"
+            >
+              {users.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "category") {
+        // Category dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              value={formData.category || ""}
+              onChange={handleInputChange}
+              label="Category"
+            >
+              <MenuItem value="Default">Default</MenuItem>
+              <MenuItem value="Animal">Animal</MenuItem>
+              <MenuItem value="Bicycle">Bicycle</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "geofence") {
+        // Geofence dropdown (Areas)
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel id="areas-label-5">Areas</InputLabel>
+            <Select
+              labelId="areas-label-5"
+              id="areas-select-5"
+              value={formData.areas || ""}
+              onChange={handleInputChange}
+              label="Select Areas"
+            >
+              <MenuItem value="All Areas">All Areas</MenuItem>
+              {areas.map((area, index) => (
+                <MenuItem key={index} value={area}>
+                  {area}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "model") {
+        // Model dropdown with options v1, v2, v3, v4, v5
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Model</InputLabel>
+            <Select
+              name="model"
+              value={formData.model || ""}
+              onChange={handleInputChange}
+              label="Model"
+            >
+              <MenuItem value="v1">v1</MenuItem>
+              <MenuItem value="v2">v2</MenuItem>
+              <MenuItem value="v3">v3</MenuItem>
+              <MenuItem value="v4">v4</MenuItem>
+              <MenuItem value="v5">v5</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "expiration") {
+        // Expiration Date field with dropdown for years (1, 2, 3 years)
+        return (
+          <Box key={col.accessor} sx={{ marginBottom: 2 }}>
+            {/* Expiration Date TextField */}
+            <TextField
+              label="Expiration Date"
+              type="date"
+              name="expiration"
+              value={formData.expiration || ""}
+              onChange={handleInputChange}
+              onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
+              fullWidth
+              InputLabelProps={{
+                shrink: true, // Ensures the label is always visible
+              }}
+            />
 
-    {/* Calendar ID dropdown */}
-    <FormControl fullWidth sx={{ marginBottom: 2 }}>
-      <InputLabel>Calendar ID</InputLabel>
-      <Select
-        name="calendarId"
-        value={formData.calendarId || ''}
-        onChange={handleInputChange}
-        label="Calendar ID"
-      >
-        {calendars.map((calendar) => (
-          <MenuItem key={calendar.id} value={calendar.id}>
-            {calendar.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-
-    {/* Category dropdown */}
-    <FormControl fullWidth sx={{ marginBottom: 2 }}>
-      <InputLabel>Category</InputLabel>
-      <Select
-        name="category"
-        value={formData.category || ''}
-        onChange={handleInputChange}
-        label="Category"
-      >
-        <MenuItem value="Default">Default</MenuItem>
-        <MenuItem value="Animal">Animal</MenuItem>
-        <MenuItem value="Bicycle">Bicycle</MenuItem>
-      </Select>
-    </FormControl>
-
-    {/* Other fields */}
-    {columns.slice(3, -1).map((col) => (
-      <TextField
-        key={col.accessor}
-        label={col.Header}
-        variant="outlined"
-        name={col.accessor}
-        value={formData[col.accessor] || ''}
-        onChange={handleInputChange}
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      />
-    ))}
+            {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
+            {showExpirationDropdown && (
+              <FormControl fullWidth sx={{ marginTop: 1 }}>
+                <InputLabel>Expiration Options</InputLabel>
+                <Select
+                  value=""
+                  onChange={(e) => {
+                    handleYearSelection(parseInt(e.target.value));
+                    setShowExpirationDropdown(false); // Hide dropdown after selection
+                  }}
+                  label="Expiration Options"
+                >
+                  <MenuItem value={1}>1 Year</MenuItem>
+                  <MenuItem value={2}>2 Years</MenuItem>
+                  <MenuItem value={3}>3 Years</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          </Box>
+        );
+      }else {
+        // Default TextField for other columns
+        return (
+          <TextField
+            key={col.accessor}
+            label={col.Header}
+            variant="outlined"
+            name={col.accessor}
+            value={formData[col.accessor] || ""}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+        );
+      }
+    })}
 
     <Button
       variant="contained"
@@ -600,8 +866,6 @@ const handleEditSubmit = async () => {
     </Button>
   </Box>
 </Modal>
-
-
 
     </div>
   );
