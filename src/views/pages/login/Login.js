@@ -1,85 +1,115 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardGroup,
-  CCol,
-  CContainer,
-  CForm,
-  CFormInput,
-  CInputGroup,
-  CInputGroupText,
-  CRow,
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import React, { useState } from 'react'
+import { Link, useNavigate, useNavigation } from 'react-router-dom';
+import axios from 'axios';
+import loginImg from '../../../assets/loginImg.png'
+
 
 const Login = () => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const navigate = useNavigate()
+
+  const handleUserInput = (e) => {
+    setUsername(e.target.value)
+  }
+  const handlePasswordInput = (e) => {
+    setPassword(e.target.value)
+  }
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+  
+    // Ensure username and password are provided before sending the request
+    if (!username || !password) {
+      alert('Please enter both username and password');
+      return;
+    }
+  
+    try {
+      const response = await axios.post(`http://63.142.251.13:4000/superadmin/login`, {
+        username,
+        password,
+      });
+  
+      // Assuming the token is returned in response.data.token
+      const { token } = response.data;
+  
+      // Store the token and navigate on success
+      if (token) {
+        console.log(token);
+        localStorage.setItem('token', token);
+        alert("successfully logged in")
+        navigate('/dashboard');
+      } else {
+        throw new Error('Invalid login response');
+      }
+  
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Invalid credentials');
+    }
+  };
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
-      <CContainer>
-        <CRow className="justify-content-center">
-          <CCol md={8}>
-            <CCardGroup>
-              <CCard className="p-4">
-                <CCardBody>
-                  <CForm>
-                    <h1>Login</h1>
-                    <p className="text-body-secondary">Sign In to your account</p>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupText>
-                        <CIcon icon={cilUser} />
-                      </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
-                    </CInputGroup>
-                    <CInputGroup className="mb-4">
-                      <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
-                      </CInputGroupText>
-                      <CFormInput
-                        type="password"
-                        placeholder="Password"
-                        autoComplete="current-password"
-                      />
-                    </CInputGroup>
-                    <CRow>
-                      <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
-                          Login
-                        </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
-                        </CButton>
-                      </CCol>
-                    </CRow>
-                  </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
-                      </CButton>
-                    </Link>
-                  </div>
-                </CCardBody>
-              </CCard>
-            </CCardGroup>
-          </CCol>
-        </CRow>
-      </CContainer>
-    </div>
+    <>
+      
+      <div className="loginContainer">
+        <div className="row" style={{ height: '98vh', width: '100%' }}>
+          <div className="col-12 col-md-6">
+            <img src={loginImg} alt="" height='100%' width="100%" />
+          </div>
+          <div className="col-12 col-md-6 d-flex justify-content-center align-items-center">
+            <form className='w-50 border border-2 p-5 rounded-3'>
+            <h1>Login</h1>
+              <div className="mb-3">
+                <label htmlFor="exampleInputEmail1" className="form-label">
+                  Username
+                </label>
+                <div className="input-group mb-3">
+                  <span className="input-group-text" id="basic-addon1">
+                    👤
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Username"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+
+                
+              </div>
+              <div className="mb-3">
+                <label htmlFor="exampleInputPassword1" className="form-label">
+                  Password
+                </label>
+                <div className="input-group mb-3">
+                  <span className="input-group-text" id="basic-addon1">
+                    🔑
+                  </span>
+                  <input
+                    type="Password"
+                    className="form-control"
+                    placeholder="Username"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+              </div>
+              <div className="mb-3 form-check">
+                <input type="checkbox" className="form-check-input" id="exampleCheck1" />
+                <label className="form-check-label" htmlFor="exampleCheck1">
+                  Check me out
+                </label>
+              </div>
+              <button type="submit" className="btn btn-primary">
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
