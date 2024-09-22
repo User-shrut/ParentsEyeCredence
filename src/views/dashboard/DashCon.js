@@ -61,53 +61,53 @@ import { IoMdBatteryCharging } from "react-icons/io";
 
 
 // ================================CAR==================================
-import carGreen from "/public/vehicleList/Car/carGreen.svg";
-import carRed from "/public/vehicleList/Car/carRed.svg";
-import carYellow from "/public/vehicleList/Car/carYellow.svg";
-import carOrange from "/public/vehicleList/Car/carOrange.svg";
-import carGray from "/public/vehicleList/Car/carGray.svg";
+import carGreen from "../../assets/vehicleList/Car/carGreen.svg";
+import carRed from "../../assets/vehicleList/Car/carRed.svg";
+import carYellow from "../../assets/vehicleList/Car/carYellow.svg";
+import carOrange from "../../assets/vehicleList/Car/carOrange.svg";
+import carGray from "../../assets/vehicleList/Car/carGray.svg";
 
 //==============================BIKE========================================
-import bikeGreen from "/public/vehicleList/Bike/bikeGreen.svg";
-import bikeRed from "/public/vehicleList/Bike/bikeRed.svg";
-import bikeYellow from "/public/vehicleList/Bike/bikeYellow.svg";
-import bikeOrange from "/public/vehicleList/Bike/bikeOrange.svg";
-import bikeGray from "/public/vehicleList/Bike/bikeGray.svg";
+import bikeGreen from "../../assets/vehicleList/Bike/bikeGreen.svg";
+import bikeRed from "../../assets/vehicleList/Bike/bikeRed.svg";
+import bikeYellow from "../../assets/vehicleList/Bike/bikeYellow.svg";
+import bikeOrange from "../../assets/vehicleList/Bike/bikeOrange.svg";
+import bikeGray from "../../assets/vehicleList/Bike/bikeGray.svg";
 
 
-import busGreen from "/public/vehicleList/Bus/busGreen.svg";
-import busRed from "/public/vehicleList/Bus/busRed.svg";
-import busOrange from "/public/vehicleList/Bus/busOrange.svg";
-import busYellow from "/public/vehicleList/Bus/busYellow.svg";
-import busGray from "/public/vehicleList/Bus/busGray.svg";
+import busGreen from "../../assets/vehicleList/Bus/busGreen.svg";
+import busRed from "../../assets/vehicleList/Bus/busRed.svg";
+import busOrange from "../../assets/vehicleList/Bus/busOrange.svg";
+import busYellow from "../../assets/vehicleList/Bus/busYellow.svg";
+import busGray from "../../assets/vehicleList/Bus/busGray.svg";
 
 //==============================TRUCK========================================
-import truckGreen from "/public/vehicleList/Truck/truckGreen.svg";
-import truckRed from "/public/vehicleList/Truck/truckRed.svg";
-import truckYellow from "/public/vehicleList/Truck/truckYellow.svg";
-import truckOrange from "/public/vehicleList/Truck/truckOrange.svg";
-import truckGray from "/public/vehicleList/Truck/truckGray.svg";
+import truckGreen from "../../assets/vehicleList/Truck/truckGreen.svg";
+import truckRed from "../../assets/vehicleList/Truck/truckRed.svg";
+import truckYellow from "../../assets/vehicleList/Truck/truckYellow.svg";
+import truckOrange from "../../assets/vehicleList/Truck/truckOrange.svg";
+import truckGray from "../../assets/vehicleList/Truck/truckGray.svg";
 
 //==============================CRANE========================================
-import craneGreen from "/public/vehicleList/Crane/craneGreen.svg";
-import craneRed from "/public/vehicleList/Crane/craneRed.svg";
-import craneYellow from "/public/vehicleList/Crane/craneYellow.svg";
-import craneOrange from "/public/vehicleList/Crane/craneOrange.svg";
-import craneGray from "/public/vehicleList/Crane/craneGray.svg";
+import craneGreen from "../../assets/vehicleList/Crane/craneGreen.svg";
+import craneRed from "../../assets/vehicleList/Crane/craneRed.svg";
+import craneYellow from "../../assets/vehicleList/Crane/craneYellow.svg";
+import craneOrange from "../../assets/vehicleList/Crane/craneOrange.svg";
+import craneGray from "../../assets/vehicleList/Crane/craneGray.svg";
 
 //==============================JCB========================================
-import jcbGreen from "/public/vehicleList/JCB/jcbGreen.svg";
-import jcbRed from "/public/vehicleList/JCB/jcbRed.svg";
-import jcbYellow from "/public/vehicleList/JCB/jcbYellow.svg";
-import jcbOrange from "/public/vehicleList/JCB/jcbOrange.svg";
-import jcbGray from "/public/vehicleList/JCB/jcbGray.svg";
+import jcbGreen from "../../assets/vehicleList/JCB/jcbGreen.svg";
+import jcbRed from "../../assets/vehicleList/JCB/jcbRed.svg";
+import jcbYellow from "../../assets/vehicleList/JCB/jcbYellow.svg";
+import jcbOrange from "../../assets/vehicleList/JCB/jcbOrange.svg";
+import jcbGray from "../../assets/vehicleList/JCB/jcbGray.svg";
 
 //==============================AUTO========================================
-import autoGreen from "/public/vehicleList/Auto/autoGreen.svg";
-import autoRed from "/public/vehicleList/Auto/autoRed.svg";
-import autoYellow from "/public/vehicleList/Auto/autoYellow.svg";
-import autoOrange from "/public/vehicleList/Auto/autoOrange.svg";
-import autoGray from "/public/vehicleList/Auto/autoGray.svg";
+import autoGreen from "../../assets/vehicleList/Auto/autoGreen.svg";
+import autoRed from "../../assets/vehicleList/Auto/autoRed.svg";
+import autoYellow from "../../assets/vehicleList/Auto/autoYellow.svg";
+import autoOrange from "../../assets/vehicleList/Auto/autoOrange.svg";
+import autoGray from "../../assets/vehicleList/Auto/autoGray.svg";
 
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
