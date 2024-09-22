@@ -58,7 +58,7 @@ const LiveTrack = () => {
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {salesman?.slice(0, 10).map((item, index) => (
+              {salesman?.map((item, index) => (
                 <CTableRow v-for="item in tableItems" key={index} to="/dashboard">
                   <CTableDataCell className="text-center">{item.id}</CTableDataCell>
                   <CTableDataCell className="">{item.name}</CTableDataCell>
