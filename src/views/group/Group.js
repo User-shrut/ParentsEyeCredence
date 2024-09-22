@@ -35,6 +35,7 @@ import { AiOutlineUpload } from 'react-icons/ai'
 const Group = () => {
   const [open, setOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false) // Modal for adding a new row
+  const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({}) // Form data state
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
@@ -42,44 +43,13 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
   const [filteredRows, setFilteredRows] = useState([])
-  const handleModalClose = () => setAddModalOpen(false)
+  
+  const handleEditModalClose = () => setEditModalOpen(false)
+  const handleAddModalClose = () => setAddModalOpen(false)
+
   const [filteredData, setFilteredData] = useState([])
 
   // Table columns (excluding ID, Group ID, and Calendar ID)
-  const columns = [
-    { Header: 'Name', accessor: 'name' },
-    // { Header: 'Unique ID', accessor: 'uniqueId' },
-    // { Header: 'Last Update', accessor: 'lastUpdate', Cell: ({ value }) => new Date(value).toLocaleString() },
-    // { Header: 'Position ID', accessor: 'positionId' },
-    // { Header: 'Phone', accessor: 'phone' },
-    // { Header: 'Model', accessor: 'model' },
-    // { Header: 'Contact', accessor: 'contact' },
-    // { Header: 'Category', accessor: 'category' },
-    // { Header: 'Disabled', accessor: 'disabled', Cell: ({ value }) => (value ? 'Yes' : 'No') },
-    // { Header: 'Expiration Time', accessor: 'expirationTime', Cell: ({ value }) => value ? new Date(value).toLocaleString() : 'N/A' },
-    // { Header: 'Status', accessor: 'status' },
-  ]
-
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '12%',
-    transform: 'translate(-50%, -50%)',
-    width: '25%',
-    height: '101%',
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '1rem',
-    margintop: '8px',
-  }
 
   const fetchData = async () => {
     setLoading(true)
@@ -110,22 +80,36 @@ const Group = () => {
   }
 
   useEffect(() => {
+    fetchData()
+  }, [])
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    color: 'black',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  }
+
+  useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase()
     setFilteredData(
-      data.filter((item) =>
-        columns.some((column) =>
-          item[column.accessor]?.toString().toLowerCase().includes(lowerCaseQuery),
-        ),
-      ),
+      data.filter((item) => item.name?.toString().toLowerCase().includes(lowerCaseQuery)),
     )
-  }, [data, searchQuery, columns])
+  }, [data, searchQuery])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prevData) => ({ ...prevData, [name]: value }))
   }
 
-  const handleAddSubmit = async () => {
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
     try {
       const apiUrl = 'https://rocketsalestracker.com/api/devices'
       const username = 'school'
@@ -171,6 +155,10 @@ const Group = () => {
     }
   }
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+  }
+
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
@@ -209,12 +197,6 @@ const Group = () => {
         </div>
 
         <div className="d-flex">
-          {/* <InputBase
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ marginRight: '5px', backgroundColor: '#f0f0f0', borderRadius: '5px', padding: '5px 10px', border: '0.5px solid grey', marginTop: "7px" }}
-          /> */}
           <div className="me-3">
             <input
               type="search"
@@ -243,31 +225,29 @@ const Group = () => {
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-                <CTableHeaderCell className="bg-body-tertiary text-start ps-5">Name</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-end " style={{paddingRight: "7vw"}}>Actions</CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary text-start ps-5">
+                  Name
+                </CTableHeaderCell>
+                <CTableHeaderCell
+                  className="bg-body-tertiary text-end "
+                  style={{ paddingRight: '7vw' }}
+                >
+                  Actions
+                </CTableHeaderCell>
               </CTableRow>
-
-              
             </CTableHead>
             <CTableBody>
               {filteredData.map((item, index) => (
                 <CTableRow key={index}>
-                  {columns.map((column, i) => (
-                    <CTableDataCell key={i} className="ps-5">
-                      {item[column.accessor]}
-                    </CTableDataCell>
-                  ))}
-                  <CTableDataCell
-                    className="pe-md-5 d-flex"
-                    style={{ justifyContent: 'flex-end' }}
-                  >
-                    
+                  <CTableDataCell className="ps-5">{item.name}</CTableDataCell>
+
+                  <CTableDataCell className="pe-md-5 d-flex" style={{ justifyContent: 'flex-end' }}>
                     <IconButton aria-label="upload">
                       <AiOutlineUpload
                         style={{ fontSize: '25px', color: 'orange', margin: '5.3px' }}
                       />
                     </IconButton>
-                    <IconButton aria-label="edit">
+                    <IconButton aria-label="edit" onClick={() => setEditModalOpen(true)}>
                       <RiEdit2Fill
                         style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
                       />
@@ -284,7 +264,7 @@ const Group = () => {
       </TableContainer>
 
       {/* Add Modal */}
-      <Modal
+      {/* <Modal
         open={addModalOpen}
         onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
@@ -316,12 +296,7 @@ const Group = () => {
                 onChange={handleInputChange}
                 required
               />
-              {/* <TextField label="Status" name="status" value={formData.status || ''} onChange={handleInputChange} required /> */}
-              {/* <TextField label="Phone" name="phone" value={formData.phone || ''} onChange={handleInputChange} /> */}
-              {/* <TextField label="Model" name="model" value={formData.model || ''} onChange={handleInputChange} /> */}
-              {/* <TextField label="Contact" name="contact" value={formData.contact || ''} onChange={handleInputChange} /> */}
-              {/* <TextField label="Category" name="category" value={formData.category || ''} onChange={handleInputChange} /> */}
-              {/* <TextField label="Expiration Time" name="expirationTime" value={formData.expirationTime || ''} onChange={handleInputChange} /> */}
+             
             </FormControl>
             <Button
               variant="contained"
@@ -331,6 +306,91 @@ const Group = () => {
             >
               Submit
             </Button>
+          </DialogContent>
+        </Box>
+      </Modal> */}
+
+      <Modal
+        open={addModalOpen}
+        onClose={handleAddModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div className="d-flex justify-content-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Add New Group
+            </Typography>
+            <IconButton
+              // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
+              onClick={handleAddModalClose}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <form onSubmit={handleAddSubmit}>
+              <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <TextField
+                  label="Group Name"
+                  name="name"
+                  value={formData.name || ''}
+                  onChange={handleInputChange}
+                  required
+                />
+              </FormControl>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                
+                style={{ marginTop: '20px' }}
+              >
+                Submit
+              </Button>
+            </form>
+          </DialogContent>
+        </Box>
+      </Modal>
+      <Modal
+        open={editModalOpen}
+        onClose={handleEditModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div className="d-flex justify-content-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Edit Group
+            </Typography>
+            <IconButton
+              // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
+              onClick={handleEditModalClose}
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <form onSubmit={handleAddSubmit}>
+              <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <TextField
+                  label="Group Name"
+                  name="name"
+                  value={formData.name || ''}
+                  onChange={handleInputChange}
+                  required
+                />
+              </FormControl>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                
+                style={{ marginTop: '20px' }}
+              >
+                Submit
+              </Button>
+            </form>
           </DialogContent>
         </Box>
       </Modal>
