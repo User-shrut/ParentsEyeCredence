@@ -1,17 +1,10 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
+  "name": "credence_tracker_october",
   "version": "5.1.0",
-  "description": "CoreUI Free React Admin Template",
+  "description": "Vehicle tracking system",
   "homepage": ".",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
-  },
   "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "author": "Aniket Ikhar",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,9 +14,7 @@
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",
-
     "@coreui/coreui": "^5.1.2",
-
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-react": "^2.2.1",
     "@coreui/react": "^5.1.0",
