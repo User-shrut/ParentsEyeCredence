@@ -103,9 +103,11 @@ const Devices = () => {
   const fetchData = async () => {
     setLoading(true) // Start loading
     try {
-      const username = 'hbtrack';
-      const password = '123456@';
-      const token = btoa(`${username}:${password}`);
+
+      const username = 'hbtrack'
+      const password = '123456@'
+      const token = btoa(`${username}:${password}`)
+
 
       const response = await axios.get('http://104.251.212.84/api/devices', {
         headers: {
@@ -480,7 +482,7 @@ const Devices = () => {
   }, []);
   return (
     <div className='m-3'>
-      
+
 
       <div className="d-flex justify-content-between mb-2">
         <div>
