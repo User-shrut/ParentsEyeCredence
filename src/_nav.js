@@ -83,9 +83,6 @@ const _nav = [
         name: 'Maintenance',
         to: '/maintenance',
       },
-      
-      
-      
       {
         component: CNavItem,
         name: 'Preferences',
