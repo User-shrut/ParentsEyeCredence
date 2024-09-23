@@ -59,7 +59,8 @@ const Driver = () => {
 
   const columns = [
     { Header: 'Device Name', accessor: 'name' },
-    { Header: 'Identifier', accessor: 'uniqueId' },
+    { Header: 'IMEI', accessor: 'uniqueId' },
+    
     // { Header: 'Sim', accessor: 'Sim' },
     // { Header: 'Speed', accessor: 'Speed' },
     // { Header: 'Average', accessor: 'Average' },
@@ -149,15 +150,15 @@ const Driver = () => {
       const newRow = {
         name: formData.name, // Ensure formData has 'name'
         uniqueId: formData.uniqueId, // Ensure formData has 'uniqueId'
-        groupId: formData.groupId, // Ensure formData has 'groupId'
-        attributes: formData.attributes || {}, // Ensure formData has 'attributes' (empty object if not provided)
-        calendarId: formData.calendarId, // Ensure formData has 'calendarId'
-        status: formData.status, // Ensure formData has 'status'
-        phone: formData.phone, // Ensure formData has 'phone'
-        model: formData.model, // Ensure formData has 'model'
-        expirationTime: formData.expirationTime, // Ensure formData has 'expirationTime'
-        contact: formData.contact, // Ensure formData has 'contact'
-        category: formData.category, // Ensure formData has 'category'
+        // groupId: formData.groupId, // Ensure formData has 'groupId'
+        // attributes: formData.attributes || {}, // Ensure formData has 'attributes' (empty object if not provided)
+        // calendarId: formData.calendarId, // Ensure formData has 'calendarId'
+        // status: formData.status, // Ensure formData has 'status'
+        // phone: formData.phone, // Ensure formData has 'phone'
+        // model: formData.model, // Ensure formData has 'model'
+        // expirationTime: formData.expirationTime, // Ensure formData has 'expirationTime'
+        // contact: formData.contact, // Ensure formData has 'contact'
+        // category: formData.category, // Ensure formData has 'category'
       }
 
       // POST request to the server with Basic Auth

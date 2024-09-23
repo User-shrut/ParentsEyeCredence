@@ -26,7 +26,7 @@ const Login = () => {
     }
   
     try {
-      const response = await axios.post(`http://63.142.251.13:4000/superadmin/login`, {
+      const response = await axios.post(`${process.env.VITE_APP_API}/auth/login`, {
         username,
         password,
       });
