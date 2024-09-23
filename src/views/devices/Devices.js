@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   TableContainer,
   Paper,
@@ -47,12 +47,18 @@ const Devices = () => {
   const navigate = useNavigate()
   const [filteredRows, setFilteredRows] = useState([])
   // const handleModalClose = () => setAddModalOpen(false);
-  const [filteredData, setFilteredData] = useState([]) // Your initial data
-  const [selectedRow, setSelectedRow] = useState(null)
-  const [users, setUsers] = useState([])
+  const [filteredData, setFilteredData] = useState([]); // Your initial data
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [extendedPasswordModel , setExtendedPasswordModel] = useState(false);
+  const myPassword = "123456";
+  const [extendedPassword , setExtendedPassword] = useState();
+  const [passwordCheck ,setPasswordCheck] = useState(false);
+  const [drivers, setDrivers] = useState([]);
   const handleModalClose = () => {
-    setEditModalOpen(false)
-    setAddModalOpen(false)
+    setEditModalOpen(false);
+    setAddModalOpen(false);
+    // setExtendedPasswordModel(false);
     // setFormData({});
   }
   const [areasValue, setAreasValue] = useState('')
@@ -63,6 +69,7 @@ const Devices = () => {
     { Header: 'Sim', accessor: 'Sim' },
     { Header: 'Speed', accessor: 'Speed' },
     { Header: 'Average', accessor: 'Average' },
+    { Header: 'Driver', accessor: 'driver' },
     { Header: 'Model', accessor: 'model' },
     { Header: 'Category', accessor: 'category' },
     { Header: 'Groups', accessor: 'groupId' },
@@ -76,13 +83,13 @@ const Devices = () => {
   }, [])
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '35%',
-    height: '97%',
-    bgcolor: 'background.paper',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "30%",
+    height: "100%",
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
     overflowY: 'auto', // Enable vertical scrolling
@@ -96,11 +103,11 @@ const Devices = () => {
   const fetchData = async () => {
     setLoading(true) // Start loading
     try {
-      const username = 'school'
-      const password = '123456'
-      const token = btoa(`${username}:${password}`)
+      const username = 'hbtrack';
+      const password = '123456@';
+      const token = btoa(`${username}:${password}`);
 
-      const response = await axios.get('https://rocketsalestracker.com/api/devices', {
+      const response = await axios.get('http://104.251.212.84/api/devices', {
         headers: {
           Authorization: `Basic ${token}`,
         },
@@ -133,18 +140,43 @@ const Devices = () => {
   }, [data, searchQuery, columns])
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => ({ ...prevData, [name]: value }))
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleEditDateInputChange = (e) => {
+    const { name, value } = e.target;
+    setExtendedPasswordModel(true);
+
+    if(passwordCheck){
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
+
+    
+
+  };
+
+  const handleCheckPassword = () => {
+    if(extendedPassword == myPassword){
+      setPasswordCheck(true);
+      setExtendedPasswordModel(false);
+      alert("password is correct")
+
+
+    }else{
+      alert("password is not correct");
+    }
   }
 
+ 
   const handleAddSubmit = async () => {
     try {
       // Define the API endpoint and credentials
-      const apiUrl = 'https://rocketsalestracker.com/api/devices' // Replace with actual API endpoint
-      const username = 'school' // Replace with your actual username
-      const password = '123456' // Replace with your actual password
-      const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-
+      const apiUrl = "http://104.251.212.84/api/devices"; // Replace with actual API endpoint
+      const username = "credenceOCT"; // Replace with your actual username
+      const password = "123456"; // Replace with your actual password
+      const token = btoa(`${username}:${password}`); // Encode credentials in Base64
+  
       // Prepare the new row object based on the expected schema
       const newRow = {
         name: formData.name, // Ensure formData has 'name'
@@ -416,7 +448,36 @@ const Devices = () => {
       .split('T')[0] // Format to yyyy-mm-dd
     handleInputChange({ target: { name: 'expiration', value: expirationDate } })
   }
-
+  const fetchDrivers = async () => {
+    const username = 'credenceOCT';
+    const password = '123456';
+    const token = btoa(`${username}:${password}`);
+  
+    try {
+      const response = await axios.get('http://104.251.212.84/api/drivers', {
+        headers: {
+          Authorization: `Basic ${token}`
+        }
+      });
+  
+      // Handle the response
+      if (response && response.data) {
+        return response.data;
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      return [];
+    }
+  };
+  useEffect(() => {
+    const getDrivers = async () => {
+      const driversData = await fetchDrivers();
+      setDrivers(driversData); // Assuming you have a state variable `drivers` to store this data
+    };
+  
+    getDrivers();
+  }, []);
   return (
     <div className='m-3'>
       
@@ -613,6 +674,24 @@ const Devices = () => {
                   </Select>
                 </FormControl>
               )
+            } else if (col.accessor === 'driver') {
+              return (
+                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                  <InputLabel>Driver</InputLabel>
+                  <Select
+                    name="driver"
+                    value={formData.driver || ''}
+                    onChange={handleInputChange}
+                    label="Driver"
+                  >
+                    {drivers.map((driver) => (
+                      <MenuItem key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )
             } else if (col.accessor === 'expiration') {
               // Expiration Date field with dropdown for years (1, 2, 3 years)
               return (
@@ -690,120 +769,138 @@ const Devices = () => {
             </IconButton>
           </div>
 
-          {/* Conditional rendering based on col.accessor */}
-          {columns.map((col) => {
-            if (col.accessor === 'groupId') {
-              // Group ID dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Group ID</InputLabel>
-                  <Select
-                    name="groupId"
-                    value={formData.groupId || ''}
-                    onChange={handleInputChange}
-                    label="Group ID"
-                  >
-                    {groups.map((group) => (
-                      <MenuItem key={group.id} value={group.id}>
-                        {group.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'User') {
-              // User dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>User</InputLabel>
-                  <Select
-                    name="user"
-                    value={formData.user || ''}
-                    onChange={handleInputChange}
-                    label="User"
-                  >
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'category') {
-              // Category dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category || ''}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="Default">Default</MenuItem>
-                    <MenuItem value="Animal">Animal</MenuItem>
-                    <MenuItem value="Bicycle">Bicycle</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'geofence') {
-              // Geofence dropdown (Areas)
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel id="areas-label-5">Areas</InputLabel>
-                  <Select
-                    labelId="areas-label-5"
-                    id="areas-select-5"
-                    value={formData.areas || ''}
-                    onChange={handleInputChange}
-                    label="Select Areas"
-                  >
-                    <MenuItem value="All Areas">All Areas</MenuItem>
-                    {areas.map((area, index) => (
-                      <MenuItem key={index} value={area}>
-                        {area}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'model') {
-              // Model dropdown with options v1, v2, v3, v4, v5
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    name="model"
-                    value={formData.model || ''}
-                    onChange={handleInputChange}
-                    label="Model"
-                  >
-                    <MenuItem value="v1">v1</MenuItem>
-                    <MenuItem value="v2">v2</MenuItem>
-                    <MenuItem value="v3">v3</MenuItem>
-                    <MenuItem value="v4">v4</MenuItem>
-                    <MenuItem value="v5">v5</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'expiration') {
-              // Expiration Date field with dropdown for years (1, 2, 3 years)
-              return (
-                <Box key={col.accessor} sx={{ marginBottom: 2 }}>
-                  {/* Expiration Date TextField */}
-                  <TextField
-                    label="Expiration Date"
-                    type="date"
-                    name="expiration"
-                    value={formData.expiration || ''}
-                    onChange={handleInputChange}
-                    onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true, // Ensures the label is always visible
-                    }}
-                  />
+    {/* Conditional rendering based on col.accessor */}
+    {columns.map((col) => {
+       if (col.accessor === "groupId") {
+        // Group ID dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Group ID</InputLabel>
+            <Select
+              name="groupId"
+              value={formData.groupId || ""}
+              onChange={handleInputChange}
+              label="Group ID"
+            >
+              {groups.map((group) => (
+                <MenuItem key={group.id} value={group.id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      }else if (col.accessor === 'driver') {
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Driver</InputLabel>
+            <Select
+              name="driver"
+              value={formData.driver || ''}
+              onChange={handleInputChange}
+              label="Driver"
+            >
+              {drivers.map((driver) => (
+                <MenuItem key={driver.id} value={driver.id}>
+                  {driver.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )
+      } else if (col.accessor === 'User') {
+        // User dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>User</InputLabel>
+            <Select
+              name="user"
+              value={formData.user || ''}
+              onChange={handleInputChange}
+              label="User"
+            >
+              {users.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "category") {
+        // Category dropdown
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              value={formData.category || ""}
+              onChange={handleInputChange}
+              label="Category"
+            >
+              <MenuItem value="Default">Default</MenuItem>
+              <MenuItem value="Animal">Animal</MenuItem>
+              <MenuItem value="Bicycle">Bicycle</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "geofence") {
+        // Geofence dropdown (Areas)
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel id="areas-label-5">Areas</InputLabel>
+            <Select
+              labelId="areas-label-5"
+              id="areas-select-5"
+              value={formData.areas || ""}
+              onChange={handleInputChange}
+              label="Select Areas"
+            >
+              <MenuItem value="All Areas">All Areas</MenuItem>
+              {areas.map((area, index) => (
+                <MenuItem key={index} value={area}>
+                  {area}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "model") {
+        // Model dropdown with options v1, v2, v3, v4, v5
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Model</InputLabel>
+            <Select
+              name="model"
+              value={formData.model || ""}
+              onChange={handleInputChange}
+              label="Model"
+            >
+              <MenuItem value="v1">v1</MenuItem>
+              <MenuItem value="v2">v2</MenuItem>
+              <MenuItem value="v3">v3</MenuItem>
+              <MenuItem value="v4">v4</MenuItem>
+              <MenuItem value="v5">v5</MenuItem>
+            </Select>
+          </FormControl>
+        );
+      } else if (col.accessor === "expiration") {
+        // Expiration Date field with dropdown for years (1, 2, 3 years)
+        return (
+          <Box key={col.accessor} sx={{ marginBottom: 2 }}>
+            {/* Expiration Date TextField */}
+            <TextField
+              label="Extended Date"
+              type="date"
+              name="expiration"
+              value={formData.expiration || ""}
+              onChange={handleEditDateInputChange}
+              onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
+              fullWidth
+              InputLabelProps={{
+                shrink: true, // Ensures the label is always visible
+              }}
+            />
 
                   {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
                   {showExpirationDropdown && (
@@ -842,16 +939,47 @@ const Devices = () => {
             }
           })}
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleEditSubmit}
-            sx={{ marginTop: 2 }}
-          >
-            Submit
-          </Button>
-        </Box>
-      </Modal>
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleEditSubmit}
+      sx={{ marginTop: 2 }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal>
+
+<Modal open={extendedPasswordModel} onClose={handleModalClose}>
+  <Box sx={style} style={{height:'30%'}}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
+      <Typography variant="h6">Enter Password</Typography>
+      <IconButton onClick={handleModalClose}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+
+    {/* Conditional rendering based on col.accessor */}
+      <input type="password" name="" id="" value={extendedPassword} onChange={(e) => setExtendedPassword(e.target.value)} />
+
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleCheckPassword}
+      sx={{ marginTop: 2 }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal>
+
     </div>
   )
 }
