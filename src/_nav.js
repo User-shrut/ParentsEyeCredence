@@ -91,6 +91,16 @@ const _nav = [
         name: 'Preferences',
         to: '/preferences',
       },
+      {
+        component: CNavItem,
+        name: 'Catogery',
+        to: '/catogery',
+      },
+      {
+        component: CNavItem,
+        name: 'Modal',
+        to: '/modal',
+      },
     ],
   },
   {

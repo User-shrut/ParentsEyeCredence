@@ -96,11 +96,11 @@ const Devices = () => {
   const fetchData = async () => {
     setLoading(true) // Start loading
     try {
-      const username = 'school'
-      const password = '123456'
+      const username = 'hbtrack'
+      const password = '123456@'
       const token = btoa(`${username}:${password}`)
 
-      const response = await axios.get('https://rocketsalestracker.com/api/devices', {
+      const response = await axios.get('http://104.251.212.84/api/devices', {
         headers: {
           Authorization: `Basic ${token}`,
         },
@@ -419,7 +419,7 @@ const Devices = () => {
 
   return (
     <div className='m-3'>
-      
+
 
       <div className="d-flex justify-content-between mb-2">
         <div>
