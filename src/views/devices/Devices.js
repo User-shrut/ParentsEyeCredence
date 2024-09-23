@@ -54,6 +54,7 @@ const Devices = () => {
   const myPassword = "123456";
   const [extendedPassword , setExtendedPassword] = useState();
   const [passwordCheck ,setPasswordCheck] = useState(false);
+  const [drivers, setDrivers] = useState([]);
   const handleModalClose = () => {
     setEditModalOpen(false);
     setAddModalOpen(false);
@@ -68,6 +69,7 @@ const Devices = () => {
     { Header: 'Sim', accessor: 'Sim' },
     { Header: 'Speed', accessor: 'Speed' },
     { Header: 'Average', accessor: 'Average' },
+    { Header: 'Driver', accessor: 'driver' },
     { Header: 'Model', accessor: 'model' },
     { Header: 'Category', accessor: 'category' },
     { Header: 'Groups', accessor: 'groupId' },
@@ -446,7 +448,36 @@ const Devices = () => {
       .split('T')[0] // Format to yyyy-mm-dd
     handleInputChange({ target: { name: 'expiration', value: expirationDate } })
   }
-
+  const fetchDrivers = async () => {
+    const username = 'credenceOCT';
+    const password = '123456';
+    const token = btoa(`${username}:${password}`);
+  
+    try {
+      const response = await axios.get('http://104.251.212.84/api/drivers', {
+        headers: {
+          Authorization: `Basic ${token}`
+        }
+      });
+  
+      // Handle the response
+      if (response && response.data) {
+        return response.data;
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      return [];
+    }
+  };
+  useEffect(() => {
+    const getDrivers = async () => {
+      const driversData = await fetchDrivers();
+      setDrivers(driversData); // Assuming you have a state variable `drivers` to store this data
+    };
+  
+    getDrivers();
+  }, []);
   return (
     <div className='m-3'>
       
@@ -643,6 +674,24 @@ const Devices = () => {
                   </Select>
                 </FormControl>
               )
+            } else if (col.accessor === 'driver') {
+              return (
+                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                  <InputLabel>Driver</InputLabel>
+                  <Select
+                    name="driver"
+                    value={formData.driver || ''}
+                    onChange={handleInputChange}
+                    label="Driver"
+                  >
+                    {drivers.map((driver) => (
+                      <MenuItem key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )
             } else if (col.accessor === 'expiration') {
               // Expiration Date field with dropdown for years (1, 2, 3 years)
               return (
@@ -741,6 +790,24 @@ const Devices = () => {
             </Select>
           </FormControl>
         );
+      }else if (col.accessor === 'driver') {
+        return (
+          <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+            <InputLabel>Driver</InputLabel>
+            <Select
+              name="driver"
+              value={formData.driver || ''}
+              onChange={handleInputChange}
+              label="Driver"
+            >
+              {drivers.map((driver) => (
+                <MenuItem key={driver.id} value={driver.id}>
+                  {driver.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )
       } else if (col.accessor === 'User') {
         // User dropdown
         return (
