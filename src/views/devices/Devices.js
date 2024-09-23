@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -50,9 +44,14 @@ const Devices = () => {
   const [filteredData, setFilteredData] = useState([]); // Your initial data
   const [selectedRow, setSelectedRow] = useState(null);
   const [users, setUsers] = useState([]);
+  const [extendedPasswordModel , setExtendedPasswordModel] = useState(false);
+  const myPassword = "123456";
+  const [extendedPassword , setExtendedPassword] = useState();
+  const [passwordCheck ,setPasswordCheck] = useState(false);
   const handleModalClose = () => {
     setEditModalOpen(false);
     setAddModalOpen(false);
+    // setExtendedPasswordModel(false);
     // setFormData({});
   };
   const [areasValue, setAreasValue] = useState("");
@@ -78,10 +77,10 @@ const Devices = () => {
   const style = {
     position: "absolute",
     top: "50%",
-    left: "12%",
+    left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "25%",
-    height: "101%",
+    width: "35%",
+    height: "100%",
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
@@ -98,11 +97,11 @@ const Devices = () => {
   const fetchData = async () => {
     setLoading(true); // Start loading
     try {
-      const username = 'school';
-      const password = '123456';
+      const username = 'hbtrack';
+      const password = '123456@';
       const token = btoa(`${username}:${password}`);
 
-      const response = await axios.get('https://rocketsalestracker.com/api/devices', {
+      const response = await axios.get('http://104.251.212.84/api/devices', {
         headers: {
           Authorization: `Basic ${token}`,
         },
@@ -140,12 +139,36 @@ const Devices = () => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleEditDateInputChange = (e) => {
+    const { name, value } = e.target;
+    setExtendedPasswordModel(true);
+
+    if(passwordCheck){
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
+
+    
+
+  };
+
+  const handleCheckPassword = () => {
+    if(extendedPassword == myPassword){
+      setPasswordCheck(true);
+      setExtendedPasswordModel(false);
+      alert("password is correct")
+
+
+    }else{
+      alert("password is not correct");
+    }
+  }
+
  
   const handleAddSubmit = async () => {
     try {
       // Define the API endpoint and credentials
-      const apiUrl = "https://rocketsalestracker.com/api/devices"; // Replace with actual API endpoint
-      const username = "school"; // Replace with your actual username
+      const apiUrl = "http://104.251.212.84/api/devices"; // Replace with actual API endpoint
+      const username = "credenceOCT"; // Replace with your actual username
       const password = "123456"; // Replace with your actual password
       const token = btoa(`${username}:${password}`); // Encode credentials in Base64
   
@@ -807,11 +830,11 @@ useEffect(() => {
           <Box key={col.accessor} sx={{ marginBottom: 2 }}>
             {/* Expiration Date TextField */}
             <TextField
-              label="Expiration Date"
+              label="Extended Date"
               type="date"
               name="expiration"
               value={formData.expiration || ""}
-              onChange={handleInputChange}
+              onChange={handleEditDateInputChange}
               onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
               fullWidth
               InputLabelProps={{
@@ -860,6 +883,36 @@ useEffect(() => {
       variant="contained"
       color="primary"
       onClick={handleEditSubmit}
+      sx={{ marginTop: 2 }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Modal>
+
+<Modal open={extendedPasswordModel} onClose={handleModalClose}>
+  <Box sx={style} style={{height:'30%'}}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px",
+      }}
+    >
+      <Typography variant="h6">Enter Password</Typography>
+      <IconButton onClick={handleModalClose}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+
+    {/* Conditional rendering based on col.accessor */}
+      <input type="password" name="" id="" value={extendedPassword} onChange={(e) => setExtendedPassword(e.target.value)} />
+
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={handleCheckPassword}
       sx={{ marginTop: 2 }}
     >
       Submit
