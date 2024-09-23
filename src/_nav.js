@@ -83,13 +83,20 @@ const _nav = [
         name: 'Maintenance',
         to: '/maintenance',
       },
-      
-      
-      
       {
         component: CNavItem,
         name: 'Preferences',
         to: '/preferences',
+      },
+      {
+        component: CNavItem,
+        name: 'Catogery',
+        to: '/catogery',
+      },
+      {
+        component: CNavItem,
+        name: 'Modal',
+        to: '/modal',
       },
     ],
   },

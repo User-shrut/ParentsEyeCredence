@@ -1,12 +1,10 @@
-/* eslint-disable prettier/prettier */
-// src/GoogleMapComponent.js
-
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Marker, Polyline, Polygon } from '@react-google-maps/api';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';  
 import CropDinIcon from '@mui/icons-material/CropDin'; 
 import PolylineIcon from '@mui/icons-material/Polyline'; 
+import { CTooltip } from '@coreui/react';
 
 const containerStyle = {
   width: '100%',
@@ -14,6 +12,16 @@ const containerStyle = {
   borderRadius: '10px',
   overflow: 'hidden',
   position: 'relative',
+};
+
+const fullscreenContainerStyle = {
+  width: '100%',
+  height: '100vh',
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  zIndex: 1000,
+  backgroundColor: '#fff',
 };
 
 const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik'; // Replace with your actual API key
@@ -26,10 +34,12 @@ const Gmap = () => {
   const [lat, setLat] = useState(center.lat);
   const [lng, setLng] = useState(center.lng);
   const [showInputs, setShowInputs] = useState(false);
-  const [isDrawingPolyline, setIsDrawingPolyline] = useState(false);
-  const [isDrawingPolygon, setIsDrawingPolygon] = useState(false);
+  const [isPolylineActive, setIsPolylineActive] = useState(false);
+  const [isPolygonActive, setIsPolygonActive] = useState(false);
   const [path, setPath] = useState([]);
   const [polygonPath, setPolygonPath] = useState([]);
+  const [isFullscreen, setIsFullscreen] = useState(false); // Fullscreen state
+  const mapContainerRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,45 +55,64 @@ const Gmap = () => {
   };
 
   const handleMapClick = (e) => {
-    if (isDrawingPolyline) {
+    if (isPolylineActive) {
       const newPath = [...path, { lat: e.latLng.lat(), lng: e.latLng.lng() }];
       setPath(newPath);
     }
-    if (isDrawingPolygon) {
+    if (isPolygonActive) {
       const newPolygonPath = [...polygonPath, { lat: e.latLng.lat(), lng: e.latLng.lng() }];
       setPolygonPath(newPolygonPath);
     }
   };
 
-  const toggleDrawingPolyline = () => {
-    setIsDrawingPolyline(!isDrawingPolyline);
-    if (isDrawingPolyline) {
-      setPath([]); // Reset path when stopping drawing polyline
+  const togglePolyline = () => {
+    setIsPolylineActive(!isPolylineActive);
+    setIsPolygonActive(false);
+    if (!isPolylineActive) {
+      setPath([]);
     }
   };
 
-  const toggleDrawingPolygon = () => {
-    setIsDrawingPolygon(!isDrawingPolygon);
-    if (isDrawingPolygon) {
-      setPolygonPath([]); // Reset polygon path when stopping drawing polygon
+  const togglePolygon = () => {
+    setIsPolygonActive(!isPolygonActive);
+    setIsPolylineActive(false);
+    if (!isPolygonActive) {
+      setPolygonPath([]);
     }
   };
 
-  // Function to clear the drawn path and polygon
   const clearAll = () => {
-    setPath([]); // Clear the polyline path
-    setPolygonPath([]); // Clear the polygon path
+    setPath([]);
+    setPolygonPath([]);
+    setIsPolylineActive(false);
+    setIsPolygonActive(false);
   };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      mapContainerRef.current.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   return (
-    <div>
-      <LoadScript
-        googleMapsApiKey={apiKey}
-        loadingElement={<div>Loading...</div>}
-      >
+    <div ref={mapContainerRef} style={isFullscreen ? fullscreenContainerStyle : containerStyle}>
+      <LoadScript googleMapsApiKey={apiKey}>
         <div style={{ position: 'relative' }}>
           <GoogleMap
-            mapContainerStyle={containerStyle}
+            mapContainerStyle={isFullscreen ? fullscreenContainerStyle : containerStyle}
             center={center}
             zoom={14}
             onClick={handleMapClick}
@@ -113,9 +142,18 @@ const Gmap = () => {
             )}
           </GoogleMap>
 
+          {/* Fullscreen Toggle Button */}
+          <button 
+            onClick={toggleFullscreen} 
+            style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'skyblue', zIndex: 1000 }}
+          >
+            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+          </button>
+
+          {/* LAT/LNG Form */}
           <button 
             onClick={toggleInputs}  
-            style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'skyblue' }}
+            style={{ position: 'absolute', top: '50px', left: '10px', backgroundColor: 'skyblue', zIndex: 1000 }}
           >
             {showInputs ? 'LAT/LNG' : 'Click On LAT/LNG'}
           </button>
@@ -124,13 +162,12 @@ const Gmap = () => {
               onSubmit={handleSubmit} 
               style={{
                 position: 'absolute',
-                top: '50px',
-                left: '3px',
+                top: '90px',
+                left: '10px',
                 backgroundColor: 'grey',
                 padding: '4px',
                 borderRadius: '5px',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-                zIndex: 1000,
+                zIndex: 1100,
               }}
             >
               <input
@@ -138,40 +175,49 @@ const Gmap = () => {
                 value={lat}
                 onChange={(e) => setLat(e.target.value)}
                 placeholder="Latitude"
-                style={{ marginRight: '0px' }}
+                style={{ marginRight: '10px' }}
               />
               <input
                 type="number"
                 value={lng}
                 onChange={(e) => setLng(e.target.value)}
                 placeholder="Longitude"
-                style={{ marginRight: '0px' }}
+                style={{ marginRight: '10px' }}
               />
               <button type="submit" style={{ backgroundColor: 'green', color: 'white' }}>Submit</button>
             </form>
           )}
 
           {/* Icon buttons */}
-          <IconButton 
-            style={{ position: 'absolute', top: '60px', right: '10px', backgroundColor: 'white' }} 
-            onClick={toggleDrawingPolyline}
-          >
-            <PolylineIcon />
-          </IconButton>
+          <CTooltip content='Line'>
+            <IconButton 
+              style={{ position: 'absolute', top: '60px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+              onClick={togglePolyline}
+              color={isPolylineActive ? 'primary' : 'default'}
+            >
+              <PolylineIcon />
+            </IconButton>
+          </CTooltip>
 
-          <IconButton 
-            style={{ position: 'absolute', top: '103px', right: '10px', backgroundColor: 'white' }} 
-            onClick={toggleDrawingPolygon}
-          >
-            <CropDinIcon />
-          </IconButton>
+          <CTooltip content='Polygon'>
+            <IconButton 
+              style={{ position: 'absolute', top: '103px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+              onClick={togglePolygon}
+              color={isPolygonActive ? 'primary' : 'default'}
+            >
+              <CropDinIcon />
+            </IconButton>
+          </CTooltip>
 
-          <IconButton 
-            style={{ position: 'absolute', top: '147px', right: '10px', backgroundColor: 'white' }} 
-            onClick={clearAll} // Call the clearAll function on click
-          >
-            <DeleteIcon />
-          </IconButton>
+          <CTooltip content='Delete'>
+            <IconButton 
+              style={{ position: 'absolute', top: '147px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+              onClick={clearAll}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </CTooltip>
+          
         </div>
       </LoadScript>
     </div>
