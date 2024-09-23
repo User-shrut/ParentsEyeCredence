@@ -13,24 +13,17 @@ import {
   Box,
   TextField,
   FormControl,
-} from '@mui/material'
-import { RiEdit2Fill } from 'react-icons/ri'
-import { AiFillDelete } from 'react-icons/ai'
-import {
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-} from '@coreui/react'
-import { useNavigate } from 'react-router-dom'
-import Loader from '../../components/Loader/Loader'
-import CloseIcon from '@mui/icons-material/Close'
-import { MdConnectWithoutContact } from 'react-icons/md'
-import { AiOutlineUpload } from 'react-icons/ai'
 
-// const getStatusColor = (status) => (status === 'online' ? 'green' : 'red');
+} from '@mui/material';
+import { RiEdit2Fill } from 'react-icons/ri';
+import { AiFillDelete } from 'react-icons/ai';
+import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import { useNavigate } from 'react-router-dom';
+import Loader from "../../components/Loader/Loader";
+import CloseIcon from '@mui/icons-material/Close';
+import { MdConnectWithoutContact } from 'react-icons/md';
+import { AiOutlineUpload } from 'react-icons/ai';
+
 
 const Group = () => {
   const [open, setOpen] = useState(false)
@@ -47,9 +40,29 @@ const Group = () => {
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
-  const [filteredData, setFilteredData] = useState([])
 
-  // Table columns (excluding ID, Group ID, and Calendar ID)
+  const columns = [
+    { Header: 'Name', accessor: 'name' },
+    // { Header: 'Unique ID', accessor: 'uniqueId' },
+  ];
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "40%",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    display: "flex",
+    flexDirection: "column",
+  };
+
 
   const fetchData = async () => {
     setLoading(true)
@@ -58,7 +71,7 @@ const Group = () => {
       const password = '123456'
       const token = btoa(`${username}:${password}`)
 
-      const response = await axios.get('https://rocketsalestracker.com/api/devices', {
+      const response = await axios.get('https://rocketsalestracker.com/api/groups', {
         headers: {
           Authorization: `Basic ${token}`,
         },
@@ -111,21 +124,19 @@ const Group = () => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      const apiUrl = 'https://rocketsalestracker.com/api/devices'
-      const username = 'school'
-      const password = '123456'
-      const token = btoa(`${username}:${password}`)
+
+      const apiUrl = "https://rocketsalestracker.com/api/groups";
+      const username = "school";
+      const password = "123456";
+      const token = btoa(`${username}:${password}`);
+
 
       const newRow = {
         name: formData.name,
         uniqueId: formData.uniqueId,
-        status: formData.status,
-        phone: formData.phone,
-        model: formData.model,
-        expirationTime: formData.expirationTime,
-        contact: formData.contact,
-        category: formData.category,
-      }
+
+      };
+
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -166,8 +177,10 @@ const Group = () => {
         const password = '123456'
         const token = btoa(`${username}:${password}`)
 
-        const response = await fetch(`https://rocketsalestracker.com/api/devices/${id}`, {
-          method: 'DELETE',
+
+        const response = await fetch(`https://rocketsalestracker.com/api/groups/${id}`, {
+          method: "DELETE",
+
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Basic ${token}`,
@@ -218,19 +231,27 @@ const Group = () => {
         </div>
       </div>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
         {loading ? (
           <Loader />
         ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-                <CTableHeaderCell className="bg-body-tertiary text-start ps-5">
-                  Name
-                </CTableHeaderCell>
+
+                {columns.map((column, index) => (
+                  <CTableHeaderCell
+                    key={index}
+                    className="bg-body-tertiary text-center"
+                    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
+                  >
+                    {column.Header}
+                  </CTableHeaderCell>
+                ))}
                 <CTableHeaderCell
-                  className="bg-body-tertiary text-end "
-                  style={{ paddingRight: '7vw' }}
+                  className="bg-body-tertiary text-center"
+                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
+
                 >
                   Actions
                 </CTableHeaderCell>
@@ -239,18 +260,16 @@ const Group = () => {
             <CTableBody>
               {filteredData.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="ps-5">{item.name}</CTableDataCell>
 
-                  <CTableDataCell className="pe-md-5 d-flex" style={{ justifyContent: 'flex-end' }}>
-                    <IconButton aria-label="upload">
-                      <AiOutlineUpload
-                        style={{ fontSize: '25px', color: 'orange', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="edit" onClick={() => setEditModalOpen(true)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
+                  {columns.map((column, i) => (
+                    <CTableDataCell key={i} className="text-center">
+                      {item[column.accessor]}
+                    </CTableDataCell>
+                  ))}
+                  <CTableDataCell className="text-center d-flex" style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <IconButton aria-label="edit">
+                      <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
+
                     </IconButton>
                     <IconButton aria-label="delete" onClick={() => handleDeleteSelected(item.id)}>
                       <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
@@ -264,49 +283,41 @@ const Group = () => {
       </TableContainer>
 
       {/* Add Modal */}
-      {/* <Modal
-        open={addModalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+
+      <Modal open={addModalOpen} onClose={handleModalClose}>
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add New Device
-          </Typography>
           <IconButton
-            style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
+            aria-label="close"
             onClick={handleModalClose}
+            style={{ position: 'absolute', top: 10, right: 10 }}
           >
             <CloseIcon />
           </IconButton>
-          <DialogContent>
-            <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <TextField
-                label="Name"
-                name="name"
-                value={formData.name || ''}
-                onChange={handleInputChange}
-                required
-              />
-              <TextField
-                label="Group Id"
-                name="uniqueId"
-                value={formData.uniqueId || ''}
-                onChange={handleInputChange}
-                required
-              />
-             
-            </FormControl>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddSubmit}
-              style={{ marginTop: '20px' }}
-            >
+          <Typography variant="h6" gutterBottom>
+            Add New Record
+          </Typography>
+          <TextField
+            label="Name"
+            name="name"
+            onChange={handleInputChange}
+            value={formData.name || ''}
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Group ID"
+            name="uniqueId"
+            onChange={handleInputChange}
+            value={formData.uniqueId || ''}
+            margin="normal"
+            required
+          />
+          <FormControl fullWidth>
+            <Button onClick={handleAddSubmit} variant="contained" color="primary">
+
               Submit
             </Button>
-          </DialogContent>
+          </FormControl>
         </Box>
       </Modal> */}
 
