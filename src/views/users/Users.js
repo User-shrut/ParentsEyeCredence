@@ -17,6 +17,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  ListItemText,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -31,6 +38,7 @@ import {
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
+import { ExpandMoreOutlined } from '@mui/icons-material'
 // import "./table.css";
 // import { FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
 const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
@@ -382,7 +390,7 @@ const Users = () => {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '35%',
-    height: '100%',
+    height: 'auto',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
@@ -596,8 +604,8 @@ const Users = () => {
       return
     }
 
-    const apiUrl = `https://rocketsalestracker.com/api/devices/${selectedRow.id}`
-    const username = 'school'
+    const apiUrl = `http://104.251.212.84/api/users/${selectedRow.id}`
+    const username = 'credenceOCT'
     const password = '123456'
     const token = btoa(`${username}:${password}`)
 
@@ -775,9 +783,7 @@ const Users = () => {
                     ))}
                   <CTableDataCell className="text-center d-flex">
                     <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue' }}
-                      />
+                      <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
                     </IconButton>
                     <IconButton
                       aria-label="delete"
@@ -888,8 +894,8 @@ const Users = () => {
       <Modal open={addModalOpen} onClose={handleModalClose}>
         <Box sx={style}>
           <div className="d-flex justify-content-between">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Edit User
+            <Typography id="modal-modal-title" variant="h6" sx={{ color: 'black' }} component="h2">
+              Add User
             </Typography>
             <IconButton
               // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
@@ -900,225 +906,92 @@ const Users = () => {
           </div>
 
           {/* Mapping through columns and rendering specific inputs for each accessor */}
-          {columns.slice(0, -22).map((col) =>
-            col.accessor === 'map' && col.Header === 'Default Map' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="maps-select-label">Default Map</InputLabel>
-                <Select
-                  labelId="maps-select-label"
-                  label="Default Map"
-                  name={col.accessor}
-                  value={formData[col.accessor] || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Map options */}
-                  <MenuItem value={'LocationIQ Streets'}>LocationIQ Streets</MenuItem>
-                  <MenuItem value={'LocationIQ Dark'}>LocationIQ Dark</MenuItem>
-                  <MenuItem value={'OpenStreet Map'}>OpenStreet Map</MenuItem>
-                  <MenuItem value={'OpenTopoMap'}>OpenTopoMap</MenuItem>
-                  <MenuItem value={'Carto Basemaps'}>Carto Basemaps</MenuItem>
-                  <MenuItem value={'Google Road'}>Google Road</MenuItem>
-                  <MenuItem value={'Google Satellite'}>Google Satellite</MenuItem>
-                  <MenuItem value={'Google Hybrid'}>Google Hybrid</MenuItem>
-                  <MenuItem value={'Auto Navi'}>Auto Navi</MenuItem>
-                  <MenuItem value={'Ordnance Survey'}>Ordnance Survey</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'coordinateFormat' && col.Header === 'Coordinate Format' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="coordinates-select-label">Coordinate Format</InputLabel>
-                <Select
-                  labelId="coordinates-select-label"
-                  label="Coordinate Format"
-                  name={col.accessor}
-                  value={formData[col.accessor] || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Coordinate format options */}
-                  <MenuItem value={'dd'}>Decimal Degrees</MenuItem>
-                  <MenuItem value={'ddm'}>Degrees Decimal Minutes</MenuItem>
-                  <MenuItem value={'dms'}>Degrees Minutes Seconds</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'attributes.speedUnit' && col.Header === 'Speed Unit' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="speed-select-label">Speed Unit</InputLabel>
-                <Select
-                  labelId="speed-select-label"
-                  label="Speed Unit"
-                  name="attributes.speedUnit" // Directly access nested field
-                  value={formData.attributes?.speedUnit || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Speed unit options */}
-                  <MenuItem value={'kn'}>kn</MenuItem>
-                  <MenuItem value={'km/h'}>km/h</MenuItem>
-                  <MenuItem value={'mph'}>mph</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'attributes.distance' && col.Header === 'Distance' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="distance-select-label">Distance Unit</InputLabel>
-                <Select
-                  labelId="distance-select-label"
-                  label="Distance Unit"
-                  name="attributes.distance"
-                  value={formData.attributes?.distance || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Distance unit options */}
-                  <MenuItem value={'km'}>km</MenuItem>
-                  <MenuItem value={'mi'}>mi</MenuItem>
-                  <MenuItem value={'nmi'}>nmi</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'attributes.altitudeUnit' && col.Header === 'Altitude' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="altitude-select-label">Altitude Unit</InputLabel>
-                <Select
-                  labelId="altitude-select-label"
-                  label="Altitude Unit"
-                  name="attributes.altitudeUnit"
-                  value={formData.attributes?.altitudeUnit || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Altitude unit options */}
-                  <MenuItem value={'m'}>m</MenuItem>
-                  <MenuItem value={'ft'}>ft</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'attributes.volumeUnit' && col.Header === 'Volume' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="volume-select-label">Volume Unit</InputLabel>
-                <Select
-                  labelId="volume-select-label"
-                  label="Volume Unit"
-                  name="attributes.volumeUnit"
-                  value={formData.attributes?.volumeUnit || ''}
-                  onChange={handleInputChange}
-                >
-                  {/* Volume unit options */}
-                  <MenuItem value={'ltr'}>Liter</MenuItem>
-                  <MenuItem value={'usGal'}>U.S. Gallon</MenuItem>
-                  <MenuItem value={'impGal'}>Imp. Gallon</MenuItem>
-                </Select>
-              </FormControl>
-            ) : col.accessor === 'attributes.loc' && col.Header === 'Location' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="location-select-label">Location</InputLabel>
-                <Select
-                  labelId="location-select-label"
-                  label="Location"
-                  name="attributes.loc"
-                  value={formData.attributes?.loc || ''}
-                  onChange={handleInputChange}
-                  onClick={() => setLocationOpen(!locationOpen)}
-                >
-                  <MenuItem value="Location Details">Location Details</MenuItem>
-                </Select>
 
-                {locationOpen && (
-                  <Box mt={2}>
-                    <TextField
-                      label="Latitude"
-                      variant="outlined"
-                      name="latitude"
-                      type="number"
-                      value={formData.latitude || 0}
-                      onChange={handleInputChange}
-                      inputProps={{ step: 1 }}
-                      sx={{ marginBottom: '10px' }}
-                      fullWidth
-                    />
-                    <TextField
-                      label="Longitude"
-                      variant="outlined"
-                      name="longitude"
-                      type="number"
-                      value={formData.longitude || 0}
-                      onChange={handleInputChange}
-                      inputProps={{ step: 1 }}
-                      sx={{ marginBottom: '10px' }}
-                      fullWidth
-                    />
-                    <TextField
-                      label="Zoom"
-                      variant="outlined"
-                      name="zoom"
-                      value={formData.zoom || ''}
-                      onChange={handleInputChange}
-                      sx={{ marginBottom: '10px' }}
-                      fullWidth
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleCurrentLocation}
-                      sx={{ marginTop: '10px' }}
-                    >
-                      Current Location
-                    </Button>
-                  </Box>
-                )}
-              </FormControl>
-            ) : col.accessor === 'attributes.per' && col.Header === 'Permission' ? (
-              <FormControl fullWidth sx={{ marginBottom: '10px' }} key={col.accessor}>
-                <InputLabel id="permission-select-label">Permission</InputLabel>
-                <Select
-                  labelId="permission-select-label"
-                  label="Permission"
-                  name="attributes.per"
-                  value={formData.attributes?.per || ''}
-                  onChange={handleInputChange}
-                  onClick={() => setPermissionOpen(!permissionOpen)}
-                >
-                  <MenuItem value="Permission Details">Permission Details</MenuItem>
-                </Select>
+          <TextField
+            label={'User Name'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
+          <TextField
+            label={'Email Address'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
+          <TextField
+            label={'Password'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
 
-                {permissionOpen && (
-                  <Box mt={2}>
-                    {[
-                      { label: 'Registration', accessor: 'registration' },
-                      { label: 'Readonly', accessor: 'readonly' },
-                      { label: 'Device Readonly', accessor: 'deviceReadonly' },
-                      { label: 'Limit Commands', accessor: 'limitCommands' },
-                      { label: 'Disable Reports', accessor: 'disableReports' },
-                      { label: 'No Email Change', accessor: 'fixedEmail' },
-                    ].map(({ label, accessor }) => (
-                      <TextField
-                        key={accessor}
-                        label={label}
-                        variant="outlined"
-                        name={accessor}
-                        value={formData[accessor] || ''}
-                        onChange={handleInputChange}
-                        sx={{ marginBottom: '10px' }}
-                        fullWidth
-                      />
-                    ))}
-                  </Box>
-                )}
-              </FormControl>
-            ) : (
-              // Default TextField for other columns
-              <TextField
-                key={col.accessor}
-                label={col.Header}
-                variant="outlined"
-                name={col.accessor}
-                value={formData[col.accessor] || ''}
-                onChange={handleInputChange}
-                sx={{ marginBottom: '10px' }}
-                fullWidth
-              />
-            ),
-          )}
+          <Typography id="modal-modal-title" sx={{ color: 'black', marginTop: "15px" }} component="h4">
+            Permissions
+          </Typography>
+
+          <FormControlLabel
+            sx={{ color: 'black' }}
+            control={<Checkbox defaultChecked />}
+            label="Admin"
+          />
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreOutlined />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Master
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormGroup sx={{ color: 'black' }}>
+                <FormControlLabel control={<Checkbox />} label="User" />
+                <FormControlLabel control={<Checkbox />} label="Groups" />
+                <FormControlLabel control={<Checkbox />} label="Devices" />
+                <FormControlLabel control={<Checkbox />} label="Geofence" />
+                <FormControlLabel control={<Checkbox />} label="Drivers" />
+                <FormControlLabel control={<Checkbox />} label="Maintainance" />
+                <FormControlLabel control={<Checkbox />} label="Notification" />
+                <FormControlLabel control={<Checkbox />} label="Preferences" />
+              </FormGroup>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreOutlined />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              Reports
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormGroup sx={{ color: 'black' }}>
+                <FormControlLabel control={<Checkbox defaultChecked />} label="History" />
+                <FormControlLabel control={<Checkbox />} label="Stops" />
+                <FormControlLabel control={<Checkbox />} label="Trips" />
+                <FormControlLabel control={<Checkbox />} label="Statistics" />
+                <FormControlLabel control={<Checkbox />} label="Combine Reports" />
+                <FormControlLabel control={<Checkbox />} label="Custom Reports" />
+                <FormControlLabel control={<Checkbox />} label="Alert" />
+                <FormControlLabel control={<Checkbox />} label="Summary" />
+                <FormControlLabel control={<Checkbox />} label="Schedule Reports" />
+                <FormControlLabel control={<Checkbox />} label="Geofence Reports" />
+              </FormGroup>
+            </AccordionDetails>
+          </Accordion>
 
           {/* Submit button */}
           <Button
             variant="contained"
             color="primary"
-            onClick={handleAddSubmit}
+            // onClick={handleAddSubmit}
             sx={{ marginTop: '20px' }}
           >
             Submit
@@ -1136,80 +1009,98 @@ const Users = () => {
               marginBottom: '20px',
             }}
           >
-            <Typography variant="h6">Edit Row</Typography>
+            <Typography variant="h6" sx={{color: "black"}}>Edit User</Typography>
             <IconButton onClick={handleModalClose}>
               <CloseIcon />
             </IconButton>
           </Box>
 
-          {/* Group ID dropdown */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Group ID</InputLabel>
-            <Select
-              name="groupId"
-              value={formData.groupId || ''}
-              onChange={handleInputChange}
-              label="Group ID"
+          <TextField
+            label={'User Name'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
+          <TextField
+            label={'Email Address'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
+          <TextField
+            label={'Password'}
+            variant="outlined"
+            name={'name'}
+            onChange={handleInputChange}
+            sx={{ marginBottom: '10px' }}
+            fullWidth
+          />
+
+          <Typography id="modal-modal-title" sx={{ color: 'black', marginTop: "15px" }} component="h4">
+            Permissions
+          </Typography>
+
+          <FormControlLabel
+            sx={{ color: 'black' }}
+            control={<Checkbox defaultChecked />}
+            label="Admin"
+          />
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreOutlined />}
+              aria-controls="panel1-content"
+              id="panel1-header"
             >
-              {groups.map((group) => (
-                <MenuItem key={group.id} value={group.id}>
-                  {group.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Calendar ID dropdown */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Calendar ID</InputLabel>
-            <Select
-              name="calendarId"
-              value={formData.calendarId || ''}
-              onChange={handleInputChange}
-              label="Calendar ID"
+              Master
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormGroup sx={{ color: 'black' }}>
+                <FormControlLabel control={<Checkbox />} label="User" />
+                <FormControlLabel control={<Checkbox />} label="Groups" />
+                <FormControlLabel control={<Checkbox />} label="Devices" />
+                <FormControlLabel control={<Checkbox />} label="Geofence" />
+                <FormControlLabel control={<Checkbox />} label="Drivers" />
+                <FormControlLabel control={<Checkbox />} label="Maintainance" />
+                <FormControlLabel control={<Checkbox />} label="Notification" />
+                <FormControlLabel control={<Checkbox />} label="Preferences" />
+              </FormGroup>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreOutlined />}
+              aria-controls="panel1-content"
+              id="panel1-header"
             >
-              {calendars.map((calendar) => (
-                <MenuItem key={calendar.id} value={calendar.id}>
-                  {calendar.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              Reports
+            </AccordionSummary>
+            <AccordionDetails>
+              <FormGroup sx={{ color: 'black' }}>
+                <FormControlLabel control={<Checkbox defaultChecked />} label="History" />
+                <FormControlLabel control={<Checkbox />} label="Stops" />
+                <FormControlLabel control={<Checkbox />} label="Trips" />
+                <FormControlLabel control={<Checkbox />} label="Statistics" />
+                <FormControlLabel control={<Checkbox />} label="Combine Reports" />
+                <FormControlLabel control={<Checkbox />} label="Custom Reports" />
+                <FormControlLabel control={<Checkbox />} label="Alert" />
+                <FormControlLabel control={<Checkbox />} label="Summary" />
+                <FormControlLabel control={<Checkbox />} label="Schedule Reports" />
+                <FormControlLabel control={<Checkbox />} label="Geofence Reports" />
+              </FormGroup>
+            </AccordionDetails>
+          </Accordion>
 
-          {/* Category dropdown */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Category</InputLabel>
-            <Select
-              name="category"
-              value={formData.category || ''}
-              onChange={handleInputChange}
-              label="Category"
-            >
-              <MenuItem value="Default">Default</MenuItem>
-              <MenuItem value="Animal">Animal</MenuItem>
-              <MenuItem value="Bicycle">Bicycle</MenuItem>
-            </Select>
-          </FormControl>
-
-          {/* Other fields */}
-          {columns.slice(3, -1).map((col) => (
-            <TextField
-              key={col.accessor}
-              label={col.Header}
-              variant="outlined"
-              name={col.accessor}
-              value={formData[col.accessor] || ''}
-              onChange={handleInputChange}
-              fullWidth
-              sx={{ marginBottom: 2 }}
-            />
-          ))}
-
+          {/* Submit button */}
           <Button
             variant="contained"
             color="primary"
-            onClick={handleEditSubmit}
-            sx={{ marginTop: 2 }}
+            // onClick={handleAddSubmit}
+            sx={{ marginTop: '20px' }}
           >
             Submit
           </Button>
