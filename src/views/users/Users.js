@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import ReactPaginate from 'react-paginate'
 import {
   TableContainer,
   Paper,
@@ -29,7 +30,6 @@ import {
   CTableRow,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
-import Loader from '../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
 // import "./table.css";
 // import { FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
@@ -51,6 +51,7 @@ const Users = () => {
   const [selectedRow, setSelectedRow] = useState(null)
   const [locationOpen, setLocationOpen] = useState(false)
   const [permissionOpen, setPermissionOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const [attributesOpen, setAttributesOpen] = useState(false)
   const handleModalClose = () => {
@@ -549,36 +550,36 @@ const Users = () => {
     fetchCalendars()
   }, [])
 
-  const handleDeleteSelected = async (id) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      try {
-        const username = 'school' // Replace with your actual username
-        const password = '123456' // Replace with your actual password
-        const token = btoa(`${username}:${password}`) // Encode credentials in Base64
+  // const handleDeleteSelected = async (id) => {
+  //   if (window.confirm('Are you sure you want to delete this record?')) {
+  //     try {
+  //       const username = 'school' // Replace with your actual username
+  //       const password = '123456' // Replace with your actual password
+  //       const token = btoa(`${username}:${password}`) // Encode credentials in Base64
 
-        const response = await fetch(`https://rocketsalestracker.com/api/devices/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${token}`,
-          },
-        })
+  //       const response = await fetch(`https://rocketsalestracker.com/api/devices/${id}`, {
+  //         method: 'DELETE',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `Basic ${token}`,
+  //         },
+  //       })
 
-        if (response.ok) {
-          // Update the state to remove the deleted row
-          setFilteredData(filteredData.filter((item) => item.id !== id))
-          alert('Record deleted successfully')
-        } else {
-          const result = await response.json()
-          console.error('Server responded with:', result)
-          alert(`Unable to delete record: ${result.message || response.statusText}`)
-        }
-      } catch (error) {
-        console.error('Error during DELETE request:', error)
-        alert('Unable to delete record. Please check the console for more details.')
-      }
-    }
-  }
+  //       if (response.ok) {
+  //         // Update the state to remove the deleted row
+  //         setFilteredData(filteredData.filter((item) => item.id !== id))
+  //         alert('Record deleted successfully')
+  //       } else {
+  //         const result = await response.json()
+  //         console.error('Server responded with:', result)
+  //         alert(`Unable to delete record: ${result.message || response.statusText}`)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error during DELETE request:', error)
+  //       alert('Unable to delete record. Please check the console for more details.')
+  //     }
+  //   }
+  // }
   // const handleEditSubmit = () => {
   //   // setEditModalOpen(true);
   // };
@@ -644,81 +645,97 @@ const Users = () => {
     handleModalClose()
   }
 
-  return (
-    <div className="m-3">
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Users</h2>
-        </div>
+  const handlePageClick = async (e) => {
+    console.log(e)
+    setLoading(true) // Start loading
+    try {
+      const username = 'hbtrack'
+      const password = '123456@'
+      const token = btoa(`${username}:${password}`)
 
-        <div className="d-flex">
-          <div className="me-3">
+      const response = await axios.get('http://104.251.212.84/api/users', {
+        headers: {
+          Authorization: `Basic ${token}`,
+        },
+      })
+
+      if (Array.isArray(response.data)) {
+        setData(response.data)
+        setTotalResponses(response.data.length)
+      } else {
+        console.error('Expected an array but got:', response.data)
+        alert('Unexpected data format received.')
+      }
+    } catch (error) {
+      console.error('Fetch data error:', error)
+      alert('An error occurred while fetching data.')
+    } finally {
+      setLoading(false) // Stop loading once data is fetched
+    }
+  }
+
+  return (
+    <>
+      <div className="mx-md-3 mt-3">
+        <div>
+          <div className="d-flex justify-content-between mb-2">
+            <div>
+              <h2>Users</h2>
+            </div>
+
+            <div className="d-flex">
+              <div className="me-3 d-none d-md-block">
+                <input
+                  type="search"
+                  className="form-control"
+                  placeholder="search here...."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div>
+                <button
+                  onClick={() => setAddModalOpen(true)}
+                  variant="contained"
+                  className="btn btn-success text-white"
+                >
+                  Add User
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="mb-2 d-md-none">
             <input
               type="search"
               className="form-control"
-              placeholder="search here..."
+              placeholder="search here...."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-success text-white"
-            >
-              Add User
-            </button>
-          </div>
         </div>
-      </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: '500px', // Set the desired height
-          overflow: 'auto', // Enable scrollbar when content overflows
-        }}
-      >
         {loading ? (
-          <Loader />
+          <>
+            <div className="text-nowrap mb-2">
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+            </div>
+          </>
         ) : (
-          // <CTable align="middle" className="mb-0 border" hover responsive>
-          //   <CTableHead className="text-nowrap">
-          //     <CTableRow>
-          //       {columns.map((column, index) => (
-          //         <CTableHeaderCell key={index} className="bg-body-tertiary text-center">
-          //           {column.Header}
-          //         </CTableHeaderCell>
-          //       ))}
-          //       <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
-          //     </CTableRow>
-          //   </CTableHead>
-          //   <CTableBody>
-          //     {filteredData.map((item, index) => (
-          //       <CTableRow key={index}>
-          //         {columns.map((column, i) => (
-          //           <CTableDataCell key={i} className="text-center">
-          //             {item[column.accessor]}
-          //           </CTableDataCell>
-          //         ))}
-          //         <CTableDataCell className="text-center d-flex">
-          //           <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
-          //             <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
-          //           </IconButton>
-          //           <IconButton
-          //             aria-label="delete"
-          //             onClick={() => handleDeleteSelected(item.id)} // Pass the item's unique ID to handleDeleteSelected
-          //             sx={{ marginRight: "10px", color: "brown" }}
-          //           >
-          //             <AiFillDelete style={{ fontSize: "25px" }} />
-          //           </IconButton>
-          //         </CTableDataCell>
-          //       </CTableRow>
-          //     ))}
-          //   </CTableBody>
-          // </CTable>
-          <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTable align="middle" className="mb-2 border min-vh-25" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
                 {columns
@@ -752,20 +769,20 @@ const Users = () => {
                       ].includes(column.accessor),
                     )
                     .map((column, i) => (
-                      <CTableDataCell key={i} className="text-center">
+                      <CTableDataCell key={i} className="text-center p-0">
                         {item[column.accessor]}
                       </CTableDataCell>
                     ))}
                   <CTableDataCell className="text-center d-flex">
                     <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                       <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                        style={{ fontSize: '25px', color: 'lightBlue' }}
                       />
                     </IconButton>
                     <IconButton
                       aria-label="delete"
                       onClick={() => handleDeleteSelected(item.id)}
-                      sx={{ marginRight: '10px', color: 'brown' }}
+                      sx={{ color: 'brown' }}
                     >
                       <AiFillDelete style={{ fontSize: '25px' }} />
                     </IconButton>
@@ -775,8 +792,25 @@ const Users = () => {
             </CTableBody>
           </CTable>
         )}
-      </TableContainer>
-
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel="next >"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={10}
+          previousLabel="< previous"
+          renderOnZeroPageCount={null}
+          marginPagesDisplayed={2}
+          containerClassName="pagination justify-content-center"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          activeClassName="active"
+        />
+      </div>
       {/* <Modal open={addModalOpen} onClose={handleModalClose}>
   <Box sx={style}>
     <Box
@@ -1181,7 +1215,7 @@ const Users = () => {
           </Button>
         </Box>
       </Modal>
-    </div>
+    </>
   )
 }
 
