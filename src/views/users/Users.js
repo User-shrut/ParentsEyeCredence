@@ -653,6 +653,10 @@ const Users = () => {
     handleModalClose()
   }
 
+
+
+
+  // pagination code
   const handlePageClick = async (e) => {
     console.log(e)
     setLoading(true) // Start loading

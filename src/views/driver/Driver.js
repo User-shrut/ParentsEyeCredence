@@ -468,7 +468,24 @@ const Driver = () => {
         }}
       >
         {loading ? (
-          <Loader />
+          <>
+          <div className="text-nowrap mb-2" style={{width: "70vw"}}>
+            <p className="card-text placeholder-glow">
+              <span className="placeholder col-7" />
+              <span className="placeholder col-4" />
+              <span className="placeholder col-4" />
+              <span className="placeholder col-6" />
+              <span className="placeholder col-8" />
+            </p>
+            <p className="card-text placeholder-glow">
+              <span className="placeholder col-7" />
+              <span className="placeholder col-4" />
+              <span className="placeholder col-4" />
+              <span className="placeholder col-6" />
+              <span className="placeholder col-8" />
+            </p>
+          </div>
+        </>
         ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
