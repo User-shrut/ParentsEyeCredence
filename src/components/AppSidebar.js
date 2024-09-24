@@ -18,11 +18,39 @@ import { sygnet } from 'src/assets/brand/sygnet'
 
 // sidebar nav config
 import navigation from '../_nav'
+// auth purpose
+import Cookies from 'js-cookie';
+import { jwtDecode } from "jwt-decode";
+
+
+const getUserRole = () => {
+  const token = Cookies.get('authToken');
+  let role;
+  
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    if(decodedToken.superadmin == true){
+      role ='superadmin';
+    }else{
+      role = "user";
+    }
+  }
+
+  return role; // Default role if no token
+};
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+
+  const role = getUserRole();
+
+  console.log("role")
+  console.log(role)
+
+  const navigate = navigation(role);
+
 
   return (
     <CSidebar
@@ -46,7 +74,7 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
-      <AppSidebarNav items={navigation} />
+      <AppSidebarNav items={navigate} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
