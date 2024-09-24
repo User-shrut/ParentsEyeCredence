@@ -11,7 +11,8 @@ const Driver = React.lazy(() => import('./views/driver/Driver'))
 const Notifications = React.lazy(() => import('./views/notifications/Notifications'))
 const Maintenance = React.lazy(() => import('./views/maintenance/Maintenance'))
 const Preferences = React.lazy(() => import('./views/preferences/Preferences'))
-
+const Category = React.lazy(() => import('./views/category/Category'))
+const Model= React.lazy(() => import('./views/model/Model'))
 // reports
 const Combine = React.lazy(() => import('./views/combinereports/Combine'))
 const Custom = React.lazy(() => import('./views/customreports/Custom'))
@@ -45,6 +46,9 @@ const routes = [
   { path: '/driver', name: 'Driver', element: Driver },
   { path: '/users', name: 'Users', element: Users },
   { path: '/preferences', name: 'Preferences', element: Preferences},
+  { path: '/category', name: 'Category', element: Category},
+  { path: '/model', name: 'Model', element: Model},
+  { path: '/preferences', name: 'Preferences', element: Preferences},
   { path: '/combinereports', name: 'Combine', element:Combine },
   { path: '/customreports', name: 'Custom', element: Custom},
   { path: '/history', name: 'History', element: History },
@@ -60,5 +64,7 @@ const routes = [
   { path: '/inventory-management', name: 'Inventory Management', element: InventoryManagment },
   { path: '/chatbot', name: 'ChatBot', element: ChatBot },
   { path: '/h&s', name: 'Help & Support', element: HelpSupp },
+
+
 ]
 export default routes

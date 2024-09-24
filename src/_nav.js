@@ -90,13 +90,13 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Catogery',
-        to: '/catogery',
+        name: 'Category',
+        to: '/category',
       },
       {
         component: CNavItem,
-        name: 'Modal',
-        to: '/modal',
+        name: 'Model',
+        to: '/model',
       },
     ],
   },
