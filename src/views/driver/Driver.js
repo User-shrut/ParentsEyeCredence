@@ -4,11 +4,8 @@ import {
   TableContainer,
   Paper,
   IconButton,
-  Dialog,
-  DialogContent,
   Typography,
   Button,
-  InputBase,
   Modal,
   Box,
   TextField,
@@ -19,7 +16,6 @@ import {
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
-import SearchIcon from '@mui/icons-material/Search'
 import {
   CTable,
   CTableBody,
@@ -31,8 +27,6 @@ import {
 import { useNavigate } from 'react-router-dom'
 import Loader from '../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
-
-const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
 
 const Driver = () => {
   const [open, setOpen] = useState(false)
@@ -46,30 +40,18 @@ const Driver = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
   const [filteredRows, setFilteredRows] = useState([])
-  // const handleModalClose = () => setAddModalOpen(false);
   const [filteredData, setFilteredData] = useState([]) // Your initial data
   const [selectedRow, setSelectedRow] = useState(null)
   const [users, setUsers] = useState([])
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
-    // setFormData({});
   }
   const [areasValue, setAreasValue] = useState('')
 
   const columns = [
     { Header: 'Device Name', accessor: 'name' },
-    { Header: 'IMEI', accessor: 'uniqueId' },
-    
-    // { Header: 'Sim', accessor: 'Sim' },
-    // { Header: 'Speed', accessor: 'Speed' },
-    // { Header: 'Average', accessor: 'Average' },
-    // { Header: 'Model', accessor: 'model' },
-    // { Header: 'Category', accessor: 'category' },
-    // { Header: 'Groups', accessor: 'groupId' },
-    // { Header: 'User', accessor: 'User' },
-    // { Header: 'Geofence', accessor: 'geofence' },
-    // { Header: 'Expiration', accessor: 'expiration' },
+    { Header: 'IMEI', accessor: 'identifier' },
   ]
 
   useEffect(() => {
@@ -92,36 +74,34 @@ const Driver = () => {
     padding: '1rem',
     margintop: '8px',
   }
-  /* Replace -ms-high-contrast with forced-colors */
 
   const fetchData = async () => {
-    setLoading(true) // Start loading
+    setLoading(true); // Start loading
     try {
-      const username = 'school'
-      const password = '123456'
-      const token = btoa(`${username}:${password}`)
+      // Use your token here, ensure it's valid
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
 
-      const response = await axios.get('https://rocketsalestracker.com/api/drivers', {
+      const response = await axios.get('https://credence-tracker.onrender.com/driver/', {
         headers: {
-          Authorization: `Basic ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
-      if (Array.isArray(response.data)) {
-        setData(response.data)
-        setTotalResponses(response.data.length)
+      // Check for the expected data structure
+      if (response.data.drivers && Array.isArray(response.data.drivers)) {
+        setData(response.data.drivers);
+        setTotalResponses(response.data.pagination.totalDrivers);
       } else {
-        console.error('Expected an array but got:', response.data)
-        alert('Unexpected data format received.')
+        console.error('Expected an array but got:', response.data);
+        alert('Unexpected data format received.');
       }
     } catch (error) {
-      console.error('Fetch data error:', error)
-      alert('An error occurred while fetching data.')
+      console.error('Fetch data error:', error);
+      alert('An error occurred while fetching data: ' + error.message);
     } finally {
-      setLoading(false) // Stop loading once data is fetched
+      setLoading(false); // Stop loading once data is fetched
     }
-  }
-
+  };
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase()
     setFilteredData(
@@ -141,31 +121,22 @@ const Driver = () => {
   const handleAddSubmit = async () => {
     try {
       // Define the API endpoint and credentials
-      const apiUrl = 'https://rocketsalestracker.com/api/drivers' // Replace with actual API endpoint
-      const username = 'school' // Replace with your actual username
-      const password = '123456' // Replace with your actual password
-      const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-
+      const apiUrl = 'https://credence-tracker.onrender.com/driver' // Replace with actual API endpoint
+      // const username = 'school' // Replace with your actual username
+      // const password = '123456' // Replace with your actual password
+      // const token = btoa(`${username}:${password}`) // Encode credentials in Base64
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
       // Prepare the new row object based on the expected schema
       const newRow = {
         name: formData.name, // Ensure formData has 'name'
-        uniqueId: formData.uniqueId, // Ensure formData has 'uniqueId'
-        // groupId: formData.groupId, // Ensure formData has 'groupId'
-        // attributes: formData.attributes || {}, // Ensure formData has 'attributes' (empty object if not provided)
-        // calendarId: formData.calendarId, // Ensure formData has 'calendarId'
-        // status: formData.status, // Ensure formData has 'status'
-        // phone: formData.phone, // Ensure formData has 'phone'
-        // model: formData.model, // Ensure formData has 'model'
-        // expirationTime: formData.expirationTime, // Ensure formData has 'expirationTime'
-        // contact: formData.contact, // Ensure formData has 'contact'
-        // category: formData.category, // Ensure formData has 'category'
+        identifier: formData.identifier, // Ensure formData has 'identifier'
       }
 
       // POST request to the server with Basic Auth
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Basic ${token}`, // Add Basic Auth header
+          Authorization: `Bearer ${token}`, // Add Basic Auth header
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(newRow),
@@ -249,36 +220,68 @@ const Driver = () => {
     fetchCalendars()
   }, [])
 
+  // const handleDeleteSelected = async (id) => {
+  //   if (window.confirm('Are you sure you want to delete this record?')) {
+  //     try {
+  //       // const username = 'aniket' // Replace with your actual username
+  //       // const password = '123456' // Replace with your actual password
+  //       // const token = btoa(`${username}:${password}`) // Encode credentials in Base64
+  //       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
+  //       const response = await fetch(`https://credence-tracker.onrender.com/driver/${id}`, {
+  //         method: 'DELETE',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       })
+
+  //       if (response.ok) {
+  //         // Update the state to remove the deleted row
+  //         setFilteredData(filteredData.filter((item) => item.id !== id))
+  //         alert('Record deleted successfully')
+  //       } else {
+  //         const result = await response.json()
+  //         console.error('Server responded with:', result)
+  //         alert(`Unable to delete record: ${result.message || response.statusText}`)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error during DELETE request:', error)
+  //       alert('Unable to delete record. Please check the console for more details.')
+  //     }
+  //   }
+  // }
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        const username = 'school' // Replace with your actual username
-        const password = '123456' // Replace with your actual password
-        const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-
-        const response = await fetch(`https://rocketsalestracker.com/api/drivers/${id}`, {
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE'; // Use your actual token
+        // Make sure the URL is correct according to your API setup
+        const response = await fetch(`https://credence-tracker.onrender.com/driver/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Basic ${token}`,
+            Authorization: `Bearer ${token}`,
           },
-        })
+        });
 
+        // Log the raw response to debug issues
+        const responseText = await response.text();
+        console.log('Response:', responseText);
+
+        // Check if the response is OK
         if (response.ok) {
-          // Update the state to remove the deleted row
-          setFilteredData(filteredData.filter((item) => item.id !== id))
-          alert('Record deleted successfully')
+          setFilteredData(filteredData.filter((item) => item._id !== id)); // Use `_id`
+          alert('Record deleted successfully');
         } else {
-          const result = await response.json()
-          console.error('Server responded with:', result)
-          alert(`Unable to delete record: ${result.message || response.statusText}`)
+          console.error('Server responded with:', responseText);
+          alert(`Unable to delete record: ${responseText || response.statusText}`);
         }
       } catch (error) {
-        console.error('Error during DELETE request:', error)
-        alert('Unable to delete record. Please check the console for more details.')
+        console.error('Error during DELETE request:', error);
+        alert('Unable to delete record. Please check the console for more details.');
       }
     }
-  }
+    fetchData();
+  };
 
   const handleEditIconClick = (row) => {
     setSelectedRow(row) // Set the selected row to be edited
@@ -288,58 +291,62 @@ const Driver = () => {
 
   const handleEditSubmit = async () => {
     if (!selectedRow) {
-      alert('No row selected for editing')
-      return
+      alert('No row selected for editing');
+      return;
     }
 
-    const apiUrl = `https://rocketsalestracker.com/api/drivers/${selectedRow.id}`
-    const username = 'school'
-    const password = '123456'
-    const token = btoa(`${username}:${password}`)
+    const apiUrl = `https://credence-tracker.onrender.com/driver/${selectedRow._id}`; // Use _id for the correct driver ID
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE'; // Use your actual token
 
     // Exclude the 'isSelected' field from formData
-    const { isSelected, ...updatedData } = formData
+    const { isSelected, ...updatedData } = formData;
 
     try {
-      console.log('Sending request to:', apiUrl)
-      console.log('Request payload:', JSON.stringify(updatedData, null, 2))
+      console.log('Sending request to:', apiUrl);
+      console.log('Request payload:', JSON.stringify(updatedData, null, 2));
 
       const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
-          Authorization: `Basic ${token}`,
+          Authorization: `Bearer ${token}`, // Change to Bearer token if needed
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedData),
-      })
+      });
 
-      console.log('Response status:', response.status)
-      console.log('Response headers:', response.headers)
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
-        const errorResult = await response.json()
-        console.error('Error response:', errorResult)
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`)
+        let errorResult;
+        try {
+          errorResult = await response.json();
+        } catch (error) {
+          errorResult = { message: 'Failed to parse error response' };
+        }
+        console.error('Error response:', errorResult);
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`);
       }
 
-      const result = await response.json()
-      console.log('Update successful:', result)
-      alert('Updated successfully')
+      const result = await response.json();
+      console.log('Update successful:', result);
+      alert('Updated successfully');
 
       // Update the local state with the modified row data
       const updatedRows = filteredRows.map((row) =>
-        row.id === selectedRow.id ? { ...row, ...updatedData } : row,
-      )
-      setFilteredRows(updatedRows)
+        row._id === selectedRow._id ? { ...row, ...updatedData } : row, // Ensure you're checking _id
+      );
+      setFilteredRows(updatedRows);
 
-      handleModalClose()
-      fetchData() // Refetch the data to ensure the UI is up-to-date
+      handleModalClose();
+      fetchData(); // Refetch the data to ensure the UI is up-to-date
     } catch (error) {
-      console.error('Error updating row:', error.message, error.stack)
-      alert('Error updating data')
+      console.error('Error updating row:', error.message, error.stack);
+      alert('Error updating data');
     }
-    handleModalClose()
-  }
+    handleModalClose();
+  };
+
 
   const [dropdownOptions, setDropdownOptions] = useState([])
   const [areas, setAreas] = useState([])
@@ -420,8 +427,6 @@ const Driver = () => {
 
   return (
     <div className='m-3'>
-
-
       <div>
         <div className="d-flex justify-content-between mb-2">
           <div>
@@ -463,7 +468,7 @@ const Driver = () => {
       <TableContainer
         component={Paper}
         sx={{
-          height: '500px', // Set the desired height
+          height: '800px', // Set the desired height
           overflow: 'auto', // Enable scrollbar when content overflows
         }}
       >
@@ -499,16 +504,16 @@ const Driver = () => {
                     </IconButton>
                     <IconButton
                       aria-label="delete"
-                      onClick={() => handleDeleteSelected(item.id)} // Pass the item's unique ID to handleDeleteSelected
+                      onClick={() => handleDeleteSelected(item._id)} // Use item._id instead of item.id
                       sx={{ marginRight: '10px', color: 'brown' }}
                     >
                       <AiFillDelete style={{ fontSize: '25px' }} />
                     </IconButton>
                   </CTableDataCell>
                 </CTableRow>
-
               ))}
             </CTableBody>
+
           </CTable>
         )}
       </TableContainer>
@@ -817,7 +822,6 @@ const Driver = () => {
                       shrink: true, // Ensures the label is always visible
                     }}
                   />
-
                   {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
                   {showExpirationDropdown && (
                     <FormControl fullWidth sx={{ marginTop: 1 }}>
@@ -854,7 +858,6 @@ const Driver = () => {
               )
             }
           })}
-
           <Button
             variant="contained"
             color="primary"
@@ -868,5 +871,4 @@ const Driver = () => {
     </div>
   )
 }
-
 export default Driver
