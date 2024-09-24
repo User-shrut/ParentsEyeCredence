@@ -19,7 +19,7 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -49,7 +49,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     >
       <CCol md={6}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-        
+
         <CFormSelect
           id="devices"
           required
@@ -65,7 +65,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
-      
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
@@ -147,7 +147,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
   );
 };
 
-const CustomStyles1 = ({ rows, handleEditClick, handleSaveClick, handleDeleteClick, handleInputChange }) => {
+const CustomStyles1 = ({ rows, selectedColumn }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
@@ -162,36 +162,9 @@ const CustomStyles1 = ({ rows, handleEditClick, handleSaveClick, handleDeleteCli
         {rows.map((row) => (
           <CTableRow key={row.id} className="custom-row">
             <CTableDataCell>{row.id}</CTableDataCell>
-            <CTableDataCell>
-              {row.isEditing ? (
-                <CFormInput
-                  value={row.Devices}
-                  onChange={(e) => handleInputChange(row.id, 'Devices', e.target.value)}
-                />
-              ) : (
-                row.Devices
-              )}
-            </CTableDataCell>
-            <CTableDataCell>
-              {row.isEditing ? (
-                <CFormInput
-                  value={row.Details}
-                  onChange={(e) => handleInputChange(row.id, 'Details', e.target.value)}
-                />
-              ) : (
-                row.Details
-              )}
-            </CTableDataCell>
-            <CTableDataCell>
-              {row.isEditing ? (
-                <CFormInput
-                  value={row.Type}
-                  onChange={(e) => handleInputChange(row.id, 'Type', e.target.value)}
-                />
-              ) : (
-                row.Type
-              )}
-            </CTableDataCell>
+            <CTableDataCell>{row.Devices}</CTableDataCell>
+            <CTableDataCell>{row.Details}</CTableDataCell>
+            <CTableDataCell>{row.Type}</CTableDataCell>
           </CTableRow>
         ))}
       </CTableBody>
@@ -203,13 +176,14 @@ const Validation = () => {
   const username = 'school';
   const password = '123456';
   const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active', isEditing: false },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active', isEditing: false },
+    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active' },
+    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active'  },
   ]);
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '' });
+  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -221,11 +195,11 @@ const Validation = () => {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
         setDevices(data); // Adjust if the structure of the response is different
       } catch (error) {
@@ -242,11 +216,11 @@ const Validation = () => {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
         setGroups(data); // Adjust if the structure of the response is different
       } catch (error) {
@@ -258,75 +232,66 @@ const Validation = () => {
     fetchGroups();
   }, []);
 
-  const handleInputChange = (id, field, value) => {
-    if (id) {
-      setRows((prevRows) =>
-        prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
-      );
-    } else {
-      setFormData({ ...formData, [field]: value });
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    if (name === 'Columns') {
+      setSelectedColumn(value);
     }
   };
 
   const handleSubmit = () => {
-    const newRow = {
-      id: rows.length + 1,
-      Devices: formData.Devices,
-      Details: formData.Details,
-      Type: formData.Periods,
-      isEditing: false,
-    };
-    setRows([...rows, newRow]);
-    setFormData({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '' });
+    console.log('Form submitted with data:', formData);
   };
 
-  const filteredRows = rows.filter(row =>
-    row.Devices.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <CRow>
-      <h3>Combine Reports</h3>
-      <CCol xs={12} className="mb-4">
+    <>
+      <CRow>
+        
+          <h3>Combine Reports</h3>
+        <CCol xs={12} className='mb-4'>
         <CCard className="p-0">
-          <CCardHeader className="d-flex justify-content-between align-items-center">
+
+        <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Status Reports</strong>
-            <CFormInput
+
+              <CFormInput
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: '250px' }}
             />
-          </CCardHeader>
-          <CCardBody>
-            <CustomStyles
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleSubmit={handleSubmit}
-              devices={devices}
-              groups={groups}
-            />
-          </CCardBody>
-        </CCard>
-      </CCol>
 
-      <CCol xs={12}>
+            </CCardHeader>
+            <CCardBody>
+              <CustomStyles
+                formData={formData}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+                devices={devices}
+                groups={groups}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      <CRow>
+        <CCol xs={12}>
         <CCard className="p-0 mb-4">
           <CCardHeader>
             <strong>All Status List :</strong>
           </CCardHeader>
           <CCardBody>
-            <CustomStyles1
-              rows={filteredRows}
-              handleEditClick={() => {}}
-              handleSaveClick={() => {}}
-              handleDeleteClick={() => {}}
-              handleInputChange={handleInputChange}
-            />
+          <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
           </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+          </CCard>
+        </CCol>
+      </CRow>
+    </>
   );
 };
 
