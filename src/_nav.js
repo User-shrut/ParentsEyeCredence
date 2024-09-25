@@ -100,6 +100,27 @@ const _nav = (role) => {
       },
       {
         component: CNavGroup,
+        name: 'Master',
+        icon: (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <LiaFileInvoiceDollarSolid style={{ marginRight: '15px', fontSize: '22px' }} />
+          </div>
+        ),
+        items: [
+          { component: CNavItem, name: 'Devices', to: '/devices' },
+          { component: CNavItem, name: 'Users', to: '/users' },
+          { component: CNavItem, name: 'Group', to: '/group' },
+          { component: CNavItem, name: 'Geofences', to: '/geofences' },
+          { component: CNavItem, name: 'Driver', to: '/driver' },
+          { component: CNavItem, name: 'Notifications', to: '/notifications' },
+          { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
+          { component: CNavItem, name: 'Preferences', to: '/preferences' },
+          { component: CNavItem, name: 'Category', to: '/category' },
+          { component: CNavItem, name: 'Model', to: '/model' },
+        ],
+      },
+      {
+        component: CNavGroup,
         name: 'Report',
         icon: (
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -117,6 +138,20 @@ const _nav = (role) => {
           { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events' },
           { component: CNavItem, name: 'Summary', to: '/summary' },
           { component: CNavItem, name: 'Custom Chart', to: '/customchart', optional: true },
+        ],
+      },
+      {
+        component: CNavGroup,
+        name: 'Expense Management',
+        icon: (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <FaRegEdit style={{ marginRight: '15px', fontSize: '20px' }} />
+          </div>
+        ),
+        items: [
+          { component: CNavItem, name: 'Invoice', to: '/invoice' },
+          { component: CNavItem, name: 'PO', to: '/po' },
+          { component: CNavItem, name: 'Inventory', to: '/inventory-management' },
         ],
       },
     ]),
