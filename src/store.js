@@ -1,5 +1,8 @@
-import { legacy_createStore as createStore } from 'redux'
-
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import liveFeaturesReducer from './features/LivetrackingDataSlice.js'
+import vehicleReducer from './features/vehicleSlice.js'
+import columnVisibilityReducer from './features/columnVisibilitySlice.js'
+// Initial state and reducer for sidebar and theme
 const initialState = {
   sidebarShow: true,
   theme: 'light',
@@ -14,5 +17,17 @@ const changeState = (state = initialState, { type, ...rest }) => {
   }
 }
 
-const store = createStore(changeState)
+// Combine reducers
+const rootReducer = combineReducers({
+  liveFeatures: liveFeaturesReducer,
+  sidebar: changeState, // Add your sidebar/theme reducer here
+  vehicle: vehicleReducer,
+  columnVisibility: columnVisibilityReducer,
+})
+
+// Create the Redux store
+const store = configureStore({
+  reducer: rootReducer,
+})
+
 export default store

@@ -43,7 +43,7 @@ const getUserRole = () => {
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
-  const sidebarShow = useSelector((state) => state.sidebarShow)
+  const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
   let navigate;
   const role = getUserRole();
   const [decodedToken, setDecodedToken] = useState();

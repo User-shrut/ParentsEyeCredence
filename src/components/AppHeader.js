@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -25,15 +25,40 @@ import {
   cilSun,
 } from '@coreui/icons'
 
-import { AppBreadcrumb } from './index'
+
+import Typography from '@mui/material/Typography'
+
+import {
+  filterAllVehicles,
+  filterStoppedVehicles,
+  filterIdleVehicles,
+  filterRunningVehicles,
+  filterOverspeedVehicles,
+  filterInactiveVehicles,
+  filterByCategory,
+  filterByGroup,
+  filterByGeofence,
+  filterBySingleVehicle,
+  selectDeviceNames,
+  searchVehiclesByName,
+} from '../features/LivetrackingDataSlice.js'
+// import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import './AppHeader.css'
+import TableColumnVisibility from './TableColumnVisibility.js'
+
+
 
 const AppHeader = () => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
 
   const dispatch = useDispatch()
-  const sidebarShow = useSelector((state) => state.sidebarShow)
+  const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
+  const { filteredVehicles } = useSelector((state) => state.liveFeatures)
+  const [filter, setFilter] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -41,6 +66,64 @@ const AppHeader = () => {
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
     })
   }, [])
+
+  useEffect(() => {
+    switch (filter) {
+      case 'stopped':
+        dispatch(filterStoppedVehicles())
+        break
+      case 'idle':
+        dispatch(filterIdleVehicles())
+        break
+      case 'running':
+        dispatch(filterRunningVehicles())
+        break
+      case 'overspeed':
+        dispatch(filterOverspeedVehicles())
+        break
+      case 'inactive':
+        dispatch(filterInactiveVehicles())
+        break
+      case 'car':
+        dispatch(filterByCategory('car'))
+        break
+      case 'bus':
+        dispatch(filterByCategory('bus'))
+        break
+      case 'truck':
+        dispatch(filterByCategory('truck'))
+        break
+      case 'tracktor':
+        dispatch(filterByCategory('tracktor'))
+      case 'jcb':
+        dispatch(filterByCategory('jcb'))
+        break
+      case 'crean':
+        dispatch(filterByCategory('crean'))
+        break
+      case 'motorcycle':
+        dispatch(filterByCategory('motorcycle'))
+        break
+      case 'geofence_1':
+        dispatch(filterByGeofence(1))
+        break
+      case 'group_1':
+        dispatch(filterByGroup(1))
+        break
+      case 'vehicle_MH31FC7099':
+        dispatch(filterBySingleVehicle('MH31FC7099'))
+        break
+      default:
+        dispatch(filterAllVehicles())
+        break
+    }
+  }, [filter, dispatch])
+
+  useEffect(() => {
+    dispatch(searchVehiclesByName(searchTerm)) // Dispatch the search action
+  }, [searchTerm, dispatch])
+
+  const deviceNames = useSelector(selectDeviceNames)
 
   return (
     <CHeader position="sticky" className=" p-0" ref={headerRef}>
@@ -58,22 +141,78 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          <select
+            class="form-select"
+            aria-label="Default select example"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option selected>Status</option>
+            <option value="all">All</option>
+            <option value="running">Running</option>
+            <option value="idle">Idle</option>
+            <option value="stopped">Stop</option>
+            <option value="overspeed">OverSpeed</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          <select
+            class="form-select"
+            aria-label="Default select example"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option selected>Select By Category</option>
+
+            <option value="car">Car</option>
+            <option value="bus">Bus</option>
+            <option value="motorcycle">Bike</option>
+            <option value="truck">Truck</option>
+            <option value="tractor">Tracktor</option>
+            <option value="crean">Crean</option>
+            <option value="jcb">JCB</option>
+          </select>
+        </CHeaderNav>
+
+        {/* <CHeaderNav className="d-none d-md-flex">
+          <select class="form-select" aria-label="Default select example">
+            <option selected>Select by Name</option>
+            {deviceNames.map((name) => (
+              <option key={name} value={name}>
+                {' '}
+                {name}{' '}
+              </option>
+            ))}
+          </select>
+        </CHeaderNav> */}
+        <CHeaderNav className="ms-auto">
+          <form className="d-flex" role="search">
+            <input
+              className="form-control me-2"
+              type="text"
+              placeholder="Search vehicles by name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search"
+            />
+          </form>
+        </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          {/* table cols filter  */}
+          <TableColumnVisibility />
+        </CHeaderNav>
+
         <CHeaderNav className="ms-auto">
           <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>
           </CNavItem>
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav>
           <li className="nav-item py-1">
@@ -124,9 +263,6 @@ const AppHeader = () => {
           </li>
           <AppHeaderDropdown />
         </CHeaderNav>
-      </CContainer>
-      <CContainer className="px-4" fluid>
-        <AppBreadcrumb />
       </CContainer>
     </CHeader>
   )

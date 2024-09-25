@@ -36,8 +36,43 @@ const HelpSupp = React.lazy(() => import('./views/forms/help-support/HelpSupp'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+<<<<<<< HEAD
+
+  // { path: '/theme', name: 'Theme', element: Colors, exact: true },
+=======
+>>>>>>> f0399fcc5f3fc792a9826bde8395edf880e34456
   { path: '/dashboard', name: 'DashBoard', element: DashBoard },
   { path: '/livetrack', name: 'LiveTrack', element: LiveTrack },
+<<<<<<< HEAD
+  { path: '/salesman', name: 'IndividualTrack', element: IndividualTrack },
+  {
+    path: '/salesman/:deviceId/:category/:name',
+    name: 'IndividualTrack',
+    element: IndividualTrack,
+  },
+
+  { path: '/attendance', name: 'Attendance', element: Attendance },
+  { path: '/manual-attendance', name: 'Manual Attendance', element: Manual },
+  { path: '/leave-application', name: 'Leave Application', element: LeaveApplication },
+  { path: '/visit-shop', name: 'Visit Shop', element: VisitShop },
+
+  { path: '/invoice', name: 'Invoice', element: InvoiceForm },
+  { path: '/po', name: 'PO', element: Po },
+  { path: '/inventory-management', name: 'Inventory Management', element: InventoryManagment },
+
+  { path: '/task-management', name: 'Task Management', element: TaskManagment },
+  { path: '/user-management', name: 'User Management', element: UserDetailsForm },
+
+  { path: '/expense-details', name: 'Expense Details', element: ExpenseDetails },
+  { path: '/manual-expense', name: 'Manual Expense', element: ManualExpense },
+
+  { path: '/inventory', name: 'Inventory', element: ReportInventory },
+  { path: '/employee-details', name: 'Employee Details', element: EmployeeDetails },
+
+  { path: '/setting', name: 'Setting', element: Settings },
+  { path: '/h&s', name: 'Help & Support', element: HelpSupp },
+]
+=======
   { path: '/notifications', name: 'Notifications', element: Notifications},
   { path: '/devices', name: 'Devices', element: Devices},
   { path: '/geofences', name: 'Geofence',element: Geofences},
@@ -65,6 +100,7 @@ const routes = [
   { path: '/chatbot', name: 'ChatBot', element: ChatBot },
   { path: '/h&s', name: 'Help & Support', element: HelpSupp },
 
+>>>>>>> f0399fcc5f3fc792a9826bde8395edf880e34456
 
 ]
 export default routes
