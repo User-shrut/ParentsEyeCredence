@@ -167,89 +167,7 @@ const Driver = () => {
     }
     fetchData()
   }
-  const [groups, setGroups] = useState([])
-  // const [error, setError] = useState(null);
-  const [error, setError] = useState(null)
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Basic ' + btoa('school:123456'), // Replace with actual credentials
-          },
-        })
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        setGroups(data) // Assuming the API returns { groups: [...] }
-      } catch (error) {
-        setError(error.message)
-      }
-    }
-
-    fetchGroups()
-  }, [])
-  const [calendars, setCalendars] = useState([]) // State to store calendar data
-  const [calendarError, setCalendarError] = useState(null) // State to store error
-
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/calendars', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Basic ' + btoa('school:123456'), // Replace with actual credentials
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        setCalendars(data) // Assuming the API returns { calendars: [...] }
-      } catch (error) {
-        setCalendarError(error.message)
-      }
-    }
-
-    fetchCalendars()
-  }, [])
-
-  // const handleDeleteSelected = async (id) => {
-  //   if (window.confirm('Are you sure you want to delete this record?')) {
-  //     try {
-  //       // const username = 'aniket' // Replace with your actual username
-  //       // const password = '123456' // Replace with your actual password
-  //       // const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-  //       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
-  //       const response = await fetch(`https://credence-tracker.onrender.com/driver/${id}`, {
-  //         method: 'DELETE',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       })
-
-  //       if (response.ok) {
-  //         // Update the state to remove the deleted row
-  //         setFilteredData(filteredData.filter((item) => item.id !== id))
-  //         alert('Record deleted successfully')
-  //       } else {
-  //         const result = await response.json()
-  //         console.error('Server responded with:', result)
-  //         alert(`Unable to delete record: ${result.message || response.statusText}`)
-  //       }
-  //     } catch (error) {
-  //       console.error('Error during DELETE request:', error)
-  //       alert('Unable to delete record. Please check the console for more details.')
-  //     }
-  //   }
-  // }
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
@@ -347,71 +265,6 @@ const Driver = () => {
     handleModalClose();
   };
 
-
-  const [dropdownOptions, setDropdownOptions] = useState([])
-  const [areas, setAreas] = useState([])
-  useEffect(() => {
-    const fetchAreasData = async () => {
-      try {
-        const username = 'school' // Replace with your actual username
-        const password = '123456' // Replace with your actual password
-        const token = btoa(`${username}:${password}`) // Base64 encode the username and password
-
-        const response = await fetch('https://rocketsalestracker.com/api/drivers', {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${token}`,
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        console.log('Geofence data: ', data)
-
-        // Transform data to create dropdown options
-        setAreas(data.map((item) => item.name))
-      } catch (error) {
-        console.error('Error fetching areas data:', error)
-        setError(error.message)
-      }
-    }
-
-    fetchAreasData()
-  }, [])
-
-  const fetchUsers = async () => {
-    console.log('Fetching users...')
-    try {
-      const username = 'school'
-      const password = '123456'
-      const token = btoa(`${username}:${password}`)
-
-      const response = await axios.get('https://rocketsalestracker.com/api/drivers', {
-        headers: {
-          Authorization: `Basic ${token}`,
-        },
-      })
-
-      console.log('Fetched users:', response.data)
-
-      if (Array.isArray(response.data)) {
-        setUsers(response.data.map((user) => ({ id: user.id, name: user.name })))
-      } else {
-        console.error('Expected an array but got:', response.data)
-      }
-    } catch (error) {
-      console.error('Fetch users error:', error)
-      alert('An error occurred while fetching users.')
-    }
-  }
-
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchUsers()
-  }, [])
   // Handle year selection for expiration date
 
   const [showExpirationDropdown, setShowExpirationDropdown] = useState(false)
@@ -432,7 +285,6 @@ const Driver = () => {
           <div>
             <h2>Drivers</h2>
           </div>
-
           <div className="d-flex">
             <div className="me-3 d-none d-md-block">
               <input
@@ -555,120 +407,6 @@ const Driver = () => {
                   </Select>
                 </FormControl>
               )
-            } else if (col.accessor === 'User') {
-              // User dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>User</InputLabel>
-                  <Select
-                    name="user"
-                    value={formData.user || ''}
-                    onChange={handleInputChange}
-                    label="User"
-                  >
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'category') {
-              // Category dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category || ''}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="Default">Default</MenuItem>
-                    <MenuItem value="Animal">Animal</MenuItem>
-                    <MenuItem value="Bicycle">Bicycle</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'geofence') {
-              // Geofence dropdown (Areas)
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel id="areas-label-5">Areas</InputLabel>
-                  <Select
-                    labelId="areas-label-5"
-                    id="areas-select-5"
-                    value={formData.areas || ''}
-                    onChange={handleInputChange}
-                    label="Select Areas"
-                  >
-                    <MenuItem value="All Areas">All Areas</MenuItem>
-                    {areas.map((area, index) => (
-                      <MenuItem key={index} value={area}>
-                        {area}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'model') {
-              // Model dropdown with options v1, v2, v3, v4, v5
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    name="model"
-                    value={formData.model || ''}
-                    onChange={handleInputChange}
-                    label="Model"
-                  >
-                    <MenuItem value="v1">v1</MenuItem>
-                    <MenuItem value="v2">v2</MenuItem>
-                    <MenuItem value="v3">v3</MenuItem>
-                    <MenuItem value="v4">v4</MenuItem>
-                    <MenuItem value="v5">v5</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'expiration') {
-              // Expiration Date field with dropdown for years (1, 2, 3 years)
-              return (
-                <Box key={col.accessor} sx={{ marginBottom: 2 }}>
-                  {/* Expiration Date TextField */}
-                  <TextField
-                    label="Expiration Date"
-                    type="date"
-                    name="expiration"
-                    value={formData.expiration || ''}
-                    onChange={handleInputChange}
-                    onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true, // Ensures the label is always visible
-                    }}
-                  />
-
-                  {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
-                  {showExpirationDropdown && (
-                    <FormControl fullWidth sx={{ marginTop: 1 }}>
-                      <InputLabel>Expiration Options</InputLabel>
-                      <Select
-                        value=""
-                        onChange={(e) => {
-                          handleYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false) // Hide dropdown after selection
-                        }}
-                        label="Expiration Options"
-                      >
-                        <MenuItem value={1}>1 Year</MenuItem>
-                        <MenuItem value={2}>2 Years</MenuItem>
-                        <MenuItem value={3}>3 Years</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )}
-                </Box>
-              )
             } else {
               // Default TextField for other columns
               return (
@@ -685,7 +423,6 @@ const Driver = () => {
               )
             }
           })}
-
           <Button
             variant="contained"
             color="primary"
@@ -696,7 +433,6 @@ const Driver = () => {
           </Button>
         </Box>
       </Modal>
-
       <Modal open={editModalOpen} onClose={handleModalClose}>
         <Box sx={style}>
           <div className="d-flex justify-content-between my-3">
@@ -729,119 +465,6 @@ const Driver = () => {
                   </Select>
                 </FormControl>
               )
-            } else if (col.accessor === 'User') {
-              // User dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>User</InputLabel>
-                  <Select
-                    name="user"
-                    value={formData.user || ''}
-                    onChange={handleInputChange}
-                    label="User"
-                  >
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'category') {
-              // Category dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category || ''}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="Default">Default</MenuItem>
-                    <MenuItem value="Animal">Animal</MenuItem>
-                    <MenuItem value="Bicycle">Bicycle</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'geofence') {
-              // Geofence dropdown (Areas)
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel id="areas-label-5">Areas</InputLabel>
-                  <Select
-                    labelId="areas-label-5"
-                    id="areas-select-5"
-                    value={formData.areas || ''}
-                    onChange={handleInputChange}
-                    label="Select Areas"
-                  >
-                    <MenuItem value="All Areas">All Areas</MenuItem>
-                    {areas.map((area, index) => (
-                      <MenuItem key={index} value={area}>
-                        {area}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'model') {
-              // Model dropdown with options v1, v2, v3, v4, v5
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    name="model"
-                    value={formData.model || ''}
-                    onChange={handleInputChange}
-                    label="Model"
-                  >
-                    <MenuItem value="v1">v1</MenuItem>
-                    <MenuItem value="v2">v2</MenuItem>
-                    <MenuItem value="v3">v3</MenuItem>
-                    <MenuItem value="v4">v4</MenuItem>
-                    <MenuItem value="v5">v5</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'expiration') {
-              // Expiration Date field with dropdown for years (1, 2, 3 years)
-              return (
-                <Box key={col.accessor} sx={{ marginBottom: 2 }}>
-                  {/* Expiration Date TextField */}
-                  <TextField
-                    label="Expiration Date"
-                    type="date"
-                    name="expiration"
-                    value={formData.expiration || ''}
-                    onChange={handleInputChange}
-                    onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true, // Ensures the label is always visible
-                    }}
-                  />
-                  {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
-                  {showExpirationDropdown && (
-                    <FormControl fullWidth sx={{ marginTop: 1 }}>
-                      <InputLabel>Expiration Options</InputLabel>
-                      <Select
-                        value=""
-                        onChange={(e) => {
-                          handleYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false) // Hide dropdown after selection
-                        }}
-                        label="Expiration Options"
-                      >
-                        <MenuItem value={1}>1 Year</MenuItem>
-                        <MenuItem value={2}>2 Years</MenuItem>
-                        <MenuItem value={3}>3 Years</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )}
-                </Box>
-              )
             } else {
               // Default TextField for other columns
               return (
@@ -871,4 +494,4 @@ const Driver = () => {
     </div>
   )
 }
-export default Driver
+export default Driver;
