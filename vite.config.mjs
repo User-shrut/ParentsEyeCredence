@@ -10,11 +10,11 @@ export default defineConfig(() => {
       outDir: 'build',
     },
     css: {
-      postcss: {
-        plugins: [
-          autoprefixer({}), // add options if needed
-        ],
-      },
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler' // or "modern"
+        }
+      }
     },
     esbuild: {
       loader: 'jsx',
