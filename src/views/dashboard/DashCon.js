@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import classNames from 'classnames'
+import { FixedSizeList as List } from 'react-window'
 
 import {
   CAvatar,
@@ -44,107 +45,175 @@ import {
   cilUserFemale,
 } from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchLiveVehicles,
+  filterIdleVehicles,
+  filterInactiveVehicles,
+  filterOverspeedVehicles,
+  filterRunningVehicles,
+  filterStoppedVehicles,
+} from '../../features/LivetrackingDataSlice.js'
 
-import WidgetsBrand from '../widgets/WidgetsBrand'
-import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import MainMap from '../Map/MapComponent'
 import { GlobalContext } from '../../Context/Context'
 import { PiEngineFill } from 'react-icons/pi'
-import { MdGpsFixed } from "react-icons/md";
-import { IoMdBatteryCharging } from "react-icons/io";
-
+import { MdGpsFixed, MdGpsNotFixed } from 'react-icons/md'
+import { IoIosArrowDown, IoMdBatteryCharging } from 'react-icons/io'
 
 // ================================CAR==================================
-import carGreen from "/public/vehicleList/Car/carGreen.svg";
-import carRed from "/public/vehicleList/Car/carRed.svg";
-import carYellow from "/public/vehicleList/Car/carYellow.svg";
-import carOrange from "/public/vehicleList/Car/carOrange.svg";
-import carGray from "/public/vehicleList/Car/carGray.svg";
+import carGreen from '/public/vehicleList/Car/carGreen.svg'
+import carRed from '/public/vehicleList/Car/carRed.svg'
+import carYellow from '/public/vehicleList/Car/carYellow.svg'
+import carOrange from '/public/vehicleList/Car/carOrange.svg'
+import carGray from '/public/vehicleList/Car/carGray.svg'
 
 //==============================BIKE========================================
-import bikeGreen from "/public/vehicleList/Bike/bikeGreen.svg";
-import bikeRed from "/public/vehicleList/Bike/bikeRed.svg";
-import bikeYellow from "/public/vehicleList/Bike/bikeYellow.svg";
-import bikeOrange from "/public/vehicleList/Bike/bikeOrange.svg";
-import bikeGray from "/public/vehicleList/Bike/bikeGray.svg";
+import bikeGreen from '/public/vehicleList/Bike/bikeGreen.svg'
+import bikeRed from '/public/vehicleList/Bike/bikeRed.svg'
+import bikeYellow from '/public/vehicleList/Bike/bikeYellow.svg'
+import bikeOrange from '/public/vehicleList/Bike/bikeOrange.svg'
+import bikeGray from '/public/vehicleList/Bike/bikeGray.svg'
 
-
-import busGreen from "/public/vehicleList/Bus/busGreen.svg";
-import busRed from "/public/vehicleList/Bus/busRed.svg";
-import busOrange from "/public/vehicleList/Bus/busOrange.svg";
-import busYellow from "/public/vehicleList/Bus/busYellow.svg";
-import busGray from "/public/vehicleList/Bus/busGray.svg";
+import busGreen from '/public/vehicleList/Bus/busGreen.svg'
+import busRed from '/public/vehicleList/Bus/busRed.svg'
+import busOrange from '/public/vehicleList/Bus/busOrange.svg'
+import busYellow from '/public/vehicleList/Bus/busYellow.svg'
+import busGray from '/public/vehicleList/Bus/busGray.svg'
 
 //==============================TRUCK========================================
-import truckGreen from "/public/vehicleList/Truck/truckGreen.svg";
-import truckRed from "/public/vehicleList/Truck/truckRed.svg";
-import truckYellow from "/public/vehicleList/Truck/truckYellow.svg";
-import truckOrange from "/public/vehicleList/Truck/truckOrange.svg";
-import truckGray from "/public/vehicleList/Truck/truckGray.svg";
+import truckGreen from '/public/vehicleList/Truck/truckGreen.svg'
+import truckRed from '/public/vehicleList/Truck/truckRed.svg'
+import truckYellow from '/public/vehicleList/Truck/truckYellow.svg'
+import truckOrange from '/public/vehicleList/Truck/truckOrange.svg'
+import truckGray from '/public/vehicleList/Truck/truckGray.svg'
 
 //==============================CRANE========================================
-import craneGreen from "/public/vehicleList/Crane/craneGreen.svg";
-import craneRed from "/public/vehicleList/Crane/craneRed.svg";
-import craneYellow from "/public/vehicleList/Crane/craneYellow.svg";
-import craneOrange from "/public/vehicleList/Crane/craneOrange.svg";
-import craneGray from "/public/vehicleList/Crane/craneGray.svg";
+import craneGreen from '/public/vehicleList/Crane/craneGreen.svg'
+import craneRed from '/public/vehicleList/Crane/craneRed.svg'
+import craneYellow from '/public/vehicleList/Crane/craneYellow.svg'
+import craneOrange from '/public/vehicleList/Crane/craneOrange.svg'
+import craneGray from '/public/vehicleList/Crane/craneGray.svg'
 
 //==============================JCB========================================
-import jcbGreen from "/public/vehicleList/JCB/jcbGreen.svg";
-import jcbRed from "/public/vehicleList/JCB/jcbRed.svg";
-import jcbYellow from "/public/vehicleList/JCB/jcbYellow.svg";
-import jcbOrange from "/public/vehicleList/JCB/jcbOrange.svg";
-import jcbGray from "/public/vehicleList/JCB/jcbGray.svg";
+import jcbGreen from '/public/vehicleList/JCB/jcbGreen.svg'
+import jcbRed from '/public/vehicleList/JCB/jcbRed.svg'
+import jcbYellow from '/public/vehicleList/JCB/jcbYellow.svg'
+import jcbOrange from '/public/vehicleList/JCB/jcbOrange.svg'
+import jcbGray from '/public/vehicleList/JCB/jcbGray.svg'
 
 //==============================AUTO========================================
-import autoGreen from "/public/vehicleList/Auto/autoGreen.svg";
-import autoRed from "/public/vehicleList/Auto/autoRed.svg";
-import autoYellow from "/public/vehicleList/Auto/autoYellow.svg";
-import autoOrange from "/public/vehicleList/Auto/autoOrange.svg";
-import autoGray from "/public/vehicleList/Auto/autoGray.svg";
+import autoGreen from '/public/vehicleList/Auto/autoGreen.svg'
+import autoRed from '/public/vehicleList/Auto/autoRed.svg'
+import autoYellow from '/public/vehicleList/Auto/autoYellow.svg'
+import autoOrange from '/public/vehicleList/Auto/autoOrange.svg'
+import autoGray from '/public/vehicleList/Auto/autoGray.svg'
 
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+import { useNavigate } from 'react-router-dom'
 dayjs.extend(duration)
 
-
 const Dashboard = () => {
-  const { salesManList, salesman } = useContext(GlobalContext)
-  const [expandedRow, setExpandedRow] = useState(null)
+  const dispatch = useDispatch()
+  const { filteredVehicles } = useSelector((state) => state.liveFeatures)
+  const [filter, setFilter] = useState('all')
 
-  const handleRowClick = (index) => {
-    setExpandedRow(expandedRow === index ? null : index)
-  }
+  // Fetch live vehicles when the component mounts
+  useEffect(() => {
+    dispatch(fetchLiveVehicles())
+
+    // Setup WebSocket connection
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`)
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established')
+    }
+
+    socket.onmessage = (event) => {
+      const updatedVehicles = JSON.parse(event.data)
+      dispatch(updateVehicles(updatedVehicles)) // Update Redux state with new data
+    }
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed')
+    }
+
+    // Clean up on component unmount
+    return () => {
+      socket.close()
+    }
+  }, [dispatch])
+  const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
+  const stoppedVehiclesCount = useSelector(
+    (state) =>
+      state.liveFeatures.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === false && vehicle.speed < 1,
+      ).length,
+  )
+  const runningVehiclesCount = useSelector(
+    (state) =>
+      state.liveFeatures.vehicles.filter(
+        (vehicle) =>
+          vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
+      ).length,
+  )
+  const inactiveVehiclesCount = useSelector(
+    (state) =>
+      state.liveFeatures.vehicles.filter((vehicle) => {
+        const lastUpdate = dayjs(vehicle.lastUpdate)
+        const now = dayjs()
+        const duration = dayjs.duration(now.diff(lastUpdate))
+        return (
+          duration.asHours() > 24 || !(vehicle.attributes.ignition === true && vehicle.speed > 0)
+        )
+      }).length,
+  )
+
+  const idleVehiclesCount = useSelector(
+    (state) =>
+      state.liveFeatures.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed < 2,
+      ).length,
+  )
+  const overspeedVehiclesCount = useSelector(
+    (state) =>
+      state.liveFeatures.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 60,
+      ).length,
+  )
+
+  const { salesManList } = useContext(GlobalContext)
+  const [expandedRow, setExpandedRow] = useState(null)
 
   const getCategory = (category) => {
     switch (category) {
-      case "car":
-        return "car";
-      case "bus":
-        return "bus";
-      case "truck":
-        return "truck";
-      case "motorcycle":
-        return "bike"; // Adjusted to match the imageMap key
-      case "auto":
-        return "auto";
-      case "tractor":
-        return "crane";
-      case "jcb":
-        return "jcb";
+      case 'car':
+        return 'car'
+      case 'bus':
+        return 'bus'
+      case 'truck':
+        return 'truck'
+      case 'motorcycle':
+        return 'bike' // Adjusted to match the imageMap key
+      case 'auto':
+        return 'auto'
+      case 'tractor':
+        return 'crane'
+      case 'jcb':
+        return 'jcb'
       default:
-        return "car"; // Default case
+        return 'car' // Default case
     }
-  };
+  }
   const selectImage = (category, item) => {
-    const cate = getCategory(category);
-    let image;
+    const cate = getCategory(category)
+    let image
 
     const imageMap = {
       car: {
@@ -203,7 +272,7 @@ const Dashboard = () => {
         orange: busOrange,
         gray: busGray,
       },
-    };
+    }
 
     // Safely handle undefined position or attributes
     if (!item || !item.attributes) {
@@ -227,505 +296,517 @@ const Dashboard = () => {
     }
 
     return image || car // Return a default image if no match found
-  };
+  }
+  const navigate = useNavigate()
+  const handleClickOnTrack = (vehicle) => {
+    console.log('trcak clicked')
+    navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
+  }
 
-
-  const progressExample = [
-    { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
-    { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
-    { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
-    { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
-    { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ]
-
-  const progressGroupExample1 = [
-    { title: 'Monday', value1: 34, value2: 78 },
-    { title: 'Tuesday', value1: 56, value2: 94 },
-    { title: 'Wednesday', value1: 12, value2: 67 },
-    { title: 'Thursday', value1: 43, value2: 91 },
-    { title: 'Friday', value1: 22, value2: 73 },
-    { title: 'Saturday', value1: 53, value2: 82 },
-    { title: 'Sunday', value1: 9, value2: 69 },
-  ]
-
-  const progressGroupExample2 = [
-    { title: 'Male', icon: cilUser, value: 53 },
-    { title: 'Female', icon: cilUserFemale, value: 43 },
-  ]
-
-  const progressGroupExample3 = [
-    { title: 'Organic Search', icon: cibGoogle, percent: 56, value: '191,235' },
-    { title: 'Facebook', icon: cibFacebook, percent: 15, value: '51,223' },
-    { title: 'Twitter', icon: cibTwitter, percent: 11, value: '37,564' },
-    { title: 'LinkedIn', icon: cibLinkedin, percent: 8, value: '27,319' },
-  ]
-
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
-    },
-  ]
+  const visibleColumns = useSelector((state) => state.columnVisibility)
 
   return (
     <>
-      <WidgetsDropdown className="mb-4" />
-      <CCard className="mb-4">
-        <CCardBody>
-          <CRow>
-            <CCol sm={7} className="d-none d-md-block"></CCol>
-          </CRow>
-          <MainMap />
-        </CCardBody>
-        <CCardFooter>
-          <CRow
-            xs={{ cols: 1, gutter: 4 }}
-            sm={{ cols: 2 }}
-            lg={{ cols: 4 }}
-            xl={{ cols: 5 }}
-            className="mb-2 text-center"
-          >
-            {progressExample.map((item, index, items) => (
-              <CCol
-                className={classNames({
-                  'd-none d-xl-block': index + 1 === items.length,
-                })}
-                key={index}
-              >
-                <div className="text-body-secondary">{item.title}</div>
-                <div className="fw-semibold text-truncate">
-                  {item.value} ({item.percent}%)
-                </div>
-                <CProgress thin className="mt-2" color={item.color} value={item.percent} />
-              </CCol>
-            ))}
-          </CRow>
-        </CCardFooter>
-      </CCard>
+      {/* <WidgetsDropdown className="mb-4" /> */}
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
-            <CCardBody>
-              <CRow className="justify-content-center">
-                <CCol xs={12} md={2} xl={2}>
-                  <div className="border-start border-start-4 border-start-success py-1 px-3">
-                    <div className="text-body-secondary text-truncate small">Running</div>
-                    <div className="fs-5 fw-semibold">9,123</div>
+            <CCardBody classNmame="content">
+              <CRow className="justify-content-space-around">
+                <CCol xs={12} md={2} xl={2} className="count-col countallCol">
+                  <div className="border-start border-start-4 border-start-error countAll py-1 px-3">
+                    <div className="text-body-secondary text-truncate small ">All</div>
+                    <div className="fs-5 fw-semibold allData">{allVehiclesCount}</div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2}>
-                  <div className="border-start border-start-4 border-start py-1 px-3 mb-3 countldel">
-                    <div className="text-body-secondary text-truncate small">Idle</div>
-                    <div className="fs-5 fw-semibold">22,643</div>
+                <CCol xs={12} md={2} xl={2} className="count-col">
+                  <div className="border-start border-start-4 border-start-success countRun py-1 px-3">
+                    <div className="text-body-secondary text-truncate small ">Running</div>
+                    <div className="fs-5 fw-semibold runningData">{runningVehiclesCount}</div>
+                  </div>
+
+                  <div
+                    className="img"
+                    onClick={() => {
+                      dispatch(filterRunningVehicles())
+                    }}
+                  >
+                    <img style={{ width: '3.5rem' }} src={carGreen} alt="" />
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2}>
-                  <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
-                    <div className="text-body-secondary text-truncate small">Stopped</div>
-                    <div className="fs-5 fw-semibold">78,623</div>
+                <CCol xs={12} md={2} xl={2} className="count-col">
+                  <div className="border-start border-start-4 border-start-danger countStop py-1 px-3">
+                    <div className="text-body-secondary text-truncate small ">Stopped</div>
+                    <div className="fs-5 fw-semibold stopData">{stoppedVehiclesCount}</div>
+                  </div>
+
+                  <div
+                    className="img"
+                    onClick={() => {
+                      dispatch(filterStoppedVehicles())
+                    }}
+                  >
+                    <img style={{ width: '3.5rem' }} src={carRed} alt="" />
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2}>
-                  <div className="border-start border-start-4 border-start countOverSpeed py-1 px-3 mb-3">
-                    <div className="text-body-secondary text-truncate small">Overspeed</div>
-                    <div className="fs-5 fw-semibold">49,123</div>
+                <CCol xs={12} md={2} xl={2} className="count-col">
+                  <div className="border-start border-start-4 border-start py-1 px-3 countldel">
+                    <div className="text-body-secondary text-truncate small ">Idle</div>
+                    <div className="fs-5 fw-semibold idleData">{idleVehiclesCount}</div>
+                  </div>
+
+                  <div
+                    className="img"
+                    onClick={() => {
+                      dispatch(filterIdleVehicles())
+                    }}
+                  >
+                    <img style={{ width: '3.5rem' }} src={carYellow} alt="" />
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2}>
-                  <div className="border-start border-start-4 border-start-error countInactive py-1 px-3 mb-3">
-                    <div className="text-body-secondary text-truncate small">Inactive</div>
-                    <div className="fs-5 fw-semibold">49,123</div>
+                <CCol xs={12} md={2} xl={2} className="count-col">
+                  <div className="border-start border-start-4 border-start countOverSpeed py-1 px-3">
+                    <div className="text-body-secondary text-truncate small ">Overspeed</div>
+                    <div className="fs-5 fw-semibold overspeedData">{overspeedVehiclesCount}</div>
+                  </div>
+
+                  <div
+                    className="img"
+                    onClick={() => {
+                      dispatch(filterOverspeedVehicles())
+                    }}
+                  >
+                    <img style={{ width: '3.5rem' }} src={carOrange} alt="" />
+                  </div>
+                </CCol>
+
+                <CCol xs={12} md={2} xl={2} className="count-col">
+                  <div className="border-start border-start-4 border-start-error countInactive py-1 px-3">
+                    <div className="text-body-secondary text-truncate small ">Inactive</div>
+                    <div className="fs-5 fw-semibold inactiveData">{inactiveVehiclesCount}</div>
+                  </div>
+
+                  <div
+                    className="img"
+                    onClick={() => {
+                      dispatch(filterInactiveVehicles())
+                    }}
+                  >
+                    <img style={{ width: '3.5rem' }} src={carGray} alt="" />
                   </div>
                 </CCol>
               </CRow>
-              <hr className="mt-0" />
+              <hr className="mt-0 mb-0" />
 
-              <div className="mb-5"></div>
+              {/* <CRow>
+            <CCol sm={7} className="d-none d-md-block"></CCol>
+          </CRow> */}
+              <MainMap filteredVehicles={filteredVehicles} />
+
+              {/* <div className="mb-5"></div> */}
 
               <br />
               <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
-                <CTable className="my-3 border vehiclesTable" hover responsive>
-  <CTableHead
-    className="text-nowrap"
-    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
-  >
-    <CTableRow>
-      <CTableHeaderCell className="bg-body-tertiary text-center sr-no table-cell" style={{ position: 'sticky', top: 0 }}>
-        Sr No.
-      </CTableHeaderCell>
+                <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
+                  <CTableHead
+                    className="text-nowrap"
+                    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
+                  >
+                    <CTableRow>
+                      {visibleColumns.srNo && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center sr-no table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Sr No.
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.vehicle && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center vehicle table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Vehicle
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.deviceName && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center device-name table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Device Name
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.address && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center address table-cell"
+                          style={{
+                            position: 'sticky',
+                            top: 0,
+                            width: '25%',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          Address
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.lastUpdate && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center last-update table-cell"
+                          style={{
+                            position: 'sticky',
+                            top: 0,
+                            width: '25%',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          Last Update
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.cd && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center current-delay table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          &nbsp;&nbsp; C/D &nbsp;&nbsp;
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.sp && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center speed table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Sp
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.distance && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center distance table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Distance
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.td && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center total-distance table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          T/D
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.sat && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center satellite table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Sat
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.ig && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center ignition table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Ig
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.gps && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center gps table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          GPS
+                        </CTableHeaderCell>
+                      )}
+                      {visibleColumns.power && (
+                        <CTableHeaderCell
+                          className="bg-body-tertiary text-center power table-cell"
+                          style={{ position: 'sticky', top: 0 }}
+                        >
+                          Power
+                        </CTableHeaderCell>
+                      )}
+                      <CTableHeaderCell
+                        className="bg-body-tertiary text-center status table-cell"
+                        style={{ position: 'sticky', top: 0, width: '15%' }}
+                      >
+                        Track
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center vehicle table-cell" style={{ position: 'sticky', top: 0 }}>
-        Vehicle
-      </CTableHeaderCell>
+                  <CTableBody>
+                    {filteredVehicles.map((item, index) => (
+                      <CTableRow key={index} className={`table-row collapsed trans`}>
+                        {/* Sr No. */}
+                        {visibleColumns.srNo && (
+                          <CTableDataCell className="text-center sr-no table-cell">
+                            <IoIosArrowDown /> &nbsp; {index + 1}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.vehicle && (
+                          <CTableDataCell className="text-center vehicle table-cell">
+                            <div>
+                              {(() => {
+                                // const device = salesman.find((device) => device.id === item.deviceId)
+                                return (
+                                  <img
+                                    src={item && selectImage(item.category, item)}
+                                    className="dashimg upperdata"
+                                    alt="vehicle"
+                                  />
+                                )
+                              })()}
+                            </div>
+                            {expandedRow === index && (
+                              <>
+                                <hr />
+                                {(() => {
+                                  // const device = salesman.find(
+                                  //   (device) => device.id === item.deviceId,
+                                  // )
+                                  return (
+                                    <div className="upperdata">
+                                      {item ? item.category : 'Currently Not Available'}
+                                    </div>
+                                  )
+                                })()}
+                              </>
+                            )}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.deviceName && (
+                          <CTableDataCell className="device-name table-cell n text-center">
+                            {(() => {
+                              // const device = salesman.find((device) => device.id === item.deviceId)
+                              if (item && item.name) {
+                                const nameParts = item.name.split(' ')
+                                const firstWord = nameParts[0]
+                                const remainingWords = nameParts.slice(1).join(' ') // Join remaining words
 
-      <CTableHeaderCell className="bg-body-tertiary text-center device-name table-cell" style={{ position: 'sticky', top: 0 }}>
-        Device Name
-      </CTableHeaderCell>
+                                return (
+                                  <>
+                                    <div className="upperdata">
+                                      <div>{firstWord}</div> {/* First word on the first line */}
+                                      {remainingWords && <div>{remainingWords}</div>}{' '}
+                                      {/* Remaining words on the second line if present */}
+                                    </div>
+                                    {expandedRow === index && (
+                                      <>
+                                        <hr />
+                                        <div>
+                                          <PiEngineFill />
+                                        </div>
+                                      </>
+                                    )}
+                                  </>
+                                )
+                              }
+                              return <div className="upperdata">Unknown</div>
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.address && (
+                          <CTableDataCell
+                            className="text-center address table-cell"
+                            style={{ width: '20rem' }}
+                          >
+                            <div className="upperdata" style={{ fontSize: '1rem' }}>
+                              shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
+                            </div>
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.lastUpdate && (
+                          <CTableDataCell className="text-center last-update table-cell">
+                            {(() => {
+                              // const device = salesman.find((device) => device.id === item.deviceId)
+                              if (item && item.lastUpdate) {
+                                const date = dayjs(item.lastUpdate).format('YYYY-MM-DD') // Format date
+                                const time = dayjs(item.lastUpdate).format('HH:mm:ss') // Format time
+                                return (
+                                  <div className="upperdata ld">
+                                    <div>{date}</div> {/* Date on one line */}
+                                    <div>{time}</div> {/* Time on the next line */}
+                                  </div>
+                                )
+                              }
+                              return <div>N/A</div>
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.cd && (
+                          <CTableDataCell className="text-center cd current-delay table-cell">
+                            {(() => {
+                              // const device = salesman.find((device) => device.id === item.deviceId)
+                              if (item && item.lastUpdate) {
+                                const now = dayjs()
+                                const lastUpdate = dayjs(item.lastUpdate)
+                                const duration = dayjs.duration(now.diff(lastUpdate))
 
-      <CTableHeaderCell
-        className="bg-body-tertiary text-center address table-cell"
-        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        Address
-      </CTableHeaderCell>
+                                const days = duration.days()
+                                const hours = duration.hours()
+                                const minutes = duration.minutes()
+                                const seconds = duration.seconds()
 
-      <CTableHeaderCell
-        className="bg-body-tertiary text-center last-update table-cell"
-        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        Last Update
-      </CTableHeaderCell>
+                                // Conditional formatting based on duration values
+                                if (days > 0) {
+                                  return `${days}d ${hours}h ${minutes}m`
+                                } else if (hours > 0) {
+                                  return `${hours}h ${minutes}m`
+                                } else if (minutes > 0) {
+                                  return `${minutes}m`
+                                } else {
+                                  return `${seconds}s` // Display seconds if all else is zero
+                                }
+                              }
+                              return '0s' // Default if no device or lastUpdate
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.sp && (
+                          <CTableDataCell className="text-center sp speed table-cell">
+                            <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
+                            {expandedRow === index && (
+                              <>
+                                <hr />
+                                <div>
+                                  <PiEngineFill />
+                                </div>
+                              </>
+                            )}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.distance && (
+                          <CTableDataCell className="text-center d distance table-cell">
+                            {`${Math.round(item.attributes.distance)} km`}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.td && (
+                          <CTableDataCell className="text-center td total-distance table-cell">
+                            {`${Math.round(item.attributes.totalDistance)} km`}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.sat && (
+                          <CTableDataCell className="text-center satelite table-cell">
+                            <div style={{ position: 'relative', display: 'inline-block' }}>
+                              <MdGpsNotFixed style={{ fontSize: '1.6rem' }} />{' '}
+                              {/* Adjust icon size as needed */}
+                              <span
+                                style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '49%',
+                                  transform: 'translate(-50%, -50%)',
+                                  fontSize: '0.8rem', // Adjust text size
+                                  color: 'black',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                {item.attributes.sat}
+                              </span>
+                            </div>
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.ig && (
+                          <CTableDataCell className="text-center ignition table-cell">
+                            {(() => {
+                              const { ignition } = item.attributes
 
-      <CTableHeaderCell className="bg-body-tertiary text-center current-delay table-cell" style={{ position: 'sticky', top: 0 }}>
-        Current Delay
-      </CTableHeaderCell>
+                              let iconColor = 'gray' // Default color
+                              let iconText = 'N/A' // Default text
 
-      <CTableHeaderCell className="bg-body-tertiary text-center speed table-cell" style={{ position: 'sticky', top: 0 }}>
-        Speed
-      </CTableHeaderCell>
+                              if (ignition) {
+                                iconColor = 'green'
+                                iconText = 'On'
+                              } else if (ignition === false) {
+                                iconColor = 'red'
+                                iconText = 'Off'
+                              }
 
-      <CTableHeaderCell className="bg-body-tertiary text-center distance table-cell" style={{ position: 'sticky', top: 0 }}>
-        Distance
-      </CTableHeaderCell>
+                              return (
+                                <div style={{ color: iconColor, fontSize: '1.1rem' }}>
+                                  <PiEngineFill />
+                                </div>
+                              )
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.gps && (
+                          <CTableDataCell className="text-center gps table-cell">
+                            {(() => {
+                              const { valid } = item
 
-      <CTableHeaderCell className="bg-body-tertiary text-center total-distance table-cell" style={{ position: 'sticky', top: 0 }}>
-        Total Distance
-      </CTableHeaderCell>
+                              let iconColor = 'gray' // Default color
+                              let iconText = 'N/A' // Default text
 
-      <CTableHeaderCell className="bg-body-tertiary text-center satelite table-cell" style={{ position: 'sticky', top: 0 }}>
-        Satelite
-      </CTableHeaderCell>
+                              if (valid) {
+                                iconColor = 'green'
+                                iconText = 'On'
+                              } else if (valid === false) {
+                                iconColor = 'red'
+                                iconText = 'Off'
+                              }
 
-      <CTableHeaderCell className="bg-body-tertiary text-center ignition table-cell" style={{ position: 'sticky', top: 0 }}>
-        Ignition
-      </CTableHeaderCell>
+                              return (
+                                <div style={{ color: iconColor, fontSize: '1.1rem' }}>
+                                  <MdGpsFixed />
+                                </div>
+                              )
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        {visibleColumns.power && (
+                          <CTableDataCell className="text-center power table-cell">
+                            {(() => {
+                              const power = item.attributes.battery
 
-      <CTableHeaderCell className="bg-body-tertiary text-center gps table-cell" style={{ position: 'sticky', top: 0 }}>
-        GPS
-      </CTableHeaderCell>
+                              let iconColor = 'gray' // Default color
+                              let iconText = 'N/A' // Default text
 
-      <CTableHeaderCell className="bg-body-tertiary text-center power table-cell" style={{ position: 'sticky', top: 0 }}>
-        Power
-      </CTableHeaderCell>
+                              if (power) {
+                                iconColor = 'green'
+                                iconText = 'On'
+                              } else if (power === false) {
+                                iconColor = 'red'
+                                iconText = 'Off'
+                              }
 
-      <CTableHeaderCell className="bg-body-tertiary text-center status table-cell" style={{ position: 'sticky', top: 0, width: '15%' }}>
-        Track
-      </CTableHeaderCell>
-    </CTableRow>
-  </CTableHead>
-
-  <CTableBody>
-    {salesManList?.map((item, index) => (
-      <CTableRow
-        key={index}
-        onClick={() => handleRowClick(index)}
-        className={`table-row ${expandedRow === index ? 'expanded' : 'collapsed'} trans`}
-      >
-        {/* Sr No. */}
-        <CTableDataCell className="text-center sr-no table-cell">
-          {index + 1}
-        </CTableDataCell>
-
-        {/* Vehicle */}
-        <CTableDataCell className="text-center vehicle table-cell">
-          <div>
-            {(() => {
-              const device = salesman.find((device) => device.id === item.deviceId);
-              return (
-                <img src={selectImage(device.category, item)} className="dashimg upperdata" alt="vehicle" />
-              );
-            })()}
-          </div>
-          {expandedRow === index && (
-            <>
-              <hr />
-              {(() => {
-                const device = salesman.find((device) => device.id === item.deviceId);
-                return (
-                  <div className="upperdata">
-                    {device ? device.category : 'Currently Not Available'}
-                  </div>
-                );
-              })()}
-            </>
-          )}
-        </CTableDataCell>
-
-        {/* Device Name */}
-        <CTableDataCell className="device-name table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            return (
-              <>
-                <div className="upperdata">{device ? device.name : 'Unknown'}</div>
-                {expandedRow === index && (
-                  <>
-                    <hr />
-                    <div>
-                      <PiEngineFill />
-                    </div>
-                  </>
-                )}
-              </>
-            );
-          })()}
-        </CTableDataCell>
-
-        {/* Address */}
-        <CTableDataCell className="text-center address table-cell" style={{ width: '20rem' }}>
-          <div className="upperdata" style={{ fontSize: '1rem' }}>
-            shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
-          </div>
-        </CTableDataCell>
-
-        {/* Last Update */}
-        <CTableDataCell className="text-center last-update table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            const lastUpdate = device ? dayjs(device.lastUpdate).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
-            return (
-              <div className="upperdata">
-                {lastUpdate}
-              </div>
-            );
-          })()}
-        </CTableDataCell>
-
-        {/* Current Delay */}
-        <CTableDataCell className="text-center current-delay table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            if (device && device.lastUpdate) {
-              const now = dayjs();
-              const lastUpdate = dayjs(device.lastUpdate);
-              const duration = dayjs.duration(now.diff(lastUpdate));
-
-              const days = duration.days();
-              const hours = duration.hours();
-              const minutes = duration.minutes();
-              const seconds = duration.seconds();
-
-              // Conditional formatting based on duration values
-              if (days > 0) {
-                return `${days}d ${hours}h ${minutes}m`;
-              } else if (hours > 0) {
-                return `${hours}h ${minutes}m`;
-              } else if (minutes > 0) {
-                return `${minutes}m`;
-              } else {
-                return `${seconds}s`; // Display seconds if all else is zero
-              }
-            }
-            return '0s'; // Default if no device or lastUpdate
-          })()}
-        </CTableDataCell>
-
-        {/* Speed */}
-        <CTableDataCell className="text-center speed table-cell">
-          <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
-          {expandedRow === index && (
-            <>
-              <hr />
-              <div>
-                <PiEngineFill />
-              </div>
-            </>
-          )}
-        </CTableDataCell>
-
-        {/* Distance */}
-        <CTableDataCell className="text-center distance table-cell">
-          {`${Math.round(item.attributes.distance)} km`}
-        </CTableDataCell>
-
-        {/* Total Distance */}
-        <CTableDataCell className="text-center total-distance table-cell">
-          {`${Math.round(item.attributes.totalDistance)} km`}
-        </CTableDataCell>
-
-        {/* Satelite */}
-        <CTableDataCell className="text-center satelite table-cell">
-          {item.attributes.sat}
-        </CTableDataCell>
-
-        {/* Ignition */}
-        <CTableDataCell className="text-center ignition table-cell">
-          {(() => {
-            const { ignition } = item.attributes;
-
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
-
-            if (ignition) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (ignition === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
-
-            return (
-              <div style={{ color: iconColor }}>
-                <PiEngineFill />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
-
-        {/* GPS */}
-        <CTableDataCell className="text-center gps table-cell">
-          {(() => {
-            const { valid } = item;
-
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
-
-            if (valid) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (valid === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
-
-            return (
-              <div style={{ color: iconColor }}>
-                <PiEngineFill />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
-
-        {/* Power */}
-        <CTableDataCell className="text-center power table-cell">
-          {(() => {
-            const power = item.attributes.battery;
-
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
-
-            if (power) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (power === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
-
-            return (
-              <div style={{ color: iconColor, fontSize: "1.2rem" }}>
-                <IoMdBatteryCharging />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
-
-        {/* Track */}
-        <CTableDataCell className="text-center status table-cell">
-                        <button className="btn btn-primary" onClick={() => handleClick(item)}>
-                          Live Track
-                        </button>
-                      </CTableDataCell>
-      </CTableRow>
-    ))}
-  </CTableBody>
-</CTable>
-
+                              return (
+                                <div style={{ color: iconColor, fontSize: '1.2rem' }}>
+                                  <IoMdBatteryCharging />
+                                </div>
+                              )
+                            })()}
+                          </CTableDataCell>
+                        )}
+                        <CTableDataCell className="text-center status table-cell">
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => handleClickOnTrack(item)}
+                          >
+                            Live Track
+                          </button>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))}
+                  </CTableBody>
+                </CTable>
               </div>
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
-      <WidgetsBrand className="mb-4" withCharts />
+      {/* <WidgetsBrand className="mb-4" withCharts /> */}
     </>
   )
 }

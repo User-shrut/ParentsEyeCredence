@@ -26,17 +26,19 @@ const EmployeeDetails = React.lazy(() => import('./views/base/ReportMange/Employ
 const Settings = React.lazy(() => import('./views/forms/settings/Settings'))
 const HelpSupp = React.lazy(() => import('./views/forms/help-support/HelpSupp'))
 
-
-
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  
 
   // { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/dashboard', name: 'DashBoard', element: DashBoard },
   { path: '/chatbot', name: 'ChatBot', element: ChatBot },
   { path: '/livetrack', name: 'LiveTrack', element: LiveTrack },
   { path: '/salesman', name: 'IndividualTrack', element: IndividualTrack },
+  {
+    path: '/salesman/:deviceId/:category/:name',
+    name: 'IndividualTrack',
+    element: IndividualTrack,
+  },
 
   { path: '/attendance', name: 'Attendance', element: Attendance },
   { path: '/manual-attendance', name: 'Manual Attendance', element: Manual },
@@ -46,20 +48,18 @@ const routes = [
   { path: '/invoice', name: 'Invoice', element: InvoiceForm },
   { path: '/po', name: 'PO', element: Po },
   { path: '/inventory-management', name: 'Inventory Management', element: InventoryManagment },
-  
+
   { path: '/task-management', name: 'Task Management', element: TaskManagment },
   { path: '/user-management', name: 'User Management', element: UserDetailsForm },
-  
+
   { path: '/expense-details', name: 'Expense Details', element: ExpenseDetails },
   { path: '/manual-expense', name: 'Manual Expense', element: ManualExpense },
-  
+
   { path: '/inventory', name: 'Inventory', element: ReportInventory },
   { path: '/employee-details', name: 'Employee Details', element: EmployeeDetails },
-  
+
   { path: '/setting', name: 'Setting', element: Settings },
   { path: '/h&s', name: 'Help & Support', element: HelpSupp },
-
-  
 ]
 
 export default routes

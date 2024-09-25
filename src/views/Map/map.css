@@ -1,0 +1,16 @@
+.toolTip
+{
+  max-width: 15rem;
+  min-height: 8rem;
+}
+
+.toolTipContent{
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: space-around;
+  margin-top: 18px;
+}
+.leaflet-popup-content{
+  margin: 13px 5px 13px 8px !important;
+}
