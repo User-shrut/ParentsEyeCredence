@@ -131,7 +131,7 @@ const Group = () => {
     try {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/group/${formData.id}`,
+        `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
         {name: formData.name},
         {
           headers: {
@@ -160,6 +160,7 @@ const Group = () => {
 
 
   // ###################################################################
+  
 
   // ###################### Delete Group ##############################
 
@@ -171,7 +172,7 @@ const Group = () => {
     try {
       const accessToken = Cookies.get('authToken')
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/group/${item.id}`,
+        `${import.meta.env.VITE_API_URL}/group/${item._id}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`
@@ -234,7 +235,7 @@ const Group = () => {
       >
         {loading ? (
           <>
-            <div className="text-nowrap mb-2" style={{ width: '70vw' }}>
+            <div className="text-nowrap mb-2" style={{width: "480px"}}>
               <p className="card-text placeholder-glow">
                 <span className="placeholder col-7" />
                 <span className="placeholder col-4" />
