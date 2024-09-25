@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -23,6 +23,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 
 
+
 const getUserRole = () => {
   const token = Cookies.get('authToken');
   let role;
@@ -43,13 +44,25 @@ const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-
+  let navigate;
   const role = getUserRole();
+  const [decodedToken, setDecodedToken] = useState();
 
-  console.log("role")
-  console.log(role)
 
-  const navigate = navigation(role);
+  if(decodedToken){
+    navigate = navigation(role , decodedToken);
+
+  }
+
+  console.log("this is navs")
+  console.log(navigate)
+
+  useEffect(() => {
+    const token = Cookies.get('authToken');
+
+    setDecodedToken(jwtDecode(token));
+
+  }, [])
 
 
   return (
