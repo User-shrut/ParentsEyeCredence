@@ -28,11 +28,8 @@
     "@mui/x-date-pickers": "^7.16.0",
     "@popperjs/core": "^2.11.8",
     "@react-google-maps/api": "^2.19.3",
-<<<<<<< HEAD
     "@react-icons/all-files": "^4.1.0",
     "@reduxjs/toolkit": "^2.2.7",
-=======
->>>>>>> f0399fcc5f3fc792a9826bde8395edf880e34456
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.3",

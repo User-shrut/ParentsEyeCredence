@@ -62,54 +62,6 @@ import { MdGpsFixed, MdGpsNotFixed } from 'react-icons/md'
 import { IoIosArrowDown, IoMdBatteryCharging } from 'react-icons/io'
 
 // ================================CAR==================================
-<<<<<<< HEAD
-import carGreen from '/public/vehicleList/Car/carGreen.svg'
-import carRed from '/public/vehicleList/Car/carRed.svg'
-import carYellow from '/public/vehicleList/Car/carYellow.svg'
-import carOrange from '/public/vehicleList/Car/carOrange.svg'
-import carGray from '/public/vehicleList/Car/carGray.svg'
-
-//==============================BIKE========================================
-import bikeGreen from '/public/vehicleList/Bike/bikeGreen.svg'
-import bikeRed from '/public/vehicleList/Bike/bikeRed.svg'
-import bikeYellow from '/public/vehicleList/Bike/bikeYellow.svg'
-import bikeOrange from '/public/vehicleList/Bike/bikeOrange.svg'
-import bikeGray from '/public/vehicleList/Bike/bikeGray.svg'
-
-import busGreen from '/public/vehicleList/Bus/busGreen.svg'
-import busRed from '/public/vehicleList/Bus/busRed.svg'
-import busOrange from '/public/vehicleList/Bus/busOrange.svg'
-import busYellow from '/public/vehicleList/Bus/busYellow.svg'
-import busGray from '/public/vehicleList/Bus/busGray.svg'
-
-//==============================TRUCK========================================
-import truckGreen from '/public/vehicleList/Truck/truckGreen.svg'
-import truckRed from '/public/vehicleList/Truck/truckRed.svg'
-import truckYellow from '/public/vehicleList/Truck/truckYellow.svg'
-import truckOrange from '/public/vehicleList/Truck/truckOrange.svg'
-import truckGray from '/public/vehicleList/Truck/truckGray.svg'
-
-//==============================CRANE========================================
-import craneGreen from '/public/vehicleList/Crane/craneGreen.svg'
-import craneRed from '/public/vehicleList/Crane/craneRed.svg'
-import craneYellow from '/public/vehicleList/Crane/craneYellow.svg'
-import craneOrange from '/public/vehicleList/Crane/craneOrange.svg'
-import craneGray from '/public/vehicleList/Crane/craneGray.svg'
-
-//==============================JCB========================================
-import jcbGreen from '/public/vehicleList/JCB/jcbGreen.svg'
-import jcbRed from '/public/vehicleList/JCB/jcbRed.svg'
-import jcbYellow from '/public/vehicleList/JCB/jcbYellow.svg'
-import jcbOrange from '/public/vehicleList/JCB/jcbOrange.svg'
-import jcbGray from '/public/vehicleList/JCB/jcbGray.svg'
-
-//==============================AUTO========================================
-import autoGreen from '/public/vehicleList/Auto/autoGreen.svg'
-import autoRed from '/public/vehicleList/Auto/autoRed.svg'
-import autoYellow from '/public/vehicleList/Auto/autoYellow.svg'
-import autoOrange from '/public/vehicleList/Auto/autoOrange.svg'
-import autoGray from '/public/vehicleList/Auto/autoGray.svg'
-=======
 import carGreen from "../../assets/vehicleList/Car/carGreen.svg";
 import carRed from "../../assets/vehicleList/Car/carRed.svg";
 import carYellow from "../../assets/vehicleList/Car/carYellow.svg";
@@ -157,7 +109,6 @@ import autoRed from "../../assets/vehicleList/Auto/autoRed.svg";
 import autoYellow from "../../assets/vehicleList/Auto/autoYellow.svg";
 import autoOrange from "../../assets/vehicleList/Auto/autoOrange.svg";
 import autoGray from "../../assets/vehicleList/Auto/autoGray.svg";
->>>>>>> f0399fcc5f3fc792a9826bde8395edf880e34456
 
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
