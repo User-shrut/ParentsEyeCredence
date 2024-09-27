@@ -434,291 +434,291 @@ const Dashboard = () => {
               <br />
               <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
                 <CTable className="my-3 border vehiclesTable" hover responsive>
-  <CTableHead
-    className="text-nowrap"
-    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
-  >
-    <CTableRow>
-      <CTableHeaderCell className="bg-body-tertiary text-center sr-no table-cell" style={{ position: 'sticky', top: 0 }}>
-        Sr No.
-      </CTableHeaderCell>
+                  <CTableHead
+                    className="text-nowrap"
+                    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
+                  >
+                    <CTableRow>
+                      <CTableHeaderCell className="bg-body-tertiary text-center sr-no table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Sr No.
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center vehicle table-cell" style={{ position: 'sticky', top: 0 }}>
-        Vehicle
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center vehicle table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Vehicle
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center device-name table-cell" style={{ position: 'sticky', top: 0 }}>
-        Device Name
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center device-name table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Device Name
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell
-        className="bg-body-tertiary text-center address table-cell"
-        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        Address
-      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className="bg-body-tertiary text-center address table-cell"
+                        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      >
+                        Address
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell
-        className="bg-body-tertiary text-center last-update table-cell"
-        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        Last Update
-      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className="bg-body-tertiary text-center last-update table-cell"
+                        style={{ position: 'sticky', top: 0, width: '25%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      >
+                        Last Update
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center current-delay table-cell" style={{ position: 'sticky', top: 0 }}>
-        Current Delay
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center current-delay table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Current Delay
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center speed table-cell" style={{ position: 'sticky', top: 0 }}>
-        Speed
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center speed table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Speed
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center distance table-cell" style={{ position: 'sticky', top: 0 }}>
-        Distance
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center distance table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Distance
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center total-distance table-cell" style={{ position: 'sticky', top: 0 }}>
-        Total Distance
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center total-distance table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Total Distance
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center satelite table-cell" style={{ position: 'sticky', top: 0 }}>
-        Satelite
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center satelite table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Satelite
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center ignition table-cell" style={{ position: 'sticky', top: 0 }}>
-        Ignition
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center ignition table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Ignition
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center gps table-cell" style={{ position: 'sticky', top: 0 }}>
-        GPS
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center gps table-cell" style={{ position: 'sticky', top: 0 }}>
+                        GPS
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center power table-cell" style={{ position: 'sticky', top: 0 }}>
-        Power
-      </CTableHeaderCell>
+                      <CTableHeaderCell className="bg-body-tertiary text-center power table-cell" style={{ position: 'sticky', top: 0 }}>
+                        Power
+                      </CTableHeaderCell>
 
-      <CTableHeaderCell className="bg-body-tertiary text-center status table-cell" style={{ position: 'sticky', top: 0, width: '15%' }}>
-        Track
-      </CTableHeaderCell>
-    </CTableRow>
-  </CTableHead>
+                      <CTableHeaderCell className="bg-body-tertiary text-center status table-cell" style={{ position: 'sticky', top: 0, width: '15%' }}>
+                        Track
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
 
-  <CTableBody>
-    {salesManList?.map((item, index) => (
-      <CTableRow
-        key={index}
-        onClick={() => handleRowClick(index)}
-        className={`table-row ${expandedRow === index ? 'expanded' : 'collapsed'} trans`}
-      >
-        {/* Sr No. */}
-        <CTableDataCell className="text-center sr-no table-cell">
-          {index + 1}
-        </CTableDataCell>
+                  <CTableBody>
+                    {salesManList?.map((item, index) => (
+                      <CTableRow
+                        key={index}
+                        onClick={() => handleRowClick(index)}
+                        className={`table-row ${expandedRow === index ? 'expanded' : 'collapsed'} trans`}
+                      >
+                        {/* Sr No. */}
+                        <CTableDataCell className="text-center sr-no table-cell">
+                          {index + 1}
+                        </CTableDataCell>
 
-        {/* Vehicle */}
-        <CTableDataCell className="text-center vehicle table-cell">
-          <div>
-            {(() => {
-              const device = salesman.find((device) => device.id === item.deviceId);
-              return (
-                <img src={selectImage(device.category, item)} className="dashimg upperdata" alt="vehicle" />
-              );
-            })()}
-          </div>
-          {expandedRow === index && (
-            <>
-              <hr />
-              {(() => {
-                const device = salesman.find((device) => device.id === item.deviceId);
-                return (
-                  <div className="upperdata">
-                    {device ? device.category : 'Currently Not Available'}
-                  </div>
-                );
-              })()}
-            </>
-          )}
-        </CTableDataCell>
+                        {/* Vehicle */}
+                        <CTableDataCell className="text-center vehicle table-cell">
+                          <div>
+                            {(() => {
+                              const device = salesman.find((device) => device.id === item.deviceId);
+                              return (
+                                <img src={selectImage(device.category, item)} className="dashimg upperdata" alt="vehicle" />
+                              );
+                            })()}
+                          </div>
+                          {expandedRow === index && (
+                            <>
+                              <hr />
+                              {(() => {
+                                const device = salesman.find((device) => device.id === item.deviceId);
+                                return (
+                                  <div className="upperdata">
+                                    {device ? device.category : 'Currently Not Available'}
+                                  </div>
+                                );
+                              })()}
+                            </>
+                          )}
+                        </CTableDataCell>
 
-        {/* Device Name */}
-        <CTableDataCell className="device-name table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            return (
-              <>
-                <div className="upperdata">{device ? device.name : 'Unknown'}</div>
-                {expandedRow === index && (
-                  <>
-                    <hr />
-                    <div>
-                      <PiEngineFill />
-                    </div>
-                  </>
-                )}
-              </>
-            );
-          })()}
-        </CTableDataCell>
+                        {/* Device Name */}
+                        <CTableDataCell className="device-name table-cell">
+                          {(() => {
+                            const device = salesman.find((device) => device.id === item.deviceId);
+                            return (
+                              <>
+                                <div className="upperdata">{device ? device.name : 'Unknown'}</div>
+                                {expandedRow === index && (
+                                  <>
+                                    <hr />
+                                    <div>
+                                      <PiEngineFill />
+                                    </div>
+                                  </>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </CTableDataCell>
 
-        {/* Address */}
-        <CTableDataCell className="text-center address table-cell" style={{ width: '20rem' }}>
-          <div className="upperdata" style={{ fontSize: '1rem' }}>
-            shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
-          </div>
-        </CTableDataCell>
+                        {/* Address */}
+                        <CTableDataCell className="text-center address table-cell" style={{ width: '20rem' }}>
+                          <div className="upperdata" style={{ fontSize: '1rem' }}>
+                            shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
+                          </div>
+                        </CTableDataCell>
 
-        {/* Last Update */}
-        <CTableDataCell className="text-center last-update table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            const lastUpdate = device ? dayjs(device.lastUpdate).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
-            return (
-              <div className="upperdata">
-                {lastUpdate}
-              </div>
-            );
-          })()}
-        </CTableDataCell>
+                        {/* Last Update */}
+                        <CTableDataCell className="text-center last-update table-cell">
+                          {(() => {
+                            const device = salesman.find((device) => device.id === item.deviceId);
+                            const lastUpdate = device ? dayjs(device.lastUpdate).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
+                            return (
+                              <div className="upperdata">
+                                {lastUpdate}
+                              </div>
+                            );
+                          })()}
+                        </CTableDataCell>
 
-        {/* Current Delay */}
-        <CTableDataCell className="text-center current-delay table-cell">
-          {(() => {
-            const device = salesman.find((device) => device.id === item.deviceId);
-            if (device && device.lastUpdate) {
-              const now = dayjs();
-              const lastUpdate = dayjs(device.lastUpdate);
-              const duration = dayjs.duration(now.diff(lastUpdate));
+                        {/* Current Delay */}
+                        <CTableDataCell className="text-center current-delay table-cell">
+                          {(() => {
+                            const device = salesman.find((device) => device.id === item.deviceId);
+                            if (device && device.lastUpdate) {
+                              const now = dayjs();
+                              const lastUpdate = dayjs(device.lastUpdate);
+                              const duration = dayjs.duration(now.diff(lastUpdate));
 
-              const days = duration.days();
-              const hours = duration.hours();
-              const minutes = duration.minutes();
-              const seconds = duration.seconds();
+                              const days = duration.days();
+                              const hours = duration.hours();
+                              const minutes = duration.minutes();
+                              const seconds = duration.seconds();
 
-              // Conditional formatting based on duration values
-              if (days > 0) {
-                return `${days}d ${hours}h ${minutes}m`;
-              } else if (hours > 0) {
-                return `${hours}h ${minutes}m`;
-              } else if (minutes > 0) {
-                return `${minutes}m`;
-              } else {
-                return `${seconds}s`; // Display seconds if all else is zero
-              }
-            }
-            return '0s'; // Default if no device or lastUpdate
-          })()}
-        </CTableDataCell>
+                              // Conditional formatting based on duration values
+                              if (days > 0) {
+                                return `${days}d ${hours}h ${minutes}m`;
+                              } else if (hours > 0) {
+                                return `${hours}h ${minutes}m`;
+                              } else if (minutes > 0) {
+                                return `${minutes}m`;
+                              } else {
+                                return `${seconds}s`; // Display seconds if all else is zero
+                              }
+                            }
+                            return '0s'; // Default if no device or lastUpdate
+                          })()}
+                        </CTableDataCell>
 
-        {/* Speed */}
-        <CTableDataCell className="text-center speed table-cell">
-          <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
-          {expandedRow === index && (
-            <>
-              <hr />
-              <div>
-                <PiEngineFill />
-              </div>
-            </>
-          )}
-        </CTableDataCell>
+                        {/* Speed */}
+                        <CTableDataCell className="text-center speed table-cell">
+                          <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
+                          {expandedRow === index && (
+                            <>
+                              <hr />
+                              <div>
+                                <PiEngineFill />
+                              </div>
+                            </>
+                          )}
+                        </CTableDataCell>
 
-        {/* Distance */}
-        <CTableDataCell className="text-center distance table-cell">
-          {`${Math.round(item.attributes.distance)} km`}
-        </CTableDataCell>
+                        {/* Distance */}
+                        <CTableDataCell className="text-center distance table-cell">
+                          {`${Math.round(item.attributes.distance)} km`}
+                        </CTableDataCell>
 
-        {/* Total Distance */}
-        <CTableDataCell className="text-center total-distance table-cell">
-          {`${Math.round(item.attributes.totalDistance)} km`}
-        </CTableDataCell>
+                        {/* Total Distance */}
+                        <CTableDataCell className="text-center total-distance table-cell">
+                          {`${Math.round(item.attributes.totalDistance)} km`}
+                        </CTableDataCell>
 
-        {/* Satelite */}
-        <CTableDataCell className="text-center satelite table-cell">
-          {item.attributes.sat}
-        </CTableDataCell>
+                        {/* Satelite */}
+                        <CTableDataCell className="text-center satelite table-cell">
+                          {item.attributes.sat}
+                        </CTableDataCell>
 
-        {/* Ignition */}
-        <CTableDataCell className="text-center ignition table-cell">
-          {(() => {
-            const { ignition } = item.attributes;
+                        {/* Ignition */}
+                        <CTableDataCell className="text-center ignition table-cell">
+                          {(() => {
+                            const { ignition } = item.attributes;
 
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
+                            let iconColor = 'gray'; // Default color
+                            let iconText = 'N/A'; // Default text
 
-            if (ignition) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (ignition === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
+                            if (ignition) {
+                              iconColor = 'green';
+                              iconText = 'On';
+                            } else if (ignition === false) {
+                              iconColor = 'red';
+                              iconText = 'Off';
+                            }
 
-            return (
-              <div style={{ color: iconColor }}>
-                <PiEngineFill />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
+                            return (
+                              <div style={{ color: iconColor }}>
+                                <PiEngineFill />
+                              </div>
+                            );
+                          })()}
+                        </CTableDataCell>
 
-        {/* GPS */}
-        <CTableDataCell className="text-center gps table-cell">
-          {(() => {
-            const { valid } = item;
+                        {/* GPS */}
+                        <CTableDataCell className="text-center gps table-cell">
+                          {(() => {
+                            const { valid } = item;
 
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
+                            let iconColor = 'gray'; // Default color
+                            let iconText = 'N/A'; // Default text
 
-            if (valid) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (valid === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
+                            if (valid) {
+                              iconColor = 'green';
+                              iconText = 'On';
+                            } else if (valid === false) {
+                              iconColor = 'red';
+                              iconText = 'Off';
+                            }
 
-            return (
-              <div style={{ color: iconColor }}>
-                <PiEngineFill />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
+                            return (
+                              <div style={{ color: iconColor }}>
+                                <PiEngineFill />
+                              </div>
+                            );
+                          })()}
+                        </CTableDataCell>
 
-        {/* Power */}
-        <CTableDataCell className="text-center power table-cell">
-          {(() => {
-            const power = item.attributes.battery;
+                        {/* Power */}
+                        <CTableDataCell className="text-center power table-cell">
+                          {(() => {
+                            const power = item.attributes.battery;
 
-            let iconColor = 'gray'; // Default color
-            let iconText = 'N/A'; // Default text
+                            let iconColor = 'gray'; // Default color
+                            let iconText = 'N/A'; // Default text
 
-            if (power) {
-              iconColor = 'green';
-              iconText = 'On';
-            } else if (power === false) {
-              iconColor = 'red';
-              iconText = 'Off';
-            }
+                            if (power) {
+                              iconColor = 'green';
+                              iconText = 'On';
+                            } else if (power === false) {
+                              iconColor = 'red';
+                              iconText = 'Off';
+                            }
 
-            return (
-              <div style={{ color: iconColor, fontSize: "1.2rem" }}>
-                <IoMdBatteryCharging />
-              </div>
-            );
-          })()}
-        </CTableDataCell>
+                            return (
+                              <div style={{ color: iconColor, fontSize: "1.2rem" }}>
+                                <IoMdBatteryCharging />
+                              </div>
+                            );
+                          })()}
+                        </CTableDataCell>
 
-        {/* Track */}
-        <CTableDataCell className="text-center status table-cell">
-                        <button className="btn btn-primary" onClick={() => handleClick(item)}>
-                          Live Track
-                        </button>
-                      </CTableDataCell>
-      </CTableRow>
-    ))}
-  </CTableBody>
-</CTable>
+                        {/* Track */}
+                        <CTableDataCell className="text-center status table-cell">
+                          <button className="btn btn-primary" onClick={() => handleClick(item)}>
+                            Live Track
+                          </button>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))}
+                  </CTableBody>
+                </CTable>
 
               </div>
             </CCardBody>

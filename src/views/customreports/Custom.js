@@ -19,7 +19,7 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns, selectedColumns, setSelectedColumns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, selectedColumns, setSelectedColumns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -56,7 +56,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -76,7 +76,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      {/* <CCol md={6}>
         <CFormLabel htmlFor="details">Groups</CFormLabel>
         <CFormSelect
           id="details"
@@ -94,7 +94,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           )}
         </CFormSelect>
         <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
@@ -116,7 +116,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+      {/* <CCol md={4}>
         <CFormLabel htmlFor="type">Type</CFormLabel>
         <CFormSelect
           id="type"
@@ -129,7 +129,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           <option value="Daily Summary">Daily Summary</option>
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
       {/* <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
@@ -307,7 +307,7 @@ const Validation = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [devices, setDevices] = useState([]);
-  const [groups, setGroups] = useState([]);
+  // const [groups, setGroups] = useState([]);
   const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
 
   useEffect(() => {
@@ -332,29 +332,29 @@ const Validation = () => {
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
-          },
-        });
+    // const fetchGroups = async () => {
+    //   try {
+    //     const response = await fetch('https://rocketsalestracker.com/api/groups', {
+    //       method: 'GET',
+    //       headers: {
+    //         'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch groups');
-        }
+    //     if (!response.ok) {
+    //       throw new Error('Failed to fetch groups');
+    //     }
 
-        const data = await response.json();
-        setGroups(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    //     const data = await response.json();
+    //     setGroups(data);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // };
 
     fetchDevices();
-    fetchGroups();
+    // fetchGroups();
   }, []);
 
   const handleInputChange = (field, value) => {
@@ -391,7 +391,7 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                groups={groups}
+                // groups={groups}
                 columns={columns}
                 selectedColumns={selectedColumns}
                 setSelectedColumns={setSelectedColumns}

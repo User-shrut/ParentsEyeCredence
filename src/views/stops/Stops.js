@@ -19,25 +19,22 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
+const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
   const handleFormSubmit = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
+    event.preventDefault();
+    if (!event.currentTarget.checkValidity()) {
       event.stopPropagation();
+      setValidated(true);
     } else {
-      event.preventDefault();
       handleSubmit();
     }
-    setValidated(true);
   };
 
   const handlePeriodChange = (value) => {
@@ -45,29 +42,16 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
     setShowDateInputs(value === 'Custom');
   };
 
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  // Function to handle button click
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  // Function to handle closing the menu
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   return (
-
     <CForm
       className="row g-3 needs-validation"
       noValidate
       validated={validated}
       onSubmit={handleFormSubmit}
     >
+      {/* Devices Dropdown */}
       <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-
         <CFormSelect
           id="devices"
           required
@@ -75,20 +59,14 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices.length > 0 ? (
-            devices.map((device) => (
-              <option key={device.id} value={device.id}>{device.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading devices...</option>
-          )}
+          {devices.map((device) => (
+            <option key={device.id} value={device.id}>{device.name}</option>
+          ))}
         </CFormSelect>
-
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-
-
+      {/* Periods Dropdown */}
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
@@ -109,37 +87,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
-        <CFormLabel htmlFor="type">Event Types</CFormLabel>
-        <CFormSelect
-          id="type"
-          required
-          value={formData.Type}
-          onChange={(e) => handleInputChange('Type', e.target.value)}
-        >
-          <option value="">Choose a type...</option>
-          <option value="Summary">Summary</option>
-          <option value="Daily Summary">Daily Summary</option>
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
-      </CCol>
-
-      <CCol md={4}>
-        <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        <CFormSelect
-          id="columns"
-          required
-          value={formData.Columns}
-          onChange={(e) => handleInputChange('Columns', e.target.value)}
-        >
-          <option value="">Choose a column...</option>
-          {columns.map((column, index) => (
-            <option key={index} value={column}>{column}</option>
-          ))}
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid column.</CFormFeedback>
-      </CCol>
-
+      {/* Custom Date Inputs */}
       {showDateInputs && (
         <>
           <CCol md={4}>
@@ -167,105 +115,69 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
         </>
       )}
 
+      {/* Show Button */}
       <CCol xs={12}>
         <div className="d-flex justify-content-end">
-          {/* <CButton color="primary" type="submit">
-            SHOW NOW
-          </CButton> */}
-
-          {/* Button with Dropdown */}
           <Button
             variant="outlined"
             color="secondary"
-            size="small"
-            onClick={handleClick}
-            endIcon={<ArrowDropDownIcon />} // Adds dropdown icon at the end
+            type="submit"
+            endIcon={<ArrowDropDownIcon />}
           >
             Show Now
           </Button>
-
-          {/* Dropdown Menu */}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            {/* Menu Items */}
-            <MenuItem onClick={handleClose}>Show Now</MenuItem>
-            <MenuItem onClick={handleClose}>Exports</MenuItem>
-            <MenuItem onClick={handleClose}>Email Reports</MenuItem>
-            <MenuItem onClick={handleClose}>Schedule</MenuItem>
-          </Menu>
-
         </div>
       </CCol>
     </CForm>
   );
 };
 
-const CustomStyles1 = ({ rows, selectedColumn }) => {
-  return (
-    <CTable borderless className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          <CTableHeaderCell>Sr.No</CTableHeaderCell>
-          <CTableHeaderCell>Devices</CTableHeaderCell>
-          <CTableHeaderCell>Fix Time</CTableHeaderCell>
-          <CTableHeaderCell>{selectedColumn}</CTableHeaderCell>
+const CustomTable = ({ rows, selectedColumn }) => (
+  <CTable borderless className="custom-table">
+    <CTableHead>
+      <CTableRow>
+        <CTableHeaderCell>Sr.No</CTableHeaderCell>
+        <CTableHeaderCell>Devices</CTableHeaderCell>
+        <CTableHeaderCell>Fix Time</CTableHeaderCell>
+        <CTableHeaderCell>{selectedColumn}</CTableHeaderCell>
+      </CTableRow>
+    </CTableHead>
+    <CTableBody>
+      {rows.map((row, index) => (
+        <CTableRow key={index} className="custom-row">
+          <CTableDataCell>{index + 1}</CTableDataCell>
+          <CTableDataCell>{row.Devices}</CTableDataCell>
+          <CTableDataCell>{row.Details}</CTableDataCell>
+          <CTableDataCell>{row[selectedColumn]}</CTableDataCell>
         </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {rows.map((row) => (
-          <CTableRow key={row.id} className="custom-row">
-            <CTableDataCell>{row.id}</CTableDataCell>
-            <CTableDataCell>{row.Devices}</CTableDataCell>
-            <CTableDataCell>{row.Details}</CTableDataCell>
-            <CTableDataCell>{row[selectedColumn]}</CTableDataCell>
-          </CTableRow>
-        ))}
-      </CTableBody>
-    </CTable>
-  );
-};
+      ))}
+    </CTableBody>
+  </CTable>
+); 
 
-const Validation = () => {
-  const username = 'school';
-  const password = '123456';
-  const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active', StartDate: '2024-01-01', Distance: '500 km' },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active', StartDate: '2024-02-01', Distance: '600 km' },
-  ]);
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+const StopagePage = () => {
+  const [formData, setFormData] = useState({ Devices: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
+  const [rows, setRows] = useState([]);
   const [devices, setDevices] = useState([]);
   const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
-  const [selectedColumn, setSelectedColumn] = useState('');
+  const [selectedColumn, setSelectedColumn] = useState(''); 
 
   useEffect(() => {
+    // Fetch devices
     const fetchDevices = async () => {
       try {
-        const response = await fetch('https://rocketsalestracker.com/api/devices', {
-          method: 'GET',
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MH0sImlhdCI6MTcyNzMzMzc3OX0.np-i9Kd821Y7BBU_G6ul_RuAUACJVz8OOxO53JvRS-c';
+        const response = await fetch('https://credence-tracker.onrender.com/device/', {
           headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        if (response.ok) {
+          const data = await response.json();
+          setDevices(data);
+        } else {
+          throw new Error('Failed to fetch devices');
         }
-
-        const data = await response.json();
-        setDevices(data); // Adjust if the structure of the response is different
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
@@ -280,26 +192,46 @@ const Validation = () => {
       [name]: value,
     }));
 
-    if (name === 'Columns') {
-      setSelectedColumn(value);
-    }
+    if (name === 'Columns') setSelectedColumn(value);
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
+  const handleSubmit = async () => {
+    const { Devices, FromDate, ToDate } = formData;
+    if (Devices && FromDate && ToDate) {
+      try {
+        const response = await fetch(
+          `https://rocketsalestracker.com/api/stoppage?device=${Devices}&fromDate=${FromDate}&toDate=${ToDate}`,
+          {
+            headers: {
+              'Authorization': 'Basic ' + btoa('school:123456'),
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setRows(data);
+        } else {
+          console.error('Failed to fetch stoppage data');
+        }
+      } catch (error) {
+        console.error('Error fetching stoppage data:', error);
+      }
+    }
   };
 
   return (
     <>
       <CRow>
-        <h3>Stop</h3>
+        <h3>Stopage Page</h3>
         <CCol xs={12} md={12}>
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>Validation</strong> <small>Custom styles</small>
+              <strong>Stopage Page</strong>
             </CCardHeader>
             <CCardBody>
-              <CustomStyles
+              <CustomForm
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
@@ -312,10 +244,11 @@ const Validation = () => {
       </CRow>
       <CRow>
         <CCol xs={12}>
-          <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
+          <CustomTable rows={rows} selectedColumn={selectedColumn} />
         </CCol>
       </CRow>
     </>
   );
 };
-export default Validation;
+
+export default StopagePage;
