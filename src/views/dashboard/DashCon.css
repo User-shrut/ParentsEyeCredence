@@ -1,10 +1,58 @@
+.content{
+  padding-top: 0 !important;
+}
+
 .countldel
 {
   border-left-color: yellow !important;
+  margin-bottom: 5px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 .countOverSpeed
 {
   border-left-color: #eb6009 !important;
+  margin-bottom: 5px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.countAll{
+  border-left-color: #0d6dec !important;
+  margin-bottom: 5px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+
+.countStop{
+  margin-bottom: 5px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.countRun{
+  margin-bottom: 5px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.allData{
+  color: #0d6dec !important;
+}
+.runningData{
+  color: green !important;
+}
+
+.stopData{
+  color: red !important;
+}
+
+.inactiveData{
+  color: black !important;
+}
+
+.overspeedData{
+  color: #eb6009 !important;
 }
 .vehiclesTable
 {
@@ -16,7 +64,7 @@
 
 
 .table-cell {
-  padding-right: 5rem !important; /* Adjust this value as needed */
+  padding-right: 1rem !important; /* Adjust this value as needed */
 }
 .trans
 {
@@ -67,4 +115,46 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.device-name{
+  width: 2% !important; /* Adjust this value as per your requirement */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
+.n{
+  font-size: 0.8rem;
+}
+.ld, td{
+  font-size: 0.8rem;
+}
+.cd{
+  font-size: 0.9rem;
+}
+
+.sp{
+  font-size: 0.9rem;
+}
+.d{
+  font-size: 0.9rem;
+}
+
+.current-delay{
+  width: 2% !important; /* Adjust this value as per your requirement */
+  /* white-space: nowrap !important; */
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
+.count-col{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.countallCol
+{
+  max-width: 9rem !important;
 }

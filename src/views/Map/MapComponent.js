@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { GlobalContext } from '../../Context/Context';
+import React, { useContext } from 'react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { GlobalContext } from '../../Context/Context'
 import MarkerClusterGroup from 'react-leaflet-cluster'
 
 // Importing all vehicle icons
@@ -41,6 +41,12 @@ import truckyellowSvg from '../../assets/AllTopViewVehicle/Truck-Y.svg';
 import truckgreenSvg from '../../assets/AllTopViewVehicle/Truck-G.svg';
 import truckorangeSvg from '../../assets/AllTopViewVehicle/Truck-O.svg';
 import truckgraySvg from '../../assets/AllTopViewVehicle/Truck-Grey.svg';
+import { FaSearchLocation } from 'react-icons/fa'
+import { IoMdSpeedometer } from 'react-icons/io'
+import { HiOutlineStatusOnline } from 'react-icons/hi'
+import { RxLapTimer } from 'react-icons/rx'
+import dayjs from 'dayjs'
+
 
 // Define map icons
 const mapIcons = {
@@ -93,32 +99,32 @@ const mapIcons = {
     orange: carorangeSvg,
     gray: cargraySvg,
   },
-};
+}
 
 // Function to get the correct icon based on vehicle state
-const getVehicleIcon = (vehicle, device) => {
-  let speed = vehicle.speed;
-  let ignition = vehicle.attributes.ignition;
-  const category = mapIcons[device?.category] || mapIcons['default'];
-  let course = vehicle.course || 0;
+const getVehicleIcon = (vehicle) => {
+  let speed = vehicle.speed
+  let ignition = vehicle.attributes.ignition
+  const category = mapIcons[vehicle?.category] || mapIcons['default']
+  let course = vehicle.course || 0
 
-  let iconUrl;
+  let iconUrl
   switch (true) {
     case speed <= 2.0 && ignition:
-      iconUrl = category['yellow'];
-      break;
+      iconUrl = category['yellow']
+      break
     case speed > 2.0 && speed < 60 && ignition:
-      iconUrl = category['green'];
-      break;
+      iconUrl = category['green']
+      break
     case speed > 60.0 && ignition:
-      iconUrl = category['orange'];
-      break;
+      iconUrl = category['orange']
+      break
     case speed <= 1.0 && !ignition:
-      iconUrl = category['red'];
-      break;
+      iconUrl = category['red']
+      break
     default:
-      iconUrl = category['gray'];
-      break;
+      iconUrl = category['gray']
+      break
   }
 
   return L.divIcon({
@@ -126,13 +132,11 @@ const getVehicleIcon = (vehicle, device) => {
     iconSize: [48, 48],
     iconAnchor: [24, 24], // Adjust anchor point based on size and rotation
     popupAnchor: [0, -24],
-    className: '' // Ensure no default styles are applied
-  });
-};
+    className: '', // Ensure no default styles are applied
+  })
+}
 
-const MainMap = () => {
-  const { salesManList, salesman } = useContext(GlobalContext);
-
+const MainMap = ({ filteredVehicles }) => {
   return (
     <MapContainer
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
@@ -143,27 +147,72 @@ const MainMap = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; RocketSales, HB Gadget Solutions Nagpur"
       />
-  <MarkerClusterGroup chunkedLoading >
-{salesManList?.map((sale, index) => {
-        const device = salesman.find(device => device.id === sale.deviceId);
-        return (
-          <Marker
-            key={index}
-            position={[sale.latitude, sale.longitude]}
-            icon={getVehicleIcon(sale, device)}
-          >
-            <Popup>
-              <div>
-                <strong>Device ID:</strong> {sale.deviceId} <br />
-                <strong>Speed:</strong> {sale.speed} km/h
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
+      <MarkerClusterGroup chunkedLoading>
+        {filteredVehicles?.map((vehicle, index) => {
+          return (
+            <Marker
+              key={index}
+              position={[vehicle.latitude, vehicle.longitude]}
+              icon={getVehicleIcon(vehicle)}
+            >
+              <Popup>
+                <div className="toolTip">
+                  <div>
+                    <strong> {vehicle.name}</strong>
+                  </div>
+
+                  <div className="toolTipContent">
+                    <div>
+                      <strong>
+                        <FaSearchLocation />
+                      </strong>{' '}
+                      shiv kailasa, mihan, khapri, nagpur, maharshtra 111111{' '}
+                    </div>
+                    <div>
+                      <strong>
+                        <IoMdSpeedometer />
+                      </strong>{' '}
+                      {vehicle.speed} km/h{' '}
+                    </div>
+                    <div>
+                      <strong>
+                        <HiOutlineStatusOnline />
+                      </strong>{' '}
+                      {(() => {
+                        const sp = vehicle.speed
+                        const ig = vehicle.attributes.ignition
+                        if (sp < 1 && ig == false) {
+                          return 'Stoped'
+                        }
+                        if (sp < 2 && ig == false) {
+                          return 'Idle'
+                        }
+                        if (sp > 2 && sp < 60 && ig == true) {
+                          return 'Running'
+                        }
+                        if (sp > 60 && ig == true) {
+                          return 'Over Speed'
+                        } else {
+                          return 'Inactive'
+                        }
+                      })()}
+                    </div>
+                    <div>
+                      <strong>
+                        <RxLapTimer />
+                      </strong>{' '}
+                      {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
+                    </div>
+                  </div>
+                  {/* <strong></strong> {device.lastUpdate} km/h */}
+                </div>
+              </Popup>
+            </Marker>
+          )
+        })}
       </MarkerClusterGroup>
     </MapContainer>
-  );
-};
+  )
+}
 
-export default MainMap;
+export default MainMap
