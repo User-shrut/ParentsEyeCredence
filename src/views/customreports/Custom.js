@@ -19,7 +19,7 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, selectedColumns, setSelectedColumns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -40,6 +40,15 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     setShowDateInputs(value === 'Custom');
   };
 
+  const handleCheckboxChange = (column) => {
+    const newSelectedColumns = selectedColumns.includes(column)
+      ? selectedColumns.filter((item) => item !== column)
+      : [...selectedColumns, column];
+
+    setSelectedColumns(newSelectedColumns);
+    handleInputChange('Columns', newSelectedColumns);
+  };
+
   return (
     <CForm
       className="row g-3 needs-validation"
@@ -47,9 +56,8 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-
         <CFormSelect
           id="devices"
           required
@@ -65,11 +73,10 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
-
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      {/* <CCol md={6}>
         <CFormLabel htmlFor="details">Groups</CFormLabel>
         <CFormSelect
           id="details"
@@ -87,7 +94,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           )}
         </CFormSelect>
         <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
@@ -109,7 +116,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+      {/* <CCol md={4}>
         <CFormLabel htmlFor="type">Type</CFormLabel>
         <CFormSelect
           id="type"
@@ -122,23 +129,105 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           <option value="Daily Summary">Daily Summary</option>
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
-      <CCol md={4}>
+      {/* <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        <CFormSelect
-          id="columns"
-          required
-          value={formData.Columns}
-          onChange={(e) => handleInputChange('Columns', e.target.value)}
-        >
-          <option value="">Choose a column...</option>
+        <div id="columns">
           {columns.map((column, index) => (
-            <option key={index} value={column}>{column}</option>
+            <div key={index} className="form-check">
+              
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`column-${index}`}
+                checked={selectedColumns.includes(column)}
+                onChange={() => handleCheckboxChange(column)}
+              />
+              
+              <label className="form-check-label" htmlFor={`column-${index}`}>
+                {column}
+              </label>
+            </div>
+            
           ))}
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid column.</CFormFeedback>
-      </CCol>
+        </div>
+        <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
+      </CCol> */}
+
+      
+<CCol
+  md={4}
+  style={{
+    padding: '10px', // Decreased from 20px to 10px
+    border: '1px solid #e0e0e0',
+    borderRadius: '8px',
+    backgroundColor: '#ffffff',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  }}
+>
+  <CFormLabel
+    htmlFor="columns"
+    style={{
+      fontWeight: 'bold',
+      marginBottom: '10px', // Decreased from 15px to 10px
+      color: '#333',
+      display: 'block',
+    }}
+  >
+    <h5 style={{ margin: 0 }}>Columns</h5>
+  </CFormLabel>
+  <div
+    id="columns"
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px', // Decreased from 15px to 10px
+    }}
+  >
+    {columns.map((column, index) => (
+      <div
+        key={index}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '4px 8px', // Decreased from 8px 12px to 4px 8px
+          borderRadius: '5px',
+          backgroundColor: selectedColumns.includes(column) ? '#e0f7fa' : 'transparent',
+          transition: 'background-color 0.3s ease',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = selectedColumns.includes(column) ? '#e0f7fa' : 'transparent')}
+      >
+        <input
+          type="checkbox"
+          className="form-check-input"
+          id={`column-${index}`}
+          checked={selectedColumns.includes(column)}
+          onChange={() => handleCheckboxChange(column)}
+          style={{
+            marginRight: '10px',
+            accentColor: '#007bff',
+          }}
+        />
+        <label
+          className="form-check-label"
+          htmlFor={`column-${index}`}
+          style={{
+            color: '#555',
+            transition: 'color 0.3s ease',
+            cursor: 'pointer',
+          }}
+        >
+          {column}
+        </label>
+      </div>
+    ))}
+  </div>
+  <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
+</CCol>
+
+
 
       {showDateInputs && (
         <>
@@ -178,15 +267,17 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
   );
 };
 
-const CustomStyles1 = ({ rows, selectedColumn }) => {
+const CustomStyles1 = ({ rows, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>Sr.No</CTableHeaderCell>
           <CTableHeaderCell>Devices</CTableHeaderCell>
-          <CTableHeaderCell>Fix Time</CTableHeaderCell>
-          <CTableHeaderCell>{selectedColumn}</CTableHeaderCell>
+          <CTableHeaderCell>Details</CTableHeaderCell>
+          {selectedColumns.map((col, index) => (
+            <CTableHeaderCell key={index}>{col}</CTableHeaderCell>
+          ))}
         </CTableRow>
       </CTableHead>
       <CTableBody>
@@ -195,7 +286,9 @@ const CustomStyles1 = ({ rows, selectedColumn }) => {
             <CTableDataCell>{row.id}</CTableDataCell>
             <CTableDataCell>{row.Devices}</CTableDataCell>
             <CTableDataCell>{row.Details}</CTableDataCell>
-            <CTableDataCell>{row[selectedColumn]}</CTableDataCell>
+            {selectedColumns.map((col, index) => (
+              <CTableDataCell key={index}>{row[col]}</CTableDataCell>
+            ))}
           </CTableRow>
         ))}
       </CTableBody>
@@ -207,15 +300,15 @@ const Validation = () => {
   const username = 'school';
   const password = '123456';
   const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active', StartDate: '2024-01-01', Distance: '500 km' },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active', StartDate: '2024-02-01', Distance: '600 km' },
+    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur' },
+    { id: 2, Devices: 'MH43BC1234', Details: 'Akola' },
   ]);
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
+  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedColumns, setSelectedColumns] = useState([]);
   const [devices, setDevices] = useState([]);
-  const [groups, setGroups] = useState([]);
+  // const [groups, setGroups] = useState([]);
   const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
-  const [selectedColumn, setSelectedColumn] = useState('');
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -229,65 +322,68 @@ const Validation = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to fetch devices');
         }
 
         const data = await response.json();
-        setDevices(data); // Adjust if the structure of the response is different
+        setDevices(data);
       } catch (error) {
-        console.error('Error fetching devices:', error);
+        console.error(error);
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
-          },
-        });
+    // const fetchGroups = async () => {
+    //   try {
+    //     const response = await fetch('https://rocketsalestracker.com/api/groups', {
+    //       method: 'GET',
+    //       headers: {
+    //         'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+    //     if (!response.ok) {
+    //       throw new Error('Failed to fetch groups');
+    //     }
 
-        const data = await response.json();
-        setGroups(data); // Adjust if the structure of the response is different
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-      }
-    };
+    //     const data = await response.json();
+    //     setGroups(data);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // };
 
     fetchDevices();
-    fetchGroups();
+    // fetchGroups();
   }, []);
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (field, value) => {
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [field]: value,
     }));
-
-    if (name === 'Columns') {
-      setSelectedColumn(value);
-    }
   };
 
   const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
+    // Logic for handling form submission
+    console.log('Form submitted:', formData);
+    // You can also handle any additional logic here if needed
   };
 
   return (
     <>
       <CRow>
-        
-          <h3>Custom Reports</h3>
-        <CCol xs={12} md={12}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Validation</strong> <small>Custom styles</small>
+        <h3>Custom Reports</h3>
+        <CCol xs={12} className='mb-4'>
+          <CCard className='p-0'>
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Status Reports</strong>
+              <CFormInput
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '250px' }}
+              />
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -295,9 +391,12 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                groups={groups}
+                // groups={groups}
                 columns={columns}
+                selectedColumns={selectedColumns}
+                setSelectedColumns={setSelectedColumns}
               />
+
             </CCardBody>
           </CCard>
         </CCol>
@@ -305,7 +404,14 @@ const Validation = () => {
 
       <CRow>
         <CCol xs={12}>
-          <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
+          <CCard className="p-0 mb-4">
+            <CCardHeader>
+              <strong>All Status List :</strong>
+            </CCardHeader>
+            <CCardBody>
+              <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+            </CCardBody>
+          </CCard>
         </CCol>
       </CRow>
     </>

@@ -18,8 +18,13 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -40,6 +45,18 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     setShowDateInputs(value === 'Custom');
   };
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  // Function to handle button click
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Function to handle closing the menu
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
 
     <CForm
@@ -48,7 +65,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
 
         <CFormSelect
@@ -70,25 +87,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
-        <CFormLabel htmlFor="details">Groups</CFormLabel>
-        <CFormSelect
-          id="details"
-          required
-          value={formData.Details}
-          onChange={(e) => handleInputChange('Details', e.target.value)}
-        >
-          <option value="">Choose a group...</option>
-          {groups.length > 0 ? (
-            groups.map((group) => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading groups...</option>
-          )}
-        </CFormSelect>
-        <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol>
+
 
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
@@ -111,7 +110,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       </CCol>
 
       <CCol md={4}>
-        <CFormLabel htmlFor="type">Type</CFormLabel>
+        <CFormLabel htmlFor="type">Event Types</CFormLabel>
         <CFormSelect
           id="type"
           required
@@ -170,9 +169,42 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
 
       <CCol xs={12}>
         <div className="d-flex justify-content-end">
-          <CButton color="primary" type="submit">
+          {/* <CButton color="primary" type="submit">
             SHOW NOW
-          </CButton>
+          </CButton> */}
+
+          {/* Button with Dropdown */}
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={handleClick}
+            endIcon={<ArrowDropDownIcon />} // Adds dropdown icon at the end
+          >
+            Show Now
+          </Button>
+
+          {/* Dropdown Menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            {/* Menu Items */}
+            <MenuItem onClick={handleClose}>Show Now</MenuItem>
+            <MenuItem onClick={handleClose}>Exports</MenuItem>
+            <MenuItem onClick={handleClose}>Email Reports</MenuItem>
+            <MenuItem onClick={handleClose}>Schedule</MenuItem>
+          </Menu>
+
         </div>
       </CCol>
     </CForm>
@@ -214,7 +246,6 @@ const Validation = () => {
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  const [groups, setGroups] = useState([]);
   const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
   const [selectedColumn, setSelectedColumn] = useState('');
 
@@ -240,29 +271,7 @@ const Validation = () => {
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setGroups(data); // Adjust if the structure of the response is different
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-      }
-    };
-
     fetchDevices();
-    fetchGroups();
   }, []);
 
   const handleInputChange = (name, value) => {
@@ -295,14 +304,12 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                groups={groups}
                 columns={columns}
               />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
-
       <CRow>
         <CCol xs={12}>
           <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
@@ -311,5 +318,4 @@ const Validation = () => {
     </>
   );
 };
-
 export default Validation;

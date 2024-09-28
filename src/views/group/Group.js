@@ -13,78 +13,38 @@ import {
   Box,
   TextField,
   FormControl,
-
-} from '@mui/material';
-import { RiEdit2Fill } from 'react-icons/ri';
-import { AiFillDelete } from 'react-icons/ai';
-import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-import { useNavigate } from 'react-router-dom';
-import Loader from "../../components/Loader/Loader";
-import CloseIcon from '@mui/icons-material/Close';
-import { MdConnectWithoutContact } from 'react-icons/md';
-import { AiOutlineUpload } from 'react-icons/ai';
-
+} from '@mui/material'
+import { RiEdit2Fill } from 'react-icons/ri'
+import { AiFillDelete } from 'react-icons/ai'
+import {
+  CTable,
+  CTableBody,
+  CTableDataCell,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+} from '@coreui/react'
+import { useNavigate } from 'react-router-dom'
+import Loader from '../../components/Loader/Loader'
+import CloseIcon from '@mui/icons-material/Close'
+import { MdConnectWithoutContact } from 'react-icons/md'
+import { AiOutlineUpload } from 'react-icons/ai'
+import ReactPaginate from 'react-paginate'
+import Cookies from 'js-cookie'
 
 const Group = () => {
-  const [open, setOpen] = useState(false)
-  const [addModalOpen, setAddModalOpen] = useState(false) // Modal for adding a new row
-  const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
-  const [formData, setFormData] = useState({}) // Form data state
-  const [loading, setLoading] = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [formData, setFormData] = useState({})
+  const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
-  const [totalResponses, setTotalResponses] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const navigate = useNavigate()
-  const [filteredRows, setFilteredRows] = useState([])
+  const [limit, setLimit] = useState(10)
+  const [pageCount, setPageCount] = useState()
   
+
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
-  const [filteredData, setFilteredData] = useState([])
-
-
-  const columns = [
-    { Header: 'Name', accessor: 'name' },
-    // { Header: 'Unique ID', accessor: 'uniqueId' },
-  ];
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  
-
-
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const username = 'school'
-      const password = '123456'
-      const token = btoa(`${username}:${password}`)
-
-      const response = await axios.get('https://rocketsalestracker.com/api/groups', {
-        headers: {
-          Authorization: `Basic ${token}`,
-        },
-      })
-
-      if (Array.isArray(response.data)) {
-        setData(response.data)
-        setTotalResponses(response.data.length)
-      } else {
-        console.error('Expected an array but got:', response.data)
-        alert('Unexpected data format received.')
-      }
-    } catch (error) {
-      console.error('Fetch data error:', error)
-      alert('An error occurred while fetching data.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const style = {
     position: 'absolute',
@@ -99,98 +59,139 @@ const Group = () => {
     p: 4,
   }
 
-  useEffect(() => {
-    const lowerCaseQuery = searchQuery.toLowerCase()
-    setFilteredData(
-      data.filter((item) => item.name?.toString().toLowerCase().includes(lowerCaseQuery)),
-    )
-  }, [data, searchQuery])
+  // ##################### getting data  ###################
+  const fetchGroupData = async (page = 1) => {
+    const accessToken = Cookies.get('authToken')
+    const url = `${import.meta.env.VITE_API_URL}/group?page=${page}&limit=${limit}`
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => ({ ...prevData, [name]: value }))
-  }
-
-  const handleAddSubmit = async (e) => {
-    e.preventDefault();
     try {
-
-      const apiUrl = "https://rocketsalestracker.com/api/groups";
-      const username = "school";
-      const password = "123456";
-      const token = btoa(`${username}:${password}`);
-
-
-      const newRow = {
-        name: formData.name,
-        uniqueId: formData.uniqueId,
-
-      };
-
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
+      const response = await axios.get(url, {
         headers: {
-          Authorization: `Basic ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + accessToken,
         },
-        body: JSON.stringify(newRow),
       })
 
-      const result = await response.json()
-
-      if (response.ok) {
-        setFilteredRows([...filteredRows, result])
-        handleModalClose()
-        fetchData()
-
-        console.log('Record created successfully:', result)
-        alert('Record created successfully')
-      } else {
-        console.error('Server responded with:', result)
-        alert(`Unable to create record: ${result.message || response.statusText}`)
+      if (response.data.groups) {
+        setData(response.data.groups)
+        setPageCount(response.data.totalPages)
+        console.log(response.data.groups)
+        console.log(response.data.totalPages)
+        setLoading(false)
       }
     } catch (error) {
-      console.error('Error during POST request:', error)
-      alert('Unable to create record')
+      setLoading(false)
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+
     }
   }
 
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    fetchGroupData()
+  }, [])
+
+  const handlePageClick = (e) => {
+    console.log(e.selected + 1)
+    let page = e.selected + 1
+    setLoading(true)
+    fetchGroupData(page)
   }
 
-  const handleDeleteSelected = async (id) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      try {
-        const username = 'school'
-        const password = '123456'
-        const token = btoa(`${username}:${password}`)
+  // #########################################################################
 
+  //  ####################  Add Group ###########################
 
-        const response = await fetch(`https://rocketsalestracker.com/api/groups/${id}`, {
-          method: "DELETE",
+  const handleAddGroup = async (e) => {
+    e.preventDefault()
+    console.log(formData)
+    try {
+      const accessToken = Cookies.get('authToken')
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/group`, formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
 
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${token}`,
-          },
-        })
-
-        if (response.ok) {
-          setFilteredData(filteredData.filter((item) => item.id !== id))
-          alert('Record deleted successfully')
-        } else {
-          const result = await response.json()
-          console.error('Server responded with:', result)
-          alert(`Unable to delete record: ${result.message || response.statusText}`)
-        }
-      } catch (error) {
-        console.error('Error during DELETE request:', error)
-        alert('Unable to delete record. Please check the console for more details.')
+      if (response.status === 201) {
+        alert('group is created successfully')
+        fetchGroupData()
+        setFormData({ name: '' })
+        setAddModalOpen(false)
       }
+    } catch (error) {
+      throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+
+  // ###################################################################
+  // ######################### Edit Group #########################
+
+  const EditGroupSubmit = async (e) => {
+    e.preventDefault()
+    console.log(formData);
+    try {
+      const accessToken = Cookies.get('authToken')
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
+        {name: formData.name},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      )
+
+      if (response.status === 200) {
+        alert('group is edited successfully')
+        fetchGroupData()
+        setFormData({ name: '' })
+        setEditModalOpen(false)
+      }
+    } catch (error) {
+      throw error.response ? error.response.data : new Error('An error occurred')
+    }
+  }
+
+  const handleEditGroup = async (item) => {
+    console.log(item)
+    setEditModalOpen(true)
+    setFormData({...item})
+    console.log("this is before edit",formData)
+  }
+
+
+  // ###################################################################
+
+
+  // ###################### Delete Group ##############################
+
+
+  const deleteGroupSubmit = async(item) => {
+    alert("you want to delete this group");
+    console.log(item)
+
+    try {
+      const accessToken = Cookies.get('authToken')
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/group/${item._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+        },
+      )
+
+      if (response.status === 200) {
+        alert('group is deleted successfully')
+        fetchGroupData()
+      }
+    } catch (error) {
+      throw error.response ? error.response.data : new Error('An error occurred')
+    }
+  }
+
+  //  ###############################################################
 
   return (
     <div className="m-3">
@@ -200,7 +201,7 @@ const Group = () => {
         </div>
 
         <div className="d-flex">
-          <div className="me-3">
+          <div className="me-3 d-none d-md-block">
             <input
               type="search"
               className="form-control"
@@ -215,53 +216,77 @@ const Group = () => {
               variant="contained"
               className="btn btn-success text-white"
             >
-              Add
+              Add Group
             </button>
           </div>
         </div>
       </div>
+      <div className="d-md-none mb-2">
+        <input
+          type="search"
+          className="form-control"
+          placeholder="search here..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
-      <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
+      <TableContainer
+        component={Paper}
+        style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
+      >
         {loading ? (
-          <Loader />
+          <>
+            <div className="text-nowrap mb-2" style={{width: "480px"}}>
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+            </div>
+          </>
         ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-
-                {columns.map((column, index) => (
-                  <CTableHeaderCell
-                    key={index}
-                    className="bg-body-tertiary text-center"
-                    style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                  >
-                    {column.Header}
-                  </CTableHeaderCell>
-                ))}
                 <CTableHeaderCell
                   className="bg-body-tertiary text-center"
                   style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
+                >
+                  Group Name
+                </CTableHeaderCell>
 
+                <CTableHeaderCell
+                  className="bg-body-tertiary text-center"
+                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
                 >
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {filteredData.map((item, index) => (
+              {data?.map((item, index) => (
                 <CTableRow key={index}>
-
-                  {columns.map((column, i) => (
-                    <CTableDataCell key={i} className="text-center">
-                      {item[column.accessor]}
-                    </CTableDataCell>
-                  ))}
-                  <CTableDataCell className="text-center d-flex" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <IconButton aria-label="edit">
-                      <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
-
+                  <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                  <CTableDataCell
+                    className="text-center d-flex"
+                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
+                      <RiEdit2Fill
+                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                      />
                     </IconButton>
-                    <IconButton aria-label="delete" onClick={() => handleDeleteSelected(item.id)}>
+                    <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
                       <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
                     </IconButton>
                   </CTableDataCell>
@@ -271,45 +296,28 @@ const Group = () => {
           </CTable>
         )}
       </TableContainer>
+      {pageCount > 1 && (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel="next >"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount} // Set based on the total pages from the API
+          previousLabel="< previous"
+          renderOnZeroPageCount={null}
+          marginPagesDisplayed={2}
+          containerClassName="pagination justify-content-center"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          activeClassName="active"
+        />
+      )}
 
       {/* Add Modal */}
-
-      {/* <Modal open={addModalOpen} onClose={handleAddModalClose}>
-        <Box sx={style}>
-          <IconButton
-            aria-label="close"
-            onClick={handleAddModalClose}
-            style={{ position: 'absolute', top: 10, right: 10 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" gutterBottom>
-            Add New Record
-          </Typography>
-          <TextField
-            label="Name"
-            name="name"
-            onChange={handleInputChange}
-            value={formData.name || ''}
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Group ID"
-            name="uniqueId"
-            onChange={handleInputChange}
-            value={formData.uniqueId || ''}
-            margin="normal"
-            required
-          />
-          <FormControl fullWidth>
-            <Button onClick={handleAddSubmit} variant="contained" color="primary">
-
-              Submit
-            </Button>
-          </FormControl>
-        </Box>
-      </Modal>  */}
 
       <Modal
         open={addModalOpen}
@@ -330,13 +338,13 @@ const Group = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddSubmit}>
+            <form onSubmit={handleAddGroup}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Group Name"
                   name="name"
-                  value={formData.name || ''}
-                  onChange={handleInputChange}
+                  value={formData.name !== undefined ? formData.name : ""}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </FormControl>
@@ -344,7 +352,6 @@ const Group = () => {
                 variant="contained"
                 color="primary"
                 type="submit"
-                
                 style={{ marginTop: '20px' }}
               >
                 Submit
@@ -353,6 +360,8 @@ const Group = () => {
           </DialogContent>
         </Box>
       </Modal>
+
+      {/* edit model */}
       <Modal
         open={editModalOpen}
         onClose={handleEditModalClose}
@@ -372,13 +381,13 @@ const Group = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddSubmit}>
+            <form onSubmit={EditGroupSubmit}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Group Name"
                   name="name"
-                  value={formData.name || ''}
-                  onChange={handleInputChange}
+                  value={formData.name !== undefined ? formData.name : ""}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </FormControl>
@@ -386,15 +395,15 @@ const Group = () => {
                 variant="contained"
                 color="primary"
                 type="submit"
-                
                 style={{ marginTop: '20px' }}
               >
-                Submit
+                Edit
               </Button>
             </form>
           </DialogContent>
         </Box>
       </Modal>
+
     </div>
   )
 }
