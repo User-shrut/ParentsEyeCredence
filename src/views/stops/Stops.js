@@ -59,7 +59,7 @@ const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, column
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices.map((device) => (
+          {devices?.map((device) => (
             <option key={device.id} value={device.id}>{device.name}</option>
           ))}
         </CFormSelect>

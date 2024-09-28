@@ -313,7 +313,7 @@ const Dashboard = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
-            <CCardBody classNmame="content">
+            <CCardBody className="content">
               <CRow className="justify-content-space-around">
                 <CCol xs={12} md={2} xl={2} className="count-col countallCol">
                   <div className="border-start border-start-4 border-start-error countAll py-1 px-3">

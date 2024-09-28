@@ -144,7 +144,7 @@ const AppHeader = () => {
 
         <CHeaderNav className="ms-auto">
           <select
-            class="form-select"
+            className="form-select"
             aria-label="Default select example"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -161,7 +161,7 @@ const AppHeader = () => {
 
         <CHeaderNav className="ms-auto">
           <select
-            class="form-select"
+            className="form-select"
             aria-label="Default select example"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
