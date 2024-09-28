@@ -14,6 +14,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = (role, decodedToken) => {
   
+  console.log(decodedToken);
   const {
     devices,
     users,
@@ -36,7 +37,7 @@ const _nav = (role, decodedToken) => {
     customCharts,
   } = decodedToken?.user
 
-  console.log(decodedToken)
+  
 
   return [
     {

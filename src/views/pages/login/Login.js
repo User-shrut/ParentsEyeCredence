@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import loginImg from '../../../assets/loginImg.png'
 import Cookies from 'js-cookie';
+import './login.css';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -20,7 +20,7 @@ const Login = () => {
     try {
       const apiUrl = `${import.meta.env.VITE_API_URL}/auth/login`
 
-      const response = await axios.post(apiUrl, credentials);
+      const response = await axios.post(apiUrl, credentials)
 
       // Assuming the token is returned in response.data.token
       const { token } = response.data
@@ -28,7 +28,7 @@ const Login = () => {
       // Store the token and navigate on success
       if (token) {
         // Store the JWT token in a cookie
-        Cookies.set('authToken',token, {
+        Cookies.set('authToken', token, {
           secure: true, // Only allow cookies over HTTPS
           sameSite: 'Strict', // Strictly same-site cookie
         })
@@ -44,14 +44,20 @@ const Login = () => {
   }
   return (
     <>
-      <div className="loginContainer">
-        <div className="row" style={{ height: '98vh', width: '100%' }}>
-          <div className="col-12 col-md-6">
-            <img src={loginImg} alt="" height="100%" width="100%" />
+      <div className="loginContainer bg-light">
+        <div className="row" style={{ height: '100vh', width: '100%', overflow: 'hidden' }}>
+          <div className="d-none d-lg-block col-md-6 p-0">
+            <div className="video-container">
+              <video autoPlay muted loop className='w-100 overflow-hidden'>
+                <source src="login-video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
-          <div className="col-12 col-md-6 d-flex justify-content-center align-items-center">
-            <form className="w-50 border border-2 p-5 rounded-3" onSubmit={handleLogin}>
-              <h1>Login</h1>
+          <div className="col-12 col-md-6 d-flex justify-content-center align-items-center bg-">
+
+            <form className="w-50 border border-2 p-5 rounded-3 text-dark" onSubmit={handleLogin}>
+              <h1 className='text-dark'>Login</h1>
               <div className="mb-3">
                 <label htmlFor="exampleInputEmail1" className="form-label">
                   Username

@@ -21,49 +21,61 @@ import navigation from '../_nav'
 // auth purpose
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom'
 
 
 
-const getUserRole = () => {
-  const token = Cookies.get('authToken');
-  let role;
+// const getUserRole = () => {
+//   const navigate = useNavigate()
+//   const token = Cookies.get('authToken');
+//   let role;
   
+//   if (token) {
+//     console.log("token hai yaha")
+//     const decodedToken = jwtDecode(token);
+//     if(decodedToken.superadmin == true){
+//       role ='superadmin';
+//     }else{
+//       role = "user";
+//     }
+//   }else{
+//     navigate('/login');
+//   }
+
+//   return role; // Default role if no token
+// };
+
+const getUserRole = (token) => {
   if (token) {
     const decodedToken = jwtDecode(token);
-    if(decodedToken.superadmin == true){
-      role ='superadmin';
-    }else{
-      role = "user";
-    }
+    return decodedToken.superadmin ? 'superadmin' : 'user';
   }
-
-  return role; // Default role if no token
+  return null; // No token means no role
 };
 
 const AppSidebar = () => {
-  const dispatch = useDispatch()
-  const unfoldable = useSelector((state) => state.sidebarUnfoldable)
-  const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
-  let navigate;
-  const role = getUserRole();
-  const [decodedToken, setDecodedToken] = useState();
+  const dispatch = useDispatch();
+  const unfoldable = useSelector((state) => state.sidebarUnfoldable);
+  const sidebarShow = useSelector((state) => state.sidebar.sidebarShow);
+  const navigate = useNavigate();
 
-
-  if(decodedToken){
-    navigate = navigation(role , decodedToken);
-
-  }
-
-  console.log("this is navs")
-  console.log(navigate)
+  const [decodedToken, setDecodedToken] = useState(null);
+  const [navigatingNav, setNavigatingNav] = useState(null);
+  const token = Cookies.get('authToken');
 
   useEffect(() => {
-    const token = Cookies.get('authToken');
+    if (!token) {
+      navigate('/login');
+    } else {
+      const decoded = jwtDecode(token);
+      setDecodedToken(decoded);
 
-    setDecodedToken(jwtDecode(token));
-
-  }, [])
-
+      const role = getUserRole(token);
+      if (role) {
+        setNavigatingNav(navigation(role, decoded));
+      }
+    }
+  }, [token, navigate]);
 
   return (
     <CSidebar
@@ -87,7 +99,7 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
-      <AppSidebarNav items={navigate} />
+      <AppSidebarNav items={navigatingNav} />
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
