@@ -413,12 +413,14 @@ const Dashboard = () => {
 
               <br />
               <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
+
                 <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
                   <CTableHead
                     className="text-nowrap"
                     style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
                   >
                     <CTableRow>
+
                       {visibleColumns.srNo && (
                         <CTableHeaderCell
                           className="bg-body-tertiary text-center sr-no table-cell"
@@ -547,6 +549,7 @@ const Dashboard = () => {
                   </CTableHead>
 
                   <CTableBody>
+
                     {filteredVehicles.map((item, index) => (
                       <CTableRow key={index} className={`table-row collapsed trans`}>
                         {/* Sr No. */}
@@ -795,6 +798,7 @@ const Dashboard = () => {
                             className="btn btn-primary"
                             onClick={() => handleClickOnTrack(item)}
                           >
+
                             Live Track
                           </button>
                         </CTableDataCell>
@@ -802,6 +806,8 @@ const Dashboard = () => {
                     ))}
                   </CTableBody>
                 </CTable>
+
+
               </div>
             </CCardBody>
           </CCard>
