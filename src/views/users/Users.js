@@ -38,8 +38,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import { ExpandMoreOutlined } from '@mui/icons-material'
 
-import Cookies from 'js-cookie'
-
+import Cookies from 'js-cookie';
+import { jwtDecode } from "jwt-decode";
 
 const Users = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -139,6 +139,27 @@ const Users = () => {
     isAdmin: false,
   })
 
+  const [availablePermissions, setAvailablePermissions] = useState({})
+
+  // Decode token and extract available permissions
+  useEffect(() => {
+    const token = Cookies.get('authToken')
+    if (token) {
+      const decodedToken = jwtDecode(token)
+      const userPermissions = decodedToken.user || {}
+
+      // Filter permissions from the token
+      const filteredPermissions = {}
+      Object.keys(formData.permissions).forEach((key) => {
+        if (userPermissions[key] === true) {
+          filteredPermissions[key] = true
+        }
+      })
+
+      setAvailablePermissions(filteredPermissions)
+    }
+  }, [])
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -157,7 +178,7 @@ const Users = () => {
         [name]: checked,
       }
 
-      // If any permission is unchecked, uncheck the "Admin" checkbox
+      // If all permissions are checked, set isAdmin to true
       const allPermissionsChecked = Object.values(updatedPermissions).every(
         (permission) => permission,
       )
@@ -165,7 +186,7 @@ const Users = () => {
       return {
         ...prev,
         permissions: updatedPermissions,
-        isAdmin: allPermissionsChecked, // If all permissions are checked, set "Admin" to true
+        isAdmin: allPermissionsChecked,
       }
     })
   }
@@ -183,8 +204,8 @@ const Users = () => {
     }))
   }
 
+  // Handle form submission
   const handleSubmit = async () => {
-    // Structure formData
     const dataToSubmit = {
       username: formData.username,
       email: formData.email,
@@ -192,12 +213,8 @@ const Users = () => {
       ...formData.permissions,
     }
 
-    console.log('Data to submit:', dataToSubmit) // Log the data to be submitted
-
     try {
-      // API call
       const accessToken = Cookies.get('authToken')
-
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/user`, dataToSubmit, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -205,34 +222,26 @@ const Users = () => {
         },
       })
 
-      // Check if the response status is in the 2xx range
       if (response.status === 201) {
         alert('User is created successfully')
         fetchUserData()
         setAddModalOpen(false) // Close the modal
       } else {
-        // Handle other response statuses
         alert(`Error: ${response.status} - ${response.statusText}`)
       }
     } catch (error) {
-      // Handle error from the server or network error
-      console.error('Error during submission:', error) // Log the error for debugging
+      console.error('Error during submission:', error)
       let errorMessage = 'An error occurred'
 
-      // Check if the error response exists
       if (error.response) {
-        // If the server responded with a status other than 2xx
         errorMessage = error.response.data.message || error.response.data || 'An error occurred'
       } else if (error.request) {
-        // If the request was made but no response was received
         errorMessage = 'Network error: Please try again later'
       }
 
-      // Show an alert with the error message
       alert(errorMessage)
     }
   }
-
   // #############################################
 
   // ####################  edit user code ############################
@@ -397,7 +406,7 @@ const Users = () => {
 
         {loading ? (
           <>
-            <div className="text-nowrap mb-2" style={{width: "480px"}}>
+            <div className="text-nowrap mb-2" style={{ width: '480px' }}>
               <p className="card-text placeholder-glow">
                 <span className="placeholder col-7" />
                 <span className="placeholder col-4" />
@@ -418,13 +427,8 @@ const Users = () => {
           <CTable align="middle" className="mb-2 border min-vh-25" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-                
-                <CTableHeaderCell className="bg-body-tertiary text-center">
-                  Name
-                </CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">
-                  Email
-                </CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary text-center">Name</CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary text-center">Email</CTableHeaderCell>
                 <CTableHeaderCell className="bg-body-tertiary text-center">
                   Master Permissions
                 </CTableHeaderCell>
@@ -588,78 +592,74 @@ const Users = () => {
             label="Admin (Select all permissions)"
           />
 
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreOutlined />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              Master
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormGroup sx={{ color: 'black' }}>
-                {[
-                  'users',
-                  'groups',
-                  'devices',
-                  'geofence',
-                  'drivers',
-                  'maintenance',
-                  'notification',
-                  'preferences',
-                ].map((permission) => (
-                  <FormControlLabel
-                    key={permission}
-                    control={
-                      <Checkbox
-                        name={permission}
-                        checked={formData.permissions[permission]}
-                        onChange={handlePermissionChange}
-                      />
-                    }
-                    label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                  />
-                ))}
-              </FormGroup>
-            </AccordionDetails>
-          </Accordion>
+          {Object.keys(availablePermissions).length > 0 && (
+            <>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Master</AccordionSummary>
+                <AccordionDetails>
+                  <FormGroup sx={{ color: 'black' }}>
+                    {[
+                      'users',
+                      'groups',
+                      'devices',
+                      'geofence',
+                      'drivers',
+                      'maintenance',
+                      'notification',
+                      'preferences',
+                    ]
+                      .filter((permission) => availablePermissions[permission])
+                      .map((permission) => (
+                        <FormControlLabel
+                          key={permission}
+                          control={
+                            <Checkbox
+                              name={permission}
+                              checked={formData.permissions[permission]}
+                              onChange={handlePermissionChange}
+                            />
+                          }
+                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                        />
+                      ))}
+                  </FormGroup>
+                </AccordionDetails>
+              </Accordion>
 
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreOutlined />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              Reports
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormGroup sx={{ color: 'black' }}>
-                {[
-                  'history',
-                  'stop',
-                  'trips',
-                  'statistics',
-                  'combinedReports',
-                  'customReports',
-                  'alerts',
-                  'summary',
-                  'schedulereports',
-                ].map((permission) => (
-                  <FormControlLabel
-                    key={permission}
-                    control={
-                      <Checkbox
-                        name={permission}
-                        checked={formData.permissions[permission]}
-                        onChange={handlePermissionChange}
-                      />
-                    }
-                    label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                  />
-                ))}
-              </FormGroup>
-            </AccordionDetails>
-          </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Reports</AccordionSummary>
+                <AccordionDetails>
+                  <FormGroup sx={{ color: 'black' }}>
+                    {[
+                      'history',
+                      'stop',
+                      'trips',
+                      'statistics',
+                      'combinedReports',
+                      'customReports',
+                      'alerts',
+                      'summary',
+                      'schedulereports',
+                    ]
+                      .filter((permission) => availablePermissions[permission])
+                      .map((permission) => (
+                        <FormControlLabel
+                          key={permission}
+                          control={
+                            <Checkbox
+                              name={permission}
+                              checked={formData.permissions[permission]}
+                              onChange={handlePermissionChange}
+                            />
+                          }
+                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                        />
+                      ))}
+                  </FormGroup>
+                </AccordionDetails>
+              </Accordion>
+            </>
+          )}
 
           <Button
             variant="contained"
