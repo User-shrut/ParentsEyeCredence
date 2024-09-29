@@ -51,7 +51,13 @@ const Driver = () => {
 
   const columns = [
     { Header: 'Device Name', accessor: 'name' },
-    { Header: 'IMEI', accessor: 'identifier' },
+    { Header: 'Phone No.', accessor: 'phone' },
+    { Header: 'Email', accessor: 'email' },
+    { Header: 'Vehicle List', accessor: 'device' },
+    { Header: 'License Number', accessor: 'licenseNumber' },
+    { Header: 'Adhar No.', accessor: 'aadharNumber' },
+    { Header: 'Address', accessor: 'address' },
+    // { Header: 'IMEI', accessor: 'identifier' },
   ]
 
   useEffect(() => {
@@ -79,7 +85,7 @@ const Driver = () => {
     setLoading(true); // Start loading
     try {
       // Use your token here, ensure it's valid
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MDY3Nzd9.80sXdrNytRMboYj4I_562cao0lCxgmtK1mZDj5YJOQg';
 
       const response = await axios.get('https://credence-tracker.onrender.com/driver/', {
         headers: {
@@ -125,11 +131,17 @@ const Driver = () => {
       // const username = 'school' // Replace with your actual username
       // const password = '123456' // Replace with your actual password
       // const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4ZTNiYWU4Y2U3ZjhhMDQzZWViOCIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGUzYmFlOGNlN2Y4YTA0M2VlYjgiLCJlbWFpbCI6InZlZGFudEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCR4Z1RtUmdkUGVpeDdFdVlKR0t3Smx1Y3BNNHozOU04dlBZVFNOMWlHUy85b3laR3R0bVFPNiIsInVzZXJuYW1lIjoidmVkYW50IiwiY3JlYXRlZEJ5IjoiNjZmMTFhYTFkOTllZGExYTcyYWI3ODU2Iiwibm90aWZpY2F0aW9uIjpmYWxzZSwiZGV2aWNlcyI6ZmFsc2UsImRyaXZlciI6ZmFsc2UsImdyb3VwcyI6ZmFsc2UsImNhdGVnb3J5IjpmYWxzZSwibW9kZWwiOmZhbHNlLCJ1c2VycyI6dHJ1ZSwicmVwb3J0IjpmYWxzZSwic3RvcCI6ZmFsc2UsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5Ijp0cnVlLCJzY2hlZHVsZXJlcG9ydHMiOnRydWUsInN0YXRpc3RpY3MiOnRydWUsImFsZXJ0cyI6dHJ1ZSwic3VtbWFyeSI6dHJ1ZSwiY3VzdG9tQ2hhcnRzIjpmYWxzZSwiX192IjowfSwiaWF0IjoxNzI3MTczNTI0fQ.igpJ7TbnWXj3ki1Gkmy-hXuqwCoyQfvxd3QzR3J8UNE';
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MDY3Nzd9.80sXdrNytRMboYj4I_562cao0lCxgmtK1mZDj5YJOQg';
       // Prepare the new row object based on the expected schema
       const newRow = {
         name: formData.name, // Ensure formData has 'name'
-        identifier: formData.identifier, // Ensure formData has 'identifier'
+        phone: formData.phone, // Ensure formData has 'phone
+        email: formData.email, // Ensure formData has 'email'
+        device: formData.device, // Ensure formData has 'device
+        licenseNumber: formData.licenseNumber, // Ensure formData has
+        aadharNumber: formData.aadharNumber, // Ensure formData is available
+        address: formData.address, // Ensure formData has 'address'
+        // identifier: formData.identifier, // Ensure formData has 'identifier'
       }
 
       // POST request to the server with Basic Auth
