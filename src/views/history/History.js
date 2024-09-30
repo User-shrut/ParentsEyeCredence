@@ -121,8 +121,8 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) =>
 
       <CCol xs={12}>
         <div className="d-flex justify-content-end">
-          <CButton color="primary" size="lg" type="submit" className="rounded-pill shadow-sm">
-            Show Now
+          <CButton color="primary" type="submit" >
+            SHOW NOW
           </CButton>
         </div>
       </CCol>
@@ -294,10 +294,10 @@ const Validation = () => {
 
   return (
     <>
-      <CRow>
-        <h3>History Reports</h3>
+      <CRow className='pt-3'>
+        <h2 className="px-4">History Reports</h2>
 
-        <CCol xs={12}>
+        <CCol xs={12} className="px-4">
           <CCard className="p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Device Tracker</strong>
@@ -311,7 +311,7 @@ const Validation = () => {
 
       {showForm && (
         <CRow className="justify-content-center mt-4">
-          <CCol xs={12} >
+          <CCol xs={12} className="px-4" >
             <CCard className="shadow-sm">
               <CCardHeader className="bg-secondary text-white">
                 <strong>Status Reports</strong>
@@ -331,7 +331,7 @@ const Validation = () => {
 
       {showTable && (
         <CRow>
-          <CCol xs={12}>
+          <CCol xs={12} className="px-4">
             <CCard className="shadow-sm mt-4">
               <CCardHeader className="bg-warning text-white">
                 <strong>Device Status</strong>
