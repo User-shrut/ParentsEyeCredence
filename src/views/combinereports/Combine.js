@@ -221,22 +221,9 @@ const Validation = () => {
 
   return (
     <>
-      <CRow className='pt-3'> 
+
+      <CRow className='pt-3'>
         <h2 className="px-4">Combine Reports</h2>
-
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Device Tracker</strong>
-            </CCardHeader>
-            <CCardBody>
-              <MapComponent /> {/* Always renders at the top */}
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
-
-      <CRow className="justify-content-center mt-4">
         <CCol xs={12} className="px-4">
           <CCard className="shadow-sm">
             <CCardHeader className="bg-secondary text-white">
@@ -257,17 +244,34 @@ const Validation = () => {
       </CRow>
 
       {showMap && (
+      <CRow className="justify-content-center mt-4">
+        <CCol xs={12} className="px-4">
+          <CCard className="p-0 shadow-lg rounded">
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Device Tracker</strong>
+            </CCardHeader>
+            <CCardBody>
+              <MapComponent /> {/* Always renders at the top */}
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+          )}
+
+
+
+      {showMap && (
         <CRow className="justify-content-center mt-4">
           <CCol xs={12} className="px-4">
             <CCard className="shadow-sm">
               <CCardHeader className="bg-secondary text-white d-flex justify-content-between align-items-center">
                 <strong>All Status Reports List</strong>
                 <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
               </CCardHeader>
               <CCardBody>
                 <CustomStyles1 rows={rows} /> {/* Displaying the second table */}
