@@ -18,8 +18,9 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
+import Select from 'react-select';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, selectedColumns, setSelectedColumns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -40,13 +41,19 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
     setShowDateInputs(value === 'Custom');
   };
 
-  const handleCheckboxChange = (column) => {
-    const newSelectedColumns = selectedColumns.includes(column)
-      ? selectedColumns.filter((item) => item !== column)
-      : [...selectedColumns, column];
+  // State to manage button text
+  const [buttonText, setButtonText] = useState('SHOW NOW');
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
 
-    setSelectedColumns(newSelectedColumns);
-    handleInputChange('Columns', newSelectedColumns);
+  // Function to handle dropdown item clicks
+  const handleDropdownClick = (text) => {
+    setButtonText(text); // Change button text based on the clicked item
+    setDropdownOpen(false); // Close the dropdown after selection
+  };
+
+  // Function to toggle dropdown visibility
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -58,6 +65,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
     >
       <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
+
         <CFormSelect
           id="devices"
           required
@@ -73,6 +81,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
@@ -125,109 +134,24 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
           onChange={(e) => handleInputChange('Type', e.target.value)}
         >
           <option value="">Choose a type...</option>
-          <option value="Summary">Summary</option>
-          <option value="Daily Summary">Daily Summary</option>
+          <option value="Stop">Stop</option>
+          <option value="Daily Stop">Daily Stop</option>
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
       </CCol> */}
 
-      {/* <CCol md={4}>
+      <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        <div id="columns">
-          {columns.map((column, index) => (
-            <div key={index} className="form-check">
-              
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id={`column-${index}`}
-                checked={selectedColumns.includes(column)}
-                onChange={() => handleCheckboxChange(column)}
-              />
-              
-              <label className="form-check-label" htmlFor={`column-${index}`}>
-                {column}
-              </label>
-            </div>
-            
-          ))}
-        </div>
-        <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
-      </CCol> */}
-
-      
-<CCol
-  md={4}
-  style={{
-    padding: '10px', // Decreased from 20px to 10px
-    border: '1px solid #e0e0e0',
-    borderRadius: '8px',
-    backgroundColor: '#ffffff',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  }}
->
-  <CFormLabel
-    htmlFor="columns"
-    style={{
-      fontWeight: 'bold',
-      marginBottom: '10px', // Decreased from 15px to 10px
-      color: '#333',
-      display: 'block',
-    }}
-  >
-    <h5 style={{ margin: 0 }}>Columns</h5>
-  </CFormLabel>
-  <div
-    id="columns"
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px', // Decreased from 15px to 10px
-    }}
-  >
-    {columns.map((column, index) => (
-      <div
-        key={index}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '4px 8px', // Decreased from 8px 12px to 4px 8px
-          borderRadius: '5px',
-          backgroundColor: selectedColumns.includes(column) ? '#e0f7fa' : 'transparent',
-          transition: 'background-color 0.3s ease',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = selectedColumns.includes(column) ? '#e0f7fa' : 'transparent')}
-      >
-        <input
-          type="checkbox"
-          className="form-check-input"
-          id={`column-${index}`}
-          checked={selectedColumns.includes(column)}
-          onChange={() => handleCheckboxChange(column)}
-          style={{
-            marginRight: '10px',
-            accentColor: '#007bff',
-          }}
+        {/* Use React-Select component for multi-select */}
+        <Select
+          isMulti
+          id="columns"
+          options={columns.map((column) => ({ value: column, label: column }))}
+          value={formData.Columns.map((column) => ({ value: column, label: column }))}
+          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
         />
-        <label
-          className="form-check-label"
-          htmlFor={`column-${index}`}
-          style={{
-            color: '#555',
-            transition: 'color 0.3s ease',
-            cursor: 'pointer',
-          }}
-        >
-          {column}
-        </label>
-      </div>
-    ))}
-  </div>
-  <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
-</CCol>
-
-
+        <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
+      </CCol>
 
       {showDateInputs && (
         <>
@@ -256,11 +180,45 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
         </>
       )}
 
-      <CCol xs={12}>
+      <CCol xs={12} >
         <div className="d-flex justify-content-end">
-          <CButton color="primary" type="submit">
-            SHOW NOW
-          </CButton>
+          <div className="btn-group">
+            <button className="btn btn-primary " type="button">
+              {buttonText}
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
+              onClick={toggleDropdown} // Toggle dropdown on click
+              aria-expanded={isDropdownOpen} // Update aria attribute
+            >
+              <span className="visually-hidden">Toggle Dropdown</span>
+            </button>
+            {isDropdownOpen && ( // Conditionally render dropdown menu
+              <ul className="dropdown-menu show ">
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
+                    Show Now
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
+                    Export
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
+                    Email Reports
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
+                    Schedule
+                  </a>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
       </CCol>
     </CForm>
@@ -272,22 +230,23 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          <CTableHeaderCell>Sr.No</CTableHeaderCell>
-          <CTableHeaderCell>Devices</CTableHeaderCell>
-          <CTableHeaderCell>Details</CTableHeaderCell>
-          {selectedColumns.map((col, index) => (
-            <CTableHeaderCell key={index}>{col}</CTableHeaderCell>
+          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+          {/* <CTableHeaderCell>Devices</CTableHeaderCell> */}
+
+          {/* Dynamically render table headers based on selected columns */}
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
           ))}
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {rows.map((row) => (
+        {rows.map((row, rowIndex) => (
           <CTableRow key={row.id} className="custom-row">
-            <CTableDataCell>{row.id}</CTableDataCell>
-            <CTableDataCell>{row.Devices}</CTableDataCell>
-            <CTableDataCell>{row.Details}</CTableDataCell>
-            {selectedColumns.map((col, index) => (
-              <CTableDataCell key={index}>{row[col]}</CTableDataCell>
+            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+            {/* <CTableDataCell>{row.Devices}</CTableDataCell> */}
+            {/* Dynamically render table cells based on selected columns */}
+            {selectedColumns.map((column, index) => (
+              <CTableDataCell key={index}>{row[column]}</CTableDataCell>
             ))}
           </CTableRow>
         ))}
@@ -300,37 +259,75 @@ const Validation = () => {
   const username = 'school';
   const password = '123456';
   const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur' },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola' },
+    { Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active', StartDate: '2024-01-01', Distance: '500 km' },
+    { Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active', StartDate: '2024-02-01', Distance: '600 km' },
   ]);
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedColumns, setSelectedColumns] = useState([]);
   const [devices, setDevices] = useState([]);
   // const [groups, setGroups] = useState([]);
-  const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
+  const [columns] = useState([
+    'Latitude',
+    'Longitude',
+    'Speed',
+    'Course',
+    'Altitude',
+    'Accuracy',
+    'Valid',
+    'Protocol',
+    'Address',
+    'Devices time',
+    'Fix time',
+    'Server time',
+    'Geofences',
+    'Satellites',
+    'Rssi',
+    'Event',
+    'Status',
+    'Odometer',
+    'Hours',
+    'Battery level',
+    'Ignition',
+    'Charge',
+    'Archive',
+    'Distance',
+    'Total distance',
+    'Motion',
+    'Block',
+    'Adc1',
+    'Iccid',
+    'Alarm1 status',
+    'Other status',
+    'Alarm2 status',
+    'Alarm3 status',
+    'Engine status'
+  ]);
+
+  const [selectedColumns, setSelectedColumns] = useState([]);
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const response = await fetch('https://rocketsalestracker.com/api/devices', {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
             'Content-Type': 'application/json',
           },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch devices');
+          throw new Error('Network response was not ok');
         }
-
         const data = await response.json();
-        setDevices(data);
+        console.log(data)
+        setDevices(data.devices); // Assuming the data returned contains device info
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching devices:', error);
       }
     };
+
+
 
     // const fetchGroups = async () => {
     //   try {
@@ -343,13 +340,13 @@ const Validation = () => {
     //     });
 
     //     if (!response.ok) {
-    //       throw new Error('Failed to fetch groups');
+    //       throw new Error('Network response was not ok');
     //     }
 
     //     const data = await response.json();
-    //     setGroups(data);
+    //     setGroups(data); // Adjust if the structure of the response is different
     //   } catch (error) {
-    //     console.error(error);
+    //     console.error('Error fetching groups:', error);
     //   }
     // };
 
@@ -357,33 +354,30 @@ const Validation = () => {
     // fetchGroups();
   }, []);
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
-      [field]: value,
+      [name]: value,
     }));
+
+    if (name === 'Columns') {
+      setSelectedColumns(value);
+    }
   };
 
   const handleSubmit = () => {
-    // Logic for handling form submission
-    console.log('Form submitted:', formData);
-    // You can also handle any additional logic here if needed
+    console.log('Form submitted with data:', formData);
   };
 
   return (
     <>
-      <CRow>
-        <h3>Custom Reports</h3>
-        <CCol xs={12} className='mb-4'>
-          <CCard className='p-0'>
-            <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Status Reports</strong>
-              <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
+      <CRow className='pt-3'>
+        <h2 className='px-4'>Custom Report</h2>
+        <CCol xs={12} md={12} className='px-4'>
+          <CCard className="mb-4 p-0 shadow-lg rounded" >
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Custom Report</strong>
+              
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -393,20 +387,23 @@ const Validation = () => {
                 devices={devices}
                 // groups={groups}
                 columns={columns}
-                selectedColumns={selectedColumns}
-                setSelectedColumns={setSelectedColumns}
               />
-
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
-      <CRow>
-        <CCol xs={12}>
-          <CCard className="p-0 mb-4">
-            <CCardHeader>
-              <strong>All Status List :</strong>
+      <CRow className="justify-content-center mt-4">
+        <CCol xs={12} className="px-4" >
+          <CCard className='p-0 mb-4 shadow-sm'>
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>All Custom Report List</strong>
+              <CFormInput
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '250px' }}
+              />
             </CCardHeader>
             <CCardBody>
               <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
