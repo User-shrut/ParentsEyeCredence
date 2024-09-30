@@ -18,8 +18,9 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
+import MapComponent from '../Map/MapComponent';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -31,12 +32,13 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     } else {
       event.preventDefault();
       handleSubmit();
+      setShowMap(true); // Show the map when form is valid and submitted
     }
     setValidated(true);
   };
 
   const handlePeriodChange = (value) => {
-    handleInputChange('Periods', value);
+    handleInputChange('Period', value);
     setShowDateInputs(value === 'Custom');
   };
 
@@ -49,7 +51,6 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     >
       <CCol md={6}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-
         <CFormSelect
           id="devices"
           required
@@ -65,36 +66,15 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
-
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
       <CCol md={6}>
-        <CFormLabel htmlFor="details">Groups</CFormLabel>
-        <CFormSelect
-          id="details"
-          required
-          value={formData.Details}
-          onChange={(e) => handleInputChange('Details', e.target.value)}
-        >
-          <option value="">Choose a group...</option>
-          {groups.length > 0 ? (
-            groups.map((group) => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading groups...</option>
-          )}
-        </CFormSelect>
-        <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol>
-
-      <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
           required
-          value={formData.Periods}
+          value={formData.Period}
           onChange={(e) => handlePeriodChange(e.target.value)}
         >
           <option value="">Choose a period...</option>
@@ -111,7 +91,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
 
       {showDateInputs && (
         <>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
             <CFormInput
               type="date"
@@ -122,7 +102,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             />
             <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
           </CCol>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="toDate">To Date</CFormLabel>
             <CFormInput
               type="date"
@@ -147,7 +127,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
   );
 };
 
-const CustomStyles1 = ({ rows, selectedColumn }) => {
+const CustomStyles1 = ({ rows }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
@@ -173,25 +153,18 @@ const CustomStyles1 = ({ rows, selectedColumn }) => {
 };
 
 const Validation = () => {
-  const username = 'school';
-  const password = '123456';
-  const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active' },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active'  },
-  ]);
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+  const [formData, setFormData] = useState({ Devices: '', Period: '', FromDate: '', ToDate: '' });
   const [devices, setDevices] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [selectedColumn, setSelectedColumn] = useState('');
+  const [rows, setRows] = useState([]);
+  const [showMap, setShowMap] = useState(false);  
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const response = await fetch('https://rocketsalestracker.com/api/devices', {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
             'Content-Type': 'application/json',
           },
         });
@@ -199,37 +172,15 @@ const Validation = () => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
         const data = await response.json();
-        setDevices(data); // Adjust if the structure of the response is different
+        console.log(data)
+        setDevices(data.devices); // Assuming the data returned contains device info
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setGroups(data); // Adjust if the structure of the response is different
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-      }
-    };
-
     fetchDevices();
-    fetchGroups();
   }, []);
 
   const handleInputChange = (name, value) => {
@@ -237,34 +188,46 @@ const Validation = () => {
       ...prevData,
       [name]: value,
     }));
-
-    if (name === 'Columns') {
-      setSelectedColumn(value);
-    }
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
+  const handleSubmit = async () => {
+
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Period, // Use the selected period from the form data
+  };
+
+    try {
+      const response = await fetch('https://credence-tracker.onrender.com/reports/combined', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setRows(data); // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', formData);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
 
   return (
     <>
       <CRow>
-        
-          <h3>Combine Reports</h3>
+        {showMap && <MapComponent />} {/* Conditionally render the MapComponent */}
+        <h3>Combine Reports</h3>
         <CCol xs={12} className='mb-4'>
-        <CCard className="p-0">
-
-        <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Status Reports</strong>
-
-              <CFormInput
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '250px' }}
-            />
-
+          <CCard>
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Status Reports</strong>
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -272,24 +235,24 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                groups={groups}
+                showMap={showMap}
+                setShowMap={setShowMap}
               />
             </CCardBody>
           </CCard>
         </CCol>
-      </CRow>
-
-      <CRow>
-        <CCol xs={12}>
-        <CCard className="p-0 mb-4">
-          <CCardHeader>
-            <strong>All Status List :</strong>
-          </CCardHeader>
-          <CCardBody>
-          <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
-          </CCardBody>
-          </CCard>
-        </CCol>
+        {showMap && (
+          <CCol xs={12}>
+            <CCard>
+              <CCardHeader>
+                <strong>All Status List</strong>
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} devices={devices} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        )}
       </CRow>
     </>
   );
