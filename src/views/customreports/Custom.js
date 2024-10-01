@@ -20,7 +20,7 @@ import {
 } from '@coreui/react';
 import Select from 'react-select';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -32,6 +32,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
     } else {
       event.preventDefault();
       handleSubmit();
+      setShowMap(true); //Show the mapping
     }
     setValidated(true);
   };
@@ -49,6 +50,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
+    setShowMap(true); // Show the map when form is valid and submitted
   };
 
   // Function to toggle dropdown visibility
@@ -183,7 +185,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
       <CCol xs={12} >
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary " type="button">
+            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
             <button
@@ -266,6 +268,7 @@ const Validation = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
   // const [groups, setGroups] = useState([]);
+  const [showMap, setShowMap] = useState(false); //show mapping data
   const [columns] = useState([
     'Latitude',
     'Longitude',
@@ -386,6 +389,8 @@ const Validation = () => {
                 handleSubmit={handleSubmit}
                 devices={devices}
                 // groups={groups}
+                showMap={showMap}
+                setShowMap={setShowMap}
                 columns={columns}
               />
             </CCardBody>
@@ -393,6 +398,7 @@ const Validation = () => {
         </CCol>
       </CRow>
 
+    {showMap && (
       <CRow className="justify-content-center mt-4">
         <CCol xs={12} className="px-4" >
           <CCard className='p-0 mb-4 shadow-sm'>
@@ -411,6 +417,8 @@ const Validation = () => {
           </CCard>
         </CCol>
       </CRow>
+      )}
+
     </>
   );
 };

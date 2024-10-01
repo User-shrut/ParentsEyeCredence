@@ -20,7 +20,7 @@ import {
 } from '@coreui/react';
 import Select from 'react-select';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns, showMap, setShowMap  }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -32,6 +32,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     } else {
       event.preventDefault();
       handleSubmit();
+      setShowMap(true); //Show the mapping
     }
     setValidated(true);
   };
@@ -49,6 +50,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
+    setShowMap(true); // Show the map when form is valid and submitted
   };
 
   // Function to toggle dropdown visibility
@@ -183,7 +185,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       <CCol xs={12} >
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary " type="button">
+            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
             <button
@@ -265,6 +267,7 @@ const Validation = () => {
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
+  const [showMap, setShowMap] = useState(false); //show mapping data
   const [groups, setGroups] = useState([]);
   const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -341,7 +344,7 @@ const Validation = () => {
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Summary</strong>
+              <strong>Summary Report</strong>
               
             </CCardHeader>
             <CCardBody>
@@ -352,17 +355,20 @@ const Validation = () => {
                 devices={devices}
                 groups={groups}
                 columns={columns}
+                showMap={showMap}
+                setShowMap={setShowMap}
               />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
+      {showMap && (
       <CRow className="justify-content-center mt-4">
         <CCol xs={12} className="px-4">
           <CCard className='p-0 mb-4 shadow-sm'>
             <CCardHeader  className="bg-secondary text-white d-flex justify-content-between align-items-center">
-              <strong>All Summary List</strong>
+              <strong>All Summary Report List</strong>
               <CFormInput
                 placeholder="Search..."
                 value={searchQuery}
@@ -376,6 +382,8 @@ const Validation = () => {
           </CCard>
         </CCol>
       </CRow>
+      )}
+
     </>
   );
 };

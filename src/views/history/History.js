@@ -297,8 +297,8 @@ const Validation = () => {
       <CRow className='pt-3'>
         <h2 className="px-4">History Reports</h2>
 
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 shadow-lg rounded">
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className="mb-2 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Device Tracker</strong>
             </CCardHeader>
@@ -311,10 +311,10 @@ const Validation = () => {
 
       {showForm && (
         <CRow className="justify-content-center mt-4">
-          <CCol xs={12} className="px-4" >
-            <CCard className="shadow-sm">
-              <CCardHeader className="bg-secondary text-white">
-                <strong>Status Reports</strong>
+          <CCol xs={12} md={12} className="px-4" >
+            <CCard className="p-0 mb-4 shadow-sm">
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>History Reports</strong>
               </CCardHeader>
               <CCardBody>
                 <CustomStyles
@@ -330,10 +330,10 @@ const Validation = () => {
       )}
 
       {showTable && (
-        <CRow>
-          <CCol xs={12} className="px-4">
-            <CCard className="shadow-sm mt-4">
-              <CCardHeader className="bg-warning text-white">
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} md={12} className="px-4">
+            <CCard className="p-0 mb-4 shadow-sm">
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-warning text-white">
                 <strong>Device Status</strong>
               </CCardHeader>
               <CCardBody>
