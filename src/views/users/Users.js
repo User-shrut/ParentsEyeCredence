@@ -47,7 +47,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(8)
+  const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
 
   const handleModalClose = () => {
@@ -799,120 +799,6 @@ const Users = () => {
           </form>
         </Box>
       </Modal>
-
-      {/* <Modal open={editModalOpen} onClose={handleModalClose}>
-        <Box sx={style}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-            }}
-          >
-            <Typography variant="h6" sx={{ color: 'black' }}>
-              Edit User
-            </Typography>
-            <IconButton onClick={handleModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-
-          <TextField
-            label={'User Name'}
-            variant="outlined"
-            name={'name'}
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
-          <TextField
-            label={'Email Address'}
-            variant="outlined"
-            name={'name'}
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
-          <TextField
-            label={'Password'}
-            variant="outlined"
-            name={'name'}
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
-
-          <Typography
-            id="modal-modal-title"
-            sx={{ color: 'black', marginTop: '15px' }}
-            component="h4"
-          >
-            Permissions
-          </Typography>
-
-          <FormControlLabel
-            sx={{ color: 'black' }}
-            control={<Checkbox defaultChecked />}
-            label="Admin"
-          />
-
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreOutlined />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              Master
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormGroup sx={{ color: 'black' }}>
-                <FormControlLabel control={<Checkbox />} label="User" />
-                <FormControlLabel control={<Checkbox />} label="Groups" />
-                <FormControlLabel control={<Checkbox />} label="Devices" />
-                <FormControlLabel control={<Checkbox />} label="Geofence" />
-                <FormControlLabel control={<Checkbox />} label="Drivers" />
-                <FormControlLabel control={<Checkbox />} label="Maintainance" />
-                <FormControlLabel control={<Checkbox />} label="Notification" />
-                <FormControlLabel control={<Checkbox />} label="Preferences" />
-              </FormGroup>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreOutlined />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              Reports
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormGroup sx={{ color: 'black' }}>
-                <FormControlLabel control={<Checkbox defaultChecked />} label="History" />
-                <FormControlLabel control={<Checkbox />} label="Stops" />
-                <FormControlLabel control={<Checkbox />} label="Trips" />
-                <FormControlLabel control={<Checkbox />} label="Statistics" />
-                <FormControlLabel control={<Checkbox />} label="Combine Reports" />
-                <FormControlLabel control={<Checkbox />} label="Custom Reports" />
-                <FormControlLabel control={<Checkbox />} label="Alert" />
-                <FormControlLabel control={<Checkbox />} label="Summary" />
-                <FormControlLabel control={<Checkbox />} label="Schedule Reports" />
-                <FormControlLabel control={<Checkbox />} label="Geofence Reports" />
-              </FormGroup>
-            </AccordionDetails>
-          </Accordion>
-
-          
-          <Button
-            variant="contained"
-            color="primary"
-            
-            sx={{ marginTop: '20px' }}
-          >
-            Submit
-          </Button>
-        </Box>
-      </Modal> */}
     </>
   )
 }

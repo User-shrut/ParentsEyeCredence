@@ -18,7 +18,10 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
-import MapComponent from '../Map/MapComponent';
+// import MapComponent from '../Map/MapComponent';
+
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -60,7 +63,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
           <option value="">Choose a device...</option>
           {devices.length > 0 ? (
             devices.map((device) => (
-              <option key={device.id} value={device.id}>{device.name}</option>
+              <option key={device.id} value={device.deviceId}>{device.name}</option>
             ))
           ) : (
             <option disabled>Loading devices...</option>
@@ -158,6 +161,7 @@ const Validation = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [rows, setRows] = useState([]);
   const [showMap, setShowMap] = useState(false);
+  const token = Cookies.get('authToken');
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -165,7 +169,7 @@ const Validation = () => {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -196,21 +200,34 @@ const Validation = () => {
       deviceId: formData.Devices, // Use the device ID from the form data
       period: formData.Period, // Use the selected period from the form data
     };
+  
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+  
+    // Construct the API URL using formData.Devices
+    const apiUrl = `http://104.251.212.80/api/combine?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
+    
+    
+    // Log the constructed API URL
+    console.log('Constructed API URL:', apiUrl);
 
+    console.log(token);
+    console.log(body);
+
+  
     try {
-      const response = await fetch('https://credence-tracker.onrender.com/reports/combined', {
-        method: 'POST', // Change to POST to send data
+      const response = await axios.get('https://credence-tracker.onrender.com/reports/combined', body , {
         headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token 
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body), // Send the request body with deviceId and period
+        }
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const data = await response.json();
       setRows(data); // Assuming the data returned is what you want to display in the table
       console.log('Form submitted with data:', body);
@@ -218,16 +235,17 @@ const Validation = () => {
       console.error('Error submitting form:', error);
     }
   };
+  
 
   return (
     <>
 
       <CRow className='pt-3'>
         <h2 className="px-4">Combine Reports</h2>
-        <CCol xs={12} className="px-4">
-          <CCard className="shadow-sm">
-            <CCardHeader className="bg-secondary text-white">
-              <strong>Status Reports</strong>
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className=" mb-4 p-0 shadow-lg rounded">
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Combine Reports</strong>
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -243,29 +261,13 @@ const Validation = () => {
         </CCol>
       </CRow>
 
-      {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Device Tracker</strong>
-            </CCardHeader>
-            <CCardBody>
-              <MapComponent /> {/* Always renders at the top */}
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
-          )}
-
-
-
+    
       {showMap && (
         <CRow className="justify-content-center mt-4">
           <CCol xs={12} className="px-4">
-            <CCard className="shadow-sm">
-              <CCardHeader className="bg-secondary text-white d-flex justify-content-between align-items-center">
-                <strong>All Status Reports List</strong>
+            <CCard className="p-0 mb-4 shadow-sm">
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Combine Reports List</strong>
                 <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
@@ -280,7 +282,10 @@ const Validation = () => {
           </CCol>
         </CRow>
       )}
-    </>
+
+
+
+   </>
   );
 };
 

@@ -55,10 +55,10 @@ const Validation = () => {
       <CRow className='pt-3'>
         <h2 className="px-4">Schedule Report</h2>
 
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 shadow-lg rounded">
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Status Reports</strong>
+              <strong>All Schedule Reports List</strong>
             </CCardHeader>
             <SimpleTable data={sampleData} />
           </CCard>
