@@ -19,6 +19,8 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import Select from 'react-select';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -26,11 +28,13 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
 
   const handleFormSubmit = (event) => {
     const form = event.currentTarget;
+    console.log("handle submit ke pass hu");
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     } else {
       event.preventDefault();
+
       handleSubmit();
       setShowMap(true); //Show the mapping
     }
@@ -50,9 +54,9 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
-    setShowMap(true); // Show the map when form is valid and submitted
+    handleSubmit(); // Submit form
+    // setShowMap(true); // Show the map when form is valid and submitted
   };
-
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -77,7 +81,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
           <option value="">Choose a device...</option>
           {devices.length > 0 ? (
             devices.map((device) => (
-              <option key={device.id} value={device.id}>{device.name}</option>
+              <option key={device.id} value={device.deviceId}>{device.name}</option>
             ))
           ) : (
             <option disabled>Loading devices...</option>
@@ -307,6 +311,7 @@ const Validation = () => {
   ]);
 
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const token = Cookies.get('authToken'); //
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -314,7 +319,7 @@ const Validation = () => {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -330,33 +335,8 @@ const Validation = () => {
       }
     };
 
-
-
-    // const fetchGroups = async () => {
-    //   try {
-    //     const response = await fetch('https://rocketsalestracker.com/api/groups', {
-    //       method: 'GET',
-    //       headers: {
-    //         'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-    //         'Content-Type': 'application/json',
-    //       },
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const data = await response.json();
-    //     setGroups(data); // Adjust if the structure of the response is different
-    //   } catch (error) {
-    //     console.error('Error fetching groups:', error);
-    //   }
-    // };
-
     fetchDevices();
-    // fetchGroups();
   }, []);
-
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -368,9 +348,40 @@ const Validation = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
+  const handleSubmit = async () => {
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Periods, // Use the selected period from the form data
+    };
+
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+
+    
+    console.log(token);
+    console.log(body);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/custom?deviceId=${body.deviceId}&period=${body.period}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Replace with your actual token
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log("ye hai albaksh")
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setRows(data); // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', body);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
+
 
   return (
     <>
@@ -380,7 +391,7 @@ const Validation = () => {
           <CCard className="mb-4 p-0 shadow-lg rounded" >
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Custom Report</strong>
-              
+
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -398,25 +409,25 @@ const Validation = () => {
         </CCol>
       </CRow>
 
-    {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} className="px-4" >
-          <CCard className='p-0 mb-4 shadow-sm'>
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>All Custom Report List</strong>
-              <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
-            </CCardHeader>
-            <CCardBody>
-              <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+      {showMap && (
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} className="px-4" >
+            <CCard className='p-0 mb-4 shadow-sm'>
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Custom Report List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
       )}
 
     </>
