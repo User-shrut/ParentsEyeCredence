@@ -18,7 +18,7 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
-import MapComponent from '../Map/MapComponent';
+// import MapComponent from '../Map/MapComponent';
 
 const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -224,9 +224,9 @@ const Validation = () => {
 
       <CRow className='pt-3'>
         <h2 className="px-4">Combine Reports</h2>
-        <CCol xs={12} className="px-4">
-          <CCard className="shadow-sm">
-            <CCardHeader className="bg-secondary text-white">
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className=" mb-4 p-0 shadow-lg rounded">
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Status Reports</strong>
             </CCardHeader>
             <CCardBody>
@@ -243,28 +243,12 @@ const Validation = () => {
         </CCol>
       </CRow>
 
-      {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Device Tracker</strong>
-            </CCardHeader>
-            <CCardBody>
-              <MapComponent /> {/* Always renders at the top */}
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
-          )}
-
-
-
+    
       {showMap && (
         <CRow className="justify-content-center mt-4">
           <CCol xs={12} className="px-4">
-            <CCard className="shadow-sm">
-              <CCardHeader className="bg-secondary text-white d-flex justify-content-between align-items-center">
+            <CCard className="p-0 mb-4 shadow-sm">
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                 <strong>All Status Reports List</strong>
                 <CFormInput
                   placeholder="Search..."
@@ -280,7 +264,10 @@ const Validation = () => {
           </CCol>
         </CRow>
       )}
-    </>
+
+
+
+   </>
   );
 };
 
