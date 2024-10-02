@@ -18,8 +18,12 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
+// import MapComponent from '../Map/MapComponent';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns }) => {
+import Cookies from 'js-cookie';
+import axios from 'axios';
+
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -30,13 +34,14 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       event.stopPropagation();
     } else {
       event.preventDefault();
-      handleSubmit();
+      handleSubmit(); // Call the submission function to fetch data
+      setShowMap(true); // Show the map when form is valid and submitted
     }
     setValidated(true);
   };
 
   const handlePeriodChange = (value) => {
-    handleInputChange('Periods', value);
+    handleInputChange('Period', value);
     setShowDateInputs(value === 'Custom');
   };
 
@@ -49,7 +54,6 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
     >
       <CCol md={6}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-
         <CFormSelect
           id="devices"
           required
@@ -59,42 +63,21 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           <option value="">Choose a device...</option>
           {devices.length > 0 ? (
             devices.map((device) => (
-              <option key={device.id} value={device.id}>{device.name}</option>
+              <option key={device.id} value={device.deviceId}>{device.name}</option>
             ))
           ) : (
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
-
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
       <CCol md={6}>
-        <CFormLabel htmlFor="details">Groups</CFormLabel>
-        <CFormSelect
-          id="details"
-          required
-          value={formData.Details}
-          onChange={(e) => handleInputChange('Details', e.target.value)}
-        >
-          <option value="">Choose a group...</option>
-          {groups.length > 0 ? (
-            groups.map((group) => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading groups...</option>
-          )}
-        </CFormSelect>
-        <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol>
-
-      <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
           required
-          value={formData.Periods}
+          value={formData.Period}
           onChange={(e) => handlePeriodChange(e.target.value)}
         >
           <option value="">Choose a period...</option>
@@ -111,7 +94,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
 
       {showDateInputs && (
         <>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
             <CFormInput
               type="date"
@@ -122,7 +105,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             />
             <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
           </CCol>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="toDate">To Date</CFormLabel>
             <CFormInput
               type="date"
@@ -147,7 +130,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
   );
 };
 
-const CustomStyles1 = ({ rows, selectedColumn }) => {
+const CustomStyles1 = ({ rows }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
@@ -173,25 +156,20 @@ const CustomStyles1 = ({ rows, selectedColumn }) => {
 };
 
 const Validation = () => {
-  const username = 'school';
-  const password = '123456';
-  const [rows, setRows] = useState([
-    { id: 1, Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active' },
-    { id: 2, Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active'  },
-  ]);
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+  const [formData, setFormData] = useState({ Devices: '', Period: '', FromDate: '', ToDate: '' });
   const [devices, setDevices] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [selectedColumn, setSelectedColumn] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [rows, setRows] = useState([]);
+  const [showMap, setShowMap] = useState(false);
+  const token = Cookies.get('authToken');
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const response = await fetch('https://rocketsalestracker.com/api/devices', {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -199,37 +177,15 @@ const Validation = () => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
         const data = await response.json();
-        setDevices(data); // Adjust if the structure of the response is different
+        console.log(data)
+        setDevices(data.devices); // Assuming the data returned contains device info
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setGroups(data); // Adjust if the structure of the response is different
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-      }
-    };
-
     fetchDevices();
-    fetchGroups();
   }, []);
 
   const handleInputChange = (name, value) => {
@@ -237,34 +193,59 @@ const Validation = () => {
       ...prevData,
       [name]: value,
     }));
+  };
 
-    if (name === 'Columns') {
-      setSelectedColumn(value);
+  const handleSubmit = async () => {
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Period, // Use the selected period from the form data
+    };
+  
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+  
+    // Construct the API URL using formData.Devices
+    const apiUrl = `http://104.251.212.80/api/combine?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
+    
+    
+    // Log the constructed API URL
+    console.log('Constructed API URL:', apiUrl);
+
+    console.log(token);
+    console.log(body);
+
+  
+    try {
+      const response = await axios.get('https://credence-tracker.onrender.com/reports/combined', body , {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      setRows(data); // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', body);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
-
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
-  };
+  
 
   return (
     <>
-      <CRow>
-        
-          <h3>Combine Reports</h3>
-        <CCol xs={12} className='mb-4'>
-        <CCard className="p-0">
 
-        <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Status Reports</strong>
-
-              <CFormInput
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '250px' }}
-            />
-
+      <CRow className='pt-3'>
+        <h2 className="px-4">Combine Reports</h2>
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className=" mb-4 p-0 shadow-lg rounded">
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Combine Reports</strong>
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -272,26 +253,39 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                groups={groups}
+                showMap={showMap}
+                setShowMap={setShowMap}
               />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
-      <CRow>
-        <CCol xs={12}>
-        <CCard className="p-0 mb-4">
-          <CCardHeader>
-            <strong>All Status List :</strong>
-          </CCardHeader>
-          <CCardBody>
-          <CustomStyles1 rows={rows} selectedColumn={selectedColumn} />
-          </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
-    </>
+    
+      {showMap && (
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} className="px-4">
+            <CCard className="p-0 mb-4 shadow-sm">
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Combine Reports List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} /> {/* Displaying the second table */}
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      )}
+
+
+
+   </>
   );
 };
 

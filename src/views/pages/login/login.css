@@ -13,6 +13,11 @@
     width: auto;
     transform: translate(-50%, -50%);
   }
+  .slogan{
+    font-size: 1.2rem;
+    font-family: cursive;
+    color: black;
+}
   
   @media (max-width: 768px) {
     .video {

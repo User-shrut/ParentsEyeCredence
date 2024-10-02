@@ -18,28 +18,46 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import Select from 'react-select';
 
-const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, columns }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
   const handleFormSubmit = (event) => {
-    event.preventDefault();
-    if (!event.currentTarget.checkValidity()) {
-      event.stopPropagation();
-      setValidated(true);
-    } else {
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.preventDefault();
       handleSubmit();
+      event.stopPropagation();
+    } else {
+      event.preventDefault();
+      handleSubmit();
+      setShowMap(true); //Show the mapping
     }
+    setValidated(true);
   };
 
   const handlePeriodChange = (value) => {
     handleInputChange('Periods', value);
     setShowDateInputs(value === 'Custom');
+  };
+
+  // State to manage button text
+  const [buttonText, setButtonText] = useState('SHOW NOW');
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+
+  // Function to handle dropdown item clicks
+  const handleDropdownClick = (text) => {
+    setButtonText(text); // Change button text based on the clicked item
+    setDropdownOpen(false); // Close the dropdown after selection
+    handleSubmit(); // Submit form
+    // setShowMap(true); // Show the map when form is valid and submitted
+  };
+
+  // Function to toggle dropdown visibility
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -49,24 +67,28 @@ const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, column
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      {/* Devices Dropdown */}
       <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
+
         <CFormSelect
           id="devices"
-          required
+          // required
           value={formData.Devices}
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices?.map((device) => (
-            <option key={device.id} value={device.id}>{device.name}</option>
-          ))}
+          {devices.length > 0 ? (
+            devices.map((device) => (
+              <option key={device.id} value={device.id}>{device.name}</option>
+            ))
+          ) : (
+            <option disabled>Loading devices...</option>
+          )}
         </CFormSelect>
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      {/* Periods Dropdown */}
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
@@ -87,7 +109,19 @@ const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, column
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      {/* Custom Date Inputs */}
+      <CCol md={4}>
+        <CFormLabel htmlFor="columns">Columns</CFormLabel>
+        {/* Use React-Select component for multi-select */}
+        <Select
+          isMulti
+          id="columns"
+          options={columns.map((column) => ({ value: column, label: column }))}
+          value={formData.Columns.map((column) => ({ value: column, label: column }))}
+          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
+        />
+        <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
+      </CCol>
+
       {showDateInputs && (
         <>
           <CCol md={4}>
@@ -115,74 +149,108 @@ const CustomForm = ({ formData, handleInputChange, handleSubmit, devices, column
         </>
       )}
 
-      {/* Show Button */}
-      <CCol xs={12}>
+      <CCol xs={12} >
         <div className="d-flex justify-content-end">
-          <Button
-            variant="outlined"
-            color="secondary"
-            type="submit"
-            endIcon={<ArrowDropDownIcon />}
-          >
-            Show Now
-          </Button>
+          <div className="btn-group">
+            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+              {buttonText}
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
+              onClick={toggleDropdown} // Toggle dropdown on click
+              aria-expanded={isDropdownOpen} // Update aria attribute
+            >
+              <span className="visually-hidden">Toggle Dropdown</span>
+            </button>
+            {isDropdownOpen && ( // Conditionally render dropdown menu
+              <ul className="dropdown-menu show ">
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
+                    Show Now
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
+                    Export
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
+                    Email Reports
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
+                    Schedule
+                  </a>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
       </CCol>
     </CForm>
   );
 };
 
-const CustomTable = ({ rows, selectedColumn }) => (
-  <CTable borderless className="custom-table">
-    <CTableHead>
-      <CTableRow>
-        <CTableHeaderCell>Sr.No</CTableHeaderCell>
-        <CTableHeaderCell>Devices</CTableHeaderCell>
-        <CTableHeaderCell>Fix Time</CTableHeaderCell>
-        <CTableHeaderCell>{selectedColumn}</CTableHeaderCell>
-      </CTableRow>
-    </CTableHead>
-    <CTableBody>
-      {rows.map((row, index) => (
-        <CTableRow key={index} className="custom-row">
-          <CTableDataCell>{index + 1}</CTableDataCell>
-          <CTableDataCell>{row.Devices}</CTableDataCell>
-          <CTableDataCell>{row.Details}</CTableDataCell>
-          <CTableDataCell>{row[selectedColumn]}</CTableDataCell>
+const CustomStyles1 = ({ rows, selectedColumns }) => {
+  return (
+    <CTable borderless className="custom-table">
+      <CTableHead>
+        <CTableRow>
+          {/* Dynamically render table headers based on selected columns */}
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+          ))}
         </CTableRow>
-      ))}
-    </CTableBody>
-  </CTable>
-); 
+      </CTableHead>
+      <CTableBody>
+        {rows.map((row, rowIndex) => (
+          <CTableRow key={row.id} className="custom-row">
+            {/* Dynamically render table cells based on selected columns */}
+            {selectedColumns.map((column, index) => (
+              <CTableDataCell key={index}>{row[column]}</CTableDataCell>
+            ))}
+          </CTableRow>
+        ))}
+      </CTableBody>
+    </CTable>
+  );
+};
 
-const StopagePage = () => {
-  const [formData, setFormData] = useState({ Devices: '', Periods: '', FromDate: '', ToDate: '', Columns: '' });
-  const [rows, setRows] = useState([]);
+const Validation = () => {
+  const [rows, setRows] = useState([
+  ]);
+  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
+  const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  const [columns] = useState(['Start Date', 'Distance', 'Odometer Start', 'Odometer End', 'Average Speed', 'Maximum Speed', 'Engine Hours', 'Spent Fuel']);
-  const [selectedColumn, setSelectedColumn] = useState(''); 
+  const [columns] = useState(['Start Time', 'Odometer', 'Address', 'End Time', 'Duration', 'Engine Hours', 'Spent Fuel']);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [showMap, setShowMap] = useState(false); //show mapping data
+
 
   useEffect(() => {
-    // Fetch devices
     const fetchDevices = async () => {
       try {
-        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MH0sImlhdCI6MTcyNzMzMzc3OX0.np-i9Kd821Y7BBU_G6ul_RuAUACJVz8OOxO53JvRS-c';
-        const response = await fetch('https://credence-tracker.onrender.com/device/', {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjY5NzQ5MjVjNmI3MjIyZDg3YzE0ZSIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmY2OTc0OTI1YzZiNzIyMmQ4N2MxNGUiLCJlbWFpbCI6IlBhdmFuQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJGVjOGRlODg1TEpMWThUZ1A3NG5ZNmU1dkdIeTNIMnVQVnN1bE1RMzZmMFVrM242VVFVZUlTIiwidXNlcm5hbWUiOiJQYXZhbiIsImNyZWF0ZWRCeSI6IjY2ZjNlNjFmNjE4NTU5NmQxZDAwYzM4NCIsIm5vdGlmaWNhdGlvbiI6dHJ1ZSwiZGV2aWNlcyI6dHJ1ZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjpmYWxzZSwic3VtbWFyeSI6ZmFsc2UsImN1c3RvbUNoYXJ0cyI6dHJ1ZSwiZGV2aWNlbGltaXQiOmZhbHNlLCJkYXRhTGltaXQiOjEsImVudHJpZXNDb3VudCI6MCwiX192IjowfSwiaWF0IjoxNzI3NDM4MTA5fQ.gfelNrYbAeS748DqP0K9_XeXdESFD8PD5lwLv8UiP50', // Replace with your actual token
+            'Content-Type': 'application/json',
           },
         });
-        if (response.ok) {
-          const data = await response.json();
-          setDevices(data);
-        } else {
-          throw new Error('Failed to fetch devices');
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        const data = await response.json();
+        console.log(data)
+        setDevices(data.devices); // Assuming the data returned contains device info
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
     };
-
     fetchDevices();
   }, []);
 
@@ -191,64 +259,91 @@ const StopagePage = () => {
       ...prevData,
       [name]: value,
     }));
-
-    if (name === 'Columns') setSelectedColumn(value);
   };
 
   const handleSubmit = async () => {
-    const { Devices, FromDate, ToDate } = formData;
-    if (Devices && FromDate && ToDate) {
-      try {
-        const response = await fetch(
-          `https://rocketsalestracker.com/api/stoppage?device=${Devices}&fromDate=${FromDate}&toDate=${ToDate}`,
-          {
-            headers: {
-              'Authorization': 'Basic ' + btoa('school:123456'),
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setRows(data);
-        } else {
-          console.error('Failed to fetch stoppage data');
-        }
-      } catch (error) {
-        console.error('Error fetching stoppage data:', error);
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Periods, // Use the selected period from the form data
+    };
+  
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+  
+    // Construct the API URL using formData.Devices
+    const apiUrl = `http://104.251.212.80/api/stop?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
+    
+    // Log the constructed API URL
+    console.log('Constructed API URL:', apiUrl);
+  
+    try {
+      const response = await fetch('https://credence-tracker.onrender.com/history/device-stopage?deviceId=2636&from=2024-09-27T05:16:57.000+00:00&to=2024-09-27T05:16:57.000+00:00 ', {
+        method: 'POST', // Use POST method to send data
+        headers: {
+          // 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body), // Send the request body with deviceId and period
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+  
+      const data = await response.json();
+      setRows(data); // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', body);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
-
+  
   return (
     <>
-      <CRow>
-        <h3>Stopage Page</h3>
-        <CCol xs={12} md={12}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Stopage Page</strong>
+      <CRow className='pt-3'>
+        <h2 className='px-4'>Stop</h2>
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className="mb-4 p-0 shadow-lg rounded">
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Stop Report</strong>
             </CCardHeader>
             <CCardBody>
-              <CustomForm
+              <CustomStyles
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
                 columns={columns}
+                showMap={showMap}
+                setShowMap={setShowMap}
               />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
-      <CRow>
-        <CCol xs={12}>
-          <CustomTable rows={rows} selectedColumn={selectedColumn} />
-        </CCol>
-      </CRow>
+
+      {showMap && (
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} className="px-4" >
+            <CCard className='p-0 mb-4 shadow-sm'>
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Stop Report List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      )}
     </>
   );
 };
-
-export default StopagePage;
+export default Validation;
