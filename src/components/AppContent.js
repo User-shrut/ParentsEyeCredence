@@ -8,7 +8,7 @@ import Loader from './Loader/Loader'
 
 const AppContent = () => {
   return (
-    <CContainer className="">
+    <div>
       <Suspense fallback={<Loader />}>
         <Routes>
           {routes.map((route, idx) => {
@@ -27,7 +27,7 @@ const AppContent = () => {
           <Route path="/" element={<Navigate to="dashboard" replace />} />
         </Routes>
       </Suspense>
-    </CContainer>
+    </div>
   )
 }
 

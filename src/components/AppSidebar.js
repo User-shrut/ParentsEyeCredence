@@ -26,7 +26,7 @@ import { jwtDecode } from "jwt-decode";
 const getUserRole = () => {
   const token = Cookies.get('authToken');
   let role;
-  
+
   if (token) {
     const decodedToken = jwtDecode(token);
     if(decodedToken.superadmin == true){
@@ -54,7 +54,7 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end"
+      className="border-end xl"
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}

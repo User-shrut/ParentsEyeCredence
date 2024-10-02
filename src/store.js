@@ -4,7 +4,7 @@ import vehicleReducer from './features/vehicleSlice.js'
 import columnVisibilityReducer from './features/columnVisibilitySlice.js'
 // Initial state and reducer for sidebar and theme
 const initialState = {
-  sidebarShow: true,
+  sidebarShow: false,
   theme: 'light',
 }
 
