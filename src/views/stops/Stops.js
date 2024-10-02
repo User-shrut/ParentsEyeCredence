@@ -20,7 +20,7 @@ import {
 } from '@coreui/react';
 import Select from 'react-select';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  columns, showMap, setShowMap }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -28,6 +28,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  col
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
+      handleSubmit();
       event.stopPropagation();
     } else {
       event.preventDefault();
@@ -50,7 +51,8 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  col
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
-    setShowMap(true); // Show the map when form is valid and submitted
+    handleSubmit(); // Submit form
+    // setShowMap(true); // Show the map when form is valid and submitted
   };
 
   // Function to toggle dropdown visibility
@@ -70,7 +72,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  col
 
         <CFormSelect
           id="devices"
-          required
+          // required
           value={formData.Devices}
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
@@ -86,26 +88,6 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  col
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
-
-      {/* <CCol md={6}>
-        <CFormLabel htmlFor="details">Groups</CFormLabel>
-        <CFormSelect
-          id="details"
-          required
-          value={formData.Details}
-          onChange={(e) => handleInputChange('Details', e.target.value)}
-        >
-          <option value="">Choose a group...</option>
-          {groups.length > 0 ? (
-            groups.map((group) => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading groups...</option>
-          )}
-        </CFormSelect>
-        <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
-      </CCol> */}
 
       <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
@@ -126,21 +108,6 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices,  col
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
-
-      {/* <CCol md={4}>
-        <CFormLabel htmlFor="type">Type</CFormLabel>
-        <CFormSelect
-          id="type"
-          required
-          value={formData.Type}
-          onChange={(e) => handleInputChange('Type', e.target.value)}
-        >
-          <option value="">Choose a type...</option>
-          <option value="Stop">Stop</option>
-          <option value="Daily Stop">Daily Stop</option>
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
-      </CCol> */}
 
       <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
@@ -232,9 +199,6 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
-          {/* <CTableHeaderCell>Devices</CTableHeaderCell> */}
-
           {/* Dynamically render table headers based on selected columns */}
           {selectedColumns.map((column, index) => (
             <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
@@ -244,8 +208,6 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
       <CTableBody>
         {rows.map((row, rowIndex) => (
           <CTableRow key={row.id} className="custom-row">
-            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-            {/* <CTableDataCell>{row.Devices}</CTableDataCell> */}
             {/* Dynamically render table cells based on selected columns */}
             {selectedColumns.map((column, index) => (
               <CTableDataCell key={index}>{row[column]}</CTableDataCell>
@@ -258,17 +220,12 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
 };
 
 const Validation = () => {
-  const username = 'school';
-  const password = '123456';
   const [rows, setRows] = useState([
-    { Devices: 'MH43BB1234', Details: 'Nagpur', Type: 'Active', StartDate: '2024-01-01', Distance: '500 km' },
-    { Devices: 'MH43BC1234', Details: 'Akola', Type: 'Active', StartDate: '2024-02-01', Distance: '600 km' },
   ]);
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  // const [groups, setGroups] = useState([]);
-  const [columns] = useState(['Start Time', 'Odometer','Address','End Time','Duration',  'Engine Hours', 'Spent Fuel']);
+  const [columns] = useState(['Start Time', 'Odometer', 'Address', 'End Time', 'Duration', 'Engine Hours', 'Spent Fuel']);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
 
@@ -279,7 +236,7 @@ const Validation = () => {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjY5NzQ5MjVjNmI3MjIyZDg3YzE0ZSIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmY2OTc0OTI1YzZiNzIyMmQ4N2MxNGUiLCJlbWFpbCI6IlBhdmFuQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJGVjOGRlODg1TEpMWThUZ1A3NG5ZNmU1dkdIeTNIMnVQVnN1bE1RMzZmMFVrM242VVFVZUlTIiwidXNlcm5hbWUiOiJQYXZhbiIsImNyZWF0ZWRCeSI6IjY2ZjNlNjFmNjE4NTU5NmQxZDAwYzM4NCIsIm5vdGlmaWNhdGlvbiI6dHJ1ZSwiZGV2aWNlcyI6dHJ1ZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjpmYWxzZSwic3VtbWFyeSI6ZmFsc2UsImN1c3RvbUNoYXJ0cyI6dHJ1ZSwiZGV2aWNlbGltaXQiOmZhbHNlLCJkYXRhTGltaXQiOjEsImVudHJpZXNDb3VudCI6MCwiX192IjowfSwiaWF0IjoxNzI3NDM4MTA5fQ.gfelNrYbAeS748DqP0K9_XeXdESFD8PD5lwLv8UiP50', // Replace with your actual token
             'Content-Type': 'application/json',
           },
         });
@@ -294,32 +251,7 @@ const Validation = () => {
         console.error('Error fetching devices:', error);
       }
     };
-
-
-
-    // const fetchGroups = async () => {
-    //   try {
-    //     const response = await fetch('https://rocketsalestracker.com/api/groups', {
-    //       method: 'GET',
-    //       headers: {
-    //         'Authorization': 'Basic ' + btoa(`${username}:${password}`),
-    //         'Content-Type': 'application/json',
-    //       },
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const data = await response.json();
-    //     setGroups(data); // Adjust if the structure of the response is different
-    //   } catch (error) {
-    //     console.error('Error fetching groups:', error);
-    //   }
-    // };
-
     fetchDevices();
-    // fetchGroups();
   }, []);
 
   const handleInputChange = (name, value) => {
@@ -327,16 +259,46 @@ const Validation = () => {
       ...prevData,
       [name]: value,
     }));
+  };
 
-    if (name === 'Columns') {
-      setSelectedColumns(value);
+  const handleSubmit = async () => {
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Periods, // Use the selected period from the form data
+    };
+  
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+  
+    // Construct the API URL using formData.Devices
+    const apiUrl = `http://104.251.212.80/api/stop?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
+    
+    // Log the constructed API URL
+    console.log('Constructed API URL:', apiUrl);
+  
+    try {
+      const response = await fetch('https://credence-tracker.onrender.com/history/device-stopage?deviceId=2636&from=2024-09-27T05:16:57.000+00:00&to=2024-09-27T05:16:57.000+00:00 ', {
+        method: 'POST', // Use POST method to send data
+        headers: {
+          // 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body), // Send the request body with deviceId and period
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      setRows(data); // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', body);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
-
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
-  };
-
+  
   return (
     <>
       <CRow className='pt-3'>
@@ -352,7 +314,6 @@ const Validation = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
-                // groups={groups}
                 columns={columns}
                 showMap={showMap}
                 setShowMap={setShowMap}
@@ -363,28 +324,26 @@ const Validation = () => {
       </CRow>
 
       {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} className="px-4" >
-          <CCard className='p-0 mb-4 shadow-sm'>
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>All Stop Report List</strong>
-              <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
-            </CCardHeader>
-            <CCardBody>
-              <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} className="px-4" >
+            <CCard className='p-0 mb-4 shadow-sm'>
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Stop Report List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
       )}
-
     </>
   );
 };
-
 export default Validation;
