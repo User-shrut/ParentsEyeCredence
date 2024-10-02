@@ -301,7 +301,7 @@ const Driver = () => {
                 variant="contained"
                 className="btn btn-success text-white"
               >
-                Add User
+                Add Driver
               </button>
             </div>
           </div>

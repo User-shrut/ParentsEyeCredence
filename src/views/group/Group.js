@@ -79,8 +79,10 @@ const Group = () => {
         setLoading(false)
       }
     } catch (error) {
+      setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
+
     }
   }
 
@@ -160,7 +162,7 @@ const Group = () => {
 
 
   // ###################################################################
-  
+
 
   // ###################### Delete Group ##############################
 

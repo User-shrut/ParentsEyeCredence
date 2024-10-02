@@ -72,6 +72,8 @@ const Geofences = () => {
     fetchPlacetype();
   }, []);
 
+  // data fetcching show data
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -126,6 +128,8 @@ const Geofences = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
+  // Post data api
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -182,6 +186,8 @@ const Geofences = () => {
     }
   };
 
+  // Delete data by id. Delete method
+
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
@@ -206,6 +212,8 @@ const Geofences = () => {
       }
     }
   };
+
+  // Edit data by id PUT method
 
   const handleEdit = (row) => {
     setFormData({
@@ -361,6 +369,7 @@ const Geofences = () => {
             margin="normal"
           />
 
+      
           <FormControl fullWidth margin="normal" >
             <InputLabel>Placetype</InputLabel>
             <Select
@@ -423,3 +432,6 @@ const Geofences = () => {
 };
 
 export default Geofences;
+
+
+

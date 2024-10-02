@@ -390,39 +390,56 @@ const IndividualTrack = () => {
               />
 
               <Draggable>
-              <CCard className="mb-4 parametersContainer" style={{ zIndex: '9999' }}>
-                <CCardHeader>Tasks</CCardHeader>
-                <CCardBody>
-                  <div className="name">
-                    <div className="nameImage">
-                      <img
-                        src={selectImage(
-                          category,
-                          individualSalesMan?.speed,
-                          individualSalesMan?.attributes?.ignition,
-                        )}
-                        className="nimg upperdata"
-                        alt="vehicle"
-                      />
-                    </div>
-                    <div>{name ? name : 'User Name'}</div>
-                  </div>
-
-                  <div className="parameters">
-                    <div className="col">
-                      <strong>Address</strong>{address
-                        ? ` : ${address.address?.road}, ${address.address?.village}, ${address.address?.state_district}, ${address.address?.state}, ${address.address?.country}, ${address.address?.postcode}`
-                        : ' : Address of User'}
+                <CCard className="mb-4 parametersContainer" style={{ zIndex: '9999' }}>
+                  <CCardHeader>Tasks</CCardHeader>
+                  <CCardBody>
+                    <div className="name">
+                      <div className="nameImage">
+                        <img
+                          src={selectImage(
+                            category,
+                            individualSalesMan?.speed,
+                            individualSalesMan?.attributes?.ignition,
+                          )}
+                          className="nimg upperdata"
+                          alt="vehicle"
+                        />
+                      </div>
+                      <div>{name ? name : 'User Name'}</div>
                     </div>
 
-                    <div className="col"><strong>Ignition</strong>{` : ${individualSalesMan?.attributes?.ignition ? "On" : "Off"}`}</div>
-                    <div className="col"><strong>Speed</strong>{` : ${Math.round(individualSalesMan?.speed)} kmph`}</div>
-                    <div className="col"><strong>Latitude</strong>{` : ${individualSalesMan?.latitude}`}</div>
-                    <div className="col"><strong>Longitude</strong>{` : ${individualSalesMan?.longitude}`}</div>
-                    <div className="col"><strong>Category</strong>{` : ${category}`}</div>
-                  </div>
-                </CCardBody>
-              </CCard></Draggable>
+                    <div className="parameters">
+                      <div className="col">
+                        <strong>Address</strong>
+                        {address
+                          ? ` : ${address.address?.road}, ${address.address?.village}, ${address.address?.state_district}, ${address.address?.state}, ${address.address?.country}, ${address.address?.postcode}`
+                          : ' : Address of User'}
+                      </div>
+
+                      <div className="col">
+                        <strong>Ignition</strong>
+                        {` : ${individualSalesMan?.attributes?.ignition ? 'On' : 'Off'}`}
+                      </div>
+                      <div className="col">
+                        <strong>Speed</strong>
+                        {` : ${Math.round(individualSalesMan?.speed)} kmph`}
+                      </div>
+                      <div className="col">
+                        <strong>Latitude</strong>
+                        {` : ${individualSalesMan?.latitude}`}
+                      </div>
+                      <div className="col">
+                        <strong>Longitude</strong>
+                        {` : ${individualSalesMan?.longitude}`}
+                      </div>
+                      <div className="col">
+                        <strong>Category</strong>
+                        {` : ${category}`}
+                      </div>
+                    </div>
+                  </CCardBody>
+                </CCard>
+              </Draggable>
               {individualSalesMan && (
                 <ReactLeafletDriftMarker
                   position={[individualSalesMan.latitude, individualSalesMan.longitude]}
