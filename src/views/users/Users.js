@@ -24,8 +24,13 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Stepper,
+  Step,
+  StepLabel,
+  InputAdornment,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
+import { TiUserAdd } from 'react-icons/ti'
 import { AiFillDelete } from 'react-icons/ai'
 import {
   CTable,
@@ -36,10 +41,17 @@ import {
   CTableRow,
 } from '@coreui/react'
 import CloseIcon from '@mui/icons-material/Close'
-import { ExpandMoreOutlined } from '@mui/icons-material'
+import {
+  AccountCircle,
+  ExpandMoreOutlined,
+  LockOutlined,
+  MailOutline,
+  Phone,
+} from '@mui/icons-material'
 
-import Cookies from 'js-cookie';
-import { jwtDecode } from "jwt-decode";
+import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
+import { IoMdAdd } from 'react-icons/io'
 
 const Users = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -49,6 +61,18 @@ const Users = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
+  const [currentStep, setCurrentStep] = useState(0)
+  const steps = ['Personal Info', 'Permissions']
+
+  // Go to the next step
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  }
+
+  // Go to the previous step
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+  }
 
   const handleModalClose = () => {
     setEditModalOpen(false)
@@ -112,29 +136,29 @@ const Users = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    mobile: '',
     password: '',
     permissions: {
       notification: false,
       devices: false,
-      drivers: false,
+      driver: false,
       groups: false,
       category: false,
       model: false,
       users: false,
       report: false,
       stop: false,
-      trips: false,
+      travel: false,
       geofence: false,
       maintenance: false,
       preferences: false,
-      combinedReports: false,
-      customReports: false,
+      status: false,
+      distance: false,
       history: false,
-      schedulereports: false,
-      statistics: false,
+      sensor: false,
+      idle: false,
       alerts: false,
-      summary: false,
-      customCharts: false,
+      vehicle: false,
     },
     isAdmin: false,
   })
@@ -206,8 +230,23 @@ const Users = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
+    setCurrentStep(0);
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+    const phonePattern = /^[0-9]{10}$/
+
+    if (!emailPattern.test(formData.email)) {
+      alert('Please enter a valid email address')
+      return
+    }
+
+    if (!phonePattern.test(formData.mobile)) {
+      alert('Please enter a valid 10-digit phone number')
+      return
+    }
+
     const dataToSubmit = {
       username: formData.username,
+      mobile: formData.mobile,
       email: formData.email,
       password: formData.password,
       ...formData.permissions,
@@ -225,7 +264,8 @@ const Users = () => {
       if (response.status === 201) {
         alert('User is created successfully')
         fetchUserData()
-        setAddModalOpen(false) // Close the modal
+        setAddModalOpen(false)
+        
       } else {
         alert(`Error: ${response.status} - ${response.statusText}`)
       }
@@ -256,25 +296,25 @@ const Users = () => {
       permissions: {
         notification: userData.notification,
         devices: userData.devices,
-        drivers: userData.driver, // userData uses 'driver' instead of 'drivers'
+        driver: userData.driver, // userData uses 'driver' instead of 'drivers'
         groups: userData.groups,
         category: userData.category,
         model: userData.model,
         users: userData.users,
         report: userData.report,
         stop: userData.stop,
-        trips: userData.trips,
+        travel: userData.travel,
         geofence: userData.geofence,
         maintenance: userData.maintenance,
         preferences: userData.preferences,
-        combinedReports: userData.combinedReports,
-        customReports: userData.customReports,
+        status: userData.status,
+        distance: userData.distance,
         history: userData.history,
-        schedulereports: userData.schedulereports,
-        statistics: userData.statistics,
+        sensor: userData.sensor,
+        idle: userData.idle,
         alerts: userData.alerts,
-        summary: userData.summary,
-        customCharts: userData.customCharts,
+        vehicle: userData.vehicle,
+        geofenceReport: userData.geofenceReport,
       },
       isAdmin: userData.isAdmin || false, // Assuming there is an isAdmin field
     })
@@ -365,11 +405,11 @@ const Users = () => {
 
   return (
     <>
-      <div className="mx-md-3 mt-3">
+      <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
         <div>
           <div className="d-flex justify-content-between mb-2">
             <div>
-              <h2>Users</h2>
+              <h3>Users</h3>
             </div>
 
             <div className="d-flex">
@@ -386,7 +426,7 @@ const Users = () => {
                 <button
                   onClick={() => setAddModalOpen(true)}
                   variant="contained"
-                  className="btn btn-success text-white"
+                  className="btn btn-primary"
                 >
                   Add User
                 </button>
@@ -404,26 +444,7 @@ const Users = () => {
           </div>
         </div>
 
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{ width: '480px' }}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
+        <div className="flex-grow-1">
           <CTable align="middle" className="mb-2 border min-vh-25" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
@@ -441,116 +462,183 @@ const Users = () => {
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {data?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center">{item.username}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.email}</CTableDataCell>
+              {loading ? (
+                <>
+                  <CTableRow>
+                    <CTableDataCell colSpan="5" className="text-center">
+                      <div className="text-nowrap mb-2 text-center w-">
+                        <p className="card-text placeholder-glow">
+                          <span className="placeholder col-12" />
+                        </p>
+                        <p className="card-text placeholder-glow">
+                          <span className="placeholder col-12" />
+                        </p>
+                        <p className="card-text placeholder-glow">
+                          <span className="placeholder col-12" />
+                        </p>
+                        <p className="card-text placeholder-glow">
+                          <span className="placeholder col-12" />
+                        </p>
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                </>
+              ) : data.length > 0 ? (
+                data?.map((item, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell className="text-center">{item.username}</CTableDataCell>
+                    <CTableDataCell className="text-center">{item.email}</CTableDataCell>
 
-                  {/* Master Column */}
-                  <CTableDataCell className="text-center">
-                    <FormControl fullWidth>
-                      <InputLabel id={`master-select-label-${index}`}>Master</InputLabel>
-                      <Select
-                        labelId={`master-select-label-${index}`}
-                        id={`master-select-${index}`}
-                        label="Master Permissions"
-                        value="" // You can control this value if needed
-                      >
-                        {[
-                          'users',
-                          'groups',
-                          'devices',
-                          'geofence',
-                          'drivers',
-                          'maintenance',
-                          'preferences',
-                        ].map(
-                          (permission) =>
-                            item[permission] && (
-                              <MenuItem key={permission} value={permission}>
-                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              </MenuItem>
-                            ),
-                        )}
-                      </Select>
-                    </FormControl>
-                  </CTableDataCell>
+                    {/* Master Column */}
+                    <CTableDataCell className="text-center">
+                      <FormControl fullWidth>
+                        <InputLabel id={`master-select-label-${index}`}>Master</InputLabel>
+                        <Select
+                          labelId={`master-select-label-${index}`}
+                          id={`master-select-${index}`}
+                          label="Master Permissions"
+                          value="" // You can control this value if needed
+                        >
+                          {[
+                            'users',
+                            'groups',
+                            'devices',
+                            'geofence',
+                            'driver',
+                            'notification',
+                            'maintenance',
+                            'preferences',
+                            'category',
+                            'model',
+                          ].map(
+                            (permission) =>
+                              item[permission] && (
+                                <MenuItem key={permission} value={permission}>
+                                  {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                </MenuItem>
+                              ),
+                          )}
+                        </Select>
+                      </FormControl>
+                    </CTableDataCell>
 
-                  {/* Reports Column */}
-                  <CTableDataCell className="text-center">
-                    <FormControl fullWidth>
-                      <InputLabel id={`reports-select-label-${index}`}>Reports</InputLabel>
-                      <Select
-                        labelId={`reports-select-label-${index}`}
-                        id={`reports-select-${index}`}
-                        label="Reports Permissions"
-                        value="" // You can control this value if needed
-                      >
-                        {[
-                          'history',
-                          'stop',
-                          'trips',
-                          'combinedReports',
-                          'customReports',
-                          'statistics',
-                          'schedulereports',
-                          'alerts',
-                          'summary',
-                        ].map(
-                          (permission) =>
-                            item[permission] && (
-                              <MenuItem key={permission} value={permission}>
-                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              </MenuItem>
-                            ),
-                        )}
-                      </Select>
-                    </FormControl>
-                  </CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
-                    </IconButton>
+                    {/* Reports Column */}
+                    <CTableDataCell className="text-center">
+                      <FormControl fullWidth>
+                        <InputLabel id={`reports-select-label-${index}`}>Reports</InputLabel>
+                        <Select
+                          labelId={`reports-select-label-${index}`}
+                          id={`reports-select-${index}`}
+                          label="Reports Permissions"
+                          value="" // You can control this value if needed
+                        >
+                          {[
+                            'history',
+                            'stop',
+                            'travel',
+                            'status',
+                            'distance',
+                            'idle',
+                            'sensor',
+                            'alerts',
+                            'vehicle',
+                            'geofenceReport',
+                          ].map(
+                            (permission) =>
+                              item[permission] && (
+                                <MenuItem key={permission} value={permission}>
+                                  {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                </MenuItem>
+                              ),
+                          )}
+                        </Select>
+                      </FormControl>
+                    </CTableDataCell>
+                    <CTableDataCell
+                      className="text-center d-flex"
+                      style={{ justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
+                        <RiEdit2Fill
+                          style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                        />
+                      </IconButton>
+                      <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
+                        <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                      </IconButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="5" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's nobody here yet.
+                        <br /> Maybe it's time to invite some awesome users!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add User
+                        </button>
+                      </div>
+                    </div>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
+              )}
             </CTableBody>
           </CTable>
-        )}
+        </div>
+
         {pageCount > 1 && (
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
-            pageCount={pageCount} // Set based on the total pages from the API
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            marginPagesDisplayed={2}
-            containerClassName="pagination justify-content-center"
-            pageClassName="page-item"
-            pageLinkClassName="page-link"
-            previousClassName="page-item"
-            previousLinkClassName="page-link"
-            nextClassName="page-item"
-            nextLinkClassName="page-link"
-            activeClassName="active"
-          />
+          <div className="">
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={5}
+              pageCount={pageCount} // Set based on the total pages from the API
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              marginPagesDisplayed={2}
+              containerClassName="pagination justify-content-center"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              activeClassName="active"
+            />
+          </div>
         )}
       </div>
 
       <Modal open={addModalOpen} onClose={handleModalClose}>
-        <Box sx={style}>
-          <div className="d-flex justify-content-between">
-            <Typography variant="h6" sx={{ color: 'black' }}>
+        <Box
+          sx={{
+            ...style,
+            backgroundColor: '#f7f9fc',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '30px',
+          }}
+        >
+          <div className="d-flex justify-content-between align-items-center">
+            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
+              <span role="img" aria-label="user">
+                <TiUserAdd className="fs-4" />
+              </span>{' '}
               Add User
             </Typography>
             <IconButton onClick={handleModalClose}>
@@ -558,35 +646,107 @@ const Users = () => {
             </IconButton>
           </div>
 
-          <TextField
-            label="User Name"
-            variant="outlined"
-            name="username"
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
-          <TextField
-            label="Email Address"
-            variant="outlined"
-            name="email"
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
-          <TextField
-            label="Password"
-            variant="outlined"
-            name="password"
-            type="password"
-            onChange={handleInputChange}
-            sx={{ marginBottom: '10px' }}
-            fullWidth
-          />
+          {/* Step-by-step form with progress indicator */}
+          <div>
+            <Stepper activeStep={currentStep} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
 
-          <Typography sx={{ color: 'black', marginTop: '15px' }}>Permissions</Typography>
+            {currentStep === 0 && (
+              <div className="mt-3">
+                {/* Personal Info Step */}
+                <TextField
+                  label="User Name"
+                  variant="outlined"
+                  name="username"
+                  value={formData.username !== undefined ? formData.username : ''}
+                  onChange={handleInputChange}
+                  sx={{ marginBottom: '10px' }}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  label="Email Address"
+                  type="email"
+                  variant="outlined"
+                  name="email"
+                  value={formData.email !== undefined ? formData.email : ''}
+                  onChange={handleInputChange}
+                  sx={{ marginBottom: '10px' }}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MailOutline />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                
+                <TextField
+                  label="Mobile Number"
+                  variant="outlined"
+                  name="mobile"
+                  type="phone"
+                  value={formData.mobile !== undefined ? formData.mobile : ''}
+                  onChange={handleInputChange}
+                  sx={{ marginBottom: '10px' }}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  label="Password"
+                  variant="outlined"
+                  name="password"
+                  type="password"
+                  value={formData.password !== undefined ? formData.password : ''}
+                  onChange={handleInputChange}
+                  sx={{ marginBottom: '10px' }}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockOutlined />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
+            )}
 
-          <FormControlLabel
+      
+
+            {currentStep === 1 && (
+              <div className="mt-3">
+                {/* Permissions Step */}
+                <Typography sx={{ color: '#333', fontWeight: 'bold', marginTop: '15px' }}>
+                  <span role="img" aria-label="permissions">
+                    🔒
+                  </span>{' '}
+                  Permissions
+                </Typography>
+
+                <FormControlLabel
             sx={{ color: 'black' }}
             control={<Checkbox checked={formData.isAdmin} onChange={handleAdminToggle} />}
             label="Admin (Select all permissions)"
@@ -603,10 +763,12 @@ const Users = () => {
                       'groups',
                       'devices',
                       'geofence',
-                      'drivers',
+                      'driver',
                       'maintenance',
                       'notification',
                       'preferences',
+                      'category',
+                      'model',
                     ]
                       .filter((permission) => availablePermissions[permission])
                       .map((permission) => (
@@ -633,13 +795,14 @@ const Users = () => {
                     {[
                       'history',
                       'stop',
-                      'trips',
-                      'statistics',
-                      'combinedReports',
-                      'customReports',
+                      'travel',
+                      'idle',
+                      'status',
+                      'distance',
                       'alerts',
-                      'summary',
-                      'schedulereports',
+                      'vehicle',
+                      'sensor',
+                      'geofenceReport',
                     ]
                       .filter((permission) => availablePermissions[permission])
                       .map((permission) => (
@@ -660,17 +823,30 @@ const Users = () => {
               </Accordion>
             </>
           )}
+              </div>
+            )}
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            sx={{ marginTop: '20px' }}
-          >
-            Submit
-          </Button>
+            {/* Navigation buttons */}
+            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
+              {currentStep > 0 && (
+                <Button onClick={handleBack} variant="outlined">
+                  Back
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button onClick={handleNext} variant="contained" color="primary">
+                  Next
+                </Button>
+              ) : (
+                <Button onClick={handleSubmit} variant="contained" color="primary">
+                  Submit
+                </Button>
+              )}
+            </div>
+          </div>
         </Box>
       </Modal>
+
       <Modal open={editModalOpen} onClose={handleModalClose}>
         <Box sx={style}>
           <div className="d-flex justify-content-between">
@@ -735,10 +911,12 @@ const Users = () => {
                     'groups',
                     'devices',
                     'geofence',
-                    'drivers',
+                    'driver',
                     'maintenance',
                     'notification',
                     'preferences',
+                    'category',
+                    'model',
                   ].map((permission) => (
                     <FormControlLabel
                       key={permission}
@@ -769,13 +947,14 @@ const Users = () => {
                   {[
                     'history',
                     'stop',
-                    'trips',
-                    'statistics',
-                    'combinedReports',
-                    'customReports',
+                    'travel',
+                    'idle',
+                    'status',
+                    'distance',
                     'alerts',
-                    'summary',
-                    'schedulereports',
+                    'vehicle',
+                    'sensor',
+                    'geofenceReport',
                   ].map((permission) => (
                     <FormControlLabel
                       key={permission}

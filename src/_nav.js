@@ -21,20 +21,21 @@ const _nav = (role, decodedToken) => {
     driver,
     groups,
     geofence,
+    notification,
     maintenance,
     preferences,
     category,
     model,
-    combinedReports,
-    customReports,
+    status,
+    distance,
     history,
     stop,
-    trips,
-    statistics,
-    schedulereports,
+    travel,
+    idle,
+    sensor,
     alerts,
-    summary,
-    customCharts,
+    vehicle,
+    geofenceReport
   } = decodedToken?.user
 
   
@@ -96,16 +97,16 @@ const _nav = (role, decodedToken) => {
               </div>
             ),
             items: [
-              { component: CNavItem, name: 'Combine Reports', to: '/combinereports' },
-              { component: CNavItem, name: 'Custom Reports', to: '/customreports' },
+              { component: CNavItem, name: 'Status Reports', to: '/statusreports' },
+              { component: CNavItem, name: 'Distance Reports', to: '/distancereports' },
               { component: CNavItem, name: 'History', to: '/history' },
               { component: CNavItem, name: 'Stops', to: '/stops' },
-              { component: CNavItem, name: 'Trips', to: '/trips' },
-              { component: CNavItem, name: 'Statistics', to: '/statistics' },
-              { component: CNavItem, name: 'Schedules Reports', to: '/schedules-reports' },
+              { component: CNavItem, name: 'Travels Report', to: '/travelsreport' },
+              { component: CNavItem, name: 'Idle Report', to: '/idlereport' },
+              { component: CNavItem, name: 'Sensor Reports', to: '/sensorreports' },
               { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events' },
-              { component: CNavItem, name: 'Summary', to: '/summary' },
-              { component: CNavItem, name: 'Custom Chart', to: '/customchart', optional: true },
+              { component: CNavItem, name: 'Vehicle Reports', to: '/vehiclereport' },
+              { component: CNavItem, name: 'Geofence Report', to: '/geofencereport' },
             ],
           },
           {
@@ -128,7 +129,7 @@ const _nav = (role, decodedToken) => {
             component: CNavTitle,
             name: 'Manage',
           },
-          (devices || users || groups || geofence || driver || preferences || maintenance || category || model) &&
+          (devices || users || groups || geofence || driver || notification || preferences || maintenance || category || model) &&
           {
             component: CNavGroup,
             name: 'Master',
@@ -143,13 +144,14 @@ const _nav = (role, decodedToken) => {
               groups && { component: CNavItem, name: 'Group', to: '/group' },
               geofence && { component: CNavItem, name: 'Geofences', to: '/geofences' },
               driver && { component: CNavItem, name: 'Driver', to: '/driver' },
+              notification && { component: CNavItem, name: 'Notifications', to: '/notifications' },
               preferences && { component: CNavItem, name: 'Preferences', to: '/preferences' },
               maintenance && { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
               category && { component: CNavItem, name: 'Category', to: '/category' },
               model && { component: CNavItem, name: 'Model', to: '/model' },
             ].filter(Boolean),
           },
-          (combinedReports || customReports || history || stop || trips || statistics || schedulereports || alerts || summary || customCharts) &&
+          (status || distance || history || stop || travel || idle || sensor || alerts || vehicle || geofenceReport) &&
           {
             component: CNavGroup,
             name: 'Report',
@@ -159,28 +161,29 @@ const _nav = (role, decodedToken) => {
               </div>
             ),
             items: [
-              combinedReports && {
+              status && {
                 component: CNavItem,
-                name: 'Combine Reports',
-                to: '/combinereports',
+                name: 'Status Reports',
+                to: '/statusreports',
               },
-              customReports && {
+              distance && {
                 component: CNavItem,
-                name: 'Custom Reports',
-                to: '/customreports',
+                name: 'Distance Reports',
+                to: '/distancereports',
               },
               history && { component: CNavItem, name: 'History', to: '/history' },
               stop && { component: CNavItem, name: 'Stops', to: '/stops' },
-              trips && { component: CNavItem, name: 'Trips', to: '/trips' },
-              statistics && { component: CNavItem, name: 'Statistics', to: '/statistics' },
-              schedulereports && {
+              travel && { component: CNavItem, name: 'Travels Report', to: '/travelsreport' },
+              idle && { component: CNavItem, name: 'Idle Report', to: '/idlereport' },
+              sensor && {
                 component: CNavItem,
-                name: 'Schedules Reports',
-                to: '/schedules-reports',
+
+                name: 'Sensor Reports',
+                to: '/sensorreports',
               },
               alerts && { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events' },
-              summary && { component: CNavItem, name: 'Summary', to: '/summary' },
-              customCharts && { component: CNavItem, name: 'Custom Chart', to: '/customchart' },
+              vehicle && { component: CNavItem, name: 'Vehicle Reports', to: '/vehiclereport' },
+              geofenceReport && { component: CNavItem, name: 'Geofence Report', to: '/geofencereport' },
             ].filter(Boolean),
           },
           {

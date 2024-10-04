@@ -165,6 +165,8 @@ const Validation = () => {
 
   useEffect(() => {
     const fetchDevices = async () => {
+
+      console.log("fetch device me aaya hu...")
       try {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
@@ -217,7 +219,7 @@ const Validation = () => {
 
   
     try {
-      const response = await axios.get('https://credence-tracker.onrender.com/reports/combined', body , {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/combined?deviceId=${body.deviceId}&period=${body.period}&from=`,{
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
