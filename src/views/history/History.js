@@ -38,10 +38,10 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) =>
     setValidated(true);
   };
 
-  const handlePeriodChange = (value) => {
-    handleInputChange('Periods', value);
-    setShowDateInputs(value === 'Custom');
-  };
+  // const handlePeriodChange = (value) => {
+  //   handleInputChange('Periods', value);
+  //   setShowDateInputs(value === 'Custom');
+  // };
 
   return (
     <CForm
@@ -50,7 +50,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) =>
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -72,7 +72,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) =>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      {/* <CCol md={6}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
@@ -90,34 +90,34 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) =>
           <option value="Custom">Custom</option>
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
-      {showDateInputs && (
-        <>
-          <CCol md={6}>
-            <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
-            <CFormInput
-              type="date"
-              id="fromDate"
-              value={formData.FromDate}
-              onChange={(e) => handleInputChange('FromDate', e.target.value)}
-              required
-            />
-            <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
-          </CCol>
-          <CCol md={6}>
-            <CFormLabel htmlFor="toDate">To Date</CFormLabel>
-            <CFormInput
-              type="date"
-              id="toDate"
-              value={formData.ToDate}
-              onChange={(e) => handleInputChange('ToDate', e.target.value)}
-              required
-            />
-            <CFormFeedback invalid>Please provide a valid to date.</CFormFeedback>
-          </CCol>
-        </>
-      )}
+      {/* {showDateInputs && ( */}
+      <>
+        <CCol md={4}>
+          <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
+          <CFormInput
+            type="datetime-local"
+            id="fromDate"
+            value={formData.FromDate}
+            onChange={(e) => handleInputChange('FromDate', e.target.value)}
+            required
+          />
+          <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
+        </CCol>
+        <CCol md={4}>
+          <CFormLabel htmlFor="toDate">To Date</CFormLabel>
+          <CFormInput
+            type="datetime-local"
+            id="toDate"
+            value={formData.ToDate}
+            onChange={(e) => handleInputChange('ToDate', e.target.value)}
+            required
+          />
+          <CFormFeedback invalid>Please provide a valid to date.</CFormFeedback>
+        </CCol>
+      </>
+      {/* )} */}
 
       <CCol xs={12}>
         <div className="d-flex justify-content-end">
@@ -240,12 +240,12 @@ const Validation = () => {
       Ignition: 'No',
       Distance: '0.00',
     },
-  //  //Add data temparoy
-  
+    //  //Add data temparoy
+
   ]);
   const [formData, setFormData] = useState({
     Devices: '',
-    Periods: '',
+    // Periods: '',
     FromDate: '',
     ToDate: '',
   });
