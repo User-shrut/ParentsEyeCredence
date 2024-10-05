@@ -272,6 +272,8 @@ const Status = () => {
 
   useEffect(() => {
     const fetchDevices = async () => {
+
+      console.log("fetch device me aaya hu...")
       try {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
