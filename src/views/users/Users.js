@@ -31,7 +31,7 @@ import {
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { TiUserAdd } from 'react-icons/ti'
-import { AiFillDelete } from 'react-icons/ai'
+import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
 import {
   CTable,
   CTableBody,
@@ -230,7 +230,7 @@ const Users = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    setCurrentStep(0);
+    setCurrentStep(0)
     const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
     const phonePattern = /^[0-9]{10}$/
 
@@ -265,7 +265,35 @@ const Users = () => {
         alert('User is created successfully')
         fetchUserData()
         setAddModalOpen(false)
-        
+        setFormData({
+          username: '',
+          email: '',
+          mobile: '',
+          password: '',
+          permissions: {
+            notification: false,
+            devices: false,
+            driver: false,
+            groups: false,
+            category: false,
+            model: false,
+            users: false,
+            report: false,
+            stop: false,
+            travel: false,
+            geofence: false,
+            maintenance: false,
+            preferences: false,
+            status: false,
+            distance: false,
+            history: false,
+            sensor: false,
+            idle: false,
+            alerts: false,
+            vehicle: false,
+          },
+          isAdmin: false,
+        })
       } else {
         alert(`Error: ${response.status} - ${response.statusText}`)
       }
@@ -444,45 +472,47 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="flex-grow-1">
-          <CTable align="middle" className="mb-2 border min-vh-25" hover responsive>
-            <CTableHead className="text-nowrap">
+        <div className="flex-grow-1 rounded-3 overflow-hidden">
+          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+            <CTableHead className="text-nowrap ">
               <CTableRow>
-                <CTableHeaderCell className="bg-body-tertiary text-center">Name</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">Email</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">
+                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  Name
+                </CTableHeaderCell>
+                <CTableHeaderCell className="text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  Email
+                </CTableHeaderCell>
+                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Master Permissions
                 </CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">
+                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Reports Permissions
                 </CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">
+                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
               {loading ? (
-                <>
-                  <CTableRow>
-                    <CTableDataCell colSpan="5" className="text-center">
-                      <div className="text-nowrap mb-2 text-center w-">
-                        <p className="card-text placeholder-glow">
-                          <span className="placeholder col-12" />
-                        </p>
-                        <p className="card-text placeholder-glow">
-                          <span className="placeholder col-12" />
-                        </p>
-                        <p className="card-text placeholder-glow">
-                          <span className="placeholder col-12" />
-                        </p>
-                        <p className="card-text placeholder-glow">
-                          <span className="placeholder col-12" />
-                        </p>
-                      </div>
-                    </CTableDataCell>
-                  </CTableRow>
-                </>
+                <CTableRow>
+                  <CTableDataCell colSpan="5" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
               ) : data.length > 0 ? (
                 data?.map((item, index) => (
                   <CTableRow key={index}>
@@ -634,10 +664,10 @@ const Users = () => {
             padding: '30px',
           }}
         >
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
               <span role="img" aria-label="user">
-                <TiUserAdd className="fs-4" />
+                <AiOutlineUserAdd className="fs-2" />
               </span>{' '}
               Add User
             </Typography>
@@ -694,7 +724,7 @@ const Users = () => {
                     ),
                   }}
                 />
-                
+
                 <TextField
                   label="Mobile Number"
                   variant="outlined"
@@ -734,8 +764,6 @@ const Users = () => {
               </div>
             )}
 
-      
-
             {currentStep === 1 && (
               <div className="mt-3">
                 {/* Permissions Step */}
@@ -747,82 +775,90 @@ const Users = () => {
                 </Typography>
 
                 <FormControlLabel
-            sx={{ color: 'black' }}
-            control={<Checkbox checked={formData.isAdmin} onChange={handleAdminToggle} />}
-            label="Admin (Select all permissions)"
-          />
+                  sx={{ color: 'black' }}
+                  control={<Checkbox checked={formData.isAdmin} onChange={handleAdminToggle} />}
+                  label="Admin (Select all permissions)"
+                />
 
-          {Object.keys(availablePermissions).length > 0 && (
-            <>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Master</AccordionSummary>
-                <AccordionDetails>
-                  <FormGroup sx={{ color: 'black' }}>
-                    {[
-                      'users',
-                      'groups',
-                      'devices',
-                      'geofence',
-                      'driver',
-                      'maintenance',
-                      'notification',
-                      'preferences',
-                      'category',
-                      'model',
-                    ]
-                      .filter((permission) => availablePermissions[permission])
-                      .map((permission) => (
-                        <FormControlLabel
-                          key={permission}
-                          control={
-                            <Checkbox
-                              name={permission}
-                              checked={formData.permissions[permission]}
-                              onChange={handlePermissionChange}
-                            />
-                          }
-                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                        />
-                      ))}
-                  </FormGroup>
-                </AccordionDetails>
-              </Accordion>
+                {Object.keys(availablePermissions).length > 0 && (
+                  <div className="row w-100">
+                    <div className='col'>
+                      <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+                          Master
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <FormGroup sx={{ color: 'black' }}>
+                            {[
+                              'users',
+                              'groups',
+                              'devices',
+                              'geofence',
+                              'driver',
+                              'maintenance',
+                              'notification',
+                              'preferences',
+                              'category',
+                              'model',
+                            ]
+                              .filter((permission) => availablePermissions[permission])
+                              .map((permission) => (
+                                <FormControlLabel
+                                  key={permission}
+                                  control={
+                                    <Checkbox
+                                      name={permission}
+                                      checked={formData.permissions[permission]}
+                                      onChange={handlePermissionChange}
+                                    />
+                                  }
+                                  label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                />
+                              ))}
+                          </FormGroup>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
 
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Reports</AccordionSummary>
-                <AccordionDetails>
-                  <FormGroup sx={{ color: 'black' }}>
-                    {[
-                      'history',
-                      'stop',
-                      'travel',
-                      'idle',
-                      'status',
-                      'distance',
-                      'alerts',
-                      'vehicle',
-                      'sensor',
-                      'geofenceReport',
-                    ]
-                      .filter((permission) => availablePermissions[permission])
-                      .map((permission) => (
-                        <FormControlLabel
-                          key={permission}
-                          control={
-                            <Checkbox
-                              name={permission}
-                              checked={formData.permissions[permission]}
-                              onChange={handlePermissionChange}
-                            />
-                          }
-                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                        />
-                      ))}
-                  </FormGroup>
-                </AccordionDetails>
-              </Accordion>
-            </>
-          )}
+                    <div className='col'>
+                      <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+                          Reports
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <FormGroup sx={{ color: 'black' }}>
+                            {[
+                              'history',
+                              'stop',
+                              'travel',
+                              'idle',
+                              'status',
+                              'distance',
+                              'alerts',
+                              'vehicle',
+                              'sensor',
+                              'geofenceReport',
+                            ]
+                              .filter((permission) => availablePermissions[permission])
+                              .map((permission) => (
+                                <FormControlLabel
+                                  key={permission}
+                                  control={
+                                    <Checkbox
+                                      name={permission}
+                                      checked={formData.permissions[permission]}
+                                      onChange={handlePermissionChange}
+                                    />
+                                  }
+                                  label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                />
+                              ))}
+                          </FormGroup>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
