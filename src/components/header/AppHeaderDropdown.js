@@ -43,7 +43,7 @@ const AppHeaderDropdown = () => {
           Account
         </CDropdownHeader>
         <div className="px-2">
-          <h3 className="text-center my-0">{decodedToken?.user.username}</h3>
+          <h3 className="text-center my-0">{decodedToken.user ? decodedToken.user.username : 'harshal_123'}</h3>
           <p className="text-center small mb-3 mt-0">User</p>
         </div>
         <CDropdownItem href="#">

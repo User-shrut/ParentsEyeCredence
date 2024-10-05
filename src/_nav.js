@@ -13,30 +13,36 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 
 const _nav = (role, decodedToken) => {
-  
+
+  let devices, users, driver, groups, geofence, notification, maintenance, preferences, category, model, status, distance, history, stop, travel, idle, sensor, alerts, vehicle, geofenceReport;  
   console.log(decodedToken);
-  const {
-    devices,
-    users,
-    driver,
-    groups,
-    geofence,
-    notification,
-    maintenance,
-    preferences,
-    category,
-    model,
-    status,
-    distance,
-    history,
-    stop,
-    travel,
-    idle,
-    sensor,
-    alerts,
-    vehicle,
-    geofenceReport
-  } = decodedToken?.user
+  
+  if(role != 'superadmin'){
+    ({
+      devices,
+      users,
+      driver,
+      groups,
+      geofence,
+      notification,
+      maintenance,
+      preferences,
+      category,
+      model,
+      status,
+      distance,
+      history,
+      stop,
+      travel,
+      idle,
+      sensor,
+      alerts,
+      vehicle,
+      geofenceReport
+    } = decodedToken.user);
+  }
+
+  console.log(role)
 
   
 
