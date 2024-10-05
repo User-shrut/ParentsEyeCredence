@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom'
 import Loader from '../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
 import Cookies from 'js-cookie'
+import { IoMdAdd } from 'react-icons/io'
 
 const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
 
@@ -836,114 +837,163 @@ const Devices = () => {
               <CTableRow>
                 {/* Skip the first column */}
                 {columns.slice(1).map((column, index) => (
-                  <CTableHeaderCell key={index} className="bg-body-tertiary text-center">
+                  <CTableHeaderCell key={index} className="text-white text-center" style={{ background: 'rgb(1,22,51)' }}>
                     {column.Header}
                   </CTableHeaderCell>
                 ))}
-                <CTableHeaderCell className="bg-body-tertiary text-center">
+                <CTableHeaderCell className="text-white text-center" style={{ background: 'rgb(1,22,51)' }}>
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {filteredData.map((item) => (
-                <CTableRow key={item._id}>
-                  {/* Skip the first field in the data row */}
-                  {columns.slice(1).map((column) => (
-                    <CTableDataCell key={column.accessor} className="text-center">
-                      {column.accessor === 'groups' ? (
-                        <FormControl fullWidth>
-                          <InputLabel>Groups</InputLabel>
-                          <Select
-                            value={item.groups.length > 0 ? item.groups[0]._id : ''} // Default to the first group ID or empty if no groups
-                            onChange={(event) => {
-                              const selectedGroupId = event.target.value // Get selected group ID
-                              console.log('Selected Group ID:', selectedGroupId) // Handle the selection if needed
-                            }}
-                            renderValue={(selected) => {
-                              const selectedGroup =
-                                item.groups.find((group) => group._id === selected) || {}
-                              return selectedGroup.name || 'No Group Selected' // Display the name of the selected group or a default message
-                            }}
-                          >
-                            {item.groups.map((group) => (
-                              <MenuItem key={group._id} value={group._id}>
-                                {group.name}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      ) : column.accessor === 'geofences' ? ( // Add geofences dropdown
-                        <FormControl fullWidth>
-                          <InputLabel>Geofences</InputLabel>
-                          <Select
-                            value={item.geofences.length > 0 ? item.geofences[0] : ''} // Default to the first geofence ID or empty if no geofences
-                            onChange={(event) => {
-                              const selectedGeofenceId = event.target.value // Get selected geofence ID
-                              console.log('Selected Geofence ID:', selectedGeofenceId) // Handle the selection if needed
-                            }}
-                            renderValue={(selected) => {
-                              const selectedGeofence =
-                                item.geofences.find((geofence) => geofence === selected) || ''
-                              return selectedGeofence || 'No Geofence Selected' // Display the selected geofence ID or a default message
-                            }}
-                          >
-                            {Array.isArray(item.geofences) &&
-                              item.geofences.map((geofence, index) => (
-                                <MenuItem key={index} value={geofence}>
-                                  {geofence}
-                                </MenuItem>
-                              ))}
-                          </Select>
-                        </FormControl>
-                      ) : column.accessor === 'users' ? (
-                        // Add FormControl for Users dropdown with safe array handling
-                        <FormControl fullWidth>
-                          <InputLabel>Users</InputLabel>
-                          <Select
-                            multiple
-                            value={
-                              Array.isArray(item.users) && item.users.length > 0
-                                ? [item.users[0].username]
-                                : []
-                            } // Default to the first username or empty if no users
-                            onChange={(event) => {
-                              const selectedUsers = event.target.value // Get selected user usernames
-                              console.log('Selected Users:', selectedUsers) // Handle selection
-                            }}
-                            renderValue={(selected) => {
-                              return selected.length > 0 ? selected.join(', ') : 'No Users Selected' // Display selected usernames or a default message
-                            }}
-                          >
-                            {Array.isArray(item.users) &&
-                              item.users.map((user) => (
-                                <MenuItem key={user._id} value={user.username}>
-                                  {user.username}
-                                </MenuItem>
-                              ))}
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        item[column.accessor] // Default rendering for other columns
-                      )}
-                    </CTableDataCell>
-                  ))}
-                  <CTableDataCell className="text-center d-flex">
-                    <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => handleDeleteSelected(item._id)}
-                      sx={{ marginRight: '10px', color: 'brown' }}
-                    >
-                      <AiFillDelete style={{ fontSize: '25px' }} />
-                    </IconButton>
+              {loading ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="5" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
+              ) : filteredData.length > 0 ? (
+                filteredData.map((item) => (
+                  <CTableRow key={item._id}>
+                    {/* Skip the first field in the data row */}
+                    {columns.slice(1).map((column) => (
+                      <CTableDataCell key={column.accessor} className="text-center">
+                        {column.accessor === 'groups' ? (
+                          <FormControl fullWidth>
+                            <InputLabel>Groups</InputLabel>
+                            <Select
+                              value={item.groups.length > 0 ? item.groups[0]._id : ''} // Default to the first group ID or empty if no groups
+                              onChange={(event) => {
+                                const selectedGroupId = event.target.value // Get selected group ID
+                                console.log('Selected Group ID:', selectedGroupId) // Handle the selection if needed
+                              }}
+                              renderValue={(selected) => {
+                                const selectedGroup =
+                                  item.groups.find((group) => group._id === selected) || {}
+                                return selectedGroup.name || 'No Group Selected' // Display the name of the selected group or a default message
+                              }}
+                            >
+                              {item.groups.map((group) => (
+                                <MenuItem key={group._id} value={group._id}>
+                                  {group.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        ) : column.accessor === 'geofences' ? ( // Add geofences dropdown
+                          <FormControl fullWidth>
+                            <InputLabel>Geofences</InputLabel>
+                            <Select
+                              value={item.geofences.length > 0 ? item.geofences[0] : ''} // Default to the first geofence ID or empty if no geofences
+                              onChange={(event) => {
+                                const selectedGeofenceId = event.target.value // Get selected geofence ID
+                                console.log('Selected Geofence ID:', selectedGeofenceId) // Handle the selection if needed
+                              }}
+                              renderValue={(selected) => {
+                                const selectedGeofence =
+                                  item.geofences.find((geofence) => geofence === selected) || ''
+                                return selectedGeofence || 'No Geofence Selected' // Display the selected geofence ID or a default message
+                              }}
+                            >
+                              {Array.isArray(item.geofences) &&
+                                item.geofences.map((geofence, index) => (
+                                  <MenuItem key={index} value={geofence}>
+                                    {geofence}
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          </FormControl>
+                        ) : column.accessor === 'users' ? (
+                          // Add FormControl for Users dropdown with safe array handling
+                          <FormControl fullWidth>
+                            <InputLabel>Users</InputLabel>
+                            <Select
+                              multiple
+                              value={
+                                Array.isArray(item.users) && item.users.length > 0
+                                  ? [item.users[0].username]
+                                  : []
+                              } // Default to the first username or empty if no users
+                              onChange={(event) => {
+                                const selectedUsers = event.target.value // Get selected user usernames
+                                console.log('Selected Users:', selectedUsers) // Handle selection
+                              }}
+                              renderValue={(selected) => {
+                                return selected.length > 0
+                                  ? selected.join(', ')
+                                  : 'No Users Selected' // Display selected usernames or a default message
+                              }}
+                            >
+                              {Array.isArray(item.users) &&
+                                item.users.map((user) => (
+                                  <MenuItem key={user._id} value={user.username}>
+                                    {user.username}
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          </FormControl>
+                        ) : (
+                          item[column.accessor] // Default rendering for other columns
+                        )}
+                      </CTableDataCell>
+                    ))}
+                    <CTableDataCell className="text-center d-flex">
+                      <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
+                        <RiEdit2Fill
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                        />
+                      </IconButton>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteSelected(item._id)}
+                        sx={{ marginRight: '10px', color: 'brown' }}
+                      >
+                        <AiFillDelete style={{ fontSize: '20px' }} />
+                      </IconButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="5" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's no device available.
+                        <br /> Maybe it's time to create some awesome device!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add User
+                        </button>
+                      </div>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              )}
             </CTableBody>
           </CTable>
         )}

@@ -15,7 +15,6 @@ import {
   TextField,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
   FormGroup,
   FormControlLabel,
@@ -29,10 +28,12 @@ import {
   StepLabel,
   InputAdornment,
 } from '@mui/material'
+import Select from 'react-select'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { TiUserAdd } from 'react-icons/ti'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
 import {
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -476,24 +477,39 @@ const Users = () => {
           <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
             <CTableHead className="text-nowrap ">
               <CTableRow>
-                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                <CTableHeaderCell
+                  className=" text-center text-white"
+                  style={{ background: 'rgb(1,22,51)' }}
+                >
                   Name
                 </CTableHeaderCell>
-                <CTableHeaderCell className="text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                <CTableHeaderCell
+                  className="text-center text-white"
+                  style={{ background: 'rgb(1,22,51)' }}
+                >
                   Email
                 </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                <CTableHeaderCell
+                  className=" text-center text-white"
+                  style={{ background: 'rgb(1,22,51)' }}
+                >
                   Master Permissions
                 </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                <CTableHeaderCell
+                  className=" text-center text-white"
+                  style={{ background: 'rgb(1,22,51)' }}
+                >
                   Reports Permissions
                 </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                <CTableHeaderCell
+                  className=" text-center text-white"
+                  style={{ background: 'rgb(1,22,51)' }}
+                >
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
-            <CTableBody>
+            <CTableBody >
               {loading ? (
                 <CTableRow>
                   <CTableDataCell colSpan="5" className="text-center">
@@ -515,55 +531,46 @@ const Users = () => {
                 </CTableRow>
               ) : data.length > 0 ? (
                 data?.map((item, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell className="text-center">{item.username}</CTableDataCell>
-                    <CTableDataCell className="text-center">{item.email}</CTableDataCell>
+                  <CTableRow key={index} className='p-0'>
+                    <CTableDataCell className="text-center p-0" >{item.username}</CTableDataCell>
+                    <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
 
                     {/* Master Column */}
-                    <CTableDataCell className="text-center">
-                      <FormControl fullWidth>
-                        <InputLabel id={`master-select-label-${index}`}>Master</InputLabel>
-                        <Select
-                          labelId={`master-select-label-${index}`}
-                          id={`master-select-${index}`}
-                          label="Master Permissions"
-                          value="" // You can control this value if needed
-                        >
-                          {[
-                            'users',
-                            'groups',
-                            'devices',
-                            'geofence',
-                            'driver',
-                            'notification',
-                            'maintenance',
-                            'preferences',
-                            'category',
-                            'model',
-                          ].map(
-                            (permission) =>
-                              item[permission] && (
-                                <MenuItem key={permission} value={permission}>
-                                  {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                                </MenuItem>
-                              ),
-                          )}
-                        </Select>
-                      </FormControl>
+                    <CTableDataCell className="text-center p-0" >
+                      <CFormSelect id="periods" className='w-75 text-center border-0'>
+                        <option value="">Master</option>
+                        {[
+                          'users',
+                          'groups',
+                          'devices',
+                          'geofence',
+                          'driver',
+                          'notification',
+                          'maintenance',
+                          'preferences',
+                          'category',
+                          'model',
+                        ].map(
+                          (permission) =>
+                            item[permission] && (
+                              <option key={permission} value={permission}>
+                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                              </option>
+                            ),
+                        )}
+                      </CFormSelect>
+
+                      
                     </CTableDataCell>
 
                     {/* Reports Column */}
-                    <CTableDataCell className="text-center">
-                      <FormControl fullWidth>
-                        <InputLabel id={`reports-select-label-${index}`}>Reports</InputLabel>
-                        <Select
-                          labelId={`reports-select-label-${index}`}
-                          id={`reports-select-${index}`}
-                          label="Reports Permissions"
-                          value="" // You can control this value if needed
-                        >
-                          {[
-                            'history',
+                    <CTableDataCell className="align-items-center p-0">
+                
+
+                      <CFormSelect id="periods" className='w-75 text-center border-0'>
+                        <option value="">Reports</option>
+                        {[
+                          'history',
                             'stop',
                             'travel',
                             'status',
@@ -573,28 +580,27 @@ const Users = () => {
                             'alerts',
                             'vehicle',
                             'geofenceReport',
-                          ].map(
-                            (permission) =>
-                              item[permission] && (
-                                <MenuItem key={permission} value={permission}>
-                                  {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                                </MenuItem>
-                              ),
-                          )}
-                        </Select>
-                      </FormControl>
+                        ].map(
+                          (permission) =>
+                            item[permission] && (
+                              <option key={permission} value={permission}>
+                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                              </option>
+                            ),
+                        )}
+                      </CFormSelect>
                     </CTableDataCell>
                     <CTableDataCell
-                      className="text-center d-flex"
+                      className="text-center d-flex p-0"
                       style={{ justifyContent: 'center', alignItems: 'center' }}
                     >
                       <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                         <RiEdit2Fill
-                          style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
                         />
                       </IconButton>
                       <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
-                        <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
                       </IconButton>
                     </CTableDataCell>
                   </CTableRow>
@@ -782,7 +788,7 @@ const Users = () => {
 
                 {Object.keys(availablePermissions).length > 0 && (
                   <div className="row w-100">
-                    <div className='col'>
+                    <div className="col">
                       <Accordion>
                         <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
                           Master
@@ -820,7 +826,7 @@ const Users = () => {
                       </Accordion>
                     </div>
 
-                    <div className='col'>
+                    <div className="col">
                       <Accordion>
                         <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
                           Reports
