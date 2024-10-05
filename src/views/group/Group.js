@@ -194,7 +194,7 @@ const Group = () => {
   //  ###############################################################
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Groups</h2>
@@ -214,7 +214,7 @@ const Group = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Group
             </button>
@@ -255,20 +255,18 @@ const Group = () => {
             </div>
           </>
         ) : (
-          <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
                 <CTableHeaderCell
-                  className="bg-body-tertiary text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className="text-center text-white"
+                  style={{background: "rgb(1,22,51)"}}>
                   Group Name
                 </CTableHeaderCell>
 
                 <CTableHeaderCell
-                  className="bg-body-tertiary text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                   className="text-center text-white"
+                   style={{background: "rgb(1,22,51)"}}>
                   Actions
                 </CTableHeaderCell>
               </CTableRow>

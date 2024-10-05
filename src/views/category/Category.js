@@ -486,10 +486,12 @@ const Category = () => {
   };
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       {/* Header and Add Category button */}
       <div className="d-flex justify-content-between mb-2">
-        <Typography variant="h4">Category</Typography>
+        <div>
+          <h2>Category</h2>
+        </div>
         <div className="d-flex">
           <TextField
             label="Search"
@@ -499,10 +501,9 @@ const Category = () => {
             style={{ marginRight: '10px' }}
           />
           <Button
+            onClick={() => setAddModalOpen(true)}
             variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddModalOpen} // Open add modal on button click
+            className="btn btn-primary"
           >
             Add Category
           </Button>
@@ -511,11 +512,13 @@ const Category = () => {
 
       {/* Table */}
       <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-        <CTable align="middle" className="mb-0 border" hover responsive>
+        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Name</CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white"
+                style={{ background: "rgb(1,22,51)" }}>Name</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white"
+                style={{ background: "rgb(1,22,51)" }}>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>

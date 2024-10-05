@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
@@ -25,8 +26,8 @@ const Model = () => {
         { name: 'Mahindra', id: 2 },
         { name: 'Jeep', id: 3 },
         { name: 'Tesla', id: 4 },
-        { name: 'Toyota', id: 5},
-        { name: 'BMW', id: 6},
+        { name: 'Toyota', id: 5 },
+        { name: 'BMW', id: 6 },
       ];
       setData(apiData);
       setFilteredData(apiData);
@@ -107,7 +108,7 @@ const Model = () => {
   };
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       {/* Header and Add Model button */}
       <div className="d-flex justify-content-between mb-2">
         <Typography variant="h4">Model</Typography>
@@ -121,8 +122,7 @@ const Model = () => {
           />
           <Button
             variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
+            className="btn btn-primary"
             onClick={handleAddModalOpen} // Open add modal on button click
           >
             Add Model
@@ -135,8 +135,10 @@ const Model = () => {
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Name</CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white"
+                style={{ background: "rgb(1,22,51)" }}>Name</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white"
+                style={{ background: "rgb(1,22,51)" }}>Actions</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
