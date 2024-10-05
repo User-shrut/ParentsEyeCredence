@@ -18,31 +18,49 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
-// import MapComponent from '../Map/MapComponent';
-
+import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, showMap, setShowMap }) => {
+const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
+  // State to manage button text
+  const [buttonText, setButtonText] = useState('SHOW NOW');
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
 
   const handleFormSubmit = (event) => {
     const form = event.currentTarget;
+    console.log("handle submit ke pass hu");
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     } else {
       event.preventDefault();
-      handleSubmit(); // Call the submission function to fetch data
-      setShowMap(true); // Show the map when form is valid and submitted
+      handleSubmit();
+      setShowMap(true); //Show the mapping
     }
     setValidated(true);
   };
 
+  
   const handlePeriodChange = (value) => {
-    handleInputChange('Period', value);
+    handleInputChange('Periods', value);
     setShowDateInputs(value === 'Custom');
+  };
+
+
+
+  // Function to handle dropdown item clicks
+  const handleDropdownClick = (text) => {
+    setButtonText(text); // Change button text based on the clicked item
+    setDropdownOpen(false); // Close the dropdown after selection
+    handleSubmit(); // Submit form
+    setShowMap(true); // Show the map when form is valid and submitted
+  };
+  // Function to toggle dropdown visibility
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -52,7 +70,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -69,15 +87,16 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
           required
-          value={formData.Period}
+          value={formData.Periods}
           onChange={(e) => handlePeriodChange(e.target.value)}
         >
           <option value="">Choose a period...</option>
@@ -92,9 +111,22 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
+      <CCol md={4}>
+        <CFormLabel htmlFor="columns">Columns</CFormLabel>
+        {/* Use React-Select component for multi-select */}
+        <Select
+          isMulti
+          id="columns"
+          options={columns.map((column) => ({ value: column, label: column }))}
+          value={formData.Columns.map((column) => ({ value: column, label: column }))}
+          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
+        />
+        <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
+      </CCol>
+
       {showDateInputs && (
         <>
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
             <CFormInput
               type="date"
@@ -105,7 +137,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
             />
             <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
           </CCol>
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="toDate">To Date</CFormLabel>
             <CFormInput
               type="date"
@@ -119,35 +151,90 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, show
         </>
       )}
 
-      <CCol xs={12}>
+      <CCol xs={12} >
         <div className="d-flex justify-content-end">
-          <CButton color="primary" type="submit">
-            SHOW NOW
-          </CButton>
+          <div className="btn-group">
+            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+              {buttonText}
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
+              onClick={toggleDropdown} // Toggle dropdown on click
+              aria-expanded={isDropdownOpen} // Update aria attribute
+            >
+              <span className="visually-hidden">Toggle Dropdown</span>
+            </button>
+            {isDropdownOpen && ( // Conditionally render dropdown menu
+              <ul className="dropdown-menu show ">
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
+                    Show Now
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
+                    Export
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
+                    Email Reports
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
+                    Schedule
+                  </a>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
       </CCol>
     </CForm>
   );
 };
 
-const CustomStyles1 = ({ rows }) => {
+const ShowStatus = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          <CTableHeaderCell>Sr.No</CTableHeaderCell>
+          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
           <CTableHeaderCell>Devices</CTableHeaderCell>
-          <CTableHeaderCell>Fix Time</CTableHeaderCell>
-          <CTableHeaderCell>Type</CTableHeaderCell>
+
+          {/* Dynamically render table headers based on selected columns */}
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+          ))}
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {rows.map((row) => (
+        {apiData?.data?.map((row, rowIndex) => (
           <CTableRow key={row.id} className="custom-row">
-            <CTableDataCell>{row.id}</CTableDataCell>
-            <CTableDataCell>{row.Devices}</CTableDataCell>
-            <CTableDataCell>{row.Details}</CTableDataCell>
-            <CTableDataCell>{row.Type}</CTableDataCell>
+            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+            <CTableDataCell>{apiData.deviceId}</CTableDataCell>
+            {/* Dynamically render table cells based on selected columns */}
+            {selectedColumns.map((column, index) => (
+              <CTableDataCell key={index}>
+              {column === 'Start Time' ? row.startDateTime :
+               column === 'End Time' ? row.endDateTime :
+               column === 'Distance' ? row.distance :
+               column === 'Total Distance' ? row.totalKm :
+               column === 'Maximum Speed' ? row.maxSpeed :
+               column === 'Start Address' ? row.startAddress :
+               column === 'End Address' ? row.endAddress :
+               column === 'Driver' ? row.driverInfos?.driverName || '--' :
+               column === 'Device Name' ? row.device?.name || '--' :
+               column === 'Vehicle Status' ? row.vehicleStatus :
+               column === 'Time' ? row.time :
+               column === 'Average Speed' ? row.averageSpeed :
+               column === 'Start Location' ? row.startLocation :
+               column === 'End Location' ? row.endLocation :
+               '--'}
+            </CTableDataCell>            
+            ))}
           </CTableRow>
         ))}
       </CTableBody>
@@ -155,13 +242,33 @@ const CustomStyles1 = ({ rows }) => {
   );
 };
 
-const Validation = () => {
-  const [formData, setFormData] = useState({ Devices: '', Period: '', FromDate: '', ToDate: '' });
-  const [devices, setDevices] = useState([]);
+const Status = () => {
+
+  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
-  const [rows, setRows] = useState([]);
-  const [showMap, setShowMap] = useState(false);
-  const token = Cookies.get('authToken');
+  const [devices, setDevices] = useState([]);
+  const [showMap, setShowMap] = useState(false); //show mapping data
+  const [columns] = useState([
+    'Start Time',
+    'End Time',
+    'Distance',
+    'Total Distance',
+    'Maximum Speed',
+    'Start Address',
+    'End Address',
+    'Driver',
+    'Device Name',
+    'Vehicle Status',
+    'Time',
+    'Average Speed',
+    'Start Location',
+    'End Location'
+  ]); 
+
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const token = Cookies.get('authToken'); //
+
+  const [apiData, setApiData] = useState();   //data from api
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -189,87 +296,94 @@ const Validation = () => {
 
     fetchDevices();
   }, []);
-
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    if (name === 'Columns') {
+      setSelectedColumns(value);
+    }
   };
 
   const handleSubmit = async () => {
+
+    console.log('DataAll',formData)
+
+     // Convert the dates to ISO format if they're provided
+     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+ 
+
     const body = {
       deviceId: formData.Devices, // Use the device ID from the form data
-      period: formData.Period, // Use the selected period from the form data
-    };
-  
-    // Convert the dates to ISO format if they're provided
-    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
-    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
-  
-    // Construct the API URL using formData.Devices
-    const apiUrl = `http://104.251.212.80/api/combine?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
+      period: formData.Periods, // Use the selected period from the form data
+      FromDate: fromDate,
+      ToDate: toDate,
+    }; 
     
-    
-    // Log the constructed API URL
-    console.log('Constructed API URL:', apiUrl);
-
     console.log(token);
-    console.log(body);
+    // console.log(body);
 
-  
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/combined?deviceId=${body.deviceId}&period=${body.period}&from=`,{
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/status?deviceId=${body.deviceId}&period=${body.period}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`, // Replace with your actual token
           'Content-Type': 'application/json',
-        }
+        },
       });
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+
+      // console.log(response.data.deviceDataByStatus[0]);
+
+      console.log("All Status reports");
+
+      if (response.status == 200) {
+        console.log(response.data.data)
+        console.log("done in all")
+        console.log(response.data);
+        setApiData(response.data);
       }
-  
-      const data = await response.json();
-      setRows(data); // Assuming the data returned is what you want to display in the table
+
+         // Assuming the data returned is what you want to display in the table
       console.log('Form submitted with data:', body);
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
-  
+
 
   return (
     <>
-
       <CRow className='pt-3'>
-        <h2 className="px-4">Combine Reports</h2>
-        <CCol xs={12} md={12} className="px-4">
-          <CCard className=" mb-4 p-0 shadow-lg rounded">
+        <h2 className='px-4'>Status Report</h2>
+        <CCol xs={12} md={12} className='px-4'>
+          <CCard className="mb-4 p-0 shadow-lg rounded" >
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Combine Reports</strong>
+              <strong>Combine Report</strong>
+
             </CCardHeader>
             <CCardBody>
-              <CustomStyles
+              <SearchStatus
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
                 devices={devices}
                 showMap={showMap}
                 setShowMap={setShowMap}
+                columns={columns}
               />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
-    
       {showMap && (
         <CRow className="justify-content-center mt-4">
-          <CCol xs={12} className="px-4">
-            <CCard className="p-0 mb-4 shadow-sm">
+          <CCol xs={12} className="px-4" >
+            <CCard className='p-0 mb-4 shadow-sm'>
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-                <strong>All Combine Reports List</strong>
+                <strong>All Combine Report List</strong>
                 <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
@@ -278,17 +392,15 @@ const Validation = () => {
                 />
               </CCardHeader>
               <CCardBody>
-                <CustomStyles1 rows={rows} /> {/* Displaying the second table */}
+                <ShowStatus apiData={apiData} selectedColumns={selectedColumns} />
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
       )}
 
-
-
-   </>
+    </>
   );
 };
 
-export default Validation;
+export default Status;
