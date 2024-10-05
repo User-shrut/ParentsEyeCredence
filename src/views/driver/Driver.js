@@ -12,6 +12,7 @@ import {
   Modal,
   Box,
   TextField,
+  InputAdornment,
   FormControl,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
@@ -31,6 +32,15 @@ import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
+import {
+  AccountCircle,
+  MailOutline,
+  Phone,
+} from '@mui/icons-material'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import DialpadIcon from '@mui/icons-material/Dialpad';
+import HomeIcon from '@mui/icons-material/Home';
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -39,9 +49,9 @@ const Driver = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(5)
+  const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  
+
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
@@ -156,8 +166,8 @@ const Driver = () => {
   const handleEditDriver = async (item) => {
     console.log(item)
     setEditModalOpen(true)
-    setFormData({...item})
-    console.log("this is before edit",formData)
+    setFormData({ ...item })
+    console.log("this is before edit", formData)
   }
 
 
@@ -167,7 +177,7 @@ const Driver = () => {
   // ###################### Delete Group ##############################
 
 
-  const deleteDriverSubmit = async(item) => {
+  const deleteDriverSubmit = async (item) => {
     alert("you want to delete this Driver");
     console.log(item)
 
@@ -194,7 +204,7 @@ const Driver = () => {
   //  ###############################################################
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Driver</h2>
@@ -214,14 +224,14 @@ const Driver = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Driver
             </button>
           </div>
         </div>
       </div>
-      <div className="d-md-none mb-2">
+      <div className="mb-2 d-md-none">
         <input
           type="search"
           className="form-control"
@@ -235,76 +245,39 @@ const Driver = () => {
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{width: "480px"}}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow className='bg-body-tertiary'>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Driver Name
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                 className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Mobile No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                 className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Email
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Vehicle no.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Lic. No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Aadhar No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Address
                 </CTableHeaderCell>
-
                 <CTableHeaderCell
-                  className="text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
@@ -336,7 +309,6 @@ const Driver = () => {
               ))}
             </CTableBody>
           </CTable>
-        )}
       </TableContainer>
       {pageCount > 1 && (
         <ReactPaginate
@@ -388,6 +360,13 @@ const Driver = () => {
                   value={formData.name !== undefined ? formData.name : ""}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label="Mobile No."
@@ -395,6 +374,13 @@ const Driver = () => {
                   value={formData.phone !== undefined ? formData.phone : ""}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label="Email"
@@ -402,6 +388,13 @@ const Driver = () => {
                   value={formData.email !== undefined ? formData.email : ""}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MailOutline />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label='Vehicle List'
@@ -409,13 +402,27 @@ const Driver = () => {
                   value={formData.device !== undefined ? formData.device : ""}
                   onChange={(e) => setFormData({ ...formData, device: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
-                  label='Lic No.'
+                  label='Licence No.'
                   name="lic"
                   value={formData.licenseNumber !== undefined ? formData.licenseNumber : ""}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <TextSnippetIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label='Aadhar No.'
@@ -423,6 +430,13 @@ const Driver = () => {
                   value={formData.aadharNumber !== undefined ? formData.aadharNumber : ""}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DialpadIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label='Address'
@@ -430,6 +444,13 @@ const Driver = () => {
                   value={formData.address !== undefined ? formData.address : ""}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <HomeIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button
@@ -465,7 +486,7 @@ const Driver = () => {
             </IconButton>
           </div>
           <DialogContent>
-          <form onSubmit={EditDriverSubmit}>
+            <form onSubmit={EditDriverSubmit}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Driver Name"
