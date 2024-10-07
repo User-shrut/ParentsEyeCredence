@@ -258,10 +258,12 @@ const Category = () => {
     fetchData();
   };
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       {/* Header and Add Category button */}
       <div className="d-flex justify-content-between mb-2">
-        <Typography variant="h4">Category</Typography>
+        <div>
+          <h2>Category</h2>
+        </div>
         <div className="d-flex">
           <TextField
             label="Search"
@@ -271,10 +273,9 @@ const Category = () => {
             style={{ marginRight: '10px' }}
           />
           <Button
+            onClick={() => setAddModalOpen(true)}
             variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddModalOpen} // Open add modal on button click
+            className="btn btn-primary"
           >
             Add Category
           </Button>

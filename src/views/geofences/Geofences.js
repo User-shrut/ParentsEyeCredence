@@ -305,7 +305,7 @@ const Geofences = () => {
   //  ###############################################################
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Geofence</h2>
@@ -325,7 +325,7 @@ const Geofences = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Geofence
             </button>
@@ -365,32 +365,24 @@ const Geofences = () => {
                 </div>
               </>
             ) : (
-              <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                       className=" text-center text-white bg-secondary">
                       Geofence Name
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                      className=" text-center text-white bg-secondary">
                       Type
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                       className=" text-center text-white bg-secondary">
                       Vehicles
                     </CTableHeaderCell>
 
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                      className=" text-center text-white bg-secondary">
                       Actions
                     </CTableHeaderCell>
                   </CTableRow>
