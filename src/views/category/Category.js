@@ -264,21 +264,25 @@ const Category = () => {
         <div>
           <h2>Category</h2>
         </div>
-        <div className="d-flex">
-          <TextField
-            label="Search"
-            variant="outlined"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{ marginRight: '10px' }}
-          />
-          <Button
+        <div className="d-flex  justify-content-center align-items-center">
+          <div className="me-3 d-none d-md-block">
+            <input
+              type="search"
+              className="form-control"
+              placeholder="search here...."
+              variant="outlined"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <button
             onClick={() => setAddModalOpen(true)}
             variant="contained"
             className="btn btn-primary"
           >
             Add Category
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -293,8 +297,8 @@ const Category = () => {
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-                <CTableHeaderCell className="bg-body-tertiary text-center">Category Name</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell> {/* Actions header */}
+                <CTableHeaderCell className=" text-center text-white bg-secondary">Category Name</CTableHeaderCell>
+                <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell> {/* Actions header */}
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -310,7 +314,7 @@ const Category = () => {
                       <IconButton
                         aria-label="delete"
                         onClick={() => handleDeleteSelected(item._id)} // Pass the item's unique ID to handleDeleteSelected
-                        sx={{ color: 'brown' }} // Remove margin-top for row layout
+                        sx={{ color: 'red' }} // Remove margin-top for row layout
                       >
                         <AiFillDelete style={{ fontSize: '25px' }} />
                       </IconButton>

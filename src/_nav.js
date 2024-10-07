@@ -89,7 +89,7 @@ const _nav = (role, decodedToken) => {
               { component: CNavItem, name: 'Driver', to: '/driver' },
               { component: CNavItem, name: 'Notifications', to: '/notifications' },
               { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
-              { component: CNavItem, name: 'Preferences', to: '/preferences' },
+              // { component: CNavItem, name: 'Preferences', to: '/preferences' },
               { component: CNavItem, name: 'Category', to: '/category' },
               { component: CNavItem, name: 'Model', to: '/model' },
             ],

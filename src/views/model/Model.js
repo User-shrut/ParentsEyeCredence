@@ -67,9 +67,9 @@ const Model = () => {
     boxShadow: 24,
     p: 4,
   };
-  
+
   const fetchData = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const response = await axios.get('https://credence-tracker.onrender.com/model', {
         headers: {
@@ -83,12 +83,12 @@ const Model = () => {
     } catch (error) {
       console.error('Error fetching data:', error.response ? error.response.data : error.message);
       setFilteredData([]); // Ensure it's set to an array on error
-    }finally {
+    } finally {
       setLoading(false); // Stop loading once data is fetched
     }
   };
-  
-  
+
+
 
   useEffect(() => {
     fetchData();
@@ -105,7 +105,7 @@ const Model = () => {
     const filtered = data.filter(item => item.modelName.toLowerCase().includes(lowerCaseQuery));
     setFilteredData(filtered);
   };
-  
+
 
   const handleAddModalOpen = () => {
     setAddModalOpen(true);
@@ -171,7 +171,7 @@ const Model = () => {
       try {
         await axios.delete(`https://credence-tracker.onrender.com/model/${id}`, {
           headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
         });
@@ -185,137 +185,139 @@ const Model = () => {
   };
 
   return (
-    <div className="m-3">
-    {/* Header and Add Category button */}
-    <div className="d-flex justify-content-between mb-2">
-      <Typography variant="h4">Model</Typography>
-      <div className="d-flex">
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          style={{ marginRight: '10px' }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleAddModalOpen} // Open add modal on button click
-        >
-          Add Model
-        </Button>
-      </div>
-    </div>
-  
-    {/* Table */}
-    <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-  {loading ? ( // Show Loader when data is being fetched
-    <Loader /> // Replace this with your actual Loader component
-  ) : (
-    <CTable align="middle" className="mb-0 border" hover responsive>
-      <CTableHead className="text-nowrap">
-        <CTableRow>
-          <CTableHeaderCell className="bg-body-tertiary text-center">Model Name</CTableHeaderCell>
-          <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
-        </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {Array.isArray(filteredData) && filteredData.length > 0 ? (
-          filteredData.map((item) => (
-            <CTableRow key={item._id}>
-              <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
-              <CTableDataCell className="text-center">
-                {/* Row layout for the icons */}
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
-                  <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
-                    <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
-                  </IconButton>
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => handleDeleteSelected(item._id)}
-                    sx={{ color: 'brown' }}
-                  >
-                    <AiFillDelete style={{ fontSize: '25px' }} />
-                  </IconButton>
-                </div>
-              </CTableDataCell>
-            </CTableRow>
-          ))
-        ) : (
-          <CTableRow>
-            <CTableDataCell colSpan={2} className="text-center">No data available</CTableDataCell>
-          </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
-  )}
-</TableContainer>
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      {/* Header and Add Category button */}
+      <div className="d-flex justify-content-between mb-2">
+        <Typography variant="h4">Model</Typography>
+        <div className="d-flex  justify-content-center align-items-center">
+          <div className="me-3 d-none d-md-block">
+            <input
+              type="search"
+              className="form-control"
+              placeholder="search here...."
+              variant="outlined"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
 
-  
-    {/* Add Modal */}
-    <Modal open={addModalOpen} onClose={handleAddModalClose}>
-      <Box sx={style}>
-        <div className="d-flex justify-content-between">
-          <Typography variant="h6">Add New Model</Typography>
-          <IconButton onClick={handleAddModalClose}>
-            <CloseIcon />
-          </IconButton>
+          <button
+            onClick={handleAddModalOpen} // Open add modal on button click
+            variant="contained"
+            className="btn btn-primary"
+          >
+            Add Model
+          </button>
         </div>
-        <form onSubmit={handleAddSubmit}>
-          <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <TextField
-              name="modelName"
-              value={formData.modelName || ''}
-              onChange={handleInputChange}
-              label="Model Name"
-              required
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              style={{ marginTop: '20px' }}
-            >
-              Add
-            </Button>
-          </FormControl>
-        </form>
-      </Box>
-    </Modal>
-  
-    {/* Edit Modal */}
-    <Modal open={editModalOpen} onClose={handleEditModalClose}>
-      <Box sx={style}>
-        <div className="d-flex justify-content-between">
-          <Typography variant="h6">Edit Model</Typography>
-          <IconButton onClick={handleEditModalClose}>
-            <CloseIcon />
-          </IconButton>
-        </div>
-        <form onSubmit={handleEditSubmit}>
-          <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <TextField
-              name="modelName"
-              value={formData.modelName || ''}
-              onChange={handleInputChange}
-              label="Model Name"
-              required
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              style={{ marginTop: '20px' }}
-            >
-              Update
-            </Button>
-          </FormControl>
-        </form>
-      </Box>
-    </Modal>
-  </div>
-  
+      </div>
+
+      {/* Table */}
+      <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
+        {loading ? ( // Show Loader when data is being fetched
+          <Loader /> // Replace this with your actual Loader component
+        ) : (
+          <CTable align="middle" className="mb-0 border" hover responsive>
+            <CTableHead className="text-nowrap">
+              <CTableRow>
+                <CTableHeaderCell className=" text-center text-white bg-secondary">Model Name</CTableHeaderCell>
+                <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {Array.isArray(filteredData) && filteredData.length > 0 ? (
+                filteredData.map((item) => (
+                  <CTableRow key={item._id}>
+                    <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
+                    <CTableDataCell className="text-center">
+                      {/* Row layout for the icons */}
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
+                        <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
+                          <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleDeleteSelected(item._id)}
+                          sx={{ color: 'red' }}
+                        >
+                          <AiFillDelete style={{ fontSize: '25px' }} />
+                        </IconButton>
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan={2} className="text-center">No data available</CTableDataCell>
+                </CTableRow>
+              )}
+            </CTableBody>
+          </CTable>
+        )}
+      </TableContainer>
+
+
+      {/* Add Modal */}
+      <Modal open={addModalOpen} onClose={handleAddModalClose}>
+        <Box sx={style}>
+          <div className="d-flex justify-content-between">
+            <Typography variant="h6">Add New Model</Typography>
+            <IconButton onClick={handleAddModalClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <form onSubmit={handleAddSubmit}>
+            <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <TextField
+                name="modelName"
+                value={formData.modelName || ''}
+                onChange={handleInputChange}
+                label="Model Name"
+                required
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ marginTop: '20px' }}
+              >
+                Add
+              </Button>
+            </FormControl>
+          </form>
+        </Box>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal open={editModalOpen} onClose={handleEditModalClose}>
+        <Box sx={style}>
+          <div className="d-flex justify-content-between">
+            <Typography variant="h6">Edit Model</Typography>
+            <IconButton onClick={handleEditModalClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <form onSubmit={handleEditSubmit}>
+            <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <TextField
+                name="modelName"
+                value={formData.modelName || ''}
+                onChange={handleInputChange}
+                label="Model Name"
+                required
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ marginTop: '20px' }}
+              >
+                Update
+              </Button>
+            </FormControl>
+          </form>
+        </Box>
+      </Modal>
+    </div>
   );
 };
 

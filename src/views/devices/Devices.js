@@ -731,7 +731,7 @@ const Devices = () => {
                       <IconButton
                         aria-label="delete"
                         onClick={() => handleDeleteSelected(item._id)}
-                        sx={{ marginRight: '10px', color: 'brown' }}
+                        sx={{ marginRight: '10px', color: 'red' }}
                       >
                         <AiFillDelete style={{ fontSize: '20px' }} />
                       </IconButton>
