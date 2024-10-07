@@ -249,35 +249,35 @@ const Driver = () => {
             <CTableHead className="text-nowrap">
               <CTableRow className='bg-body-tertiary'>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Driver Name
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                 className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                 className=" text-center text-white bg-secondary">
                   Mobile No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                 className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                 className=" text-center text-white bg-secondary">
                   Email
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Vehicle no.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Lic. No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Aadhar No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Address
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center text-white" style={{background: "rgb(1,22,51)"}}>
+                  className=" text-center text-white bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>

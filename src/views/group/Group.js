@@ -259,14 +259,12 @@ const Group = () => {
             <CTableHead className="text-nowrap">
               <CTableRow>
                 <CTableHeaderCell
-                  className="text-center text-white"
-                  style={{background: "rgb(1,22,51)"}}>
+                 className=" text-center text-white bg-secondary">
                   Group Name
                 </CTableHeaderCell>
 
                 <CTableHeaderCell
-                   className="text-center text-white"
-                   style={{background: "rgb(1,22,51)"}}>
+                   className=" text-center text-white bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>

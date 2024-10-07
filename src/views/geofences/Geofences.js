@@ -369,24 +369,20 @@ const Geofences = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell
-                       className="text-center text-white"
-                       style={{background: "rgb(1,22,51)"}}>
+                       className=" text-center text-white bg-secondary">
                       Geofence Name
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                      className="text-center text-white"
-                      style={{background: "rgb(1,22,51)"}}>
+                      className=" text-center text-white bg-secondary">
                       Type
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                       className="text-center text-white"
-                       style={{background: "rgb(1,22,51)"}}>
+                       className=" text-center text-white bg-secondary">
                       Vehicles
                     </CTableHeaderCell>
 
                     <CTableHeaderCell
-                      className="text-center text-white"
-                      style={{background: "rgb(1,22,51)"}}>
+                      className=" text-center text-white bg-secondary">
                       Actions
                     </CTableHeaderCell>
                   </CTableRow>

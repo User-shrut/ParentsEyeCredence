@@ -58,7 +58,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(18)
   const [pageCount, setPageCount] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Personal Info', 'Permissions']
