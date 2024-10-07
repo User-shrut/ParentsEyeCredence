@@ -1,99 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import {
-  TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
-} from '@mui/material';
+// import {
+//   TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
+// } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri';
 import { AiFillDelete } from 'react-icons/ai';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';  // Importing js-cookie for managing cookies
+// import {
+//   CTable,
+//   CTableBody,
+//   CTableRow,
+//   CTableHead,
+//   CTableHeaderCell,
+//   CTableDataCell,
+//   CTableContainer
+// } from '@coreui/react';
+// import {
+//   TableContainer as MuiTableContainer, // Renaming to avoid confusion
+//   Paper,
+//   IconButton,
+//   Typography,
+//   TextField,
+//   Button,
+//   Modal,
+//   Box,
+//   FormControl,
+// } from '@mui/material';
+import {
+  TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
+} from '@mui/material';
+import {
+  CTable,
+  CTableBody,
+  CTableRow,
+  CTableHead,
+  CTableHeaderCell,
+  CTableDataCell,
+} from '@coreui/react';
+import Loader from '../../components/Loader/Loader';
 const Model = () => {
-  const [data, setData] = useState([]); // Data from API
-  const [filteredData, setFilteredData] = useState([]); // Data after filtering
-  const [searchQuery, setSearchQuery] = useState(''); // Search input state
-  const [addModalOpen, setAddModalOpen] = useState(false); // State for add modal open/close
-  const [editModalOpen, setEditModalOpen] = useState(false); // State for edit modal open/close
-  const [formData, setFormData] = useState({}); // Form data state
-  const [currentItemId, setCurrentItemId] = useState(null); // ID of the item being edited
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [currentItemId, setCurrentItemId] = useState(null);
+  // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOmZhbHNlLCJkZXZpY2VzIjpmYWxzZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOmZhbHNlLCJzdG9wIjpmYWxzZSwidHJpcHMiOnRydWUsImdlb2ZlbmNlIjpmYWxzZSwibWFpbnRlbmFuY2UiOmZhbHNlLCJwcmVmZXJlbmNlcyI6ZmFsc2UsImNvbWJpbmVkUmVwb3J0cyI6ZmFsc2UsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5IjpmYWxzZSwic2NoZWR1bGVyZXBvcnRzIjpmYWxzZSwic3RhdGlzdGljcyI6ZmFsc2UsImFsZXJ0cyI6ZmFsc2UsInN1bW1hcnkiOmZhbHNlLCJjdXN0b21DaGFydHMiOmZhbHNlLCJfX3YiOjB9LCJpYXQiOjE3MjcxNzQzMjh9.mZcaQCnOwFXUm4E91VIzo2txOxV9OQs06rZ9wgV1-V8'; // Use environment variable in real applications
+  const [loading, setLoading] = useState(false);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
-  // Fetch data from API (Mock or real API)
-  useEffect(() => {
-    const fetchData = async () => {
-      const apiData = [
-        { name: 'Creta', id: 1 },
-        { name: 'Mahindra', id: 2 },
-        { name: 'Jeep', id: 3 },
-        { name: 'Tesla', id: 4 },
-        { name: 'Toyota', id: 5},
-        { name: 'BMW', id: 6},
-      ];
-      setData(apiData);
-      setFilteredData(apiData);
-    };
-    fetchData();
-  }, []);
+  const token = Cookies.get('authToken'); //
 
-  // Handle search query change
-  const handleSearchChange = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchQuery(value);
-    filterData(value);
-  };
-
-  // Filter data based on search query
-  const filterData = (query) => {
-    const lowerCaseQuery = query.toLowerCase();
-    const filtered = data.filter((item) =>
-      item.name.toLowerCase().includes(lowerCaseQuery)
-    );
-    setFilteredData(filtered);
-  };
-
-  // Handle modal open for adding
-  const handleAddModalOpen = () => {
-    setAddModalOpen(true);
-    setFormData({}); // Reset form data
-  };
-
-  // Handle modal close for adding
-  const handleAddModalClose = () => {
-    setAddModalOpen(false);
-  };
-
-  // Handle modal open for editing
-  const handleEditModalOpen = (item) => {
-    setFormData({ name: item.name });
-    setCurrentItemId(item.id);
-    setEditModalOpen(true);
-  };
-
-  // Handle modal close for editing
-  const handleEditModalClose = () => {
-    setEditModalOpen(false);
-  };
-
-  // Handle form input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Handle form submit for adding
-  const handleAddSubmit = (e) => {
-    e.preventDefault();
-    // Add your submit logic here (e.g., post the data to an API)
-    console.log('Add Form Submitted:', formData);
-    handleAddModalClose(); // Close modal after submission
-  };
-
-  // Handle form submit for editing
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    // Add your submit logic here (e.g., update the data in the API)
-    console.log('Edit Form Submitted for ID:', currentItemId, formData);
-    handleEditModalClose(); // Close modal after submission
-  };
 
   const style = {
     position: 'absolute',
@@ -105,134 +67,255 @@ const Model = () => {
     boxShadow: 24,
     p: 4,
   };
+  
+  const fetchData = async () => {
+    setLoading(true); 
+    try {
+      const response = await axios.get('https://credence-tracker.onrender.com/model', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setData(response.data.models);  // Set to response.data.models
+      setFilteredData(response.data.models); // Set to response.data.models
+      console.log("Fetched Data: ", response.data.models); // Log the fetched data
+    } catch (error) {
+      console.error('Error fetching data:', error.response ? error.response.data : error.message);
+      setFilteredData([]); // Ensure it's set to an array on error
+    }finally {
+      setLoading(false); // Stop loading once data is fetched
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchQuery(value);
+    filterData(value);
+  };
+
+  const filterData = (query) => {
+    const lowerCaseQuery = query.toLowerCase();
+    const filtered = data.filter(item => item.modelName.toLowerCase().includes(lowerCaseQuery));
+    setFilteredData(filtered);
+  };
+  
+
+  const handleAddModalOpen = () => {
+    setAddModalOpen(true);
+    setFormData({});
+  };
+
+  const handleAddModalClose = () => setAddModalOpen(false);
+
+  const handleEditModalOpen = (item) => {
+    setFormData({ modelName: item.modelName });
+    setCurrentItemId(item._id);
+    setEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => setEditModalOpen(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('https://credence-tracker.onrender.com/model', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setData(prevData => [...prevData, response.data]);
+      setFilteredData(prevFilteredData => [...prevFilteredData, response.data]);
+      handleAddModalClose();
+      fetchData(); // Optional: Fetch fresh data
+    } catch (error) {
+      console.error('Error adding category:', error);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentItemId) return;
+
+    try {
+      const response = await axios.put(`https://credence-tracker.onrender.com/model/${currentItemId}`, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setData(prevData => prevData.map(item => item._id === currentItemId ? response.data : item));
+      setFilteredData(prevFilteredData => prevFilteredData.map(item => item._id === currentItemId ? response.data : item));
+      handleEditModalClose();
+      fetchData(); // Optional: Fetch fresh data
+    } catch (error) {
+      console.error('Error updating category:', error);
+    }
+  };
+  const handleDeleteSelected = async (id) => {
+    if (window.confirm('Are you sure you want to delete this record?')) {
+      try {
+        await axios.delete(`https://credence-tracker.onrender.com/model/${id}`, {
+          headers: {
+          'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+        });
+        setFilteredData(filteredData.filter((item) => item._id !== id));
+        alert('Record deleted successfully');
+      } catch (error) {
+        console.error('Error deleting record:', error);
+        alert('Failed to delete the record');
+      }
+    }
+  };
 
   return (
     <div className="m-3">
-      {/* Header and Add Model button */}
-      <div className="d-flex justify-content-between mb-2">
-        <Typography variant="h4">Model</Typography>
-        <div className="d-flex">
-          <TextField
-            label="Search"
-            variant="outlined"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{ marginRight: '10px' }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddModalOpen} // Open add modal on button click
-          >
-            Add Model
-          </Button>
-        </div>
+    {/* Header and Add Category button */}
+    <div className="d-flex justify-content-between mb-2">
+      <Typography variant="h4">Model</Typography>
+      <div className="d-flex">
+        <TextField
+          label="Search"
+          variant="outlined"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{ marginRight: '10px' }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleAddModalOpen} // Open add modal on button click
+        >
+          Add Model
+        </Button>
       </div>
-
-      {/* Table */}
-      <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-        <CTable align="middle" className="mb-0 border" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Name</CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {filteredData.map((item) => (
-              <CTableRow key={item.id}>
-                <CTableDataCell className="text-center">{item.name}</CTableDataCell>
-                <CTableDataCell className="text-center">
-                  <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
-                    <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }} />
-                  </IconButton>
-                  <IconButton aria-label="delete">
-                    <AiFillDelete style={{ fontSize: '25px', color: 'brown', margin: '5.3px' }} />
-                  </IconButton>
-                </CTableDataCell>
-              </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
-
-      {/* Modal for adding new model */}
-      <Modal
-        open={addModalOpen}
-        onClose={handleAddModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <div className="d-flex justify-content-between">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Add New Model
-            </Typography>
-            <IconButton onClick={handleAddModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </div>
-          <form onSubmit={handleAddSubmit}>
-            <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <TextField
-                label="Model Name"
-                name="name"
-                value={formData.name || ''}
-                onChange={handleInputChange}
-                required
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                style={{ marginTop: '20px' }}
-              >
-                Submit
-              </Button>
-            </FormControl>
-          </form>
-        </Box>
-      </Modal>
-
-      {/* Modal for editing model */}
-      <Modal
-        open={editModalOpen}
-        onClose={handleEditModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <div className="d-flex justify-content-between">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Edit Model
-            </Typography>
-            <IconButton onClick={handleEditModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </div>
-          <form onSubmit={handleEditSubmit}>
-            <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <TextField
-                label="Model Name"
-                name="name"
-                value={formData.name || ''}
-                onChange={handleInputChange}
-                required
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                style={{ marginTop: '20px' }}
-              >
-                Submit
-              </Button>
-            </FormControl>
-          </form>
-        </Box>
-      </Modal>
     </div>
+  
+    {/* Table */}
+    <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
+  {loading ? ( // Show Loader when data is being fetched
+    <Loader /> // Replace this with your actual Loader component
+  ) : (
+    <CTable align="middle" className="mb-0 border" hover responsive>
+      <CTableHead className="text-nowrap">
+        <CTableRow>
+          <CTableHeaderCell className="bg-body-tertiary text-center">Model Name</CTableHeaderCell>
+          <CTableHeaderCell className="bg-body-tertiary text-center">Actions</CTableHeaderCell>
+        </CTableRow>
+      </CTableHead>
+      <CTableBody>
+        {Array.isArray(filteredData) && filteredData.length > 0 ? (
+          filteredData.map((item) => (
+            <CTableRow key={item._id}>
+              <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
+              <CTableDataCell className="text-center">
+                {/* Row layout for the icons */}
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
+                  <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
+                    <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
+                  </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => handleDeleteSelected(item._id)}
+                    sx={{ color: 'brown' }}
+                  >
+                    <AiFillDelete style={{ fontSize: '25px' }} />
+                  </IconButton>
+                </div>
+              </CTableDataCell>
+            </CTableRow>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell colSpan={2} className="text-center">No data available</CTableDataCell>
+          </CTableRow>
+        )}
+      </CTableBody>
+    </CTable>
+  )}
+</TableContainer>
+
+  
+    {/* Add Modal */}
+    <Modal open={addModalOpen} onClose={handleAddModalClose}>
+      <Box sx={style}>
+        <div className="d-flex justify-content-between">
+          <Typography variant="h6">Add New Model</Typography>
+          <IconButton onClick={handleAddModalClose}>
+            <CloseIcon />
+          </IconButton>
+        </div>
+        <form onSubmit={handleAddSubmit}>
+          <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <TextField
+              name="modelName"
+              value={formData.modelName || ''}
+              onChange={handleInputChange}
+              label="Model Name"
+              required
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              style={{ marginTop: '20px' }}
+            >
+              Add
+            </Button>
+          </FormControl>
+        </form>
+      </Box>
+    </Modal>
+  
+    {/* Edit Modal */}
+    <Modal open={editModalOpen} onClose={handleEditModalClose}>
+      <Box sx={style}>
+        <div className="d-flex justify-content-between">
+          <Typography variant="h6">Edit Model</Typography>
+          <IconButton onClick={handleEditModalClose}>
+            <CloseIcon />
+          </IconButton>
+        </div>
+        <form onSubmit={handleEditSubmit}>
+          <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <TextField
+              name="modelName"
+              value={formData.modelName || ''}
+              onChange={handleInputChange}
+              label="Model Name"
+              required
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              style={{ marginTop: '20px' }}
+            >
+              Update
+            </Button>
+          </FormControl>
+        </form>
+      </Box>
+    </Modal>
+  </div>
+  
   );
 };
 

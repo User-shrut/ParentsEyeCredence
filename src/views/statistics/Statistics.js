@@ -19,13 +19,19 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import Select from 'react-select';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, showMap, setShowMap }) => {
+const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
+  // State to manage button text
+  const [buttonText, setButtonText] = useState('SHOW NOW');
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
 
   const handleFormSubmit = (event) => {
     const form = event.currentTarget;
+    console.log("handle submit ke pass hu");
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
@@ -37,22 +43,21 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
     setValidated(true);
   };
 
+
   const handlePeriodChange = (value) => {
     handleInputChange('Periods', value);
     setShowDateInputs(value === 'Custom');
   };
 
-  // State to manage button text
-  const [buttonText, setButtonText] = useState('SHOW NOW');
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+
 
   // Function to handle dropdown item clicks
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
+    handleSubmit(); // Submit form
     setShowMap(true); // Show the map when form is valid and submitted
   };
-
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -65,7 +70,28 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      <CCol md={4}>
+        <CFormLabel htmlFor="devices">Devices</CFormLabel>
+        <CFormSelect
+          id="devices"
+          required
+          value={formData.Devices}
+          onChange={(e) => handleInputChange('Devices', e.target.value)}
+        >
+          <option value="">Choose a device...</option>
+          {devices.length > 0 ? (
+            devices.map((device) => (
+              <option key={device.id} value={device.deviceId}>{device.name}</option>
+            ))
+          ) : (
+            <option disabled>Loading devices...</option>
+          )}
+        </CFormSelect>
+
+        <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
+      </CCol>
+
+      <CCol md={4}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
@@ -85,7 +111,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         {/* Use React-Select component for multi-select */}
         <Select
@@ -93,16 +119,14 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
           id="columns"
           options={columns.map((column) => ({ value: column, label: column }))}
           value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) =>
-            handleInputChange('Columns', selectedOptions.map((option) => option.value))
-          }
+          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
 
       {showDateInputs && (
         <>
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
             <CFormInput
               type="date"
@@ -113,7 +137,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
             />
             <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
           </CCol>
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="toDate">To Date</CFormLabel>
             <CFormInput
               type="date"
@@ -127,10 +151,10 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
         </>
       )}
 
-      <CCol xs={12}>
+      <CCol xs={12} >
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary" type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
             <button
@@ -142,24 +166,24 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
               <span className="visually-hidden">Toggle Dropdown</span>
             </button>
             {isDropdownOpen && ( // Conditionally render dropdown menu
-              <ul className="dropdown-menu show">
+              <ul className="dropdown-menu show ">
                 <li>
-                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Show Now')}>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
                     Show Now
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Export')}>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
                     Export
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Email Reports')}>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
                     Email Reports
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Schedule')}>
+                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
                     Schedule
                   </a>
                 </li>
@@ -172,12 +196,13 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, columns, show
   );
 };
 
-const CustomStyles1 = ({ rows, selectedColumns }) => {
+const ShowIdeal = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          {/* <CTableHeaderCell>Devices</CTableHeaderCell> */}
+          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+          <CTableHeaderCell>Devices</CTableHeaderCell>
 
           {/* Dynamically render table headers based on selected columns */}
           {selectedColumns.map((column, index) => (
@@ -186,42 +211,89 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {rows.map((row, rowIndex) => (
-          <CTableRow key={rowIndex} className="custom-row">
-            {/* <CTableDataCell>{row.Devices}</CTableDataCell> */}
-            {/* Dynamically render table cells based on selected columns */}
-            {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>{row[column]}</CTableDataCell>
-            ))}
-          </CTableRow>
+        {apiData?.map((row, rowIndex) => (
+          row.data?.map((nestedRow, nestedIndex) => (
+            <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
+              {/* Use the deviceId and nested row index to create a unique key */}
+
+              <CTableDataCell>{row.deviceId}</CTableDataCell>
+
+              {/* Dynamically render table cells based on selected columns */}
+              {selectedColumns.map((column, index) => (
+                <CTableDataCell key={index}>
+                  {
+                    // column === 'OUID' ? nestedRow.ouid :
+                      column === 'Vehicle Status' ? nestedRow.vehicleStatus :
+                        column === 'Duration (seconds)' ? nestedRow.durationSeconds :
+                          column === 'Location' ? nestedRow.location :
+                            column === 'Address' ? (nestedRow.address || '--') :
+                              column === 'Arrival Time' ? nestedRow.arrivalTime :
+                                column === 'Departure Time' ? nestedRow.departureTime :
+                                  column === 'Total Duration (seconds)' ? row.totalDurationSeconds :
+                                    '--'
+                  }
+                </CTableDataCell>
+              ))}
+            </CTableRow>
+          ))
         ))}
+
+
       </CTableBody>
     </CTable>
   );
 };
 
-const Validation = () => {
-  const [rows, setRows] = useState([
-    { CaptureTime: '2024-01-01', ActiveUsers: '50', ActiveDevices: '45', Requests: '120', MessagesReceived: '80', MessagesStored: '60', Mail: '30', SMS: '20', GeocoderRequests: '10', GeolocationRequests: '5' },
-    { CaptureTime: '2024-02-01', ActiveUsers: '60', ActiveDevices: '50', Requests: '130', MessagesReceived: '90', MessagesStored: '70', Mail: '40', SMS: '25', GeocoderRequests: '15', GeolocationRequests: '8' },
-  ]);
-  const [formData, setFormData] = useState({ Periods: '', FromDate: '', ToDate: '', Columns: [] });
+const Ideal = () => {
+
+  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
+  const [devices, setDevices] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
   const [columns] = useState([
-    'Capture Time',
-    'Active Users',
-    'Active Devices',
-    'Requests',
-    'Messages Received',
-    'Messages Stored',
-    'Mail',
-    'SMS',
-    'Geocoder Requests',
-    'Geolocation Requests',
+    // 'OUID',
+    'Vehicle Status',
+    'Duration (seconds)',
+    'Location',
+    'Address',
+    'Arrival Time',
+    'Departure Time',
+    'Total Duration (seconds)'
   ]);
-  const [selectedColumns, setSelectedColumns] = useState([]);
 
+
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const token = Cookies.get('authToken'); //
+
+  const [apiData, setApiData] = useState();   //data from api
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+
+      console.log("fetch device me aaya hu...")
+      try {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data)
+        setDevices(data.devices); // Assuming the data returned contains device info
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
+  
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -233,30 +305,71 @@ const Validation = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted with data:', formData);
+  const handleSubmit = async () => {
+
+    console.log('DataAll', formData)
+
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+
+
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      period: formData.Periods, // Use the selected period from the form data
+      FromDate: fromDate,
+      ToDate: toDate,
+    };
+
+    // console.log(token);
+    // console.log(body);
+
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/idleSummary?deviceIds=${body.deviceId}&period=${body.period}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Replace with your actual token
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // console.log(response.data.deviceDataByStatus[0]);
+
+      console.log("All Status reports");
+
+      if (response.status == 200) {
+        console.log(response.data.data)
+        console.log("done in all")
+        console.log(response.data.data);
+        setApiData(response.data.data);
+      }
+
+      // Assuming the data returned is what you want to display in the table
+      console.log('Form submitted with data:', body);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
 
-  
 
   return (
     <>
       <CRow className='pt-3'>
-        <h2 className='px-4'>Statistics</h2>
-        <CCol xs={12} md={12} className="px-4">
-          <CCard className="mb-4 p-0 shadow-lg rounded">
+        <h2 className='px-4'>Idle Report</h2>
+        <CCol xs={12} md={12} className='px-4'>
+          <CCard className="mb-4 p-0 shadow-lg rounded" >
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Statistics Reports</strong>
-             
+              <strong>Idle Report</strong>
+
             </CCardHeader>
             <CCardBody>
-              <CustomStyles
+              <SearchIdeal
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
-                columns={columns}
+                devices={devices}
                 showMap={showMap}
                 setShowMap={setShowMap}
+                columns={columns}
               />
             </CCardBody>
           </CCard>
@@ -264,28 +377,28 @@ const Validation = () => {
       </CRow>
 
       {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} md={12} className="px-4">
-          <CCard className="mb-4 shadow-sm">
-            <CCardHeader className='bg-secondary text-white d-flex justify-content-between align-items-center'>
-              <strong>All Statistics Reports List</strong>
-              <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
-            </CCardHeader>
-            <CCardBody>
-              <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+        <CRow className="justify-content-center mt-4">
+          <CCol xs={12} className="px-4" >
+            <CCard className='p-0 mb-4 shadow-sm'>
+              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <strong>All Idle Report List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <ShowIdeal apiData={apiData} selectedColumns={selectedColumns} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
       )}
 
     </>
   );
 };
 
-export default Validation;
+export default Ideal;
