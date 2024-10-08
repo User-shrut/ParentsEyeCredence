@@ -51,6 +51,7 @@ import {
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Users = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -77,6 +78,7 @@ const Users = () => {
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
+    setCurrentStep(0)
   }
 
   const style = {
@@ -327,6 +329,7 @@ const Users = () => {
       id: userData._id,
       username: userData.username,
       email: userData.email,
+      mobile: userData.mobile,
       permissions: {
         notification: userData.notification,
         devices: userData.devices,
@@ -362,6 +365,7 @@ const Users = () => {
       id: formData.id,
       username: formData.username,
       email: formData.email,
+      mobile: formData.mobile,
       password: formData.password,
       ...formData.permissions,
     }
@@ -386,6 +390,7 @@ const Users = () => {
       if (response.status === 200) {
         alert('User is edited successfully')
         setEditModalOpen(false)
+        setCurrentStep(0)
         fetchUserData()
         setLoading(false)
 
@@ -445,7 +450,7 @@ const Users = () => {
   //  ######################### delete user #########################
 
   const deleteUserSubmit = async (item) => {
-    alert('you want to delete this user')
+    confirm('you want to delete this user')
     console.log(item)
 
     try {
@@ -457,7 +462,7 @@ const Users = () => {
       })
 
       if (response.status === 200) {
-        alert('user is deleted successfully')
+        toast.success('Successfully deleted User!')
         fetchUserData()
       }
     } catch (error) {
@@ -470,6 +475,7 @@ const Users = () => {
   return (
     <>
       <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+        <Toaster position="top-center" reverseOrder={false} />
         <div>
           <div className="d-flex justify-content-between mb-2">
             <div>
@@ -518,6 +524,9 @@ const Users = () => {
                 <CTableHeaderCell className="text-center text-white bg-secondary">
                   Email
                 </CTableHeaderCell>
+                <CTableHeaderCell className="text-center text-white bg-secondary">
+                  Mobile No.
+                </CTableHeaderCell>
                 <CTableHeaderCell className=" text-center text-white bg-secondary">
                   Master Permissions
                 </CTableHeaderCell>
@@ -532,7 +541,7 @@ const Users = () => {
             <CTableBody>
               {loading ? (
                 <CTableRow>
-                  <CTableDataCell colSpan="5" className="text-center">
+                  <CTableDataCell colSpan="6" className="text-center">
                     <div className="text-nowrap mb-2 text-center w-">
                       <p className="card-text placeholder-glow">
                         <span className="placeholder col-12" />
@@ -554,6 +563,9 @@ const Users = () => {
                   <CTableRow key={index} className="p-0">
                     <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
                     <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
+                    <CTableDataCell className="text-center p-0">
+                      {item.mobile || 'N/A'}
+                    </CTableDataCell>
 
                     {/* Master Column */}
                     <CTableDataCell className="text-center p-0">
@@ -623,7 +635,7 @@ const Users = () => {
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan="5" className="text-center">
+                  <CTableDataCell colSpan="6" className="text-center">
                     <div
                       className="d-flex flex-column justify-content-center align-items-center"
                       style={{ height: '200px' }}
@@ -1126,18 +1138,18 @@ const Users = () => {
                             'category',
                             'model',
                           ].map((permission) => (
-                              <FormControlLabel
-                                key={permission}
-                                control={
-                                  <Checkbox
-                                    name={permission}
-                                    checked={formData.permissions[permission]}
-                                    onChange={handlePermissionChange}
-                                  />
-                                }
-                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              />
-                            ))}
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                          ))}
                         </FormGroup>
                       </AccordionDetails>
                     </Accordion>
@@ -1162,18 +1174,18 @@ const Users = () => {
                             'sensor',
                             'geofenceReport',
                           ].map((permission) => (
-                              <FormControlLabel
-                                key={permission}
-                                control={
-                                  <Checkbox
-                                    name={permission}
-                                    checked={formData.permissions[permission]}
-                                    onChange={handlePermissionChange}
-                                  />
-                                }
-                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              />
-                            ))}
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                          ))}
                         </FormGroup>
                       </AccordionDetails>
                     </Accordion>
@@ -1202,7 +1214,6 @@ const Users = () => {
           </div>
         </Box>
       </Modal>
-
     </>
   )
 }

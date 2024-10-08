@@ -47,7 +47,7 @@ const Devices = () => {
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
   const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(15)
+  const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
 
   const [data, setData] = useState([])
@@ -75,6 +75,7 @@ const Devices = () => {
     setAddModalOpen(false)
     setExtendedPasswordModel(false)
     setCurrentStep(0)
+    setFormData({})
   }
 
   // Go to the next step
@@ -110,7 +111,7 @@ const Devices = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '40%',
+    width: '35%',
     height: 'auto',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -216,7 +217,7 @@ const Devices = () => {
           average: device.average || 'N/A',
           model: device.model || 'N/A',
           category: device.category || 'N/A',
-          Driver: device.Driver?.name || 'N/A',
+          Driver: device.Driver || 'N/A',
           installationdate: device.installationdate || 'N/A',
           expirationdate: device.expirationdate || 'N/A',
           extenddate: device.extenddate || 'N/A',
@@ -260,7 +261,7 @@ const Devices = () => {
     const apiUrl = `${import.meta.env.VITE_API_URL}/device`
     const newRow = {
       name: formData.name || '',
-      uniqueId: formData.uniqueId.trim() || '', // Trim whitespace
+      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '', // Trim whitespace
       sim: formData.sim || '',
       groups: Array.isArray(formData.groups) ? formData.groups : [],
       users: Array.isArray(formData.users) ? formData.users : [],
@@ -275,6 +276,16 @@ const Devices = () => {
       extenddate: formData.extenddate || '',
     }
 
+    if(newRow){
+      // Check for any required fields missing
+      if (!newRow.name ||!newRow.uniqueId ||!newRow.sim ||!newRow.model ||!newRow.category || !newRow.expirationdate) {
+        alert('Please fill in all required fields.')
+        return
+      }
+
+      
+    }
+
     try {
       const response = await axios.post(apiUrl, newRow, {
         headers: {
@@ -285,7 +296,7 @@ const Devices = () => {
 
       console.log('Raw response:', response)
 
-      if (response.ok) {
+      if (response.status == 201) {
         console.log('Record created successfully:')
         alert('Record created successfully')
         handleModalClose()
@@ -326,12 +337,10 @@ const Devices = () => {
       expirationdate: row.expirationdate,
       category: row.category,
       average: row.average,
-      Driver: row.Driver,
-      geofences: row.geofences,
-      groups: row.groups.map(group => group._id),
-      users: row.users.map(user => user._id),
-
-
+      Driver: row.Driver._id,
+      geofences: row.geofences.map( geo => geo._id),
+      groups: row.groups.map((group) => group._id),
+      users: row.users.map((user) => user._id),
     })
     setEditModalOpen(true)
   }
@@ -433,12 +442,7 @@ const Devices = () => {
 
         // Checking if response contains the expected structure
         if (response.data && Array.isArray(response.data.users)) {
-          setUsers(
-            response.data.users.map((user) => ({
-              _id: user._id,
-              username: user.username,
-            })),
-          ) // Correct mapping
+          setUsers(response.data.users) // Correct mapping
         } else {
           console.error('Unexpected response structure:', response.data)
         }
@@ -462,6 +466,7 @@ const Devices = () => {
         }
 
         const data = await response.json()
+        console.log('groups: ', data.groups)
         setGroups(data.groups) // Assuming the API returns { groups: [...] }
       } catch (error) {
         console.log(error)
@@ -583,24 +588,26 @@ const Devices = () => {
 
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {
+    setExtendedPasswordModel(true);
     const ExpiryDate = formData.expirationdate
 
-
-    
     if (ExpiryDate) {
       const expiry = new Date(ExpiryDate)
       console.log('expiration hai ye ', expiry)
-      
+
       const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + years))
         .toISOString()
         .split('T')[0] // Format to yyyy-mm-dd
 
-
-      console.log("ye hai extended date: ", extendedDate)
-      setFormData({
-        ...formData,
-        extenddate: extendedDate,
-      })
+      console.log('ye hai extended date: ', extendedDate)
+      if(passwordCheck){
+        setFormData({
+          ...formData,
+          extenddate: extendedDate,
+          expirationdate: extendedDate,
+        })
+      }
+      
     }
   }
 
@@ -720,13 +727,14 @@ const Devices = () => {
                             style={{ width: '100px' }}
                           >
                             <option>Groups</option>
-                            {item.groups.map((group) => (
-                              <option key={group._id} value={group._id}>
-                                {group.name}
-                              </option>
-                            ))}
+                            {Array.isArray(item.groups) &&
+                              item.groups.map((group) => (
+                                <option key={group._id} value={group._id}>
+                                  {group.name || 'undefine group'}
+                                </option>
+                              ))}
                           </CFormSelect>
-                        ) : column.accessor === 'geofences' ? ( // Add geofences dropdown
+                        ) : column.accessor === 'geofences' ? (
                           <CFormSelect
                             id="geofence"
                             className=" text-center border-0"
@@ -735,8 +743,8 @@ const Devices = () => {
                             <option value="">Geofence</option>
                             {Array.isArray(item.geofences) &&
                               item.geofences.map((geofence, index) => (
-                                <option key={index} value={geofence}>
-                                  {geofence}
+                                <option key={index} value={geofence._id}>
+                                  {geofence.name}
                                 </option>
                               ))}
                           </CFormSelect>
@@ -749,13 +757,13 @@ const Devices = () => {
                             <option value="">Users</option>
                             {Array.isArray(item.users) &&
                               item.users.map((user) => (
-                                <MenuItem key={user._id} value={user._id}>
+                                <option key={user._id} value={user._id}>
                                   {user.username}
-                                </MenuItem>
+                                </option>
                               ))}
                           </CFormSelect>
                         ) : column.accessor === 'Driver' ? (
-                          <div style={{ width: '120px' }}>{item[column.accessor]}</div>
+                          <div style={{ width: '120px' }}>{item[column.accessor].name}</div>
                         ) : (
                           item[column.accessor] // Default rendering for other columns
                         )}
@@ -979,7 +987,7 @@ const Devices = () => {
                         label={col.Header}
                       >
                         {models.map((model) => (
-                          <MenuItem key={model._id} value={model._id}>
+                          <MenuItem key={model.modelName} value={model.modelName}>
                             {model.modelName}
                           </MenuItem>
                         ))}
@@ -997,7 +1005,7 @@ const Devices = () => {
                         label={col.Header}
                       >
                         {categories.map((category) => (
-                          <MenuItem key={category._id} value={category._id}>
+                          <MenuItem key={category.categoryName} value={category.categoryName}>
                             {category.categoryName}
                           </MenuItem>
                         ))}
@@ -1214,7 +1222,7 @@ const Devices = () => {
                         label={col.Header}
                       >
                         {models.map((model) => (
-                          <MenuItem key={model._id} value={model._id}>
+                          <MenuItem key={model} value={model.modelName}>
                             {model.modelName}
                           </MenuItem>
                         ))}
@@ -1232,7 +1240,7 @@ const Devices = () => {
                         label={col.Header}
                       >
                         {categories.map((category) => (
-                          <MenuItem key={category._id} value={category._id}>
+                          <MenuItem key={category} value={category.categoryName}>
                             {category.categoryName}
                           </MenuItem>
                         ))}
@@ -1247,7 +1255,7 @@ const Devices = () => {
               columns.map((col) => {
                 if (col.accessor === 'installationdate') {
                   return (
-                    <div className='mt-3'>
+                    <div className="mt-3">
                       <label>Installation date: </label>
                       <TextField
                         key={col.accessor}
@@ -1261,7 +1269,7 @@ const Devices = () => {
                   )
                 } else if (col.accessor === 'expirationdate') {
                   return (
-                    <div className='mt-3'>
+                    <div className="mt-3">
                       <label>Expiration Date: </label>
                       <TextField
                         key={col.accessor}
@@ -1275,8 +1283,9 @@ const Devices = () => {
                   )
                 } else if (col.accessor === 'extenddate') {
                   return (
-                    <div className='mt-3'>
-                    <label>Extend Plan: </label><br />
+                    <div className="mt-3">
+                      <label>Extend Plan: </label>
+                      <br />
                       <Select
                         onChange={(e) => {
                           handleExtendYearSelection(parseInt(e.target.value))

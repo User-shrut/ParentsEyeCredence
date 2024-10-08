@@ -41,6 +41,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import DialpadIcon from '@mui/icons-material/Dialpad';
 import HomeIcon from '@mui/icons-material/Home';
+import { IoMdAdd } from 'react-icons/io'
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -241,6 +242,8 @@ const Driver = () => {
         />
       </div>
 
+
+      
       <TableContainer
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
@@ -283,7 +286,28 @@ const Driver = () => {
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {data?.map((item, index) => (
+
+            {loading ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="8" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              ) : data.length > 0 ? (
+              data?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center">{item.name}</CTableDataCell>
                   <CTableDataCell className="text-center">{item.phone}</CTableDataCell>
@@ -306,7 +330,33 @@ const Driver = () => {
                     </IconButton>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
+              ))) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="8" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's nobody here yet.
+                        <br /> Maybe it's time to invite some drivers!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add Driver
+                        </button>
+                      </div>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              )}
             </CTableBody>
           </CTable>
       </TableContainer>
