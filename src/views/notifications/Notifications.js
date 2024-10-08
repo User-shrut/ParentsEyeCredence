@@ -202,7 +202,7 @@ const Group = () => {
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
-          <h2>Groups</h2>
+          <h2>Notifications</h2>
         </div>
 
         <div className="d-flex">
@@ -221,7 +221,7 @@ const Group = () => {
               variant="contained"
               className="btn btn-primary"
             >
-              Add Group
+              Add Notifications
             </button>
           </div>
         </div>
@@ -265,7 +265,7 @@ const Group = () => {
               <CTableRow>
                 <CTableHeaderCell
                   className=" text-center text-white bg-secondary">
-                  Group Name
+                  Notifications Name
                 </CTableHeaderCell>
 
                 <CTableHeaderCell
