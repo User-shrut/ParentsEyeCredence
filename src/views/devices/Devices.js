@@ -70,15 +70,13 @@ const Devices = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Device Info', 'Assign To', 'Subscription']
 
-
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
     setExtendedPasswordModel(false)
-    setCurrentStep(0);
+    setCurrentStep(0)
   }
 
-  
   // Go to the next step
   const handleNext = () => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
@@ -315,14 +313,32 @@ const Devices = () => {
   // #########################  Edit Device API function #######################
 
   const handleEditIconClick = (row) => {
-    setFormData(row) // Populate form with the row's data
-    setEditModalOpen(true) // Open the modal
+    console.log(row)
+    setFormData({
+      ...row,
+      name: row.name,
+      uniqueId: row.uniqueId,
+      speed: row.speed,
+      sim: row.sim,
+      model: row.model,
+      installationdate: row.installationdate,
+      extenddate: row.extenddate,
+      expirationdate: row.expirationdate,
+      category: row.category,
+      average: row.average,
+      Driver: row.Driver,
+      geofences: row.geofences,
+      groups: row.groups.map(group => group._id),
+      users: row.users.map(user => user._id),
+
+
+    })
+    setEditModalOpen(true)
   }
 
   const handleEditSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
 
     console.log('Data to submit:', formData) // Log the data to be submitted
 
@@ -331,7 +347,7 @@ const Devices = () => {
       const accessToken = Cookies.get('authToken')
 
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/device/${formData.id}`,
+        `${import.meta.env.VITE_API_URL}/device/${formData._id}`,
         formData,
         {
           headers: {
@@ -565,6 +581,29 @@ const Devices = () => {
     }
   }
 
+  // this is run when date is extended i edit mmodel
+  const handleExtendYearSelection = (years) => {
+    const ExpiryDate = formData.expirationdate
+
+
+    
+    if (ExpiryDate) {
+      const expiry = new Date(ExpiryDate)
+      console.log('expiration hai ye ', expiry)
+      
+      const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + years))
+        .toISOString()
+        .split('T')[0] // Format to yyyy-mm-dd
+
+
+      console.log("ye hai extended date: ", extendedDate)
+      setFormData({
+        ...formData,
+        extenddate: extendedDate,
+      })
+    }
+  }
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
@@ -710,7 +749,7 @@ const Devices = () => {
                             <option value="">Users</option>
                             {Array.isArray(item.users) &&
                               item.users.map((user) => (
-                                <MenuItem key={user._id} value={user.username}>
+                                <MenuItem key={user._id} value={user._id}>
                                   {user.username}
                                 </MenuItem>
                               ))}
@@ -1208,34 +1247,48 @@ const Devices = () => {
               columns.map((col) => {
                 if (col.accessor === 'installationdate') {
                   return (
-                    <>
+                    <div className='mt-3'>
                       <label>Installation date: </label>
                       <TextField
                         key={col.accessor}
-                        type="date"
                         name={col.accessor}
                         value={formData[col.accessor] || ''}
                         onChange={handleInputChange}
                         fullWidth
+                        disabled
                       />
-                    </>
+                    </div>
                   )
                 } else if (col.accessor === 'expirationdate') {
                   return (
-                    <FormControl fullWidth sx={{ marginY: 2 }} key={col.accessor}>
-                      <InputLabel>Expiration Plans</InputLabel>
+                    <div className='mt-3'>
+                      <label>Expiration Date: </label>
+                      <TextField
+                        key={col.accessor}
+                        name={col.accessor}
+                        value={formData[col.accessor]}
+                        onChange={handleInputChange}
+                        fullWidth
+                        disabled
+                      />
+                    </div>
+                  )
+                } else if (col.accessor === 'extenddate') {
+                  return (
+                    <div className='mt-3'>
+                    <label>Extend Plan: </label><br />
                       <Select
                         onChange={(e) => {
-                          handleYearSelection(parseInt(e.target.value))
+                          handleExtendYearSelection(parseInt(e.target.value))
                           setShowExpirationDropdown(false)
                         }}
-                        label="Expiration Options"
+                        fullWidth
                       >
                         <MenuItem value={1}>1 Year</MenuItem>
                         <MenuItem value={2}>2 Years</MenuItem>
                         <MenuItem value={3}>3 Years</MenuItem>
                       </Select>
-                    </FormControl>
+                    </div>
                   )
                 }
 
@@ -1263,8 +1316,6 @@ const Devices = () => {
           </div>
         </Box>
       </Modal>
-
-      
 
       <Modal open={extendedPasswordModel} onClose={handleModalClose}>
         <Box sx={style} style={{ height: '30%' }}>
