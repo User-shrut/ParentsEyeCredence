@@ -15,6 +15,7 @@ import {
   InputAdornment,
   FormControl,
 } from '@mui/material'
+import { Select, MenuItem, } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
@@ -54,8 +55,15 @@ const Driver = () => {
   const [pageCount, setPageCount] = useState()
 
 
-  const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+  const handleEditModalClose = () => {
+    setEditModalOpen(false);
+    setFormData({})
+  }
+  const handleAddModalClose = () => {
+   setAddModalOpen(false)
+   setFormData({});
+  }
+    
 
   const style = {
     position: 'absolute',
@@ -201,6 +209,37 @@ const Driver = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+
+  const [fomData, setFomData] = useState({ device: '' });
+  const [devices, setDevices] = useState([]);
+  const token = Cookies.get('authToken'); //
+
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      console.log("fetch device me aaya hu...");
+      try {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        setDevices(data.devices); // Assuming the data returned contains device info
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
 
   //  ###############################################################
 
@@ -446,11 +485,13 @@ const Driver = () => {
                     ),
                   }}
                 />
+
                 <TextField
-                  label='Vehicle List'
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
                   InputProps={{
                     startAdornment: (
@@ -459,7 +500,19 @@ const Driver = () => {
                       </InputAdornment>
                     ),
                   }}
-                />
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
                   label='Licence No.'
                   name="lic"
@@ -559,13 +612,34 @@ const Driver = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
-                <TextField
-                  label='Vehicle List'
+                
+                   <TextField
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
-                />
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
                   label='Lic No.'
                   name="lic"

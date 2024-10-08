@@ -31,6 +31,7 @@ import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
+import { IoMdAdd } from 'react-icons/io'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -41,7 +42,7 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  
+
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
@@ -49,14 +50,19 @@ const Group = () => {
   const style = {
     position: 'absolute',
     top: '50%',
+    borderRadius: '10px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '35%',
+    maxHeight: '90vh',
     bgcolor: 'background.paper',
-    color: 'black',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto', // Enable vertical scrolling
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    marginTop: '8px',
   }
 
   // ##################### getting data  ###################
@@ -134,7 +140,7 @@ const Group = () => {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
-        {name: formData.name},
+        { name: formData.name },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -156,8 +162,8 @@ const Group = () => {
   const handleEditGroup = async (item) => {
     console.log(item)
     setEditModalOpen(true)
-    setFormData({...item})
-    console.log("this is before edit",formData)
+    setFormData({ ...item })
+    console.log("this is before edit", formData)
   }
 
 
@@ -167,7 +173,7 @@ const Group = () => {
   // ###################### Delete Group ##############################
 
 
-  const deleteGroupSubmit = async(item) => {
+  const deleteGroupSubmit = async (item) => {
     alert("you want to delete this group");
     console.log(item)
 
@@ -237,7 +243,7 @@ const Group = () => {
       >
         {loading ? (
           <>
-            <div className="text-nowrap mb-2" style={{width: "480px"}}>
+            <div className="text-nowrap mb-2" style={{ width: "480px" }}>
               <p className="card-text placeholder-glow">
                 <span className="placeholder col-7" />
                 <span className="placeholder col-4" />
@@ -259,35 +265,61 @@ const Group = () => {
             <CTableHead className="text-nowrap">
               <CTableRow>
                 <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
+                  className=" text-center text-white bg-secondary">
                   Group Name
                 </CTableHeaderCell>
 
                 <CTableHeaderCell
-                   className=" text-center text-white bg-secondary">
+                  className=" text-center text-white bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {data?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center">{item.name}</CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
-                    </IconButton>
+              {data.length > 0 ? (
+                data?.map((item, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                    <CTableDataCell
+                      className="text-center d-flex"
+                      style={{ justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
+                        <RiEdit2Fill
+                          style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                        />
+                      </IconButton>
+                      <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
+                        <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                      </IconButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="2" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's no device available.
+                        <br /> Maybe it's time to create some devices!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add Group
+                        </button>
+                      </div>
+                    </div>
                   </CTableDataCell>
-                </CTableRow>
-              ))}
+                </CTableRow>)}
             </CTableBody>
           </CTable>
         )}

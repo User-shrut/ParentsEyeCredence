@@ -470,6 +470,7 @@ const fullscreenContainerStyle = {
   width: '100%',
   height: '100vh',
   position: 'fixed',
+  borderRadius: '10px',
   top: 0,
   left: 0,
   zIndex: 1000,
