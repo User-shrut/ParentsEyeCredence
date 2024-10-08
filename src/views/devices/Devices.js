@@ -47,7 +47,7 @@ const Devices = () => {
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
   const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(15)
   const [pageCount, setPageCount] = useState()
 
   const [data, setData] = useState([])
@@ -770,7 +770,7 @@ const Devices = () => {
                       <IconButton
                         aria-label="delete"
                         onClick={() => handleDeleteSelected(item._id)}
-                        sx={{ marginRight: '10px', color: 'brown' }}
+                        sx={{ marginRight: '10px', color: 'red' }}
                       >
                         <AiFillDelete style={{ fontSize: '20px' }} />
                       </IconButton>
