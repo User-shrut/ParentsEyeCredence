@@ -111,12 +111,17 @@ const Geofences = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '700px',
+    width: '35%',
+    maxHeight: '90vh',
+    BorderRadius: '10px',
     bgcolor: 'background.paper',
-    color: 'black',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto', // Enable vertical scrolling
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    marginTop: '8px',
   }
   if (deviceData) {
     console.log('hey bro this is device data : ', deviceData)
@@ -369,7 +374,7 @@ const Geofences = () => {
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell
-                       className=" text-center text-white bg-secondary">
+                      className=" text-center text-white bg-secondary">
                       Geofence Name
                     </CTableHeaderCell>
                     <CTableHeaderCell
@@ -377,7 +382,7 @@ const Geofences = () => {
                       Type
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                       className=" text-center text-white bg-secondary">
+                      className=" text-center text-white bg-secondary">
                       Vehicles
                     </CTableHeaderCell>
 
@@ -470,7 +475,7 @@ const Geofences = () => {
               {/* Check if Google Maps is loaded */}
               {isLoaded ? (
                 <GoogleMap
-                  mapContainerStyle={{ height: '300px', width: '100%' }}
+                  mapContainerStyle={{ height: '300px', width: '100%', }}
                   center={selectedLocation}
                   zoom={13}
                   onClick={onMapClick} // Set marker on click
@@ -501,7 +506,7 @@ const Geofences = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-              
+
               <Select
                 placeholder="Select Place Type..."
                 value={PlaceType.find((option) => option.value === formData.type) || ''}

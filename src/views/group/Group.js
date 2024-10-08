@@ -41,7 +41,7 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  
+
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
@@ -49,14 +49,19 @@ const Group = () => {
   const style = {
     position: 'absolute',
     top: '50%',
+    borderRadius: '10px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '35%',
+    maxHeight: '90vh',
     bgcolor: 'background.paper',
-    color: 'black',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto', // Enable vertical scrolling
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    marginTop: '8px',
   }
 
   // ##################### getting data  ###################
@@ -134,7 +139,7 @@ const Group = () => {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
-        {name: formData.name},
+        { name: formData.name },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -156,8 +161,8 @@ const Group = () => {
   const handleEditGroup = async (item) => {
     console.log(item)
     setEditModalOpen(true)
-    setFormData({...item})
-    console.log("this is before edit",formData)
+    setFormData({ ...item })
+    console.log("this is before edit", formData)
   }
 
 
@@ -167,7 +172,7 @@ const Group = () => {
   // ###################### Delete Group ##############################
 
 
-  const deleteGroupSubmit = async(item) => {
+  const deleteGroupSubmit = async (item) => {
     alert("you want to delete this group");
     console.log(item)
 
@@ -237,7 +242,7 @@ const Group = () => {
       >
         {loading ? (
           <>
-            <div className="text-nowrap mb-2" style={{width: "480px"}}>
+            <div className="text-nowrap mb-2" style={{ width: "480px" }}>
               <p className="card-text placeholder-glow">
                 <span className="placeholder col-7" />
                 <span className="placeholder col-4" />
@@ -259,12 +264,12 @@ const Group = () => {
             <CTableHead className="text-nowrap">
               <CTableRow>
                 <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
+                  className=" text-center text-white bg-secondary">
                   Group Name
                 </CTableHeaderCell>
 
                 <CTableHeaderCell
-                   className=" text-center text-white bg-secondary">
+                  className=" text-center text-white bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
