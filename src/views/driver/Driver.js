@@ -12,8 +12,10 @@ import {
   Modal,
   Box,
   TextField,
+  InputAdornment,
   FormControl,
 } from '@mui/material'
+import { Select, MenuItem, } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
@@ -31,6 +33,16 @@ import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
+import {
+  AccountCircle,
+  MailOutline,
+  Phone,
+} from '@mui/icons-material'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import DialpadIcon from '@mui/icons-material/Dialpad';
+import HomeIcon from '@mui/icons-material/Home';
+import { IoMdAdd } from 'react-icons/io'
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -39,12 +51,19 @@ const Driver = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(5)
+  const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  
 
-  const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+
+  const handleEditModalClose = () => {
+    setEditModalOpen(false);
+    setFormData({})
+  }
+  const handleAddModalClose = () => {
+   setAddModalOpen(false)
+   setFormData({});
+  }
+    
 
   const style = {
     position: 'absolute',
@@ -156,8 +175,8 @@ const Driver = () => {
   const handleEditDriver = async (item) => {
     console.log(item)
     setEditModalOpen(true)
-    setFormData({...item})
-    console.log("this is before edit",formData)
+    setFormData({ ...item })
+    console.log("this is before edit", formData)
   }
 
 
@@ -167,7 +186,7 @@ const Driver = () => {
   // ###################### Delete Group ##############################
 
 
-  const deleteDriverSubmit = async(item) => {
+  const deleteDriverSubmit = async (item) => {
     alert("you want to delete this Driver");
     console.log(item)
 
@@ -191,10 +210,41 @@ const Driver = () => {
     }
   }
 
+  const [fomData, setFomData] = useState({ device: '' });
+  const [devices, setDevices] = useState([]);
+  const token = Cookies.get('authToken'); //
+
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      console.log("fetch device me aaya hu...");
+      try {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        setDevices(data.devices); // Assuming the data returned contains device info
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
+
   //  ###############################################################
 
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Driver</h2>
@@ -214,14 +264,14 @@ const Driver = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Driver
             </button>
           </div>
         </div>
       </div>
-      <div className="d-md-none mb-2">
+      <div className="mb-2 d-md-none">
         <input
           type="search"
           className="form-control"
@@ -231,86 +281,72 @@ const Driver = () => {
         />
       </div>
 
+
+      
       <TableContainer
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{width: "480px"}}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow className='bg-body-tertiary'>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Driver Name
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                 className=" text-center text-white bg-secondary">
                   Mobile No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                 className=" text-center text-white bg-secondary">
                   Email
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Vehicle no.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Lic. No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Aadhar No.
                 </CTableHeaderCell>
                 <CTableHeaderCell
-                  className=" text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Address
                 </CTableHeaderCell>
-
                 <CTableHeaderCell
-                  className="text-center"
-                  style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                >
+                  className=" text-center text-white bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {data?.map((item, index) => (
+
+            {loading ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="8" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              ) : data.length > 0 ? (
+              data?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center">{item.name}</CTableDataCell>
                   <CTableDataCell className="text-center">{item.phone}</CTableDataCell>
@@ -333,10 +369,35 @@ const Driver = () => {
                     </IconButton>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
+              ))) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="8" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's nobody here yet.
+                        <br /> Maybe it's time to invite some drivers!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add Driver
+                        </button>
+                      </div>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              )}
             </CTableBody>
           </CTable>
-        )}
       </TableContainer>
       {pageCount > 1 && (
         <ReactPaginate
@@ -388,6 +449,13 @@ const Driver = () => {
                   value={formData.name !== undefined ? formData.name : ""}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label="Mobile No."
@@ -395,6 +463,13 @@ const Driver = () => {
                   value={formData.phone !== undefined ? formData.phone : ""}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label="Email"
@@ -402,20 +477,55 @@ const Driver = () => {
                   value={formData.email !== undefined ? formData.email : ""}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <MailOutline />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
+
                 <TextField
-                  label='Vehicle List'
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
-                />
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
-                  label='Lic No.'
+                  label='Licence No.'
                   name="lic"
                   value={formData.licenseNumber !== undefined ? formData.licenseNumber : ""}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <TextSnippetIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label='Aadhar No.'
@@ -423,6 +533,13 @@ const Driver = () => {
                   value={formData.aadharNumber !== undefined ? formData.aadharNumber : ""}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DialpadIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
                   label='Address'
@@ -430,6 +547,13 @@ const Driver = () => {
                   value={formData.address !== undefined ? formData.address : ""}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <HomeIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button
@@ -465,7 +589,7 @@ const Driver = () => {
             </IconButton>
           </div>
           <DialogContent>
-          <form onSubmit={EditDriverSubmit}>
+            <form onSubmit={EditDriverSubmit}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Driver Name"
@@ -488,13 +612,34 @@ const Driver = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
-                <TextField
-                  label='Vehicle List'
+                
+                   <TextField
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
-                />
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
                   label='Lic No.'
                   name="lic"

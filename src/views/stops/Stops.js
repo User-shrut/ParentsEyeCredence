@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  CButton,
   CCard,
   CCardBody,
   CCardHeader,
@@ -19,140 +18,118 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import Select from 'react-select';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
+const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
-  const [showDateInputs, setShowDateInputs] = useState(false);
-
+  const [buttonText, setButtonText] = useState('SHOW NOW');
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  // Date conversion function to convert the given date to the desired format
+  const convertToDesiredFormat = (inputDate) => {
+    const date = new Date(inputDate); // Create a Date object with the given input
+    // Get the timezone offset in minutes and convert to milliseconds
+    const timezoneOffset = date.getTimezoneOffset() * 60000;
+    // Adjust the date object to local time by subtracting the offset
+    const localDate = new Date(date.getTime() - timezoneOffset);
+    // Convert to ISO string format and append the +00:00 offset
+    const formattedDate = localDate.toISOString().replace('Z', '+00:00');
+    console.log('Original Date:', date);
+    console.log('Local Adjusted Date:', localDate);
+    console.log('Formatted Date:', formattedDate);
+    return formattedDate;
+  };
+  // Modify the existing handleInputChange function to include the format conversion
+  const handleDateChange = (field, value) => {
+    const formattedDate = convertToDesiredFormat(value); // Convert the input date
+    handleInputChange(field, formattedDate); // Call the input change handler
+    console.log("Formatted Date:", formattedDate); // Log the formatted date
+  };
   const handleFormSubmit = (event) => {
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
-      handleSubmit();
       event.stopPropagation();
     } else {
       event.preventDefault();
       handleSubmit();
-      setShowMap(true); //Show the mapping
+      setShowMap(true); //Show data mapping
     }
     setValidated(true);
   };
-
-  const handlePeriodChange = (value) => {
-    handleInputChange('Periods', value);
-    setShowDateInputs(value === 'Custom');
-  };
-
-  // State to manage button text
-  const [buttonText, setButtonText] = useState('SHOW NOW');
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
-
   // Function to handle dropdown item clicks
   const handleDropdownClick = (text) => {
     setButtonText(text); // Change button text based on the clicked item
     setDropdownOpen(false); // Close the dropdown after selection
-    handleSubmit(); // Submit form
-    // setShowMap(true); // Show the map when form is valid and submitted
+    setShowMap(true); // Show the map data
   };
-
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
-
   return (
-    <CForm
-      className="row g-3 needs-validation"
-      noValidate
-      validated={validated}
-      onSubmit={handleFormSubmit}
-    >
-      <CCol md={4}>
+    <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
+      <CCol md={6}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-
         <CFormSelect
           id="devices"
-          // required
+          required
           value={formData.Devices}
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
           {devices.length > 0 ? (
             devices.map((device) => (
-              <option key={device.id} value={device.id}>{device.name}</option>
+              <option key={device.id} value={device.deviceId}>
+                {device.name}
+              </option>
             ))
           ) : (
             <option disabled>Loading devices...</option>
           )}
         </CFormSelect>
-
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
-
-      <CCol md={4}>
-        <CFormLabel htmlFor="periods">Periods</CFormLabel>
-        <CFormSelect
-          id="periods"
-          required
-          value={formData.Periods}
-          onChange={(e) => handlePeriodChange(e.target.value)}
-        >
-          <option value="">Choose a period...</option>
-          <option value="Today">Today</option>
-          <option value="Yesterday">Yesterday</option>
-          <option value="This Week">This Week</option>
-          <option value="Previous Week">Previous Week</option>
-          <option value="This Month">This Month</option>
-          <option value="Previous Month">Previous Month</option>
-          <option value="Custom">Custom</option>
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
-      </CCol>
-
-      <CCol md={4}>
+      <CCol md={6}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        {/* Use React-Select component for multi-select */}
         <Select
           isMulti
           id="columns"
           options={columns.map((column) => ({ value: column, label: column }))}
           value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
+          onChange={(selectedOptions) =>
+            handleInputChange('Columns', selectedOptions.map((option) => option.value))
+          }
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
-
-      {showDateInputs && (
-        <>
-          <CCol md={4}>
-            <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
-            <CFormInput
-              type="date"
-              id="fromDate"
-              value={formData.FromDate}
-              onChange={(e) => handleInputChange('FromDate', e.target.value)}
-              required
-            />
-            <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
-          </CCol>
-          <CCol md={4}>
-            <CFormLabel htmlFor="toDate">To Date</CFormLabel>
-            <CFormInput
-              type="date"
-              id="toDate"
-              value={formData.ToDate}
-              onChange={(e) => handleInputChange('ToDate', e.target.value)}
-              required
-            />
-            <CFormFeedback invalid>Please provide a valid to date.</CFormFeedback>
-          </CCol>
-        </>
-      )}
-
-      <CCol xs={12} >
+      {/* Date Inputs for From Date and To Date */}
+      <CCol md={6}>
+        <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
+        <CFormInput
+          type="datetime-local"
+          id="fromDate"
+          value={formData.FromDate ? formData.FromDate.slice(0, 16) : ''} // Display local datetime value
+          onChange={(e) => handleDateChange('FromDate', e.target.value)} // Use handleDateChange for conversion
+          required
+        />
+        <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
+      </CCol>
+      <CCol md={6}>
+        <CFormLabel htmlFor="toDate">To Date</CFormLabel>
+        <CFormInput
+          type="datetime-local"
+          id="toDate"
+          value={formData.ToDate ? formData.ToDate.slice(0, 16) : ''} // Display local datetime value
+          onChange={(e) => handleDateChange('ToDate', e.target.value)} // Use handleDateChange for conversion
+          required
+        />
+        <CFormFeedback invalid>Please provide a valid to date.</CFormFeedback>
+      </CCol>
+      <CCol xs={12}>
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+            <button className="btn btn-primary" type="submit" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
             <button
@@ -163,25 +140,25 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
             >
               <span className="visually-hidden">Toggle Dropdown</span>
             </button>
-            {isDropdownOpen && ( // Conditionally render dropdown menu
-              <ul className="dropdown-menu show ">
+            {isDropdownOpen && (
+              <ul className="dropdown-menu show">
                 <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
+                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Show Now')}>
                     Show Now
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
+                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Export')}>
                     Export
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
+                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Email Reports')}>
                     Email Reports
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
+                  <a className="dropdown-item" href="#" onClick={() => handleDropdownClick('Schedule')}>
                     Schedule
                   </a>
                 </li>
@@ -193,12 +170,13 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, colu
     </CForm>
   );
 };
-
-const CustomStyles1 = ({ rows, selectedColumns }) => {
+const StopTable = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
+          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+          <CTableHeaderCell>Device</CTableHeaderCell>
           {/* Dynamically render table headers based on selected columns */}
           {selectedColumns.map((column, index) => (
             <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
@@ -206,11 +184,21 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {rows.map((row, rowIndex) => (
+        {apiData?.finalDeviceDataByStopage?.map((row, rowIndex) => (
           <CTableRow key={row.id} className="custom-row">
+            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+            <CTableDataCell>{row.deviceId}</CTableDataCell>
             {/* Dynamically render table cells based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>{row[column]}</CTableDataCell>
+              <CTableDataCell key={index}>   {column === 'Speed' ? row.speed :
+                column === 'Ignition' ? row.ignition ? "ON" : "OFF" :
+                  column === 'Direction' ? row.course :
+                    column === 'Device Id' ? row.deviceId :
+                      column === 'Arrival Time' ? row.arrivalTime :
+                        column === 'Departure Time' ? row.departureTime :
+                          column === 'Device Name' ? row.device?.name :
+
+                            '--'}</CTableDataCell>
             ))}
           </CTableRow>
         ))}
@@ -218,29 +206,25 @@ const CustomStyles1 = ({ rows, selectedColumns }) => {
     </CTable>
   );
 };
-
-const Validation = () => {
-  const [rows, setRows] = useState([
-  ]);
+const Stops = () => {
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  const [columns] = useState(['Start Time', 'Odometer', 'Address', 'End Time', 'Duration', 'Engine Hours', 'Spent Fuel']);
+  const [columns] = useState(['Speed', 'Ignition', 'Direction', 'Device Id', 'Arrival Time', 'Departure Time',]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
-
-
+  const token = Cookies.get('authToken'); //token
+  const [apiData, setApiData] = useState();   //data from api
   useEffect(() => {
     const fetchDevices = async () => {
       try {
         const response = await fetch('https://credence-tracker.onrender.com/device', {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjY5NzQ5MjVjNmI3MjIyZDg3YzE0ZSIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmY2OTc0OTI1YzZiNzIyMmQ4N2MxNGUiLCJlbWFpbCI6IlBhdmFuQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJGVjOGRlODg1TEpMWThUZ1A3NG5ZNmU1dkdIeTNIMnVQVnN1bE1RMzZmMFVrM242VVFVZUlTIiwidXNlcm5hbWUiOiJQYXZhbiIsImNyZWF0ZWRCeSI6IjY2ZjNlNjFmNjE4NTU5NmQxZDAwYzM4NCIsIm5vdGlmaWNhdGlvbiI6dHJ1ZSwiZGV2aWNlcyI6dHJ1ZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjpmYWxzZSwic3VtbWFyeSI6ZmFsc2UsImN1c3RvbUNoYXJ0cyI6dHJ1ZSwiZGV2aWNlbGltaXQiOmZhbHNlLCJkYXRhTGltaXQiOjEsImVudHJpZXNDb3VudCI6MCwiX192IjowfSwiaWF0IjoxNzI3NDM4MTA5fQ.gfelNrYbAeS748DqP0K9_XeXdESFD8PD5lwLv8UiP50', // Replace with your actual token
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -253,63 +237,59 @@ const Validation = () => {
     };
     fetchDevices();
   }, []);
-
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    if (name === 'Columns') {
+      setSelectedColumns(value);
+    }
   };
-
   const handleSubmit = async () => {
-    const body = {
-      deviceId: formData.Devices, // Use the device ID from the form data
-      period: formData.Periods, // Use the selected period from the form data
-    };
-  
+    console.log(formData);
     // Convert the dates to ISO format if they're provided
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
-  
-    // Construct the API URL using formData.Devices
-    const apiUrl = `http://104.251.212.80/api/stop?deviceId=${formData.Devices}&from=${fromDate}&to=${toDate}`;
-    
-    // Log the constructed API URL
-    console.log('Constructed API URL:', apiUrl);
-  
+    const body = {
+      deviceId: formData.Devices, // Use the device ID from the form data
+      // period: formData.Periods, // Use the selected period from the form data
+      FromDate: fromDate,
+      ToDate: toDate,
+    };
+    console.log(token);
+    // console.log(body);
     try {
-      const response = await fetch('https://credence-tracker.onrender.com/history/device-stopage?deviceId=2636&from=2024-09-27T05:16:57.000+00:00&to=2024-09-27T05:16:57.000+00:00 ', {
-        method: 'POST', // Use POST method to send data
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/history/device-stopage?deviceId=${body.deviceId}&from=${body.FromDate}&to=${body.ToDate}`, {
         headers: {
-          // 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOnRydWUsImRldmljZXMiOnRydWUsImRyaXZlciI6dHJ1ZSwiZ3JvdXBzIjp0cnVlLCJjYXRlZ29yeSI6dHJ1ZSwibW9kZWwiOnRydWUsInVzZXJzIjp0cnVlLCJyZXBvcnQiOnRydWUsInN0b3AiOnRydWUsInRyaXBzIjp0cnVlLCJnZW9mZW5jZSI6dHJ1ZSwibWFpbnRlbmFuY2UiOnRydWUsInByZWZlcmVuY2VzIjp0cnVlLCJjb21iaW5lZFJlcG9ydHMiOnRydWUsImN1c3RvbVJlcG9ydHMiOnRydWUsImhpc3RvcnkiOnRydWUsInNjaGVkdWxlcmVwb3J0cyI6dHJ1ZSwic3RhdGlzdGljcyI6dHJ1ZSwiYWxlcnRzIjp0cnVlLCJzdW1tYXJ5Ijp0cnVlLCJjdXN0b21DaGFydHMiOnRydWUsIl9fdiI6MCwiZGV2aWNlbGltaXQiOmZhbHNlLCJlbnRyaWVzQ291bnQiOjZ9LCJpYXQiOjE3Mjc1MTUxNjd9.nH3Ly-ElbGjwah4r4FV0GdYE0TnZ9hBwlIqdo8Gpewc', // Replace with your actual token
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body), // Send the request body with deviceId and period
+        }
       });
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      // console.log(response.data.deviceDataByTrips[0]);
+      if (response.status == 201) {
+        console.log(response.data.finalDeviceDataByStopage)
+        console.log("done in all")
+        console.log(response.data);
+        setApiData(response.data);
       }
-  
-      const data = await response.json();
-      setRows(data); // Assuming the data returned is what you want to display in the table
+      // Assuming the data returned is what you want to display in the table
       console.log('Form submitted with data:', body);
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
-  
   return (
-    <>
+    <div>
       <CRow className='pt-3'>
         <h2 className='px-4'>Stop</h2>
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Stop Report</strong>
+              <strong>Stop</strong>
             </CCardHeader>
             <CCardBody>
-              <CustomStyles
+              <SearchStop
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
@@ -322,13 +302,12 @@ const Validation = () => {
           </CCard>
         </CCol>
       </CRow>
-
       {showMap && (
         <CRow className="justify-content-center mt-4">
           <CCol xs={12} className="px-4" >
             <CCard className='p-0 mb-4 shadow-sm'>
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-                <strong>All Stop Report List</strong>
+                <strong>All Stop List</strong>
                 <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
@@ -337,13 +316,13 @@ const Validation = () => {
                 />
               </CCardHeader>
               <CCardBody>
-                <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+                <StopTable apiData={apiData} selectedColumns={selectedColumns} />
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
       )}
-    </>
+    </div>
   );
 };
-export default Validation;
+export default Stops;

@@ -23,8 +23,8 @@ import {
   TextField,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  OutlinedInput,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -32,8 +32,11 @@ import ReactPaginate from 'react-paginate'
 import Gmap from '../Googlemap/Gmap'
 import CloseIcon from '@mui/icons-material/Close'
 import { GoogleMap, Marker, Polygon, useLoadScript } from '@react-google-maps/api'
+import { useSelector } from 'react-redux'
+import Select from 'react-select'
 
 const Geofences = () => {
+  const deviceData = useSelector((state) => state.device.data)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -46,17 +49,95 @@ const Geofences = () => {
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
+  const PlaceType = [
+    { value: 'ATM', label: 'ATM' },
+    { value: 'Airport', label: 'Airport' },
+    { value: 'Bank', label: 'Bank' },
+    { value: 'Beach', label: 'Beach' },
+    { value: 'Bus_Stop', label: 'Bus Stop' },
+    { value: 'Restaurant', label: 'Restaurant' },
+    { value: 'Dairy', label: 'Dairy' },
+    { value: 'District', label: 'District' },
+    { value: 'Facility', label: 'Facility' },
+    { value: 'Factory', label: 'Factory' },
+    { value: 'Fuel_Station', label: 'Fuel Station' },
+    { value: 'Highway_point', label: 'Highway Point' },
+    { value: 'Home', label: 'Home' },
+    { value: 'Hospital', label: 'Hospital' },
+    { value: 'Hotel', label: 'Hotel' },
+    { value: 'Mosque', label: 'Mosque' },
+    { value: 'Office', label: 'Office' },
+    { value: 'Other', label: 'Other' },
+    { value: 'Police_Station', label: 'Police Station' },
+    { value: 'Post_Office', label: 'Post Office' },
+    { value: 'Railway_Station', label: 'Railway Station' },
+    { value: 'Recycle_Station', label: 'Recycle Station' },
+    { value: 'School', label: 'School' },
+    { value: 'Traffic_Signal', label: 'Traffic Signal' },
+    { value: 'State_Border', label: 'State Border' },
+    { value: 'Sub_Division', label: 'Sub Division' },
+    { value: 'Temple', label: 'Temple' },
+    { value: 'Theater', label: 'Theater' },
+    { value: 'Theme_Park', label: 'Theme Park' },
+    { value: 'Toll_Gate', label: 'Toll Gate' },
+    { value: 'Tunnel', label: 'Tunnel' },
+    { value: 'University', label: 'University' },
+    { value: 'Way_Bridge', label: 'Way Bridge' },
+    { value: 'Sensative_Points', label: 'Sensitive Points' },
+    { value: 'Dumping_Yard', label: 'Dumping Yard' },
+    { value: 'Mine', label: 'Mine' },
+    { value: 'No_POI_Report', label: 'No POI Report' },
+    { value: 'Entry_Restriction', label: 'Entry Restriction' },
+    { value: 'Tyre_Shop', label: 'Tyre Shop' },
+    { value: 'Workshop', label: 'Workshop' },
+    { value: 'Yard', label: 'Yard' },
+    { value: 'Parking_Place', label: 'Parking Place' },
+    { value: 'Driver_Home', label: 'Driver Home' },
+    { value: 'Customer', label: 'Customer' },
+    { value: 'Puspakom', label: 'Puspakom' },
+    { value: 'Exit_Restriction', label: 'Exit Restriction' },
+    { value: 'Gurudwara', label: 'Gurudwara' },
+    { value: 'Church', label: 'Church' },
+    { value: 'Distributor', label: 'Distributor' },
+    { value: 'State', label: 'State' },
+    { value: 'WaterFall', label: 'WaterFall' },
+    { value: 'Depot', label: 'Depot' },
+    { value: 'Terminal', label: 'Terminal' },
+    { value: 'Port', label: 'Port' },
+  ]
+
   const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '700px',
+    width: '35%',
+    maxHeight: '90vh',
+    BorderRadius: '10px',
     bgcolor: 'background.paper',
-    color: 'black',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto', // Enable vertical scrolling
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    marginTop: '8px',
+  }
+  if (deviceData) {
+    console.log('hey bro this is device data : ', deviceData)
+  } else {
+    console.log('abe yaar device data nh hai')
+  }
+
+  const deviceOptions = deviceData?.devices?.map((device) => ({
+    value: device.deviceId,
+    label: device.name,
+  }))
+
+  const [selectedDevices, setSelectedDevices] = useState([])
+
+  const handleDeviceChange = (selected) => {
+    setSelectedDevices(selected)
   }
 
   // ############ map code #################################
@@ -128,24 +209,29 @@ const Geofences = () => {
     const updatedFormData = {
       ...formData,
       area: polygonCoords, // Add your polygonCoords here
-    };
+      deviceIds: selectedDevices.map((device) => device.value),
+    }
 
-    console.log("this is updated formdata: ", updatedFormData);
+    console.log('this is updated formdata: ', updatedFormData)
 
     try {
-      const accessToken = Cookies.get('authToken');
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/geofence`, updatedFormData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const accessToken = Cookies.get('authToken')
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/geofence`,
+        updatedFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
 
       if (response.status == 201) {
         alert('Geofence is created successfully')
         fetchGeofenceData()
         setFormData({})
-        setPolygonCoords([]);
+        setPolygonCoords([])
         setAddModalOpen(false)
       }
     } catch (error) {
@@ -153,18 +239,23 @@ const Geofences = () => {
     }
   }
 
-
   // ###########################################################################
   // ######################  Edit Geofence ###################################
 
   const EditGeofenceSubmit = async (e) => {
     e.preventDefault()
-    console.log(formData);
+    console.log(formData)
+
+    const editedData = {
+      ...formData,
+      area: polygonCoords, // Add your polygonCoords here
+      deviceIds: selectedDevices.map((device) => device.value),
+    }
     try {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/Geofence/${formData._id}`,
-        formData,
+        editedData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -174,9 +265,9 @@ const Geofences = () => {
 
       if (response.status === 200) {
         alert('Geofence is edited successfully')
-        fetchGeofenceData();
+        fetchGeofenceData()
         setFormData({})
-        setPolygonCoords([]);
+        setPolygonCoords([])
         setEditModalOpen(false)
       }
     } catch (error) {
@@ -187,33 +278,29 @@ const Geofences = () => {
   const handleEditGeofence = async (item) => {
     console.log(item)
     setEditModalOpen(true)
-    setFormData({...item})
-    console.log("this is before edit",formData)
+    setFormData({ ...item })
+    console.log('this is before edit', formData)
   }
-
 
   // #########################################################################
 
   // ######################## Delete Geofence ################################
 
-  const deleteGeofenceSubmit = async(item) => {
-    alert("you want to delete this Geofence");
+  const deleteGeofenceSubmit = async (item) => {
+    alert('you want to delete this Geofence')
     console.log(item)
 
     try {
       const accessToken = Cookies.get('authToken')
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/Geofence/${item._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          },
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/Geofence/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      )
+      })
 
       if (response.status === 200) {
-        alert('Geofence is deleted successfully');
-        fetchGeofenceData();
+        alert('Geofence is deleted successfully')
+        fetchGeofenceData()
       }
     } catch (error) {
       throw error.response ? error.response.data : new Error('An error occurred')
@@ -222,9 +309,8 @@ const Geofences = () => {
 
   //  ###############################################################
 
-
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Geofence</h2>
@@ -244,7 +330,7 @@ const Geofences = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Geofence
             </button>
@@ -284,32 +370,24 @@ const Geofences = () => {
                 </div>
               </>
             ) : (
-              <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
                 <CTableHead className="text-nowrap">
                   <CTableRow>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                      className=" text-center text-white bg-secondary">
                       Geofence Name
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                      className=" text-center text-white bg-secondary">
                       Type
                     </CTableHeaderCell>
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
-                      Assign To
+                      className=" text-center text-white bg-secondary">
+                      Vehicles
                     </CTableHeaderCell>
 
                     <CTableHeaderCell
-                      className="bg-body-tertiary text-center"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#fff' }}
-                    >
+                      className=" text-center text-white bg-secondary">
                       Actions
                     </CTableHeaderCell>
                   </CTableRow>
@@ -319,7 +397,11 @@ const Geofences = () => {
                     <CTableRow key={index}>
                       <CTableDataCell className="text-center">{item.name}</CTableDataCell>
                       <CTableDataCell className="text-center">{item.type}</CTableDataCell>
-                      <CTableDataCell className="text-center">{item.assignType}</CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        {item.deviceIds.map((device) => (
+                          <span>{device.name} ,</span>
+                        ))}
+                      </CTableDataCell>
                       <CTableDataCell
                         className="text-center d-flex"
                         style={{ justifyContent: 'center', alignItems: 'center' }}
@@ -366,7 +448,7 @@ const Geofences = () => {
           <div style={{ flex: 1 }}>{data.length > 0 && <Gmap data={data} />}</div>
         </div>
       </div>
-      
+
       <Modal
         open={addModalOpen}
         onClose={handleAddModalClose}
@@ -393,7 +475,7 @@ const Geofences = () => {
               {/* Check if Google Maps is loaded */}
               {isLoaded ? (
                 <GoogleMap
-                  mapContainerStyle={{ height: '300px', width: '100%' }}
+                  mapContainerStyle={{ height: '300px', width: '100%', }}
                   center={selectedLocation}
                   zoom={13}
                   onClick={onMapClick} // Set marker on click
@@ -417,77 +499,30 @@ const Geofences = () => {
               )}
               <br />
               <TextField
-              fullWidth
+                fullWidth
                 label="Geofence Name"
                 name="name"
                 value={formData.name !== undefined ? formData.name : ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Placetype</InputLabel>
-                <Select
-                  value={formData.type !== undefined ? formData.type : ''}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  fullWidth
-                >
-                  <MenuItem value="ATM">ATM</MenuItem>
-                  <MenuItem value="Airport">Airport</MenuItem>
-                  <MenuItem value="Bank">Bank</MenuItem>
-                  <MenuItem value="Beach">Beach</MenuItem>
-                  <MenuItem value="Bus_Stop">Bus Stop</MenuItem>
-                  <MenuItem value="Restaurant">Restaurant</MenuItem>
-                  <MenuItem value="Dairy">Dairy</MenuItem>
-                  <MenuItem value="District">District</MenuItem>
-                  <MenuItem value="Facility">Facility</MenuItem>
-                  <MenuItem value="Factory">Factory</MenuItem>
-                  <MenuItem value="Fuel_Station">Fuel Station</MenuItem>
-                  <MenuItem value="Highway_point">Highway Point</MenuItem>
-                  <MenuItem value="Home">Home</MenuItem>
-                  <MenuItem value="Hospital">Hospital</MenuItem>
-                  <MenuItem value="Hotel">Hotel</MenuItem>
-                  <MenuItem value="Mosque">Mosque</MenuItem>
-                  <MenuItem value="Office">Office</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                  <MenuItem value="Police_Station">Police Station</MenuItem>
-                  <MenuItem value="Post_Office">Post Office</MenuItem>
-                  <MenuItem value="Railway_Station">Railway Station</MenuItem>
-                  <MenuItem value="Recycle_Station">Recycle Station</MenuItem>
-                  <MenuItem value="School">School</MenuItem>
-                  <MenuItem value="Traffic_Signal">Traffic Signal</MenuItem>
-                  <MenuItem value="State_Border">State Border</MenuItem>
-                  <MenuItem value="Sub_Division">Sub Division</MenuItem>
-                  <MenuItem value="Temple">Temple</MenuItem>
-                  <MenuItem value="Theater">Theater</MenuItem>
-                  <MenuItem value="Theme_Park">Theme Park</MenuItem>
-                  <MenuItem value="Toll_Gate">Toll Gate</MenuItem>
-                  <MenuItem value="Tunnel">Tunnel</MenuItem>
-                  <MenuItem value="University">University</MenuItem>
-                  <MenuItem value="Way_Bridge">Way Bridge</MenuItem>
-                  <MenuItem value="Sensative_Points">Sensitive Points</MenuItem>
-                  <MenuItem value="Dumping_Yard">Dumping Yard</MenuItem>
-                  <MenuItem value="Mine">Mine</MenuItem>
-                  <MenuItem value="No_POI_Report">No POI Report</MenuItem>
-                  <MenuItem value="Entry_Restriction">Entry Restriction</MenuItem>
-                  <MenuItem value="Tyre_Shop">Tyre Shop</MenuItem>
-                  <MenuItem value="Workshop">Workshop</MenuItem>
-                  <MenuItem value="Yard">Yard</MenuItem>
-                  <MenuItem value="Parking_Place">Parking Place</MenuItem>
-                  <MenuItem value="Driver_Home">Driver Home</MenuItem>
-                  <MenuItem value="Customer">Customer</MenuItem>
-                  <MenuItem value="Puspakom">Puspakom</MenuItem>
-                  <MenuItem value="Exit_Restriction">Exit Restriction</MenuItem>
-                  <MenuItem value="Gurudwara">Gurudwara</MenuItem>
-                  <MenuItem value="Church">Church</MenuItem>
-                  <MenuItem value="Distributor">Distributor</MenuItem>
-                  <MenuItem value="State">State</MenuItem>
-                  <MenuItem value="WaterFall">WaterFall</MenuItem>
-                  <MenuItem value="Depot">Depot</MenuItem>
-                  <MenuItem value="Terminal">Terminal</MenuItem>
-                  <MenuItem value="Port">Port</MenuItem>
-                </Select>
-              </FormControl>
-              
+
+              <Select
+                placeholder="Select Place Type..."
+                value={PlaceType.find((option) => option.value === formData.type) || ''}
+                onChange={(selectedOption) =>
+                  setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
+                }
+                options={PlaceType}
+              />
+
+              <Select
+                isMulti
+                options={deviceOptions}
+                onChange={handleDeviceChange}
+                value={selectedDevices}
+                placeholder="Select devices"
+              />
 
               <Button
                 variant="contained"
@@ -551,14 +586,14 @@ const Geofences = () => {
               )}
               <br />
               <TextField
-              fullWidth
+                fullWidth
                 label="Geofence Name"
                 name="name"
                 value={formData.name !== undefined ? formData.name : ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-              <FormControl fullWidth margin="normal">
+              {/* <FormControl fullWidth margin="normal">
                 <InputLabel>Placetype</InputLabel>
                 <Select
                   value={formData.type !== undefined ? formData.type : ''}
@@ -620,8 +655,24 @@ const Geofences = () => {
                   <MenuItem value="Terminal">Terminal</MenuItem>
                   <MenuItem value="Port">Port</MenuItem>
                 </Select>
-              </FormControl>
-              
+              </FormControl> */}
+
+              <Select
+                placeholder="Select Place Type..."
+                value={PlaceType.find((option) => option.value === formData.type) || ''}
+                onChange={(selectedOption) =>
+                  setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
+                }
+                options={PlaceType}
+              />
+
+              <Select
+                isMulti
+                options={deviceOptions}
+                onChange={handleDeviceChange}
+                value={selectedDevices}
+                placeholder="Select devices"
+              />
 
               <Button
                 variant="contained"

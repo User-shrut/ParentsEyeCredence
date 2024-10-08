@@ -460,7 +460,7 @@ import { CTooltip } from '@coreui/react';
 
 const containerStyle = {
   width: '100%',
-  height: '500px',
+  height: '740px',
   borderRadius: '10px',
   overflow: 'hidden',
   position: 'relative',
@@ -470,6 +470,7 @@ const fullscreenContainerStyle = {
   width: '100%',
   height: '100vh',
   position: 'fixed',
+  borderRadius: '10px',
   top: 0,
   left: 0,
   zIndex: 1000,

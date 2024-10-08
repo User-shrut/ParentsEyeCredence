@@ -16,11 +16,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Step,
+  Stepper,
+  StepLabel,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
-import { AiFillDelete } from 'react-icons/ai'
+import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai'
 import SearchIcon from '@mui/icons-material/Search'
 import {
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -31,64 +35,84 @@ import {
 import { useNavigate } from 'react-router-dom'
 import Loader from '../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
+import Cookies from 'js-cookie'
+import { IoMdAdd } from 'react-icons/io'
+import ReactPaginate from 'react-paginate'
+import { Label } from '@mui/icons-material'
 
 const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
 
 const Devices = () => {
-  const [open, setOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
-  const [anchorEl, setAnchorEl] = useState(null) // Form data state
   const [loading, setLoading] = useState(false)
+  const [limit, setLimit] = useState(10)
+  const [pageCount, setPageCount] = useState()
+
   const [data, setData] = useState([])
-  const [totalResponses, setTotalResponses] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const navigate = useNavigate()
-  const [filteredRows, setFilteredRows] = useState([])
-  // const handleModalClose = () => setAddModalOpen(false);
-  const [filteredData, setFilteredData] = useState([]) // Your initial data
-  const [selectedRow, setSelectedRow] = useState(null)
-  const [users, setUsers] = useState([])
+
   const [extendedPasswordModel, setExtendedPasswordModel] = useState(false)
   const myPassword = '123456'
   const [extendedPassword, setExtendedPassword] = useState()
   const [passwordCheck, setPasswordCheck] = useState(false)
+
+  const [groups, setGroups] = useState([])
+  const [users, setUsers] = useState([])
   const [drivers, setDrivers] = useState([])
+  const [areas, setAreas] = useState([])
+  const [models, setModels] = useState([])
+  const [categories, setCategories] = useState([])
+
+  const token = Cookies.get('authToken')
+
+  const [currentStep, setCurrentStep] = useState(0)
+  const steps = ['Device Info', 'Assign To', 'Subscription']
+
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
-    // setExtendedPasswordModel(false);
-    // setFormData({});
+    setExtendedPasswordModel(false)
+    setCurrentStep(0)
+    setFormData({})
   }
-  const [areasValue, setAreasValue] = useState('')
+
+  // Go to the next step
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  }
+
+  // Go to the previous step
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+  }
 
   const columns = [
-    { Header: 'Device Name', accessor: 'name' },
-    { Header: 'Imei No.', accessor: 'uniqueId' },
-    { Header: 'Sim', accessor: 'Sim' },
-    { Header: 'Speed', accessor: 'Speed' },
-    { Header: 'Average', accessor: 'Average' },
-    { Header: 'Driver', accessor: 'driver' },
-    { Header: 'Model', accessor: 'model' },
-    { Header: 'Category', accessor: 'category' },
-    { Header: 'Groups', accessor: 'groupId' },
-    { Header: 'User', accessor: 'User' },
-    { Header: 'Geofence', accessor: 'geofence' },
-    { Header: 'Expiration', accessor: 'expiration' },
+    { Header: 'Device Id', accessor: '_id' },
+    { Header: 'Device Name', accessor: 'name' }, // Maps to 'name'
+    { Header: 'IMEI No.', accessor: 'uniqueId' }, // Maps to 'uniqueId'
+    { Header: 'Sim', accessor: 'sim' }, // Maps to 'sim'
+    { Header: 'Speed', accessor: 'speed' }, // Maps to 'speed'
+    { Header: 'Average', accessor: 'average' }, // Maps to 'average'
+    { Header: 'Users', accessor: 'users' },
+    { Header: 'Groups', accessor: 'groups' },
+    { Header: 'Driver', accessor: 'Driver' },
+    { Header: 'Geofences', accessor: 'geofences' },
+    { Header: 'Model', accessor: 'model' }, // Maps to 'model'
+    { Header: 'Category', accessor: 'category' }, // Maps to 'category'
+    { Header: 'Installation Date', accessor: 'installationdate' }, // Maps to 'installationdate'
+    { Header: 'Expiration', accessor: 'expirationdate' }, // Maps to 'expirationdate'
+    { Header: 'Extend Date', accessor: 'extenddate' },
   ]
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '30%',
-    height: '100%',
+    width: '35%',
+    height: 'auto',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
@@ -99,50 +123,6 @@ const Devices = () => {
     margintop: '8px',
   }
   /* Replace -ms-high-contrast with forced-colors */
-
-  const fetchData = async () => {
-    setLoading(true) // Start loading
-    try {
-      const username = 'hbtrack'
-      const password = '123456@'
-      const token = btoa(`${username}:${password}`)
-
-      const response = await axios.get('http://104.251.212.84/api/devices', {
-        headers: {
-          Authorization: `Basic ${token}`,
-        },
-      })
-
-      if (Array.isArray(response.data)) {
-        setData(response.data)
-        setTotalResponses(response.data.length)
-      } else {
-        console.error('Expected an array but got:', response.data)
-        alert('Unexpected data format received.')
-      }
-    } catch (error) {
-      console.error('Fetch data error:', error)
-      alert('An error occurred while fetching data.')
-    } finally {
-      setLoading(false) // Stop loading once data is fetched
-    }
-  }
-
-  useEffect(() => {
-    const lowerCaseQuery = searchQuery.toLowerCase()
-    setFilteredData(
-      data.filter((item) =>
-        columns.some((column) =>
-          item[column.accessor]?.toString().toLowerCase().includes(lowerCaseQuery),
-        ),
-      ),
-    )
-  }, [data, searchQuery, columns])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => ({ ...prevData, [name]: value }))
-  }
 
   const handleEditDateInputChange = (e) => {
     const { name, value } = e.target
@@ -163,222 +143,321 @@ const Devices = () => {
     }
   }
 
-  const handleAddSubmit = async () => {
-    try {
-      // Define the API endpoint and credentials
-      const apiUrl = 'http://104.251.212.84/api/devices' // Replace with actual API endpoint
-      const username = 'credenceOCT' // Replace with your actual username
-      const password = '123456' // Replace with your actual password
-      const token = btoa(`${username}:${password}`) // Encode credentials in Base64
+  // const handleEditSubmit = async () => {
+  //   if (!selectedRow) {
+  //     alert('No row selected for editing')
+  //     return
+  //   }
 
-      // Prepare the new row object based on the expected schema
-      const newRow = {
-        name: formData.name, // Ensure formData has 'name'
-        uniqueId: formData.uniqueId, // Ensure formData has 'uniqueId'
-        groupId: formData.groupId, // Ensure formData has 'groupId'
-        attributes: formData.attributes || {}, // Ensure formData has 'attributes' (empty object if not provided)
-        calendarId: formData.calendarId, // Ensure formData has 'calendarId'
-        status: formData.status, // Ensure formData has 'status'
-        phone: formData.phone, // Ensure formData has 'phone'
-        model: formData.model, // Ensure formData has 'model'
-        expirationTime: formData.expirationTime, // Ensure formData has 'expirationTime'
-        contact: formData.contact, // Ensure formData has 'contact'
-        category: formData.category, // Ensure formData has 'category'
+  //   const apiUrl = `https://credence-tracker.onrender.com/device/${selectedRow._id}`
+
+  //   // Exclude the 'isSelected' field from formData
+  //   const { isSelected, ...updatedData } = formData
+
+  //   try {
+  //     console.log('Sending request to:', apiUrl)
+  //     console.log('Request payload:', JSON.stringify(updatedData, null, 2))
+
+  //     const response = await fetch(apiUrl, {
+  //       method: 'PUT',
+  //       headers: {
+  //         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJkZXZpY2VsaW1pdCI6ZmFsc2UsIl9pZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsImVtYWlsIjoieWFzaEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCRCSHp0NnU0YnA0TTVLeFlhcDlTbFh1NDdyVWJ1S2xWVC9KUVZSTERscVBxVjgvUDc5OVdvaSIsInVzZXJuYW1lIjoieWFzaCIsImNyZWF0ZWRCeSI6IjY2ZjI4NDcwZGU4ZGRlMDVmNzRhN2Q5OCIsIm5vdGlmaWNhdGlvbiI6dHJ1ZSwiZGV2aWNlcyI6dHJ1ZSwiZHJpdmVyIjp0cnVlLCJncm91cHMiOnRydWUsImNhdGVnb3J5Ijp0cnVlLCJtb2RlbCI6dHJ1ZSwidXNlcnMiOnRydWUsInJlcG9ydCI6dHJ1ZSwic3RvcCI6dHJ1ZSwidHJpcHMiOnRydWUsImdlb2ZlbmNlIjp0cnVlLCJtYWludGVuYW5jZSI6dHJ1ZSwicHJlZmVyZW5jZXMiOnRydWUsImNvbWJpbmVkUmVwb3J0cyI6dHJ1ZSwiY3VzdG9tUmVwb3J0cyI6dHJ1ZSwiaGlzdG9yeSI6dHJ1ZSwic2NoZWR1bGVyZXBvcnRzIjp0cnVlLCJzdGF0aXN0aWNzIjp0cnVlLCJhbGVydHMiOnRydWUsInN1bW1hcnkiOnRydWUsImN1c3RvbUNoYXJ0cyI6dHJ1ZSwiX192IjowfSwiaWF0IjoxNzI3MzQ0OTc2fQ.yYjpV596hRjy4FuGzeBaUfZuNJ3LbUQL2XwyR0-6tsE`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(updatedData),
+  //     })
+
+  //     if (!response.ok) {
+  //       const errorResult = await response.json()
+  //       throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`)
+  //     }
+
+  //     const result = await response.json()
+  //     console.log('Update successful:', result)
+  //     alert('Updated successfully')
+
+  //     // Update local state with the modified row data
+  //     const updatedRows = rows.map((row) =>
+  //       row.id === selectedRow.id ? { ...row, ...updatedData } : row,
+  //     )
+  //     // Assuming you have a setFilteredRows or similar to update the state
+  //     setFilteredRows(updatedRows)
+
+  //     setEditModalOpen(false)
+  //     fetchData() // Refetch data to ensure the UI is up-to-date
+  //   } catch (error) {
+  //     console.error('Error updating row:', error.message)
+  //     alert('Error updating data')
+  //   }
+  // }
+  const [rows, setRows] = useState([])
+
+  // ###################### Fetch device Data ######################
+
+  const fetchData = async (page = 1) => {
+    setLoading(true) // Start loading
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      // Access the devices array from the response
+      if (response.data && Array.isArray(response.data.devices)) {
+        const deviceData = response.data.devices.map((device) => ({
+          _id: device._id || 'N/A',
+          name: device.name || 'N/A',
+          uniqueId: device.uniqueId || 'N/A',
+          sim: device.sim || 'N/A', //
+          speed: device.speed || 'N/A',
+          average: device.average || 'N/A',
+          model: device.model || 'N/A',
+          category: device.category || 'N/A',
+          Driver: device.Driver || 'N/A',
+          installationdate: device.installationdate || 'N/A',
+          expirationdate: device.expirationdate || 'N/A',
+          extenddate: device.extenddate || 'N/A',
+
+          groups: device.groups || [],
+
+          users: device.users || [],
+
+          geofences: device.geofences || [],
+        }))
+
+        setData(deviceData)
+        setPageCount(response.data.totalPages)
+      } else {
+        console.error('Expected an array but got:', response.data)
+        alert('Unexpected data format received.')
+      }
+    } catch (error) {
+      console.error('Fetch data error:', error)
+      alert('An error occurred while fetching data.')
+    } finally {
+      setLoading(false) // Stop loading once data is fetched
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const handlePageClick = (e) => {
+    console.log(e.selected + 1)
+    let page = e.selected + 1
+    setLoading(true)
+    fetchData(page)
+  }
+
+  // ###############################################################
+  // ######################  Add Device API Function ######################
+
+  const handleAddSubmit = async () => {
+    const apiUrl = `${import.meta.env.VITE_API_URL}/device`
+    const newRow = {
+      name: formData.name || '',
+      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '', // Trim whitespace
+      sim: formData.sim || '',
+      groups: Array.isArray(formData.groups) ? formData.groups : [],
+      users: Array.isArray(formData.users) ? formData.users : [],
+      Driver: formData.Driver || '',
+      speed: formData.speed || '',
+      average: formData.average || '',
+      geofences: Array.isArray(formData.geofences) ? formData.geofences : [],
+      model: formData.model || '',
+      category: formData.category || '',
+      installationdate: formData.installationdate || '',
+      expirationdate: formData.expirationdate || '',
+      extenddate: formData.extenddate || '',
+    }
+
+    if(newRow){
+      // Check for any required fields missing
+      if (!newRow.name ||!newRow.uniqueId ||!newRow.sim ||!newRow.model ||!newRow.category || !newRow.expirationdate) {
+        alert('Please fill in all required fields.')
+        return
       }
 
-      // POST request to the server with Basic Auth
-      const response = await fetch(apiUrl, {
-        method: 'POST',
+      
+    }
+
+    try {
+      const response = await axios.post(apiUrl, newRow, {
         headers: {
-          Authorization: `Basic ${token}`, // Add Basic Auth header
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newRow),
       })
 
-      // Parse the JSON response
-      const result = await response.json()
+      console.log('Raw response:', response)
 
-      if (response.ok) {
-        // Update the state with the new row
-        setFilteredRows([...filteredRows, result])
-
-        // Close the modal and refresh data
+      if (response.status == 201) {
+        console.log('Record created successfully:')
+        alert('Record created successfully')
         handleModalClose()
         fetchData()
-
-        console.log('Record created successfully:', result)
-        alert('Record created successfully')
       } else {
-        // Log and alert the specific server response in case of an error
-        console.error('Server responded with:', result)
-        alert(`Unable to create record: ${result.message || response.statusText}`)
+        const contentType = response.headers.get('content-type')
+        let responseBody
+
+        if (contentType && contentType.includes('application/json')) {
+          responseBody = await response.json()
+        } else {
+          responseBody = await response.text()
+        }
+
+        console.error('Error Response:', responseBody)
+        alert(`Unable to create record: ${responseBody.message || response.statusText}`)
       }
     } catch (error) {
       console.error('Error during POST request:', error)
       alert('Unable to create record')
-      // Handle the error appropriately (e.g., show a notification to the user)
-    }
-    fetchData()
-  }
-  const [groups, setGroups] = useState([])
-  // const [error, setError] = useState(null);
-  const [error, setError] = useState(null)
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/groups', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Basic ' + btoa('school:123456'), // Replace with actual credentials
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        setGroups(data) // Assuming the API returns { groups: [...] }
-      } catch (error) {
-        setError(error.message)
-      }
-    }
-
-    fetchGroups()
-  }, [])
-  const [calendars, setCalendars] = useState([]) // State to store calendar data
-  const [calendarError, setCalendarError] = useState(null) // State to store error
-
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await fetch('https://rocketsalestracker.com/api/calendars', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Basic ' + btoa('school:123456'), // Replace with actual credentials
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        setCalendars(data) // Assuming the API returns { calendars: [...] }
-      } catch (error) {
-        setCalendarError(error.message)
-      }
-    }
-
-    fetchCalendars()
-  }, [])
-
-  const handleDeleteSelected = async (id) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      try {
-        const username = 'school' // Replace with your actual username
-        const password = '123456' // Replace with your actual password
-        const token = btoa(`${username}:${password}`) // Encode credentials in Base64
-
-        const response = await fetch(`https://rocketsalestracker.com/api/devices/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${token}`,
-          },
-        })
-
-        if (response.ok) {
-          // Update the state to remove the deleted row
-          setFilteredData(filteredData.filter((item) => item.id !== id))
-          alert('Record deleted successfully')
-        } else {
-          const result = await response.json()
-          console.error('Server responded with:', result)
-          alert(`Unable to delete record: ${result.message || response.statusText}`)
-        }
-      } catch (error) {
-        console.error('Error during DELETE request:', error)
-        alert('Unable to delete record. Please check the console for more details.')
-      }
     }
   }
+
+  // #######################################################################
+  // #########################  Edit Device API function #######################
 
   const handleEditIconClick = (row) => {
-    setSelectedRow(row) // Set the selected row to be edited
-    setFormData(row) // Populate form with the row's data
-    setEditModalOpen(true) // Open the modal
+    console.log(row)
+    setFormData({
+      ...row,
+      name: row.name,
+      uniqueId: row.uniqueId,
+      speed: row.speed,
+      sim: row.sim,
+      model: row.model,
+      installationdate: row.installationdate,
+      extenddate: row.extenddate,
+      expirationdate: row.expirationdate,
+      category: row.category,
+      average: row.average,
+      Driver: row.Driver._id,
+      geofences: row.geofences.map( geo => geo._id),
+      groups: row.groups.map((group) => group._id),
+      users: row.users.map((user) => user._id),
+    })
+    setEditModalOpen(true)
   }
 
-  const handleEditSubmit = async () => {
-    if (!selectedRow) {
-      alert('No row selected for editing')
-      return
-    }
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
 
-    const apiUrl = `https://rocketsalestracker.com/api/devices/${selectedRow.id}`
-    const username = 'school'
-    const password = '123456'
-    const token = btoa(`${username}:${password}`)
-
-    // Exclude the 'isSelected' field from formData
-    const { isSelected, ...updatedData } = formData
+    console.log('Data to submit:', formData) // Log the data to be submitted
 
     try {
-      console.log('Sending request to:', apiUrl)
-      console.log('Request payload:', JSON.stringify(updatedData, null, 2))
+      // API call
+      const accessToken = Cookies.get('authToken')
 
-      const response = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Basic ${token}`,
-          'Content-Type': 'application/json',
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/device/${formData._id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-        body: JSON.stringify(updatedData),
-      })
+      )
 
-      console.log('Response status:', response.status)
-      console.log('Response headers:', response.headers)
+      // Check if the response status is in the 2xx range
+      if (response.status === 200) {
+        alert('User is edited successfully')
+        setEditModalOpen(false)
+        fetchData()
+        setLoading(false)
 
-      if (!response.ok) {
-        const errorResult = await response.json()
-        console.error('Error response:', errorResult)
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`)
+        setFormData({})
+      } else {
+        // Handle other response statuses
+        alert(`Error: ${response.status} - ${response.statusText}`)
+        setLoading(false)
+      }
+    } catch (error) {
+      // Handle error from the server or network error
+      console.error('Error during submission:', error) // Log the error for debugging
+      let errorMessage = 'An error occurred'
+
+      // Check if the error response exists
+      if (error.response) {
+        // If the server responded with a status other than 2xx
+        errorMessage = error.response.data.message || error.response.data || 'An error occurred'
+      } else if (error.request) {
+        // If the request was made but no response was received
+        errorMessage = 'Network error: Please try again later'
       }
 
-      const result = await response.json()
-      console.log('Update successful:', result)
-      alert('Updated successfully')
-
-      // Update the local state with the modified row data
-      const updatedRows = filteredRows.map((row) =>
-        row.id === selectedRow.id ? { ...row, ...updatedData } : row,
-      )
-      setFilteredRows(updatedRows)
-
-      handleModalClose()
-      fetchData() // Refetch the data to ensure the UI is up-to-date
-    } catch (error) {
-      console.error('Error updating row:', error.message, error.stack)
-      alert('Error updating data')
+      // Show an alert with the error message
+      alert(errorMessage)
     }
-    handleModalClose()
   }
 
-  const [dropdownOptions, setDropdownOptions] = useState([])
-  const [areas, setAreas] = useState([])
-  useEffect(() => {
-    const fetchAreasData = async () => {
-      try {
-        const username = 'hbtrack' // Replace with your actual username
-        const password = '123456@' // Replace with your actual password
-        const token = btoa(`${username}:${password}`) // Base64 encode the username and password
+  // ########################################################################
+  // ######################## Delete Device API function #######################
 
-        const response = await fetch('http://104.251.212.84/api/geofences', {
+  const handleDeleteSelected = async (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this record?')
+    if (!confirmed) return
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/device/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        alert('Record deleted successfully')
+        fetchData()
+      } else {
+        const result = await response.json()
+        alert(`Unable to delete record: ${result.message || response.statusText}`)
+      }
+    } catch (error) {
+      console.error('Error during DELETE request:', error)
+      alert('Unable to delete record. Please check the console for more details.')
+    }
+  }
+
+  // ######################################################################
+  // ######################  getting other field data ###############################
+  useEffect(() => {
+    const fetchUsers = async () => {
+      console.log('Fetching users...')
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        console.log('Fetched users:', response.data)
+
+        // Checking if response contains the expected structure
+        if (response.data && Array.isArray(response.data.users)) {
+          setUsers(response.data.users) // Correct mapping
+        } else {
+          console.error('Unexpected response structure:', response.data)
+        }
+      } catch (error) {
+        console.error('Fetch users error:', error)
+        alert('An error occurred while fetching users.')
+      }
+    }
+
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
           method: 'GET',
           headers: {
-            Authorization: `Basic ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         })
 
@@ -387,93 +466,153 @@ const Devices = () => {
         }
 
         const data = await response.json()
-        console.log('Geofence data: ', data)
+        console.log('groups: ', data.groups)
+        setGroups(data.groups) // Assuming the API returns { groups: [...] }
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
-        // Transform data to create dropdown options
-        setAreas(data.map((item) => item.name))
+    const fetchAreasData = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/geofence`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        if (data.geofences) {
+          setAreas(data.geofences)
+        }
       } catch (error) {
         console.error('Error fetching areas data:', error)
-        setError(error.message)
       }
     }
 
+    const fetchDrivers = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/driver`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response && response.data) {
+          setDrivers(response.data.drivers) // Set the driver data from the API response
+        }
+      } catch (error) {
+        console.error('Error fetching drivers:', error)
+      }
+    }
+
+    const fetchModels = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/model`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response?.data?.models) {
+          setModels(response.data.models) // Store the fetched models in state
+        }
+      } catch (error) {
+        console.error('Error fetching models:', error)
+      }
+    }
+
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/category`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response?.data) {
+          setCategories(response.data) // Store the fetched categories in state
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+
+    fetchUsers()
+    fetchGroups()
     fetchAreasData()
+    fetchDrivers()
+    fetchModels()
+    fetchCategories()
   }, [])
 
-  const fetchUsers = async () => {
-    console.log('Fetching users...')
-    try {
-      const username = 'hbtrack'
-      const password = '123456@'
-      const token = btoa(`${username}:${password}`)
+  // ################################################################
 
-      const response = await axios.get('http://104.251.212.84/api/users', {
-        headers: {
-          Authorization: `Basic ${token}`,
-        },
-      })
-
-      console.log('Fetched users:', response.data)
-
-      if (Array.isArray(response.data)) {
-        setUsers(response.data.map((user) => ({ id: user.id, name: user.name })))
-      } else {
-        console.error('Expected an array but got:', response.data)
-      }
-    } catch (error) {
-      console.error('Fetch users error:', error)
-      alert('An error occurred while fetching users.')
-    }
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    // console.log(`Selected value: ${value}`); // Log the selected value
+    setFormData({
+      ...formData,
+      [name]: value,
+    })
+    console.log(formData)
   }
 
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchUsers()
-  }, [])
   // Handle year selection for expiration date
 
   const [showExpirationDropdown, setShowExpirationDropdown] = useState(false)
 
   // Handle year selection and calculate expiration date based on the number of years selected
   const handleYearSelection = (years) => {
-    const currentDate = new Date()
-    const expirationDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + years))
-      .toISOString()
-      .split('T')[0] // Format to yyyy-mm-dd
-    handleInputChange({ target: { name: 'expiration', value: expirationDate } })
-  }
-  const fetchDrivers = async () => {
-    const username = 'credenceOCT'
-    const password = '123456'
-    const token = btoa(`${username}:${password}`)
+    const installationDate = formData.installationdate
 
-    try {
-      const response = await axios.get('http://104.251.212.84/api/drivers', {
-        headers: {
-          Authorization: `Basic ${token}`,
-        },
+    console.log('installation hai ye ', installationDate)
+
+    if (installationDate) {
+      const installation = new Date(installationDate)
+      const expirationDate = new Date(installation.setFullYear(installation.getFullYear() + years))
+        .toISOString()
+        .split('T')[0] // Format to yyyy-mm-dd
+
+      setFormData({
+        ...formData,
+        expirationdate: expirationDate,
       })
-
-      // Handle the response
-      if (response && response.data) {
-        return response.data
-      }
-      console.log(response.data)
-    } catch (error) {
-      console.error('Error fetching drivers:', error)
-      return []
     }
   }
-  useEffect(() => {
-    const getDrivers = async () => {
-      const driversData = await fetchDrivers()
-      setDrivers(driversData) // Assuming you have a state variable `drivers` to store this data
-    }
 
-    getDrivers()
-  }, [])
+  // this is run when date is extended i edit mmodel
+  const handleExtendYearSelection = (years) => {
+    setExtendedPasswordModel(true);
+    const ExpiryDate = formData.expirationdate
+
+    if (ExpiryDate) {
+      const expiry = new Date(ExpiryDate)
+      console.log('expiration hai ye ', expiry)
+
+      const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + years))
+        .toISOString()
+        .split('T')[0] // Format to yyyy-mm-dd
+
+      console.log('ye hai extended date: ', extendedDate)
+      if(passwordCheck){
+        setFormData({
+          ...formData,
+          extenddate: extendedDate,
+          expirationdate: extendedDate,
+        })
+      }
+      
+    }
+  }
+
   return (
-    <div className="m-3">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Devices</h2>
@@ -493,7 +632,7 @@ const Devices = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-success text-white"
+              className="btn btn-primary"
             >
               Add Device
             </button>
@@ -514,424 +653,393 @@ const Devices = () => {
       <TableContainer
         component={Paper}
         sx={{
-          height: '500px', // Set the desired height
-          overflow: 'auto', // Enable scrollbar when content overflows
+          height: 'auto', // Set the desired height
+          overflowX: 'auto', // Enable horizontal scrollbar
+          overflowY: 'auto', // Enable vertical scrollbar if needed
+          marginBottom: '10px',
+          borderRadius: '10px',
         }}
       >
         {loading ? (
           <>
-          <div className="text-nowrap mb-2" style={{width: "70vw"}}>
-            <p className="card-text placeholder-glow">
-              <span className="placeholder col-7" />
-              <span className="placeholder col-4" />
-              <span className="placeholder col-4" />
-              <span className="placeholder col-6" />
-              <span className="placeholder col-8" />
-            </p>
-            <p className="card-text placeholder-glow">
-              <span className="placeholder col-7" />
-              <span className="placeholder col-4" />
-              <span className="placeholder col-4" />
-              <span className="placeholder col-6" />
-              <span className="placeholder col-8" />
-            </p>
-          </div>
-        </>
+            <div className="text-nowrap mb-2" style={{ width: '480px' }}>
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+              <p className="card-text placeholder-glow">
+                <span className="placeholder col-7" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-4" />
+                <span className="placeholder col-6" />
+                <span className="placeholder col-8" />
+              </p>
+            </div>
+          </>
         ) : (
-          <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
-                {columns.map((column, index) => (
-                  <CTableHeaderCell key={index} className="bg-body-tertiary text-center">
+                {/* Skip the first column */}
+                {columns.slice(1).map((column, index) => (
+                  <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
                     {column.Header}
                   </CTableHeaderCell>
                 ))}
-                <CTableHeaderCell className="bg-body-tertiary text-center">
+                <CTableHeaderCell className="text-white text-center bg-secondary">
                   Actions
                 </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {filteredData.slice(0, 10).map((item, index) => (
-                <CTableRow key={index}>
-                  {columns.map((column, i) => (
-                    <CTableDataCell key={i} className="text-center">
-                      {item[column.accessor]}
-                    </CTableDataCell>
-                  ))}
-                  <CTableDataCell className="text-center d-flex">
-                    <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => handleDeleteSelected(item.id)} // Pass the item's unique ID to handleDeleteSelected
-                      sx={{ marginRight: '10px', color: 'brown' }}
-                    >
-                      <AiFillDelete style={{ fontSize: '25px' }} />
-                    </IconButton>
+              {loading ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="5" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
+              ) : data.length > 0 ? (
+                data.map((item) => (
+                  <CTableRow key={item._id}>
+                    {/* Skip the first field in the data row */}
+                    {columns.slice(1).map((column) => (
+                      <CTableDataCell key={column.accessor} className="text-center">
+                        {column.accessor === 'groups' ? (
+                          <CFormSelect
+                            id="groups"
+                            className=" text-center border-0"
+                            style={{ width: '100px' }}
+                          >
+                            <option>Groups</option>
+                            {Array.isArray(item.groups) &&
+                              item.groups.map((group) => (
+                                <option key={group._id} value={group._id}>
+                                  {group.name || 'undefine group'}
+                                </option>
+                              ))}
+                          </CFormSelect>
+                        ) : column.accessor === 'geofences' ? (
+                          <CFormSelect
+                            id="geofence"
+                            className=" text-center border-0"
+                            style={{ width: '120px' }}
+                          >
+                            <option value="">Geofence</option>
+                            {Array.isArray(item.geofences) &&
+                              item.geofences.map((geofence, index) => (
+                                <option key={index} value={geofence._id}>
+                                  {geofence.name}
+                                </option>
+                              ))}
+                          </CFormSelect>
+                        ) : column.accessor === 'users' ? (
+                          <CFormSelect
+                            id="users"
+                            className=" text-center border-0"
+                            style={{ width: '120px' }}
+                          >
+                            <option value="">Users</option>
+                            {Array.isArray(item.users) &&
+                              item.users.map((user) => (
+                                <option key={user._id} value={user._id}>
+                                  {user.username}
+                                </option>
+                              ))}
+                          </CFormSelect>
+                        ) : column.accessor === 'Driver' ? (
+                          <div style={{ width: '120px' }}>{item[column.accessor].name}</div>
+                        ) : (
+                          item[column.accessor] // Default rendering for other columns
+                        )}
+                      </CTableDataCell>
+                    ))}
+                    <CTableDataCell className="text-center d-flex">
+                      <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
+                        <RiEdit2Fill
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                        />
+                      </IconButton>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteSelected(item._id)}
+                        sx={{ marginRight: '10px', color: 'red' }}
+                      >
+                        <AiFillDelete style={{ fontSize: '20px' }} />
+                      </IconButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell colSpan="15" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's no device available.
+                        <br /> Maybe it's time to create some devices!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add Device
+                        </button>
+                      </div>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              )}
             </CTableBody>
           </CTable>
         )}
       </TableContainer>
 
+      {pageCount > 1 && (
+        <div className="">
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={pageCount} // Set based on the total pages from the API
+            previousLabel="< previous"
+            renderOnZeroPageCount={null}
+            marginPagesDisplayed={2}
+            containerClassName="pagination justify-content-center"
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            activeClassName="active"
+          />
+        </div>
+      )}
+
       <Modal open={addModalOpen} onClose={handleModalClose}>
-        <Box sx={style}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-            }}
-          >
-            <Typography variant="h6" className="text-dark">
+        <Box
+          sx={{
+            ...style,
+            backgroundColor: '#f7f9fc',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '30px',
+          }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
+              <span role="img" aria-label="device">
+                <AiOutlinePlus className="fs-2" />
+              </span>{' '}
               Add Device
-            </Typography>
-            <IconButton onClick={handleModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-
-          {/* Conditional rendering based on col.accessor */}
-          {columns.map((col) => {
-            if (col.accessor === 'groupId') {
-              // Group ID dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Group ID</InputLabel>
-                  <Select
-                    name="groupId"
-                    value={formData.groupId || ''}
-                    onChange={handleInputChange}
-                    label="Group ID"
-                  >
-                    {groups.map((group) => (
-                      <MenuItem key={group.id} value={group.id}>
-                        {group.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'User') {
-              // User dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>User</InputLabel>
-                  <Select
-                    name="user"
-                    value={formData.user || ''}
-                    onChange={handleInputChange}
-                    label="User"
-                  >
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'category') {
-              // Category dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category || ''}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="Default">Default</MenuItem>
-                    <MenuItem value="Animal">Animal</MenuItem>
-                    <MenuItem value="Bicycle">Bicycle</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'geofence') {
-              // Geofence dropdown (Areas)
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel id="areas-label-5">Areas</InputLabel>
-                  <Select
-                    labelId="areas-label-5"
-                    id="areas-select-5"
-                    value={formData.areas || ''}
-                    onChange={handleInputChange}
-                    label="Select Areas"
-                  >
-                    <MenuItem value="All Areas">All Areas</MenuItem>
-                    {areas.map((area, index) => (
-                      <MenuItem key={index} value={area}>
-                        {area}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'model') {
-              // Model dropdown with options v1, v2, v3, v4, v5
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    name="model"
-                    value={formData.model || ''}
-                    onChange={handleInputChange}
-                    label="Model"
-                  >
-                    <MenuItem value="v1">v1</MenuItem>
-                    <MenuItem value="v2">v2</MenuItem>
-                    <MenuItem value="v3">v3</MenuItem>
-                    <MenuItem value="v4">v4</MenuItem>
-                    <MenuItem value="v5">v5</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'driver') {
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Driver</InputLabel>
-                  <Select
-                    name="driver"
-                    value={formData.driver || ''}
-                    onChange={handleInputChange}
-                    label="Driver"
-                  >
-                    {drivers.map((driver) => (
-                      <MenuItem key={driver.id} value={driver.id}>
-                        {driver.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'expiration') {
-              // Expiration Date field with dropdown for years (1, 2, 3 years)
-              return (
-                <Box key={col.accessor} sx={{ marginBottom: 2 }}>
-                  {/* Expiration Date TextField */}
-                  <TextField
-                    label="Expiration Date"
-                    type="date"
-                    name="expiration"
-                    value={formData.expiration || ''}
-                    onChange={handleInputChange}
-                    onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true, // Ensures the label is always visible
-                    }}
-                  />
-
-                  {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
-                  {showExpirationDropdown && (
-                    <FormControl fullWidth sx={{ marginTop: 1 }}>
-                      <InputLabel>Expiration Options</InputLabel>
-                      <Select
-                        value=""
-                        onChange={(e) => {
-                          handleYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false) // Hide dropdown after selection
-                        }}
-                        label="Expiration Options"
-                      >
-                        <MenuItem value={1}>1 Year</MenuItem>
-                        <MenuItem value={2}>2 Years</MenuItem>
-                        <MenuItem value={3}>3 Years</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )}
-                </Box>
-              )
-            } else {
-              // Default TextField for other columns
-              return (
-                <TextField
-                  key={col.accessor}
-                  label={col.Header}
-                  variant="outlined"
-                  name={col.accessor}
-                  value={formData[col.accessor] || ''}
-                  onChange={handleInputChange}
-                  fullWidth
-                  sx={{ marginBottom: 2 }}
-                />
-              )
-            }
-          })}
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddSubmit}
-            sx={{ marginTop: 2 }}
-          >
-            Submit
-          </Button>
-        </Box>
-      </Modal>
-
-      <Modal open={editModalOpen} onClose={handleModalClose}>
-        <Box sx={style}>
-          <div className="d-flex justify-content-between my-3">
-            <Typography variant="h6" className="text-dark">
-              Edit Device
             </Typography>
             <IconButton onClick={handleModalClose}>
               <CloseIcon />
             </IconButton>
           </div>
 
-          {/* Conditional rendering based on col.accessor */}
-          {columns.map((col) => {
-            if (col.accessor === 'groupId') {
-              // Group ID dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Group ID</InputLabel>
-                  <Select
-                    name="groupId"
-                    value={formData.groupId || ''}
-                    onChange={handleInputChange}
-                    label="Group ID"
-                  >
-                    {groups.map((group) => (
-                      <MenuItem key={group.id} value={group.id}>
-                        {group.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'driver') {
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Driver</InputLabel>
-                  <Select
-                    name="driver"
-                    value={formData.driver || ''}
-                    onChange={handleInputChange}
-                    label="Driver"
-                  >
-                    {drivers.map((driver) => (
-                      <MenuItem key={driver.id} value={driver.id}>
-                        {driver.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'User') {
-              // User dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>User</InputLabel>
-                  <Select
-                    name="user"
-                    value={formData.user || ''}
-                    onChange={handleInputChange}
-                    label="User"
-                  >
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'category') {
-              // Category dropdown
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category || ''}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="Default">Default</MenuItem>
-                    <MenuItem value="Animal">Animal</MenuItem>
-                    <MenuItem value="Bicycle">Bicycle</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'geofence') {
-              // Geofence dropdown (Areas)
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel id="areas-label-5">Areas</InputLabel>
-                  <Select
-                    labelId="areas-label-5"
-                    id="areas-select-5"
-                    value={formData.areas || ''}
-                    onChange={handleInputChange}
-                    label="Select Areas"
-                  >
-                    <MenuItem value="All Areas">All Areas</MenuItem>
-                    {areas.map((area, index) => (
-                      <MenuItem key={index} value={area}>
-                        {area}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'model') {
-              // Model dropdown with options v1, v2, v3, v4, v5
-              return (
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    name="model"
-                    value={formData.model || ''}
-                    onChange={handleInputChange}
-                    label="Model"
-                  >
-                    <MenuItem value="v1">v1</MenuItem>
-                    <MenuItem value="v2">v2</MenuItem>
-                    <MenuItem value="v3">v3</MenuItem>
-                    <MenuItem value="v4">v4</MenuItem>
-                    <MenuItem value="v5">v5</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            } else if (col.accessor === 'expiration') {
-              // Expiration Date field with dropdown for years (1, 2, 3 years)
-              return (
-                <Box key={col.accessor} sx={{ marginBottom: 2 }}>
-                  {/* Expiration Date TextField */}
-                  <TextField
-                    label="Extended Date"
-                    type="date"
-                    name="expiration"
-                    value={formData.expiration || ''}
-                    onChange={handleEditDateInputChange}
-                    onFocus={() => setShowExpirationDropdown(true)} // Show dropdown on focus
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true, // Ensures the label is always visible
-                    }}
-                  />
+          {/* Step-by-step form with progress indicator */}
+          <div>
+            <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
 
-                  {/* Dropdown for selecting 1 year, 2 years, or 3 years */}
-                  {showExpirationDropdown && (
-                    <FormControl fullWidth sx={{ marginTop: 1 }}>
-                      <InputLabel>Expiration Options</InputLabel>
+            {/* Step 1: General Information */}
+            {currentStep === 0 &&
+              columns.map((col) => {
+                if (
+                  col.accessor === 'name' ||
+                  col.accessor === 'uniqueId' ||
+                  col.accessor === 'sim' ||
+                  col.accessor === 'speed' ||
+                  col.accessor === 'average'
+                ) {
+                  return (
+                    <TextField
+                      key={col.accessor}
+                      label={col.Header}
+                      variant="outlined"
+                      name={col.accessor}
+                      value={formData[col.accessor] || ''}
+                      onChange={handleInputChange}
+                      fullWidth
+                      sx={{ marginBottom: 2 }}
+                    />
+                  )
+                }
+                return null // Return null for columns that don't match the condition
+              })}
+
+            {/* Step 2: device assign to user, groups, geofence etc  */}
+            {currentStep === 1 &&
+              columns.map((col) => {
+                if (col.accessor == 'users') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
                       <Select
-                        value=""
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {users.map((user) => (
+                          <MenuItem key={user._id} value={user._id}>
+                            {user.username}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'groups') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {groups.map((group) => (
+                          <MenuItem key={group._id} value={group._id}>
+                            {group.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'Driver') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {drivers.map((driver) => (
+                          <MenuItem key={driver._id} value={driver._id}>
+                            {driver.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'geofences') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {areas.map((geofence) => (
+                          <MenuItem key={geofence._id} value={geofence._id}>
+                            {geofence.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'model') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {models.map((model) => (
+                          <MenuItem key={model.modelName} value={model.modelName}>
+                            {model.modelName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'category') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category.categoryName} value={category.categoryName}>
+                            {category.categoryName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                }
+                return null
+              })}
+
+            {currentStep === 2 &&
+              columns.map((col) => {
+                if (col.accessor === 'installationdate') {
+                  return (
+                    <>
+                      <label>Installation date: </label>
+                      <TextField
+                        key={col.accessor}
+                        type="date"
+                        name={col.accessor}
+                        value={formData[col.accessor] || ''}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </>
+                  )
+                } else if (col.accessor === 'expirationdate') {
+                  return (
+                    <FormControl fullWidth sx={{ marginY: 2 }} key={col.accessor}>
+                      <InputLabel>Expiration Plans</InputLabel>
+                      <Select
                         onChange={(e) => {
                           handleYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false) // Hide dropdown after selection
+                          setShowExpirationDropdown(false)
                         }}
                         label="Expiration Options"
                       >
@@ -940,34 +1048,281 @@ const Devices = () => {
                         <MenuItem value={3}>3 Years</MenuItem>
                       </Select>
                     </FormControl>
-                  )}
-                </Box>
-              )
-            } else {
-              // Default TextField for other columns
-              return (
-                <TextField
-                  key={col.accessor}
-                  label={col.Header}
-                  variant="outlined"
-                  name={col.accessor}
-                  value={formData[col.accessor] || ''}
-                  onChange={handleInputChange}
-                  fullWidth
-                  sx={{ marginBottom: 2 }}
-                />
-              )
-            }
-          })}
+                  )
+                }
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleEditSubmit}
-            sx={{ marginTop: 2 }}
-          >
-            Submit
-          </Button>
+                // Always return null if no conditions are met
+                return null
+              })}
+
+            {/* Navigation buttons */}
+            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
+              {currentStep > 0 && (
+                <Button onClick={handleBack} variant="outlined">
+                  Back
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button onClick={handleNext} variant="contained" color="primary">
+                  Next
+                </Button>
+              ) : (
+                <Button onClick={handleAddSubmit} variant="contained" color="primary">
+                  Submit
+                </Button>
+              )}
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      <Modal open={editModalOpen} onClose={handleModalClose}>
+        <Box
+          sx={{
+            ...style,
+            backgroundColor: '#f7f9fc',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '30px',
+          }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
+              <span role="img" aria-label="device">
+                <AiOutlinePlus className="fs-2" />
+              </span>{' '}
+              Update Device
+            </Typography>
+            <IconButton onClick={handleModalClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          {/* Step-by-step form with progress indicator */}
+          <div>
+            <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {/* Step 1: General Information */}
+            {currentStep === 0 &&
+              columns.map((col) => {
+                if (
+                  col.accessor === 'name' ||
+                  col.accessor === 'uniqueId' ||
+                  col.accessor === 'sim' ||
+                  col.accessor === 'speed' ||
+                  col.accessor === 'average'
+                ) {
+                  return (
+                    <TextField
+                      key={col.accessor}
+                      label={col.Header}
+                      variant="outlined"
+                      name={col.accessor}
+                      value={formData[col.accessor] || ''}
+                      onChange={handleInputChange}
+                      fullWidth
+                      sx={{ marginBottom: 2 }}
+                    />
+                  )
+                }
+                return null // Return null for columns that don't match the condition
+              })}
+
+            {/* Step 2: device assign to user, groups, geofence etc  */}
+            {currentStep === 1 &&
+              columns.map((col) => {
+                if (col.accessor == 'users') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {users.map((user) => (
+                          <MenuItem key={user._id} value={user._id}>
+                            {user.username}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'groups') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {groups.map((group) => (
+                          <MenuItem key={group._id} value={group._id}>
+                            {group.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'Driver') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {drivers.map((driver) => (
+                          <MenuItem key={driver._id} value={driver._id}>
+                            {driver.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'geofences') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                        multiple
+                      >
+                        {areas.map((geofence) => (
+                          <MenuItem key={geofence._id} value={geofence._id}>
+                            {geofence.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'model') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {models.map((model) => (
+                          <MenuItem key={model} value={model.modelName}>
+                            {model.modelName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                } else if (col.accessor === 'category') {
+                  return (
+                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
+                      <InputLabel>{col.Header}</InputLabel>
+                      <Select
+                        name={col.accessor}
+                        value={formData[col.accessor] || []}
+                        onChange={handleInputChange}
+                        label={col.Header}
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category} value={category.categoryName}>
+                            {category.categoryName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                }
+                return null
+              })}
+
+            {currentStep === 2 &&
+              columns.map((col) => {
+                if (col.accessor === 'installationdate') {
+                  return (
+                    <div className="mt-3">
+                      <label>Installation date: </label>
+                      <TextField
+                        key={col.accessor}
+                        name={col.accessor}
+                        value={formData[col.accessor] || ''}
+                        onChange={handleInputChange}
+                        fullWidth
+                        disabled
+                      />
+                    </div>
+                  )
+                } else if (col.accessor === 'expirationdate') {
+                  return (
+                    <div className="mt-3">
+                      <label>Expiration Date: </label>
+                      <TextField
+                        key={col.accessor}
+                        name={col.accessor}
+                        value={formData[col.accessor]}
+                        onChange={handleInputChange}
+                        fullWidth
+                        disabled
+                      />
+                    </div>
+                  )
+                } else if (col.accessor === 'extenddate') {
+                  return (
+                    <div className="mt-3">
+                      <label>Extend Plan: </label>
+                      <br />
+                      <Select
+                        onChange={(e) => {
+                          handleExtendYearSelection(parseInt(e.target.value))
+                          setShowExpirationDropdown(false)
+                        }}
+                        fullWidth
+                      >
+                        <MenuItem value={1}>1 Year</MenuItem>
+                        <MenuItem value={2}>2 Years</MenuItem>
+                        <MenuItem value={3}>3 Years</MenuItem>
+                      </Select>
+                    </div>
+                  )
+                }
+
+                // Always return null if no conditions are met
+                return null
+              })}
+
+            {/* Navigation buttons */}
+            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
+              {currentStep > 0 && (
+                <Button onClick={handleBack} variant="outlined">
+                  Back
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button onClick={handleNext} variant="contained" color="primary">
+                  Next
+                </Button>
+              ) : (
+                <Button onClick={handleEditSubmit} variant="contained" color="primary">
+                  Submit
+                </Button>
+              )}
+            </div>
+          </div>
         </Box>
       </Modal>
 

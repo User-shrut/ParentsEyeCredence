@@ -26,12 +26,16 @@ import { jwtDecode } from 'jwt-decode'
 import { VscAccount } from 'react-icons/vsc'
 import { BiSupport } from 'react-icons/bi'
 import { CgLogOut } from 'react-icons/cg'
+import { useNavigate } from 'react-router-dom'
 
 const AppHeaderDropdown = () => {
   const token = Cookies.get('authToken')
+  const navigate = useNavigate();
   let decodedToken;
   if (token) {
     decodedToken = jwtDecode(token)
+  }else{
+    navigate('/login');
   }
   return (
     <CDropdown variant="nav-item">
@@ -43,8 +47,8 @@ const AppHeaderDropdown = () => {
           Account
         </CDropdownHeader>
         <div className="px-2">
-          <h3 className="text-center my-0">{decodedToken?.user.username}</h3>
-          <p className="text-center small mb-3 mt-0">User</p>
+          <h3 className="text-center my-0">{(decodedToken && decodedToken.user) ? decodedToken.user.username : 'harshal_123'}</h3>
+          <p className="text-center small mb-3 mt-0">{(decodedToken && decodedToken.user) ? 'User' : 'SuperAdmin'}</p>
         </div>
         <CDropdownItem href="#">
           <BiSupport className="me-3 fs-5" />
