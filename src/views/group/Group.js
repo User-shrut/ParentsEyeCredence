@@ -50,14 +50,19 @@ const Group = () => {
   const style = {
     position: 'absolute',
     top: '50%',
+    borderRadius: '10px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '35%',
+    maxHeight: '90vh',
     bgcolor: 'background.paper',
-    color: 'black',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto', // Enable vertical scrolling
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    marginTop: '8px',
   }
 
   // ##################### getting data  ###################
