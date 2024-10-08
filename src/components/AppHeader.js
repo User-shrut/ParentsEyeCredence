@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -25,7 +25,6 @@ import {
   cilSun,
 } from '@coreui/icons'
 
-
 import Typography from '@mui/material/Typography'
 
 import {
@@ -47,8 +46,6 @@ import { AppHeaderDropdown } from './header/index'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './AppHeader.css'
 import TableColumnVisibility from './TableColumnVisibility.js'
-
-
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -124,6 +121,10 @@ const AppHeader = () => {
   }, [searchTerm, dispatch])
 
   const deviceNames = useSelector(selectDeviceNames)
+  const location = useLocation()
+
+  // Check if the current page is the dashboard
+  const isDashboard = location.pathname === '/dashboard'
 
   return (
     <CHeader position="sticky" className=" p-0" ref={headerRef}>
@@ -142,41 +143,45 @@ const AppHeader = () => {
           </CNavItem>
         </CHeaderNav>
 
-        <CHeaderNav className="ms-auto">
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option selected>Status</option>
-            <option value="all">All</option>
-            <option value="running">Running</option>
-            <option value="idle">Idle</option>
-            <option value="stopped">Stop</option>
-            <option value="overspeed">OverSpeed</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </CHeaderNav>
+        {isDashboard && (
+          <CHeaderNav className="ms-auto">
+            <select
+              className="form-select"
+              aria-label="Default select example"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option selected>Status</option>
+              <option value="all">All</option>
+              <option value="running">Running</option>
+              <option value="idle">Idle</option>
+              <option value="stopped">Stop</option>
+              <option value="overspeed">OverSpeed</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </CHeaderNav>
+        )}
 
-        <CHeaderNav className="ms-auto">
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option selected>Select By Category</option>
+        {isDashboard && (
+          <CHeaderNav className="ms-auto">
+            <select
+              className="form-select"
+              aria-label="Default select example"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option selected>Select By Category</option>
 
-            <option value="car">Car</option>
-            <option value="bus">Bus</option>
-            <option value="motorcycle">Bike</option>
-            <option value="truck">Truck</option>
-            <option value="tractor">Tracktor</option>
-            <option value="crean">Crean</option>
-            <option value="jcb">JCB</option>
-          </select>
-        </CHeaderNav>
+              <option value="car">Car</option>
+              <option value="bus">Bus</option>
+              <option value="motorcycle">Bike</option>
+              <option value="truck">Truck</option>
+              <option value="tractor">Tracktor</option>
+              <option value="crean">Crean</option>
+              <option value="jcb">JCB</option>
+            </select>
+          </CHeaderNav>
+        )}
 
         {/* <CHeaderNav className="d-none d-md-flex">
           <select class="form-select" aria-label="Default select example">
@@ -189,23 +194,28 @@ const AppHeader = () => {
             ))}
           </select>
         </CHeaderNav> */}
-        <CHeaderNav className="ms-auto">
-          <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="text"
-              placeholder="Search vehicles by name"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search"
-            />
-          </form>
-        </CHeaderNav>
 
-        <CHeaderNav className="ms-auto">
-          {/* table cols filter  */}
-          <TableColumnVisibility />
-        </CHeaderNav>
+        {isDashboard && (
+          <CHeaderNav className="ms-auto">
+            <form className="d-flex" role="search">
+              <input
+                className="form-control me-2"
+                type="text"
+                placeholder="Search vehicles by name"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search"
+              />
+            </form>
+          </CHeaderNav>
+        )}
+
+        {isDashboard && (
+          <CHeaderNav className="ms-auto">
+            {/* table cols filter  */}
+            <TableColumnVisibility />
+          </CHeaderNav>
+        )}
 
         <CHeaderNav className="ms-auto">
           <CNavItem>

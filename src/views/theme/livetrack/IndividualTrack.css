@@ -1,0 +1,29 @@
+.parametersContainer{
+  width: 300px;
+  float: right;
+}
+
+.parameters
+{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+}
+
+.name{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: center;
+  font-weight: 600;
+}
+
+.nameImage{
+  width: 50px;
+}
+
+.nimg{
+  width: 100%;
+}

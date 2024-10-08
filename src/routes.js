@@ -4,7 +4,6 @@ const DashBoard = React.lazy(() => import('./views/theme/dashboard/DashBoard'))
 const LiveTrack = React.lazy(() => import('./views/theme/livetrack/LiveTrack'))
 const IndividualTrack = React.lazy(() => import('./views/theme/livetrack/IndividualTrack.js'))
 
-
 // master
 const Devices = React.lazy(() => import('./views/devices/Devices'))
 const Users = React.lazy(() => import('./views/users/Users'))
@@ -47,7 +46,7 @@ const routes = [
     path: '/salesman/:deviceId/:category/:name',
     name: 'IndividualTrack',
     element: IndividualTrack,
-  },
+  },
   { path: '/notifications', name: 'Notifications', element: Notifications},
   { path: '/devices', name: 'Devices', element: Devices},
   { path: '/geofences', name: 'Geofence',element: Geofences},

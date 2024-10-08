@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom'
 //   const navigate = useNavigate()
 //   const token = Cookies.get('authToken');
 //   let role;
-  
+
 //   if (token) {
 //     console.log("token hai yaha")
 //     const decodedToken = jwtDecode(token);
@@ -79,7 +79,7 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end"
+      className="border-end xl"
       colorScheme="dark"
       position="fixed"
       unfoldable={unfoldable}
