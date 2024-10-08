@@ -15,6 +15,7 @@ import {
   InputAdornment,
   FormControl,
 } from '@mui/material'
+import { Select, MenuItem, } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
@@ -53,8 +54,15 @@ const Driver = () => {
   const [pageCount, setPageCount] = useState()
 
 
-  const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+  const handleEditModalClose = () => {
+    setEditModalOpen(false);
+    setFormData({})
+  }
+  const handleAddModalClose = () => {
+   setAddModalOpen(false)
+   setFormData({});
+  }
+    
 
   const style = {
     position: 'absolute',
@@ -201,6 +209,37 @@ const Driver = () => {
     }
   }
 
+  const [fomData, setFomData] = useState({ device: '' });
+  const [devices, setDevices] = useState([]);
+  const token = Cookies.get('authToken'); //
+
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      console.log("fetch device me aaya hu...");
+      try {
+        const response = await fetch('https://credence-tracker.onrender.com/device', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        setDevices(data.devices); // Assuming the data returned contains device info
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
+
   //  ###############################################################
 
   return (
@@ -245,70 +284,70 @@ const Driver = () => {
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-          <CTable align="middle" className="mb-0 border" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow className='bg-body-tertiary'>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Driver Name
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
-                  Mobile No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
-                  Email
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Vehicle no.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Lic. No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Aadhar No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Address
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Actions
-                </CTableHeaderCell>
+        <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow className='bg-body-tertiary'>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Driver Name
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Mobile No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Email
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Vehicle no.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Lic. No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Aadhar No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Address
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Actions
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {data?.map((item, index) => (
+              <CTableRow key={index}>
+                <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.phone}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.email}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.deviceId}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.licenseNumber}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.aadharNumber}</CTableDataCell>
+                <CTableDataCell className="text-center">{item.address}</CTableDataCell>
+                <CTableDataCell
+                  className="text-center d-flex"
+                  style={{ justifyContent: 'center', alignItems: 'center' }}
+                >
+                  <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
+                    <RiEdit2Fill
+                      style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                    />
+                  </IconButton>
+                  <IconButton aria-label="delete" onClick={() => deleteDriverSubmit(item)}>
+                    <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                  </IconButton>
+                </CTableDataCell>
               </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {data?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center">{item.name}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.phone}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.email}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.device}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.licenseNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.aadharNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.address}</CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteDriverSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
-                    </IconButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
+            ))}
+          </CTableBody>
+        </CTable>
       </TableContainer>
       {pageCount > 1 && (
         <ReactPaginate
@@ -396,11 +435,13 @@ const Driver = () => {
                     ),
                   }}
                 />
+
                 <TextField
-                  label='Vehicle List'
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
                   InputProps={{
                     startAdornment: (
@@ -409,7 +450,19 @@ const Driver = () => {
                       </InputAdornment>
                     ),
                   }}
-                />
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
                   label='Licence No.'
                   name="lic"
@@ -509,13 +562,34 @@ const Driver = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
-                <TextField
-                  label='Vehicle List'
+                
+                   <TextField
+                  select // Set the select prop to true
+                  label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={formData.device !== undefined ? formData.device : ""}
-                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                  value={fomData.device}
+                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
                   required
-                />
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth // Optional: Makes the TextField take full width
+                >
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No devices available</MenuItem>
+                  )}
+                </TextField>
+
                 <TextField
                   label='Lic No.'
                   name="lic"

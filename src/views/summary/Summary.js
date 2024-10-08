@@ -65,7 +65,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={6}>
+      {/* <CCol md={6}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
 
         <CFormSelect
@@ -85,9 +85,9 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         </CFormSelect>
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
-      <CCol md={6}>
+      {/* <CCol md={6}>
         <CFormLabel htmlFor="details">Groups</CFormLabel>
         <CFormSelect
           id="details"
@@ -105,9 +105,32 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           )}
         </CFormSelect>
         <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
+      </CCol> */}
+
+        <CCol md={6}>
+        <CFormLabel htmlFor="type">Type</CFormLabel>
+        <CFormSelect
+          id="type"
+          required
+          value={formData.Type}
+          onChange={(e) => handleInputChange('Type', e.target.value)}
+        >
+          <option value="">Choose a type...</option>
+          <option value="Summary">Imei</option>
+          <option value="Sim No">Sim No.</option>
+          <option value="Subscription">Subscription</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Active">Active</option>
+          <option value="Timezone">Timezone</option>
+          <option value="Ignition">Ignition Wire Not Connected Change</option>
+          <option value="Ignition Postive">Ignition Wire postive Change</option>
+          <option value="Vehicle">Vehicle No.</option>
+        </CFormSelect>
+        <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+
+      <CCol md={6}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
@@ -127,24 +150,9 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
-        <CFormLabel htmlFor="type">Type</CFormLabel>
-        <CFormSelect
-          id="type"
-          required
-          value={formData.Type}
-          onChange={(e) => handleInputChange('Type', e.target.value)}
-        >
-          <option value="">Choose a type...</option>
-          <option value="Summary">Summary</option>
-          <option value="Daily Summary">Daily Summary</option>
-        </CFormSelect>
-        <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
-      </CCol>
-
-      <CCol md={4}>
+     
+      {/* <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        {/* Use React-Select component for multi-select */}
         <Select
           isMulti
           id="columns"
@@ -153,11 +161,11 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
-      </CCol>
+      </CCol> */}
 
       {showDateInputs && (
         <>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
             <CFormInput
               type="date"
@@ -168,7 +176,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             />
             <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
           </CCol>
-          <CCol md={4}>
+          <CCol md={6}>
             <CFormLabel htmlFor="toDate">To Date</CFormLabel>
             <CFormInput
               type="date"
@@ -188,7 +196,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
             <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
-            <button
+            {/* <button
               type="button"
               className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
               onClick={toggleDropdown} // Toggle dropdown on click
@@ -219,7 +227,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
                   </a>
                 </li>
               </ul>
-            )}
+            )} */}
           </div>
         </div>
       </CCol>
@@ -339,7 +347,7 @@ const Validation = () => {
   return (
     <>
       <CRow className='pt-3'>
-        <h2 className="px-4">Summary</h2>
+        <h2 className="px-4">Vehicle</h2>
 
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
