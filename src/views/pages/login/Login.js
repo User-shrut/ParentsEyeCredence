@@ -4,6 +4,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import './login.css'
 import Logo from '../../../assets/brand/logo.png'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -15,7 +16,7 @@ const Login = () => {
 
     // Ensure username and password are provided before sending the request
     if (!credentials.username || !credentials.password) {
-      alert('Please enter both username and password')
+      toast.error('Please enter both username and password')
       return
     }
 
@@ -42,17 +43,20 @@ const Login = () => {
 
         Cookies.set('authToken', token, cookieOptions)
         navigate('/dashboard')
+        toast.success('successfully logged in')
         alert('successfully logged in')
+
       } else {
         alert(response.data.message)
       }
     } catch (error) {
       console.error('Login error:', error)
-      alert('Invalid credentials')
+      toast.error('Invalid credentials')
     }
   }
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="loginContainer bg-white">
         <div className="row" style={{ height: '100vh', width: '100%', overflow: 'hidden' }}>
           <div className="d-none d-lg-block col-md-6 p-0">

@@ -43,6 +43,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import DialpadIcon from '@mui/icons-material/Dialpad';
 import HomeIcon from '@mui/icons-material/Home';
 import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast';
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -133,13 +134,15 @@ const Driver = () => {
       })
 
       if (response.status == 200) {
-        alert('Driver is created successfully')
+        toast.success('Driver is created successfully')
         fetchDriverData()
         setFormData({ name: '' })
         setAddModalOpen(false)
       }
     } catch (error) {
+      toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
+      
     }
   }
 
@@ -162,12 +165,13 @@ const Driver = () => {
       )
 
       if (response.status === 200) {
-        alert('Driver is edited successfully')
+        toast.success('Driver is edited successfully')
         fetchDriverData()
         setFormData({ name: '' })
         setEditModalOpen(false)
       }
     } catch (error) {
+      toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -202,10 +206,11 @@ const Driver = () => {
       )
 
       if (response.status === 200) {
-        alert('Driver is deleted successfully')
+        toast.error('Driver is deleted successfully')
         fetchDriverData()
       }
     } catch (error) {
+      toast.error("An error occurred")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -245,6 +250,7 @@ const Driver = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Driver</h2>

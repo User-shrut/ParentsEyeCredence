@@ -43,7 +43,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
     setValidated(true);
   };
 
-  
+
   const handlePeriodChange = (value) => {
     handleInputChange('Periods', value);
     setShowDateInputs(value === 'Custom');
@@ -157,7 +157,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
             <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
-            <button
+            {/* <button
               type="button"
               className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
               onClick={toggleDropdown} // Toggle dropdown on click
@@ -188,7 +188,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
                   </a>
                 </li>
               </ul>
-            )}
+            )} */}
           </div>
         </div>
       </CCol>
@@ -211,34 +211,66 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {apiData?.data?.map((row, rowIndex) => (
-          <CTableRow key={row.id} className="custom-row">
-            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-            <CTableDataCell>{apiData.deviceId}</CTableDataCell>
-            {/* Dynamically render table cells based on selected columns */}
-            {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>
-              {column === 'Start Time' ? row.startDateTime :
-               column === 'End Time' ? row.endDateTime :
-               column === 'Distance' ? row.distance :
-               column === 'Total Distance' ? row.totalKm :
-               column === 'Maximum Speed' ? row.maxSpeed :
-               column === 'Start Address' ? row.startAddress :
-               column === 'End Address' ? row.endAddress :
-               column === 'Driver' ? row.driverInfos?.driverName || '--' :
-               column === 'Device Name' ? row.device?.name || '--' :
-               column === 'Vehicle Status' ? row.vehicleStatus :
-               column === 'Time' ? row.time :
-               column === 'Average Speed' ? row.averageSpeed :
-               column === 'Start Location' ? row.startLocation :
-               column === 'End Location' ? row.endLocation :
-               '--'}
-            </CTableDataCell>            
-            ))}
+        {apiData?.data && apiData.data.length > 0 ? (
+          apiData.data.map((row, rowIndex) => (
+            <CTableRow key={row.id} className="custom-row">
+              {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+              <CTableDataCell>{row.deviceId}</CTableDataCell>
+              {/* Dynamically render table cells based on selected columns */}
+              {selectedColumns.map((column, index) => (
+                <CTableDataCell key={index}>
+                  {column === 'Start Time'
+                    ? row.startDateTime
+                    : column === 'End Time'
+                      ? row.endDateTime
+                      : column === 'Distance'
+                        ? row.distance
+                        : column === 'Total Distance'
+                          ? row.totalKm
+                          : column === 'Maximum Speed'
+                            ? row.maxSpeed
+                            : column === 'Start Address'
+                              ? row.startAddress
+                              : column === 'End Address'
+                                ? row.endAddress
+                                : column === 'Driver'
+                                  ? row.driverInfos?.driverName || '--'
+                                  : column === 'Device Name'
+                                    ? row.device?.name || '--'
+                                    : column === 'Vehicle Status'
+                                      ? row.vehicleStatus
+                                      : column === 'Time'
+                                        ? row.time
+                                        : column === 'Average Speed'
+                                          ? row.averageSpeed
+                                          : column === 'Start Location'
+                                            ? row.startLocation
+                                            : column === 'End Location'
+                                              ? row.endLocation
+                                              : '--'}
+                </CTableDataCell>
+              ))}
+            </CTableRow>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell colSpan={selectedColumns.length + 1}
+               style={{
+                backgroundColor: '#f8f9fa', // Light gray background
+                color: '#6c757d', // Darker text color
+                fontStyle: 'italic', // Italic font style
+                padding: '16px', // Extra padding for emphasis
+                textAlign: 'center', // Center the text
+                border: '1px dashed #dee2e6' // Dashed border to highlight it
+              }}
+              >
+              No data available
+            </CTableDataCell>
           </CTableRow>
-        ))}
+        )}
       </CTableBody>
     </CTable>
+
   );
 };
 
@@ -263,7 +295,7 @@ const Status = () => {
     'Average Speed',
     'Start Location',
     'End Location'
-  ]); 
+  ]);
 
   const [selectedColumns, setSelectedColumns] = useState([]);
   const token = Cookies.get('authToken'); //
@@ -309,25 +341,25 @@ const Status = () => {
 
   const handleSubmit = async () => {
 
-    console.log('DataAll',formData)
+    console.log('DataAll', formData)
 
-     // Convert the dates to ISO format if they're provided
-     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
-     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
- 
+    // Convert the dates to ISO format if they're provided
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
+
 
     const body = {
       deviceId: formData.Devices, // Use the device ID from the form data
       period: formData.Periods, // Use the selected period from the form data
       FromDate: fromDate,
       ToDate: toDate,
-    }; 
-    
+    };
+
     console.log(token);
     // console.log(body);
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/status?deviceId=${body.deviceId}&period=${body.period}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/status?deviceId=${body.deviceId}&period=${body.period}&fromDate=${body.FromDate}&toDate=${body.ToDate}`, {
         headers: {
           'Authorization': `Bearer ${token}`, // Replace with your actual token
           'Content-Type': 'application/json',
@@ -345,7 +377,7 @@ const Status = () => {
         setApiData(response.data);
       }
 
-         // Assuming the data returned is what you want to display in the table
+      // Assuming the data returned is what you want to display in the table
       console.log('Form submitted with data:', body);
     } catch (error) {
       console.error('Error submitting form:', error);

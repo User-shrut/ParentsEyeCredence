@@ -34,6 +34,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { GoogleMap, Marker, Polygon, useLoadScript } from '@react-google-maps/api'
 import { useSelector } from 'react-redux'
 import Select from 'react-select'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Geofences = () => {
   const deviceData = useSelector((state) => state.device.data)
@@ -228,13 +229,14 @@ const Geofences = () => {
       )
 
       if (response.status == 201) {
-        alert('Geofence is created successfully')
+        toast.success('Geofence is created successfully')
         fetchGeofenceData()
         setFormData({})
         setPolygonCoords([])
         setAddModalOpen(false)
       }
     } catch (error) {
+      toast.error("An error occured")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -264,13 +266,14 @@ const Geofences = () => {
       )
 
       if (response.status === 200) {
-        alert('Geofence is edited successfully')
+        toast.success('Geofence is edited successfully')
         fetchGeofenceData()
         setFormData({})
         setPolygonCoords([])
         setEditModalOpen(false)
       }
     } catch (error) {
+      toast.error("An error occured")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -299,10 +302,11 @@ const Geofences = () => {
       })
 
       if (response.status === 200) {
-        alert('Geofence is deleted successfully')
+        toast.error('Geofence is deleted successfully')
         fetchGeofenceData()
       }
     } catch (error) {
+      toast.error("An error occured")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -311,6 +315,7 @@ const Geofences = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Geofence</h2>

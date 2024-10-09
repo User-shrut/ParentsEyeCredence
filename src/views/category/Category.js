@@ -10,6 +10,7 @@ import { CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTabl
 import Loader from '../../components/Loader/Loader'
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Base API URL for CRUD operations
 const API_URL = 'https://credence-tracker.onrender.com/category';
@@ -87,6 +88,8 @@ const Category = () => {
   // Handle modal close for adding
   const handleAddModalClose = () => {
     setAddModalOpen(false);
+    setFormData({}); // Reset form data
+
   };
 
   // Handle modal open for editing
@@ -94,11 +97,15 @@ const Category = () => {
     setFormData({ categoryName: item.categoryName });
     setCurrentItemId(item._id);
     setEditModalOpen(true);
+    setFormData({}); // Reset form data
+
   };
 
   // Handle modal close for editing
   const handleEditModalClose = () => {
     setEditModalOpen(false);
+    setFormData({}); // Reset form data
+
   };
 
   // Handle form input change
@@ -108,44 +115,50 @@ const Category = () => {
   };
 
 
-
-  //post
+  // Post
   const handleAddSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Send POST request to API_URL
       const response = await axios.post(API_URL, formData, { headers });
       setData((prevData) => [...prevData, response.data]);
       setFilteredData((prevFilteredData) => [...prevFilteredData, response.data]);
+
+      fetchData(); // Ensure the data is refreshed
+
+
+      toast.success('Successfully Added Category!')// Show success alert
       handleAddModalClose(); // Close add modal on success
     } catch (error) {
-      console.error('Error adding category:', error);
+      console.error('Error adding category via axios:', error);
+      toast.error("Error adding category  ."); // Show error alert for axios request
     }
 
-    try {
-      const response = await fetch('https://credence-tracker.onrender.com/category', requestOptions);
+    // try {
+    //   // Fetch the latest category data from another API
+    //   const response = await fetch('https://credence-tracker.onrender.com/category', requestOptions);
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+    //   if (!response.ok) {
+    //     throw new Error('Network response was not ok');
+    //   }
 
-      const newCategory = await response.json(); // Parse the JSON response
-      console.log('Add Form Submitted Successfully:', newCategory);
+    //   const newCategory = await response.json(); // Parse the JSON response
+    //   console.log('Add Form Submitted Successfully:', newCategory);
 
-      // Ensure you're correctly accessing categoryName
-      if (newCategory && newCategory.categoryName) {
-        // Update the data and filteredData states with the new category
-        setData((prevData) => [...prevData, newCategory]); // Add new category to the data
-        setFilteredData((prevFilteredData) => [...prevFilteredData, newCategory]); // Add new category to the filtered data
-      }
+    //   // Ensure you're correctly accessing categoryName
+    //   if (newCategory && newCategory.categoryName) {
+    //     // Update the data and filteredData states with the new category
+    //     setData((prevData) => [...prevData, newCategory]); // Add new category to the data
+    //     setFilteredData((prevFilteredData) => [...prevFilteredData, newCategory]); // Add new category to the filtered data
+    //     alert('Fetched new category data successfully!'); // Show success alert for fetch
+    //   }
 
-      handleAddModalClose(); // Close modal after successful submission
+    //   handleAddModalClose(); // Close modal after successful submission
+    // } catch (error) {
+    //   console.error('Error adding category via fetch:', error);
+    // }
 
-    } catch (error) {
-      console.error('Error adding category:', error);
-      // Optionally handle the error (e.g., show a notification to the user)
-    }
-    fetchData();
   };
 
 
@@ -165,7 +178,7 @@ const Category = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission
     if (!selectedRow) {
-      alert('No row selected for editing');
+      toast.error('No row selected for editing');
       return;
     }
 
@@ -197,7 +210,7 @@ const Category = () => {
 
       const result = await response.json();
       console.log('Update successful:', result);
-      alert('Updated successfully');
+      toast.success('Successfully Edited Category!');
 
       // Update the local state with the modified row data
       const updatedRows = filteredRows.map((row) =>
@@ -209,7 +222,7 @@ const Category = () => {
       fetchData(); // Refetch the data to ensure the UI is up-to-date
     } catch (error) {
       console.error('Error updating row:', error.message, error.stack);
-      alert('Error updating data');
+      toast.error('Error updating data');
     }
     fetchData();
   };
@@ -244,21 +257,22 @@ const Category = () => {
         if (response.ok) {
           // Update the state to remove the deleted row
           setFilteredData(filteredData.filter((item) => item._id !== id));
-          alert('Record deleted successfully');
+          toast.error('Record deleted successfully');
         } else {
           const result = await response.json();
           console.error('Server responded with:', result);
-          alert(`Unable to delete record: ${result.message || response.statusText}`);
+          toast.error(`Unable to delete record: ${result.message || response.statusText}`);
         }
       } catch (error) {
         console.error('Error during DELETE request:', error);
-        alert('Unable to delete record. Please check the console for more details.');
+        toast.error('Unable to delete record. Please check the console for more details.');
       }
     }
     fetchData();
   };
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center"reverseOrder={false}/>
       {/* Header and Add Category button */}
       <div className="d-flex justify-content-between mb-2">
         <div>
