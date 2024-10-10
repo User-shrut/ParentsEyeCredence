@@ -294,7 +294,7 @@ const Distances = () => {
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Distance</strong>
+              <strong>Distance Report</strong>
             </CCardHeader>
             <CCardBody>
               <SearchDistance
