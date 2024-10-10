@@ -13,10 +13,14 @@ import {
   Box,
   TextField,
   FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -31,8 +35,29 @@ import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
+import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast'
 
-const Group = () => {
+const notificationTypes = [
+  'statusOnline',
+  'statusOffline',
+  'statusUnknown',
+  'deviceActive',
+  'deviceInactive',
+  'deviceMoving',
+  'deviceStopped',
+  'speedLimitExceeded',
+  'ignitionOn',
+  'ignitionOff',
+  'fuelDrop',
+  'fuelIncrease',
+  'geofenceEntered',
+  'geofenceExited',
+  'alarm',
+  'maintenanceRequired',
+]
+
+const Notification = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -41,7 +66,12 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
+  const accessToken = Cookies.get('authToken')
 
+  const [groups, setGroups] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState()
+  const [devices, setDevices] = useState([])
+  const [selectedDevices, setSelectedDevices] = useState([])
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
@@ -64,10 +94,50 @@ const Group = () => {
     marginTop: '8px',
   }
 
+  const getGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setGroups(response.data.groups)
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  const getDevices = async (selectedGroup) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      )
+      if (response.data.success) {
+        setDevices(response.data.data)
+      } else {
+        setDevices([])
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  useEffect(() => {
+    getGroups()
+  }, [])
+
   // ##################### getting data  ###################
-  const fetchGroupData = async (page = 1) => {
-    const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/group?page=${page}&limit=${limit}`
+  const fetchNotificationData = async (page = 1) => {
+    const url = `${import.meta.env.VITE_API_URL}/notifications?page=${page}&limit=${limit}`
 
     try {
       const response = await axios.get(url, {
@@ -76,10 +146,10 @@ const Group = () => {
         },
       })
 
-      if (response.data.groups) {
-        setData(response.data.groups)
+      if (response.data) {
+        setData(response.data.notifications)
         setPageCount(response.data.totalPages)
-        console.log(response.data.groups)
+        console.log(response.data.notifications)
         console.log(response.data.totalPages)
         setLoading(false)
       }
@@ -87,31 +157,29 @@ const Group = () => {
       setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-
     }
   }
 
   useEffect(() => {
-    fetchGroupData()
+    fetchNotificationData()
   }, [])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
     let page = e.selected + 1
     setLoading(true)
-    fetchGroupData(page)
+    fetchNotificationData(page)
   }
 
   // #########################################################################
 
-  //  ####################  Add Group ###########################
+  //  ####################  Add Notification ###########################
 
-  const handleAddGroup = async (e) => {
+  const handleAddNotification = async (e) => {
     e.preventDefault()
     console.log(formData)
     try {
-      const accessToken = Cookies.get('authToken')
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/group`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/notifications`, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -119,9 +187,9 @@ const Group = () => {
       })
 
       if (response.status === 201) {
-        alert('group is created successfully')
-        fetchGroupData()
-        setFormData({ name: '' })
+        toast.success('Successfully toasted!')
+        fetchNotificationData()
+        setFormData({})
         setAddModalOpen(false)
       }
     } catch (error) {
@@ -132,13 +200,12 @@ const Group = () => {
   // ###################################################################
   // ######################### Edit Group #########################
 
-  const EditGroupSubmit = async (e) => {
+  const handleEditNotification = async (e) => {
     e.preventDefault()
-    console.log(formData);
+    console.log(formData)
     try {
-      const accessToken = Cookies.get('authToken')
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
+        `${import.meta.env.VITE_API_URL}/notifications/${formData._id}`,
         { name: formData.name },
         {
           headers: {
@@ -149,8 +216,8 @@ const Group = () => {
 
       if (response.status === 200) {
         alert('group is edited successfully')
-        fetchGroupData()
-        setFormData({ name: '' })
+        fetchNotificationData()
+        setFormData({})
         setEditModalOpen(false)
       }
     } catch (error) {
@@ -158,38 +225,34 @@ const Group = () => {
     }
   }
 
-  const handleEditGroup = async (item) => {
+  const handleClickNotification = async (item) => {
     console.log(item)
     setEditModalOpen(true)
     setFormData({ ...item })
-    console.log("this is before edit", formData)
+    console.log('this is before edit', formData)
   }
-
 
   // ###################################################################
 
-
   // ###################### Delete Group ##############################
 
-
-  const deleteGroupSubmit = async (item) => {
-    alert("you want to delete this group");
+  const handleDeleteNotification = async (item) => {
+    alert('you want to delete this group')
     console.log(item)
 
     try {
-      const accessToken = Cookies.get('authToken')
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/group/${item._id}`,
+        `${import.meta.env.VITE_API_URL}/notifications/${item._id}`,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       )
 
       if (response.status === 200) {
         alert('group is deleted successfully')
-        fetchGroupData()
+        fetchNotificationData()
       }
     } catch (error) {
       throw error.response ? error.response.data : new Error('An error occurred')
@@ -198,8 +261,13 @@ const Group = () => {
 
   //  ###############################################################
 
+  useEffect(() => {
+    console.log('this is form data...', formData)
+  }, [formData])
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Notifications</h2>
@@ -240,62 +308,110 @@ const Group = () => {
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{ width: "480px" }}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
-          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Notifications Name
-                </CTableHeaderCell>
+        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Notifications Type
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Chennel
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Assigned Devices
+              </CTableHeaderCell>
 
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Actions
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {data?.map((item, index) => (
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Actions
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
+              <>
+                <CTableRow>
+                  <CTableDataCell colSpan="4" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              </>
+            ) : data.length > 0 ? (
+              data?.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">{item.type}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">
+                    <CFormSelect
+                      id="devices"
+                      className=" text-center border-0"
+                      style={{ width: '130px' }}
+                    >
+                      <option value="">devices</option>
+                      {Array.isArray(item.Devices) &&
+                        item.Devices.map((device) => (
+                          <option key={device._id} value={device._id}>
+                            {device.name}
+                          </option>
+                        ))}
+                    </CFormSelect>
+                  </CTableDataCell>
                   <CTableDataCell
-                    className="text-center d-flex"
+                    className="text-center d-flex p-0"
                     style={{ justifyContent: 'center', alignItems: 'center' }}
                   >
-                    <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
+                    <IconButton aria-label="edit" onClick={() => handleClickNotification(item)}>
                       <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                        style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
                       />
                     </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                    <IconButton aria-label="delete" onClick={() => handleDeleteNotification(item)}>
+                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
                     </IconButton>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
-        )}
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan="4" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's no Notification you have created yet.
+                      <br /> Maybe it's time to create new Notification!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Create Notification
+                      </button>
+                    </div>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
       </TableContainer>
       {pageCount > 1 && (
         <ReactPaginate
@@ -339,15 +455,68 @@ const Group = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddGroup}>
-              <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <TextField
-                  label="Group Name"
-                  name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
+            <form onSubmit={handleAddNotification}>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Select Group</InputLabel>
+                <Select
+                  name="groups"
+                  onChange={(e) => getDevices(e.target.value)}
+                  label="select group..."
+                >
+                  {groups.map((group) => (
+                    <MenuItem key={group._id} value={group._id}>
+                      {group.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Devices</InputLabel>
+                <Select
+                  name="devices"
+                  value={formData.deviceId || []}
+                  onChange={(e) => setFormData({ ...formData, deviceId: e.target.value })}
+                  label="Select Devices..."
+                  multiple
+                >
+                  {devices.length > 0 ? (
+                    devices?.map((device) => (
+                      <MenuItem key={device._id} value={device._id}>
+                        {device.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem>No device available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Notification Type</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.type || []}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  label="Select Notification Type..."
+                  multiple
+                >
+                  {notificationTypes.map((Ntype) => (
+                    <MenuItem key={Ntype} value={Ntype}>
+                      {Ntype}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Channel</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.channel || []}
+                  onChange={(e) => setFormData({ ...formData, channel: e.target.value })}
+                  label="Select Channel..."
+                >
+                  <MenuItem value="web">Web</MenuItem>
+                  <MenuItem value="mobile">Mobile</MenuItem>
+                </Select>
               </FormControl>
               <Button
                 variant="contained"
@@ -382,12 +551,12 @@ const Group = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={EditGroupSubmit}>
+            <form onSubmit={handleEditNotification}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Group Name"
                   name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
+                  value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
@@ -404,9 +573,8 @@ const Group = () => {
           </DialogContent>
         </Box>
       </Modal>
-
     </div>
   )
 }
 
-export default Group
+export default Notification

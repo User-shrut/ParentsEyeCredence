@@ -58,6 +58,7 @@ const Devices = () => {
   const myPassword = '123456'
   const [extendedPassword, setExtendedPassword] = useState()
   const [passwordCheck, setPasswordCheck] = useState(false)
+  const [extendedYear, setExtendedYear] = useState(null);
 
   const [groups, setGroups] = useState([])
   const [users, setUsers] = useState([])
@@ -134,15 +135,7 @@ const Devices = () => {
     }
   }
 
-  const handleCheckPassword = () => {
-    if (extendedPassword == myPassword) {
-      setPasswordCheck(true)
-      setExtendedPasswordModel(false)
-      toast.success('password is correct')
-    } else {
-      toast.error('password is not correct')
-    }
-  }
+ 
 
   // const handleEditSubmit = async () => {
   //   if (!selectedRow) {
@@ -587,29 +580,42 @@ const Devices = () => {
     }
   }
 
+
+
+  const handleCheckPassword = () => {
+    if (extendedPassword == myPassword) {
+      setPasswordCheck(true);
+    setExtendedPasswordModel(false);
+    alert('Password is correct');
+    
+    // Now update the expiration date based on the selected plan (years)
+    const ExpiryDate = formData.expirationdate;
+    if (ExpiryDate && extendedYear) {
+      const expiry = new Date(ExpiryDate);
+      const extendedDate = new Date(
+        expiry.setFullYear(expiry.getFullYear() + extendedYear)
+      )
+        .toISOString()
+        .split('T')[0]; // Format to yyyy-mm-dd
+
+      // Now set the extended date
+      setFormData({
+        ...formData,
+        extenddate: extendedDate,
+        expirationdate: extendedDate,
+      });
+
+      setSelectedYears(null); // Reset the selected years after updating
+    }
+  } else {
+    alert('Password is not correct');
+  }
+  }
+
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {
+    setExtendedYear(years); // new state to hold the selected number of years
     setExtendedPasswordModel(true);
-    const ExpiryDate = formData.expirationdate
-
-    if (ExpiryDate) {
-      const expiry = new Date(ExpiryDate)
-      console.log('expiration hai ye ', expiry)
-
-      const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + years))
-        .toISOString()
-        .split('T')[0] // Format to yyyy-mm-dd
-
-      console.log('ye hai extended date: ', extendedDate)
-      if(passwordCheck){
-        setFormData({
-          ...formData,
-          extenddate: extendedDate,
-          expirationdate: extendedDate,
-        })
-      }
-      
-    }
   }
 
   return (
@@ -728,7 +734,7 @@ const Devices = () => {
                             className=" text-center border-0"
                             style={{ width: '100px' }}
                           >
-                            <option>Groups</option>
+                            <option>{item.groups.length || "0"}</option>
                             {Array.isArray(item.groups) &&
                               item.groups.map((group) => (
                                 <option key={group._id} value={group._id}>
@@ -742,7 +748,7 @@ const Devices = () => {
                             className=" text-center border-0"
                             style={{ width: '120px' }}
                           >
-                            <option value="">Geofence</option>
+                            <option value="">{item.geofences.length || "0"}</option>
                             {Array.isArray(item.geofences) &&
                               item.geofences.map((geofence, index) => (
                                 <option key={index} value={geofence._id}>
@@ -756,7 +762,7 @@ const Devices = () => {
                             className=" text-center border-0"
                             style={{ width: '120px' }}
                           >
-                            <option value="">Users</option>
+                            <option value="">{item.users.length || "0"}</option>
                             {Array.isArray(item.users) &&
                               item.users.map((user) => (
                                 <option key={user._id} value={user._id}>
