@@ -206,7 +206,7 @@ const Notification = () => {
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/notifications/${formData._id}`,
-        { name: formData.name },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -351,19 +351,19 @@ const Notification = () => {
             ) : data.length > 0 ? (
               data?.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0">{item.type}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">{item.deviceId.name}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">
+                  <CTableDataCell className="text-center p-0 ">
                     <CFormSelect
-                      id="devices"
-                      className=" text-center border-0"
-                      style={{ width: '130px' }}
+                      id="type"
+                      className=" text-center border-0 "
+                      style={{ width: '130px', margin: '0 auto' }}
                     >
-                      <option value="">devices</option>
-                      {Array.isArray(item.Devices) &&
-                        item.Devices.map((device) => (
-                          <option key={device._id} value={device._id}>
-                            {device.name}
+                      <option value="">{item.type.length}</option>
+                      {Array.isArray(item.type) &&
+                        item.type.map((typ) => (
+                          <option key={typ} value={typ}>
+                            {typ}
                           </option>
                         ))}
                     </CFormSelect>
@@ -554,12 +554,39 @@ const Notification = () => {
             <form onSubmit={handleEditNotification}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
-                  label="Group Name"
-                  name="name"
-                  value={formData.name !== undefined ? formData.name : ''}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
+                  label="Device"
+                  name="device"
+                  value={formData.deviceId?.name !== undefined ? formData.deviceId?.name : ''}
+                  disabled
                 />
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Notification Type</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.type || []}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  label="Select Notification Type..."
+                  multiple
+                >
+                  {notificationTypes.map((Ntype) => (
+                    <MenuItem key={Ntype} value={Ntype}>
+                      {Ntype}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <InputLabel>Channel</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.channel || []}
+                  onChange={(e) => setFormData({ ...formData, channel: e.target.value })}
+                  label="Select Channel..."
+                >
+                  <MenuItem value="web">Web</MenuItem>
+                  <MenuItem value="mobile">Mobile</MenuItem>
+                </Select>
               </FormControl>
               <Button
                 variant="contained"
