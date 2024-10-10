@@ -112,7 +112,7 @@ const Geofences = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '35%',
+    width: '40%',
     maxHeight: '90vh',
     BorderRadius: '10px',
     bgcolor: 'background.paper',

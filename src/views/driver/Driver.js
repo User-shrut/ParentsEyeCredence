@@ -498,7 +498,6 @@ const Driver = () => {
                   name="vehicle no."
                   value={fomData.device}
                   onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
-                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -625,7 +624,6 @@ const Driver = () => {
                   name="vehicle no."
                   value={fomData.device}
                   onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
-                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
