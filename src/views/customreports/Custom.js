@@ -193,7 +193,18 @@ const DistanceTable = ({ apiData, selectedColumns }) => {
           ))
         ) : (
           <CTableRow>
-            <CTableDataCell colSpan={selectedColumns.length + 1}>No data available</CTableDataCell>
+            <CTableDataCell colSpan={selectedColumns.length + 1}
+               style={{
+                backgroundColor: '#f8f9fa', // Light gray background
+                color: '#6c757d', // Darker text color
+                fontStyle: 'italic', // Italic font style
+                padding: '16px', // Extra padding for emphasis
+                textAlign: 'center', // Center the text
+                border: '1px dashed #dee2e6' // Dashed border to highlight it
+              }}
+            >
+              No data available
+              </CTableDataCell>
           </CTableRow>
         )}
       </CTableBody>

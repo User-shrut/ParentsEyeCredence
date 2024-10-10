@@ -32,6 +32,7 @@ import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -120,12 +121,13 @@ const Group = () => {
       })
 
       if (response.status === 201) {
-        alert('group is created successfully')
+        toast.success('group is created successfully')
         fetchGroupData()
         setFormData({ name: '' })
         setAddModalOpen(false)
       }
     } catch (error) {
+      toast.error("An error occured")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -149,12 +151,13 @@ const Group = () => {
       )
 
       if (response.status === 200) {
-        alert('group is edited successfully')
+        toast.success('group is edited successfully')
         fetchGroupData()
         setFormData({ name: '' })
         setEditModalOpen(false)
       }
     } catch (error) {
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -189,10 +192,11 @@ const Group = () => {
       )
 
       if (response.status === 200) {
-        alert('group is deleted successfully')
+        toast.error('group is deleted successfully')
         fetchGroupData()
       }
     } catch (error) {
+      toast.error("An error occurred")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -201,6 +205,7 @@ const Group = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Groups</h2>

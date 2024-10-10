@@ -39,6 +39,7 @@ import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import ReactPaginate from 'react-paginate'
 import { Label } from '@mui/icons-material'
+import toast, { Toaster } from 'react-hot-toast'
 
 const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
 
@@ -226,11 +227,11 @@ const Devices = () => {
         setPageCount(response.data.totalPages)
       } else {
         console.error('Expected an array but got:', response.data)
-        alert('Unexpected data format received.')
+        toast.error('Unexpected data format received.')
       }
     } catch (error) {
       console.error('Fetch data error:', error)
-      alert('An error occurred while fetching data.')
+      toast.error('An error occurred while fetching data.')
     } finally {
       setLoading(false) // Stop loading once data is fetched
     }
@@ -272,7 +273,7 @@ const Devices = () => {
     if(newRow){
       // Check for any required fields missing
       if (!newRow.name ||!newRow.uniqueId ||!newRow.sim ||!newRow.model ||!newRow.category || !newRow.expirationdate) {
-        alert('Please fill in all required fields.')
+        toast.error('Please fill in all required fields.')
         return
       }
 
@@ -291,7 +292,7 @@ const Devices = () => {
 
       if (response.status == 201) {
         console.log('Record created successfully:')
-        alert('Record created successfully')
+        toast.success('Record created successfully')
         handleModalClose()
         fetchData()
       } else {
@@ -305,11 +306,11 @@ const Devices = () => {
         }
 
         console.error('Error Response:', responseBody)
-        alert(`Unable to create record: ${responseBody.message || response.statusText}`)
+        toast.error(`Unable to create record: ${responseBody.message || response.statusText}`)
       }
     } catch (error) {
       console.error('Error during POST request:', error)
-      alert('Unable to create record')
+      toast.error('Unable to create record')
     }
   }
 
@@ -360,7 +361,7 @@ const Devices = () => {
 
       // Check if the response status is in the 2xx range
       if (response.status === 200) {
-        alert('User is edited successfully')
+        toast.success('User is edited successfully')
         setEditModalOpen(false)
         fetchData()
         setLoading(false)
@@ -368,7 +369,7 @@ const Devices = () => {
         setFormData({})
       } else {
         // Handle other response statuses
-        alert(`Error: ${response.status} - ${response.statusText}`)
+        toast.error(`Error: ${response.status} - ${response.statusText}`)
         setLoading(false)
       }
     } catch (error) {
@@ -386,7 +387,7 @@ const Devices = () => {
       }
 
       // Show an alert with the error message
-      alert(errorMessage)
+      toast.error(errorMessage)
     }
   }
 
@@ -407,15 +408,15 @@ const Devices = () => {
       })
 
       if (response.ok) {
-        alert('Record deleted successfully')
+        toast.error('Record deleted successfully')
         fetchData()
       } else {
         const result = await response.json()
-        alert(`Unable to delete record: ${result.message || response.statusText}`)
+        toast.error(`Unable to delete record: ${result.message || response.statusText}`)
       }
     } catch (error) {
       console.error('Error during DELETE request:', error)
-      alert('Unable to delete record. Please check the console for more details.')
+      toast.error('Unable to delete record. Please check the console for more details.')
     }
   }
 
@@ -441,7 +442,7 @@ const Devices = () => {
         }
       } catch (error) {
         console.error('Fetch users error:', error)
-        alert('An error occurred while fetching users.')
+        toast.error('An error occurred while fetching users.')
       }
     }
 
@@ -619,6 +620,7 @@ const Devices = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+        <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Devices</h2>

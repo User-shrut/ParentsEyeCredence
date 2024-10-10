@@ -199,48 +199,78 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
 const ShowIdeal = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
-          <CTableHeaderCell>Devices</CTableHeaderCell>
-
-          {/* Dynamically render table headers based on selected columns */}
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {apiData?.map((row, rowIndex) => (
-          row.data?.map((nestedRow, nestedIndex) => (
-            <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-              {/* Use the deviceId and nested row index to create a unique key */}
-
-              <CTableDataCell>{row.deviceId}</CTableDataCell>
-
-              {/* Dynamically render table cells based on selected columns */}
-              {selectedColumns.map((column, index) => (
-                <CTableDataCell key={index}>
-                  {
-                    // column === 'OUID' ? nestedRow.ouid :
-                      column === 'Vehicle Status' ? nestedRow.vehicleStatus :
-                        column === 'Duration (seconds)' ? nestedRow.durationSeconds :
-                          column === 'Location' ? nestedRow.location :
-                            column === 'Address' ? (nestedRow.address || '--') :
-                              column === 'Arrival Time' ? nestedRow.arrivalTime :
-                                column === 'Departure Time' ? nestedRow.departureTime :
-                                  column === 'Total Duration (seconds)' ? row.totalDurationSeconds :
-                                    '--'
-                  }
-                </CTableDataCell>
-              ))}
-            </CTableRow>
-          ))
+    <CTableHead>
+      <CTableRow>
+        {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+        <CTableHeaderCell>Devices</CTableHeaderCell>
+        
+        {/* Dynamically render table headers based on selected columns */}
+        {selectedColumns.map((column, index) => (
+          <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
         ))}
-
-
-      </CTableBody>
-    </CTable>
+      </CTableRow>
+    </CTableHead>
+    
+    <CTableBody>
+      {/* Render rows if apiData exists */}
+      {apiData?.length > 0 ? (
+        apiData.map((row, rowIndex) => (
+          row.data?.length > 0 ? (
+            row.data.map((nestedRow, nestedIndex) => (
+              <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
+                {/* Use the deviceId and nested row index to create a unique key */}
+                <CTableDataCell>{row.deviceId}</CTableDataCell>
+                
+                {/* Dynamically render table cells based on selected columns */}
+                {selectedColumns.map((column, index) => (
+                  <CTableDataCell key={index}>
+                    {column === 'Vehicle Status' ? nestedRow.vehicleStatus
+                      : column === 'Duration (seconds)' ? nestedRow.durationSeconds
+                      : column === 'Location' ? nestedRow.location
+                      : column === 'Address' ? (nestedRow.address || '--')
+                      : column === 'Arrival Time' ? nestedRow.arrivalTime
+                      : column === 'Departure Time' ? nestedRow.departureTime
+                      : column === 'Total Duration (seconds)' ? row.totalDurationSeconds
+                      : '--'}
+                  </CTableDataCell>
+                ))}
+              </CTableRow>
+            ))
+          ) : (
+            <CTableRow key={`${row.deviceId}-empty`}>
+              <CTableDataCell colSpan={selectedColumns.length + 1}
+                style={{
+                  backgroundColor: '#f8f9fa', // Light gray background
+                  color: '#6c757d', // Darker text color
+                  fontStyle: 'italic', // Italic font style
+                  padding: '16px', // Extra padding for emphasis
+                  textAlign: 'center', // Center the text
+                  border: '1px dashed #dee2e6' // Dashed border to highlight it
+                }}
+              >
+                No data available for {row.deviceId}
+              </CTableDataCell>
+            </CTableRow>
+          )
+        ))
+      ) : (
+        <CTableRow>
+          <CTableDataCell colSpan={selectedColumns.length + 1}
+             style={{
+              backgroundColor: '#f8f9fa', // Light gray background
+              color: '#6c757d', // Darker text color
+              fontStyle: 'italic', // Italic font style
+              padding: '16px', // Extra padding for emphasis
+              textAlign: 'center', // Center the text
+              border: '1px dashed #dee2e6' // Dashed border to highlight it
+            }}>
+            No data available
+          </CTableDataCell>
+        </CTableRow>
+      )}
+    </CTableBody>
+  </CTable>
+  
   );
 };
 

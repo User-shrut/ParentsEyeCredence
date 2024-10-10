@@ -173,37 +173,62 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
 const StopTable = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
-          <CTableHeaderCell>Device</CTableHeaderCell>
-          {/* Dynamically render table headers based on selected columns */}
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {apiData?.finalDeviceDataByStopage?.map((row, rowIndex) => (
-          <CTableRow key={row.id} className="custom-row">
+    <CTableHead>
+      <CTableRow>
+        {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+        <CTableHeaderCell>Device</CTableHeaderCell>
+        
+        {/* Dynamically render table headers based on selected columns */}
+        {selectedColumns.map((column, index) => (
+          <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+        ))}
+      </CTableRow>
+    </CTableHead>
+  
+    <CTableBody>
+      {/* Check if apiData and finalDeviceDataByStopage exist and are not empty */}
+      {apiData?.finalDeviceDataByStopage?.length > 0 ? (
+        apiData.finalDeviceDataByStopage.map((row, rowIndex) => (
+          <CTableRow key={row.id || rowIndex} className="custom-row">
+            {/* Optional: Row index cell */}
             {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+            
             <CTableDataCell>{row.deviceId}</CTableDataCell>
+  
             {/* Dynamically render table cells based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>   {column === 'Speed' ? row.speed :
-                column === 'Ignition' ? row.ignition ? "ON" : "OFF" :
-                  column === 'Direction' ? row.course :
-                    column === 'Device Id' ? row.deviceId :
-                      column === 'Arrival Time' ? row.arrivalTime :
-                        column === 'Departure Time' ? row.departureTime :
-                          column === 'Device Name' ? row.device?.name :
-
-                            '--'}</CTableDataCell>
+              <CTableDataCell key={index}>
+                {column === 'Speed' ? row.speed
+                  : column === 'Ignition' ? (row.ignition ? 'ON' : 'OFF')
+                  : column === 'Direction' ? row.course
+                  : column === 'Device Id' ? row.deviceId
+                  : column === 'Arrival Time' ? row.arrivalTime
+                  : column === 'Departure Time' ? row.departureTime
+                  : column === 'Device Name' ? row.device?.name || '--'
+                  : '--'}
+              </CTableDataCell>
             ))}
           </CTableRow>
-        ))}
-      </CTableBody>
-    </CTable>
+        ))
+      ) : (
+        <CTableRow>
+          <CTableDataCell colSpan={selectedColumns.length + 1}
+             style={{
+              backgroundColor: '#f8f9fa', // Light gray background
+              color: '#6c757d', // Darker text color
+              fontStyle: 'italic', // Italic font style
+              padding: '16px', // Extra padding for emphasis
+              textAlign: 'center', // Center the text
+              border: '1px dashed #dee2e6' // Dashed border to highlight it
+            }}
+            >
+            No data available
+          </CTableDataCell>
+        </CTableRow>
+      )}
+    </CTableBody>
+  </CTable>
+  
   );
 };
 const Stops = () => {

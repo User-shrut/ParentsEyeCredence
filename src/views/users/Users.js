@@ -241,12 +241,12 @@ const Users = () => {
     const phonePattern = /^[0-9]{10}$/
 
     if (!emailPattern.test(formData.email)) {
-      alert('Please enter a valid email address')
+      toast.error('Please enter a valid email address')
       return
     }
 
     if (!phonePattern.test(formData.mobile)) {
-      alert('Please enter a valid 10-digit phone number')
+      toast.error('Please enter a valid 10-digit phone number')
       return
     }
 
@@ -269,7 +269,7 @@ const Users = () => {
       })
 
       if (response.status === 201) {
-        alert('User is created successfully')
+        toast.success('User is created successfully')
         fetchUserData()
         setAddModalOpen(false)
         setCurrentStep(0)
@@ -303,7 +303,7 @@ const Users = () => {
           isAdmin: false,
         })
       } else {
-        alert(`Error: ${response.status} - ${response.statusText}`)
+        toast.error(`Error: ${response.status} - ${response.statusText}`)
       }
     } catch (error) {
       console.error('Error during submission:', error)
@@ -315,7 +315,7 @@ const Users = () => {
         errorMessage = 'Network error: Please try again later'
       }
 
-      alert(errorMessage)
+      toast.error(errorMessage)
     }
   }
   // #############################################
@@ -388,7 +388,7 @@ const Users = () => {
 
       // Check if the response status is in the 2xx range
       if (response.status === 200) {
-        alert('User is edited successfully')
+        toast.success('User is edited successfully')
         setEditModalOpen(false)
         setCurrentStep(0)
         fetchUserData()
@@ -425,7 +425,7 @@ const Users = () => {
         })
       } else {
         // Handle other response statuses
-        alert(`Error: ${response.status} - ${response.statusText}`)
+        toast.error(`Error: ${response.status} - ${response.statusText}`)
         setLoading(false)
       }
     } catch (error) {
@@ -443,7 +443,7 @@ const Users = () => {
       }
 
       // Show an alert with the error message
-      alert(errorMessage)
+      toast.error(errorMessage)
     }
   }
 
@@ -462,7 +462,7 @@ const Users = () => {
       })
 
       if (response.status === 200) {
-        toast.success('Successfully deleted User!')
+        toast.error('Successfully deleted User!')
         fetchUserData()
       }
     } catch (error) {

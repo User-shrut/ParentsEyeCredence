@@ -1,3 +1,12 @@
+.table-container::-webkit-scrollbar {
+  display: none !important; /* Hides scrollbar for Chrome, Safari, and Edge */
+}
+
+/* For Firefox */
+.table-container {
+  scrollbar-width: none !important; /* Hides scrollbar in Firefox */
+}
+
 .content{
   padding-top: 0 !important;
 }

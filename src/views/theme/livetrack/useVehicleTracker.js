@@ -36,7 +36,7 @@ const useVehicleTracker = (deviceId) => {
     fetchVehicleData()
 
     // Set up interval to fetch data every few seconds (e.g., 10 seconds)
-    intervalId = setInterval(fetchVehicleData, 3000)
+    intervalId = setInterval(fetchVehicleData, 2500)
 
     // Clear the interval on component unmount
     return () => clearInterval(intervalId)
