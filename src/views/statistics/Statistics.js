@@ -285,7 +285,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                     <CTableDataCell key={index}>
                       {column === 'Vehicle Status' ? (
                         nestedRow.vehicleStatus
-                      ) : column === 'Duration (seconds)' ? (
+                      ) : column === 'Duration' ? (
                         // Convert duration from seconds to HH:mm:ss format
                         new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
                       ) : column === 'Location' ? (
@@ -299,7 +299,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                         // Add 6 hours 30 minutes to departureTime and format to HH:mm
                         new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
                           .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      ) : column === 'Total Duration (seconds)' ? (
+                      ) : column === 'Total Duration' ? (
                         // Convert total duration from seconds to HH:mm:ss format
                         new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
                       ) : (
@@ -361,11 +361,11 @@ const Ideal = () => {
   const [columns] = useState([
     // 'OUID',
     'Vehicle Status',
-    'Duration (seconds)',
+    'Duration',
     'Location',
     'Arrival Time',
     'Departure Time',
-    'Total Duration (seconds)'
+    'Total Duration'
   ]);
 
 
