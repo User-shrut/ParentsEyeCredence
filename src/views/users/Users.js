@@ -749,7 +749,7 @@ const Users = () => {
                   onChange={handleInputChange}
                   sx={{ marginBottom: '10px' }}
                   fullWidth
-                  required
+                  // required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
