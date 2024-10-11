@@ -771,9 +771,9 @@ const Devices = () => {
                               ))}
                           </CFormSelect>
                         ) : column.accessor === 'Driver' ? (
-                          <div style={{ width: '120px' }}>{item[column.accessor].name}</div>
+                          <div style={{ width: '120px' }}>{item[column.accessor].name || "N/A"}</div>
                         ) : (
-                          item[column.accessor] // Default rendering for other columns
+                          item[column.accessor] ? item[column.accessor] : 'N/A'
                         )}
                       </CTableDataCell>
                     ))}
@@ -957,6 +957,9 @@ const Devices = () => {
                         onChange={handleInputChange}
                         label={col.Header}
                       >
+                        <MenuItem value=''>
+                            select driver...
+                          </MenuItem>
                         {drivers.map((driver) => (
                           <MenuItem key={driver._id} value={driver._id}>
                             {driver.name}
@@ -1192,6 +1195,9 @@ const Devices = () => {
                         onChange={handleInputChange}
                         label={col.Header}
                       >
+                        <MenuItem value=''>
+                            select driver...
+                          </MenuItem>
                         {drivers.map((driver) => (
                           <MenuItem key={driver._id} value={driver._id}>
                             {driver.name}

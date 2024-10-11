@@ -284,18 +284,18 @@ const Group = () => {
               {data.length > 0 ? (
                 data?.map((item, index) => (
                   <CTableRow key={index}>
-                    <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                    <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
                     <CTableDataCell
-                      className="text-center d-flex"
+                      className="text-center d-flex p-0"
                       style={{ justifyContent: 'center', alignItems: 'center' }}
                     >
                       <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
                         <RiEdit2Fill
-                          style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
                         />
                       </IconButton>
                       <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                        <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
                       </IconButton>
                     </CTableDataCell>
                   </CTableRow>

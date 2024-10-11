@@ -187,7 +187,7 @@ const Notification = () => {
       })
 
       if (response.status === 201) {
-        toast.success('Successfully toasted!')
+        toast.success('Successfully Notification Created!')
         fetchNotificationData()
         setFormData({})
         setAddModalOpen(false)
@@ -215,7 +215,7 @@ const Notification = () => {
       )
 
       if (response.status === 200) {
-        alert('group is edited successfully')
+        toast.success('Successfully Notification Updated!')
         fetchNotificationData()
         setFormData({})
         setEditModalOpen(false)
@@ -237,7 +237,7 @@ const Notification = () => {
   // ###################### Delete Group ##############################
 
   const handleDeleteNotification = async (item) => {
-    alert('you want to delete this group')
+    
     console.log(item)
 
     try {
@@ -351,7 +351,7 @@ const Notification = () => {
             ) : data.length > 0 ? (
               data?.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0">{item.deviceId.name}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">{item.deviceId?.name}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell>
                   <CTableDataCell className="text-center p-0 ">
                     <CFormSelect

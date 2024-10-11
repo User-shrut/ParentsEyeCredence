@@ -215,7 +215,7 @@ const Driver = () => {
     }
   }
 
-  const [fomData, setFomData] = useState({ device: '' });
+  const [fomData, setFomData] = useState({});
   const [devices, setDevices] = useState([]);
   const token = Cookies.get('authToken'); //
 
@@ -496,8 +496,8 @@ const Driver = () => {
                   select // Set the select prop to true
                   label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={fomData.device}
-                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
+                  value={fomData.deviceId}
+                  onChange={(e) => setFomData({ ...fomData, deviceId: e.target.value })}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -509,8 +509,8 @@ const Driver = () => {
                 >
                   {devices.length > 0 ? (
                     devices.map((device) => (
-                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
-                        {device.name}
+                      <MenuItem key={device.deviceId} value={device.deviceId}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.deviceId}
                       </MenuItem>
                     ))
                   ) : (
@@ -622,8 +622,8 @@ const Driver = () => {
                   select // Set the select prop to true
                   label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={fomData.device}
-                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
+                  value={fomData.deviceId}
+                  onChange={(e) => setFomData({ ...fomData, deviceId: e.target.value })}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
