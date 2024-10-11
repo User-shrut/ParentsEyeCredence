@@ -113,13 +113,27 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
 
       <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        {/* Use React-Select component for multi-select */}
         <Select
           isMulti
           id="columns"
-          options={columns.map((column) => ({ value: column, label: column }))}
-          value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
+          options={[
+            { value: 'all', label: 'All Columns' }, // Add "All Columns" option
+            ...columns.map((column) => ({ value: column, label: column })),
+          ]}
+          value={
+            formData.Columns.length === columns.length
+              ? [{ value: 'all', label: 'All Columns' }] // Show "All Columns" if all columns are selected
+              : formData.Columns.map((column) => ({ value: column, label: column }))
+          }
+          onChange={(selectedOptions) => {
+            if (selectedOptions.find(option => option.value === 'all')) {
+              // If "All Columns" is selected, select all available columns
+              handleInputChange('Columns', columns);
+            } else {
+              // Otherwise, update formData.Columns with selected values
+              handleInputChange('Columns', selectedOptions.map((option) => option.value));
+            }
+          }}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
@@ -197,82 +211,146 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
 };
 
 const ShowIdeal = ({ apiData, selectedColumns }) => {
+  const [dataWithAddresses, setDataWithAddresses] = useState([]);
+
+  // Function to get address from latitude and longitude
+  const getAddressFromLatLng = async (latitude, longitude) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+
+    try {
+      const response = await axios.get(url);
+      const address = response.data?.display_name || 'Address not found';
+      return address;
+    } catch (error) {
+      console.error('Error fetching address: ', error);
+      return 'Address not found';
+    }
+  };
+
+  // Function to map over API data and fetch addresses
+  const mapDataWithAddress = async () => {
+    if (!apiData || apiData.length === 0) return apiData;
+
+    const updatedData = await Promise.all(
+      apiData.map(async (row) => {
+        if (row.data && row.data.length > 0) {
+          const updatedNestedData = await Promise.all(
+            row.data.map(async (nestedRow) => {
+              if (nestedRow.location) {
+                const [latitude, longitude] = nestedRow.location.split(',');
+                const address = await getAddressFromLatLng(latitude.trim(), longitude.trim());
+                return { ...nestedRow, address }; // Attach address to nestedRow
+              }
+              return nestedRow;
+            })
+          );
+          return { ...row, data: updatedNestedData };
+        }
+        return row;
+      })
+    );
+
+    return updatedData;
+  };
+
+  useEffect(() => {
+    const fetchDataWithAddresses = async () => {
+      const updatedData = await mapDataWithAddress();
+      setDataWithAddresses(updatedData);
+    };
+
+    fetchDataWithAddresses();
+  }, [apiData]);
+
   return (
     <CTable borderless className="custom-table">
-    <CTableHead>
-      <CTableRow>
-        {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
-        <CTableHeaderCell>Devices</CTableHeaderCell>
-        
-        {/* Dynamically render table headers based on selected columns */}
-        {selectedColumns.map((column, index) => (
-          <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-        ))}
-      </CTableRow>
-    </CTableHead>
-    
-    <CTableBody>
-      {/* Render rows if apiData exists */}
-      {apiData?.length > 0 ? (
-        apiData.map((row, rowIndex) => (
-          row.data?.length > 0 ? (
-            row.data.map((nestedRow, nestedIndex) => (
-              <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                {/* Use the deviceId and nested row index to create a unique key */}
-                <CTableDataCell>{row.deviceId}</CTableDataCell>
-                
-                {/* Dynamically render table cells based on selected columns */}
-                {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index}>
-                    {column === 'Vehicle Status' ? nestedRow.vehicleStatus
-                      : column === 'Duration (seconds)' ? nestedRow.durationSeconds
-                      : column === 'Location' ? nestedRow.location
-                      : column === 'Address' ? (nestedRow.address || '--')
-                      : column === 'Arrival Time' ? nestedRow.arrivalTime
-                      : column === 'Departure Time' ? nestedRow.departureTime
-                      : column === 'Total Duration (seconds)' ? row.totalDurationSeconds
-                      : '--'}
-                  </CTableDataCell>
-                ))}
-              </CTableRow>
-            ))
-          ) : (
-            <CTableRow key={`${row.deviceId}-empty`}>
-              <CTableDataCell colSpan={selectedColumns.length + 1}
-                style={{
-                  backgroundColor: '#f8f9fa', // Light gray background
-                  color: '#6c757d', // Darker text color
-                  fontStyle: 'italic', // Italic font style
-                  padding: '16px', // Extra padding for emphasis
-                  textAlign: 'center', // Center the text
-                  border: '1px dashed #dee2e6' // Dashed border to highlight it
-                }}
-              >
-                No data available for {row.deviceId}
-              </CTableDataCell>
-            </CTableRow>
-          )
-        ))
-      ) : (
+      <CTableHead>
         <CTableRow>
-          <CTableDataCell colSpan={selectedColumns.length + 1}
-             style={{
-              backgroundColor: '#f8f9fa', // Light gray background
-              color: '#6c757d', // Darker text color
-              fontStyle: 'italic', // Italic font style
-              padding: '16px', // Extra padding for emphasis
-              textAlign: 'center', // Center the text
-              border: '1px dashed #dee2e6' // Dashed border to highlight it
-            }}>
-            No data available
-          </CTableDataCell>
+          <CTableHeaderCell>Devices</CTableHeaderCell>
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+          ))}
         </CTableRow>
-      )}
-    </CTableBody>
-  </CTable>
-  
+      </CTableHead>
+
+      <CTableBody>
+        {dataWithAddresses?.length > 0 ? (
+          dataWithAddresses.map((row, rowIndex) =>
+            row.data?.length > 0 ? (
+              row.data.map((nestedRow, nestedIndex) => (
+                <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
+                  <CTableDataCell>{row.deviceId}</CTableDataCell>
+
+                  {selectedColumns.map((column, index) => (
+                    <CTableDataCell key={index}>
+                      {column === 'Vehicle Status' ? (
+                        nestedRow.vehicleStatus
+                      ) : column === 'Duration (seconds)' ? (
+                        // Convert duration from seconds to HH:mm:ss format
+                        new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+                      ) : column === 'Location' ? (
+                        // Display address if available, otherwise fallback to location
+                        nestedRow.address || nestedRow.location
+                      ) : column === 'Arrival Time' ? (
+                        // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
+                        new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
+                          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      ) : column === 'Departure Time' ? (
+                        // Add 6 hours 30 minutes to departureTime and format to HH:mm
+                        new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
+                          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      ) : column === 'Total Duration (seconds)' ? (
+                        // Convert total duration from seconds to HH:mm:ss format
+                        new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
+                      ) : (
+                        '--'
+                      )}
+                    </CTableDataCell>
+
+                  ))}
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow key={`${row.deviceId}-empty`}>
+                <CTableDataCell
+                  colSpan={selectedColumns.length + 1}
+                  style={{
+                    backgroundColor: '#f8f9fa',
+                    color: '#6c757d',
+                    fontStyle: 'italic',
+                    padding: '16px',
+                    textAlign: 'center',
+                    border: '1px dashed #dee2e6',
+                  }}
+                >
+                  No data available for {row.deviceId}
+                </CTableDataCell>
+              </CTableRow>
+            )
+          )
+        ) : (
+          <CTableRow>
+            <CTableDataCell
+              colSpan={selectedColumns.length + 1}
+              style={{
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontStyle: 'italic',
+                padding: '16px',
+                textAlign: 'center',
+                border: '1px dashed #dee2e6',
+              }}
+            >
+              No data available
+            </CTableDataCell>
+          </CTableRow>
+        )}
+      </CTableBody>
+    </CTable>
   );
 };
+
+
 
 const Ideal = () => {
 
@@ -285,7 +363,6 @@ const Ideal = () => {
     'Vehicle Status',
     'Duration (seconds)',
     'Location',
-    'Address',
     'Arrival Time',
     'Departure Time',
     'Total Duration (seconds)'
@@ -323,7 +400,7 @@ const Ideal = () => {
 
     fetchDevices();
   }, []);
-  
+
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,

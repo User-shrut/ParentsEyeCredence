@@ -69,7 +69,7 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
   };
   return (
     <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -90,21 +90,34 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
           isMulti
           id="columns"
-          options={columns.map((column) => ({ value: column, label: column }))}
-          value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) =>
-            handleInputChange('Columns', selectedOptions.map((option) => option.value))
+          options={[
+            { value: 'all', label: 'All Columns' }, // Add "All Columns" option
+            ...columns.map((column) => ({ value: column, label: column })),
+          ]}
+          value={
+            formData.Columns.length === columns.length
+              ? [{ value: 'all', label: 'All Columns' }] // Show "All Columns" if all columns are selected
+              : formData.Columns.map((column) => ({ value: column, label: column }))
           }
+          onChange={(selectedOptions) => {
+            if (selectedOptions.find(option => option.value === 'all')) {
+              // If "All Columns" is selected, select all available columns
+              handleInputChange('Columns', columns);
+            } else {
+              // Otherwise, update formData.Columns with selected values
+              handleInputChange('Columns', selectedOptions.map((option) => option.value));
+            }
+          }}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
       {/* Date Inputs for From Date and To Date */}
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -115,7 +128,7 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
         />
         <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
       </CCol>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="toDate">To Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -173,62 +186,81 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
 const StopTable = ({ apiData, selectedColumns }) => {
   return (
     <CTable borderless className="custom-table">
-    <CTableHead>
-      <CTableRow>
-        {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
-        <CTableHeaderCell>Device</CTableHeaderCell>
-        
-        {/* Dynamically render table headers based on selected columns */}
-        {selectedColumns.map((column, index) => (
-          <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-        ))}
-      </CTableRow>
-    </CTableHead>
-  
-    <CTableBody>
-      {/* Check if apiData and finalDeviceDataByStopage exist and are not empty */}
-      {apiData?.finalDeviceDataByStopage?.length > 0 ? (
-        apiData.finalDeviceDataByStopage.map((row, rowIndex) => (
-          <CTableRow key={row.id || rowIndex} className="custom-row">
-            {/* Optional: Row index cell */}
-            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-            
-            <CTableDataCell>{row.deviceId}</CTableDataCell>
-  
-            {/* Dynamically render table cells based on selected columns */}
-            {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>
-                {column === 'Speed' ? row.speed
-                  : column === 'Ignition' ? (row.ignition ? 'ON' : 'OFF')
-                  : column === 'Direction' ? row.course
-                  : column === 'Device Id' ? row.deviceId
-                  : column === 'Arrival Time' ? row.arrivalTime
-                  : column === 'Departure Time' ? row.departureTime
-                  : column === 'Device Name' ? row.device?.name || '--'
-                  : '--'}
-              </CTableDataCell>
-            ))}
-          </CTableRow>
-        ))
-      ) : (
+      <CTableHead>
         <CTableRow>
-          <CTableDataCell colSpan={selectedColumns.length + 1}
-             style={{
-              backgroundColor: '#f8f9fa', // Light gray background
-              color: '#6c757d', // Darker text color
-              fontStyle: 'italic', // Italic font style
-              padding: '16px', // Extra padding for emphasis
-              textAlign: 'center', // Center the text
-              border: '1px dashed #dee2e6' // Dashed border to highlight it
-            }}
-            >
-            No data available
-          </CTableDataCell>
+          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+          <CTableHeaderCell>Device</CTableHeaderCell>
+
+          {/* Dynamically render table headers based on selected columns */}
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+          ))}
         </CTableRow>
-      )}
-    </CTableBody>
-  </CTable>
-  
+      </CTableHead>
+
+      <CTableBody>
+        {/* Check if apiData and finalDeviceDataByStopage exist and are not empty */}
+        {apiData?.finalDeviceDataByStopage?.length > 0 ? (
+          apiData.finalDeviceDataByStopage.map((row, rowIndex) => (
+            <CTableRow key={row.id || rowIndex} className="custom-row">
+              {/* Optional: Row index cell */}
+              {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
+
+              <CTableDataCell>{row.deviceId}</CTableDataCell>
+
+              {/* Dynamically render table cells based on selected columns */}
+              {selectedColumns.map((column, index) => (
+                <CTableDataCell key={index}>
+                  {column === 'Speed' ? (
+                    // Convert speed from m/s to km/h and format to 2 decimal places
+                    (row.speed * 3.6).toFixed(2) + ' km/h'
+                  ) : column === 'Ignition' ? (
+                    // Show 'ON' or 'OFF' based on ignition status
+                    row.ignition ? 'ON' : 'OFF'
+                  ) : column === 'Direction' ? (
+                    // Show direction (course)
+                    (row.course < 90 && row.course  > 0 ) ? "north east" : (row.course > 90 && row.course  < 180 ) ? "north west" : (row.course > 180 && row.course  < 270 ) ? "south west" : "south est"
+                  ) : column === 'Device Id' ? (
+                    // Show Device Id
+                    row.deviceId
+                  ) : column === 'Arrival Time' ? (
+                    // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
+                    new Date(new Date(row.arrivalTime).setHours(new Date(row.arrivalTime).getHours() + 6, new Date(row.arrivalTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'Departure Time' ? (
+                    // Add 6 hours 30 minutes to departureTime and format to HH:mm
+                    new Date(new Date(row.departureTime).setHours(new Date(row.departureTime).getHours() + 6, new Date(row.departureTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'Device Name' ? (
+                    // Show device name, or '--' if not available
+                    row.device?.name || '--'
+                  ) : (
+                    '--'
+                  )}
+                </CTableDataCell>
+
+              ))}
+            </CTableRow>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell colSpan={selectedColumns.length + 1}
+              style={{
+                backgroundColor: '#f8f9fa', // Light gray background
+                color: '#6c757d', // Darker text color
+                fontStyle: 'italic', // Italic font style
+                padding: '16px', // Extra padding for emphasis
+                textAlign: 'center', // Center the text
+                border: '1px dashed #dee2e6' // Dashed border to highlight it
+              }}
+            >
+              No data available
+            </CTableDataCell>
+          </CTableRow>
+        )}
+      </CTableBody>
+    </CTable>
+
   );
 };
 const Stops = () => {

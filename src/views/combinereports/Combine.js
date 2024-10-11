@@ -113,13 +113,27 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
 
       <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
-        {/* Use React-Select component for multi-select */}
         <Select
           isMulti
           id="columns"
-          options={columns.map((column) => ({ value: column, label: column }))}
-          value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) => handleInputChange('Columns', selectedOptions.map(option => option.value))}
+          options={[
+            { value: 'all', label: 'All Columns' }, // Add "All Columns" option
+            ...columns.map((column) => ({ value: column, label: column })),
+          ]}
+          value={
+            formData.Columns.length === columns.length
+              ? [{ value: 'all', label: 'All Columns' }] // Show "All Columns" if all columns are selected
+              : formData.Columns.map((column) => ({ value: column, label: column }))
+          }
+          onChange={(selectedOptions) => {
+            if (selectedOptions.find(option => option.value === 'all')) {
+              // If "All Columns" is selected, select all available columns
+              handleInputChange('Columns', columns);
+            } else {
+              // Otherwise, update formData.Columns with selected values
+              handleInputChange('Columns', selectedOptions.map((option) => option.value));
+            }
+          }}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
@@ -197,13 +211,83 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
 };
 
 const ShowStatus = ({ apiData, selectedColumns }) => {
+  const [addressData, setAddressData] = useState({});
+  const [newAddressData, setnewAddressData] = useState()
+
+  // Function to get address based on latitude and longitude using Nominatim API
+  const getAddress = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+      );
+      if (response.data) {
+        console.log('Fetched address:', response.data.display_name);  // Debugging: log the address
+        return response.data.display_name; // Return display_name
+      } else {
+        console.error("Error fetching address: No data found");
+        return 'Address not available';
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      return 'Address not available';
+    }
+  };
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+
+
+      // Fetch all addresses concurrently
+      const promises = apiData.data.map(async (data) => {
+        // Split the startLocation and endLocation strings into latitudes and longitudes
+        const [startLat, startLon] = data.startLocation ? data.startLocation.split(',').map(coord => coord.trim()) : [null, null];
+        const [endLat, endLon] = data.endLocation ? data.endLocation.split(',').map(coord => coord.trim()) : [null, null];
+
+        // Fetch the start and end addresses only if coordinates are valid
+        const startAddress = startLat && startLon ? await getAddress(startLat, startLon) : 'Invalid start location';
+        const endAddress = endLat && endLon ? await getAddress(endLat, endLon) : 'Invalid end location';
+
+        // Store the addresses in the addressData state
+        return {
+          ouid: data.ouid,
+          startAddress: startAddress || 'Address not found',
+          endAddress: endAddress || 'Address not found'
+        };
+      });
+
+      // Wait for all promises to resolve
+      const results = await Promise.all(promises);
+
+      // Update the addressData state with the fetched addresses
+      results.forEach(result => {
+        setnewAddressData({
+          startAddress: result.startAddress,
+          endAddress: result.endAddress
+        })
+
+
+      });
+
+      console.log('Updated addressData:', newAddressData); // Debugging: log addressData
+      setAddressData(newAddressData);
+    };
+
+    if (apiData?.data?.length > 0) {
+      fetchAddresses();
+    }
+  }, [apiData]);
+
+
+  if (newAddressData) {
+    console.log(newAddressData);
+  }
+
   return (
+
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
           <CTableHeaderCell>Devices</CTableHeaderCell>
-
           {/* Dynamically render table headers based on selected columns */}
           {selectedColumns.map((column, index) => (
             <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
@@ -214,48 +298,54 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
         {apiData?.data && apiData.data.length > 0 ? (
           apiData.data.map((row, rowIndex) => (
             <CTableRow key={row.id} className="custom-row">
-              {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-              <CTableDataCell>{row.deviceId}</CTableDataCell>
+              <CTableDataCell>{apiData.deviceId}</CTableDataCell>
               {/* Dynamically render table cells based on selected columns */}
               {selectedColumns.map((column, index) => (
                 <CTableDataCell key={index}>
-                  {column === 'Start Time'
-                    ? row.startDateTime
-                    : column === 'End Time'
-                      ? row.endDateTime
-                      : column === 'Distance'
-                        ? row.distance
-                        : column === 'Total Distance'
-                          ? row.totalKm
-                          : column === 'Maximum Speed'
-                            ? row.maxSpeed
-                            : column === 'Start Address'
-                              ? row.startAddress
-                              : column === 'End Address'
-                                ? row.endAddress
-                                : column === 'Driver'
-                                  ? row.driverInfos?.driverName || '--'
-                                  : column === 'Device Name'
-                                    ? row.device?.name || '--'
-                                    : column === 'Vehicle Status'
-                                      ? row.vehicleStatus
-                                      : column === 'Time'
-                                        ? row.time
-                                        : column === 'Average Speed'
-                                          ? row.averageSpeed
-                                          : column === 'Start Location'
-                                            ? row.startLocation
-                                            : column === 'End Location'
-                                              ? row.endLocation
-                                              : '--'}
+                  {column === 'Start Time' ? (
+                    // Format Start Time, adding 6 hours 30 minutes
+                    new Date(new Date(row.startDateTime).setHours(new Date(row.startDateTime).getHours() + 6, new Date(row.startDateTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'End Time' ? (
+                    // Format End Time, adding 6 hours 30 minutes
+                    new Date(new Date(row.endDateTime).setHours(new Date(row.endDateTime).getHours() + 6, new Date(row.endDateTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'Distance' ? (
+                    // Convert distance from meters to kilometers and round to 2 decimal places
+                    (row.distance / 1000).toFixed(2) + ' km'
+                  ) : column === 'Total Distance' ? (
+                    // Convert total distance from meters to kilometers and round to 2 decimal places
+                    (row.totalKm / 1000).toFixed(2) + ' km'
+                  ) : column === 'Maximum Speed' ? (
+                    // Convert max speed from m/s to km/h and round to 2 decimal places
+                    (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+                  ) : column === 'Average Speed' ? (
+                    // Convert average speed from m/s to km/h and round to 2 decimal places
+                    (row.averageSpeed * 3.6).toFixed(2) + ' km/h'
+                  ) : column === 'Driver' ? (
+                    row.driverInfos?.driverName || '--'
+                  ) : column === 'Device Name' ? (
+                    row.device?.name || '--'
+                  ) : column === 'Vehicle Status' ? (
+                    row.vehicleStatus
+                  ) : column === 'Time' ? (
+                    row.time
+                  ) : column === 'Start Address' ? (
+                    newAddressData?.startAddress || 'Fetching...'
+                  ) : column === 'End Address' ? (
+                    newAddressData?.endAddress || 'Fetching...'
+                  ) : (
+                    '--'
+                  )}
                 </CTableDataCell>
+
               ))}
             </CTableRow>
           ))
         ) : (
           <CTableRow>
             <CTableDataCell colSpan={selectedColumns.length + 1}
-               style={{
+              style={{
                 backgroundColor: '#f8f9fa', // Light gray background
                 color: '#6c757d', // Darker text color
                 fontStyle: 'italic', // Italic font style
@@ -263,14 +353,13 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
                 textAlign: 'center', // Center the text
                 border: '1px dashed #dee2e6' // Dashed border to highlight it
               }}
-              >
+            >
               No data available
             </CTableDataCell>
           </CTableRow>
         )}
       </CTableBody>
     </CTable>
-
   );
 };
 
@@ -283,18 +372,16 @@ const Status = () => {
   const [columns] = useState([
     'Start Time',
     'End Time',
+    'Start Address',
+    'End Address',
     'Distance',
     'Total Distance',
     'Maximum Speed',
-    'Start Address',
-    'End Address',
     'Driver',
     'Device Name',
     'Vehicle Status',
     'Time',
-    'Average Speed',
-    'Start Location',
-    'End Location'
+    'Average Speed'
   ]);
 
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -388,11 +475,11 @@ const Status = () => {
   return (
     <>
       <CRow className='pt-3'>
-        <h2 className='px-4'>Status</h2>
+        <h2 className='px-4'>Status Report</h2>
         <CCol xs={12} md={12} className='px-4'>
           <CCard className="mb-4 p-0 shadow-lg rounded" >
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-              <strong>Status Report</strong>
+              <strong>Combine Report</strong>
 
             </CCardHeader>
             <CCardBody>
