@@ -312,13 +312,13 @@ const Notification = () => {
           <CTableHead className="text-nowrap">
             <CTableRow>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Notifications Type
+                Device Name
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Chennel
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Assigned Devices
+                Notifications
               </CTableHeaderCell>
 
               <CTableHeaderCell className=" text-center text-white bg-secondary">
@@ -445,7 +445,7 @@ const Notification = () => {
         <Box sx={style}>
           <div className="d-flex justify-content-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Add New Group
+              Add New Notification
             </Typography>
             <IconButton
               // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
@@ -541,7 +541,7 @@ const Notification = () => {
         <Box sx={style}>
           <div className="d-flex justify-content-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Edit Group
+              Edit Notification
             </Typography>
             <IconButton
               // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
