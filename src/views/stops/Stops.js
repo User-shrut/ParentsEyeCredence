@@ -184,13 +184,41 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
   );
 };
 const StopTable = ({ apiData, selectedColumns }) => {
+
+  const [locationData, setLocationData] = useState({});
+
+  // Function to convert latitude and longitude into a location name
+  const fetchLocationName = async (lat, lng, rowIndex) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+    try {
+      const response = await axios.get(url);
+      const locationName = response.data.display_name || 'Unknown Location';
+      setLocationData((prevState) => ({
+        ...prevState,
+        [rowIndex]: locationName, // Save the location for the row
+      }));
+    } catch (error) {
+      console.error('Error fetching location name:', error);
+    }
+  };
+
+  // Fetch location for each row when apiData is loaded
+  useEffect(() => {
+    if (apiData?.finalDeviceDataByStopage?.length > 0) {
+      apiData.finalDeviceDataByStopage.forEach((row, index) => {
+        if (row.latitude && row.longitude) {
+          fetchLocationName(row.latitude, row.longitude, index);
+        }
+      });
+    }
+  }, [apiData]);
+
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
           <CTableHeaderCell>Device</CTableHeaderCell>
-
           {/* Dynamically render table headers based on selected columns */}
           {selectedColumns.map((column, index) => (
             <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
@@ -203,9 +231,6 @@ const StopTable = ({ apiData, selectedColumns }) => {
         {apiData?.finalDeviceDataByStopage?.length > 0 ? (
           apiData.finalDeviceDataByStopage.map((row, rowIndex) => (
             <CTableRow key={row.id || rowIndex} className="custom-row">
-              {/* Optional: Row index cell */}
-              {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-
               <CTableDataCell>{row.deviceId}</CTableDataCell>
 
               {/* Dynamically render table cells based on selected columns */}
@@ -219,10 +244,31 @@ const StopTable = ({ apiData, selectedColumns }) => {
                     row.ignition ? 'ON' : 'OFF'
                   ) : column === 'Direction' ? (
                     // Show direction (course)
-                    (row.course < 90 && row.course  > 0 ) ? "north east" : (row.course > 90 && row.course  < 180 ) ? "north west" : (row.course > 180 && row.course  < 270 ) ? "south west" : "south est"
-                  ) : column === 'Device Id' ? (
-                    // Show Device Id
-                    row.deviceId
+                    (row.course < 90 && row.course > 0) ? (
+                      <>
+                        <img src="public/direction/up-right-arrow.gif" alt="North East" width="30" height="25" />
+                        <span>North East</span>
+                      </>
+                    ) : (row.course > 90 && row.course < 180) ? (
+                      <>
+                        <img src="public/direction/up-left-arrow.gif" alt="North West" width="30" height="25" />
+                        <span>North West</span>
+                      </>
+                    ) : (row.course > 180 && row.course < 270) ? (
+                      <>
+                        <img src="public/direction/down-left-arrow.gif" alt="South West" width="30" height="25" />
+                        <span>South West</span>
+                      </>
+                    ) : (
+                      <>
+                        <img src="public/direction/down-right-arrow.gif" alt="South East" width="30" height="25" />
+                        <span>South East</span>
+                      </>
+                    )
+                  
+                  ) : column === 'Location' ? (
+                    // Show location
+                    locationData[rowIndex] || 'Fetching location...'
                   ) : column === 'Arrival Time' ? (
                     // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
                     new Date(new Date(row.arrivalTime).setHours(new Date(row.arrivalTime).getHours() + 6, new Date(row.arrivalTime).getMinutes() + 30))
@@ -238,20 +284,20 @@ const StopTable = ({ apiData, selectedColumns }) => {
                     '--'
                   )}
                 </CTableDataCell>
-
               ))}
             </CTableRow>
           ))
         ) : (
           <CTableRow>
-            <CTableDataCell colSpan={selectedColumns.length + 1}
+            <CTableDataCell
+              colSpan={selectedColumns.length + 1}
               style={{
-                backgroundColor: '#f8f9fa', // Light gray background
-                color: '#6c757d', // Darker text color
-                fontStyle: 'italic', // Italic font style
-                padding: '16px', // Extra padding for emphasis
-                textAlign: 'center', // Center the text
-                border: '1px dashed #dee2e6' // Dashed border to highlight it
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontStyle: 'italic',
+                padding: '16px',
+                textAlign: 'center',
+                border: '1px dashed #dee2e6',
               }}
             >
               No data available
@@ -260,14 +306,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
         )}
       </CTableBody>
     </CTable>
-
   );
 };
+
+
 const Stops = () => {
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  const [columns] = useState(['Speed', 'Ignition', 'Direction', 'Device Id', 'Arrival Time', 'Departure Time',]);
+  const [columns] = useState(['Speed', 'Ignition', 'Direction','Location', 'Arrival Time', 'Departure Time',]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
   const token = Cookies.get('authToken'); //token
