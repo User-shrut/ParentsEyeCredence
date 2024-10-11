@@ -324,8 +324,6 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
                     (row.averageSpeed * 3.6).toFixed(2) + ' km/h'
                   ) : column === 'Driver' ? (
                     row.driverInfos?.driverName || '--'
-                  ) : column === 'Device Name' ? (
-                    row.device?.name || '--'
                   ) : column === 'Vehicle Status' ? (
                     row.vehicleStatus
                   ) : column === 'Time' ? (
@@ -378,7 +376,6 @@ const Status = () => {
     'Total Distance',
     'Maximum Speed',
     'Driver',
-    'Device Name',
     'Vehicle Status',
     'Time',
     'Average Speed'
