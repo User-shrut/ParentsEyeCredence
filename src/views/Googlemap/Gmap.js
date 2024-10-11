@@ -525,7 +525,7 @@ const Gmap = ({ data }) => {
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
-          zoom={14}
+          zoom={12}
         >
           
           {geofences.map((geofence, index) => (

@@ -32,6 +32,7 @@ import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -120,12 +121,13 @@ const Group = () => {
       })
 
       if (response.status === 201) {
-        alert('group is created successfully')
+        toast.success('group is created successfully')
         fetchGroupData()
         setFormData({ name: '' })
         setAddModalOpen(false)
       }
     } catch (error) {
+      toast.error("An error occured")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -149,12 +151,13 @@ const Group = () => {
       )
 
       if (response.status === 200) {
-        alert('group is edited successfully')
+        toast.success('group is edited successfully')
         fetchGroupData()
         setFormData({ name: '' })
         setEditModalOpen(false)
       }
     } catch (error) {
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -189,10 +192,11 @@ const Group = () => {
       )
 
       if (response.status === 200) {
-        alert('group is deleted successfully')
+        toast.error('group is deleted successfully')
         fetchGroupData()
       }
     } catch (error) {
+      toast.error("An error occurred")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -201,6 +205,7 @@ const Group = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Groups</h2>
@@ -279,18 +284,18 @@ const Group = () => {
               {data.length > 0 ? (
                 data?.map((item, index) => (
                   <CTableRow key={index}>
-                    <CTableDataCell className="text-center">{item.name}</CTableDataCell>
+                    <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
                     <CTableDataCell
-                      className="text-center d-flex"
+                      className="text-center d-flex p-0"
                       style={{ justifyContent: 'center', alignItems: 'center' }}
                     >
                       <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
                         <RiEdit2Fill
-                          style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
                         />
                       </IconButton>
                       <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                        <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
                       </IconButton>
                     </CTableDataCell>
                   </CTableRow>

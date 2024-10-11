@@ -43,6 +43,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import DialpadIcon from '@mui/icons-material/Dialpad';
 import HomeIcon from '@mui/icons-material/Home';
 import { IoMdAdd } from 'react-icons/io'
+import toast, { Toaster } from 'react-hot-toast';
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -133,13 +134,15 @@ const Driver = () => {
       })
 
       if (response.status == 200) {
-        alert('Driver is created successfully')
+        toast.success('Driver is created successfully')
         fetchDriverData()
         setFormData({ name: '' })
         setAddModalOpen(false)
       }
     } catch (error) {
+      toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
+      
     }
   }
 
@@ -162,12 +165,13 @@ const Driver = () => {
       )
 
       if (response.status === 200) {
-        alert('Driver is edited successfully')
+        toast.success('Driver is edited successfully')
         fetchDriverData()
         setFormData({ name: '' })
         setEditModalOpen(false)
       }
     } catch (error) {
+      toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -202,15 +206,16 @@ const Driver = () => {
       )
 
       if (response.status === 200) {
-        alert('Driver is deleted successfully')
+        toast.error('Driver is deleted successfully')
         fetchDriverData()
       }
     } catch (error) {
+      toast.error("An error occurred")
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
 
-  const [fomData, setFomData] = useState({ device: '' });
+  const [fomData, setFomData] = useState({});
   const [devices, setDevices] = useState([]);
   const token = Cookies.get('authToken'); //
 
@@ -245,6 +250,7 @@ const Driver = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Driver</h2>
@@ -490,9 +496,8 @@ const Driver = () => {
                   select // Set the select prop to true
                   label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={fomData.device}
-                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
-                  required
+                  value={fomData.deviceId}
+                  onChange={(e) => setFomData({ ...fomData, deviceId: e.target.value })}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -504,8 +509,8 @@ const Driver = () => {
                 >
                   {devices.length > 0 ? (
                     devices.map((device) => (
-                      <MenuItem key={device.id} value={device.name}> {/* Replace 'device.id' and 'device.name' with actual properties */}
-                        {device.name}
+                      <MenuItem key={device.deviceId} value={device.deviceId}> {/* Replace 'device.id' and 'device.name' with actual properties */}
+                        {device.deviceId}
                       </MenuItem>
                     ))
                   ) : (
@@ -617,9 +622,8 @@ const Driver = () => {
                   select // Set the select prop to true
                   label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."
-                  value={fomData.device}
-                  onChange={(e) => setFomData({ ...fomData, device: e.target.value })}
-                  required
+                  value={fomData.deviceId}
+                  onChange={(e) => setFomData({ ...fomData, deviceId: e.target.value })}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

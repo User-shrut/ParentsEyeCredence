@@ -40,6 +40,9 @@ import {
   CTableDataCell,
 } from '@coreui/react';
 import Loader from '../../components/Loader/Loader';
+import toast, { Toaster } from 'react-hot-toast';
+
+
 const Model = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -67,6 +70,8 @@ const Model = () => {
     boxShadow: 24,
     p: 4,
   };
+
+  // #### GET ####
 
   const fetchData = async () => {
     setLoading(true);
@@ -127,24 +132,33 @@ const Model = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  //  #### POST #####
+
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+  
     try {
       const response = await axios.post('https://credence-tracker.onrender.com/model', formData, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      setData(prevData => [...prevData, response.data]);
-      setFilteredData(prevFilteredData => [...prevFilteredData, response.data]);
+  
+      setData((prevData) => [...prevData, response.data]);
+      setFilteredData((prevFilteredData) => [...prevFilteredData, response.data]);
       handleAddModalClose();
       fetchData(); // Optional: Fetch fresh data
+      
+      toast.success('Successfully Added Model!'); // Show success alert
     } catch (error) {
       console.error('Error adding category:', error);
+      toast.error("This didn't work."); // Show error alert
     }
   };
+  
+
+  // #### PUT EDIT ####
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -162,10 +176,16 @@ const Model = () => {
       setFilteredData(prevFilteredData => prevFilteredData.map(item => item._id === currentItemId ? response.data : item));
       handleEditModalClose();
       fetchData(); // Optional: Fetch fresh data
+      toast.success('Successfully Edited Model!'); // Show success alert
+
     } catch (error) {
       console.error('Error updating category:', error);
+      toast.error("This didn't work."); // Show error alert
     }
   };
+
+  // ### DELETE ####
+
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
@@ -176,16 +196,17 @@ const Model = () => {
           },
         });
         setFilteredData(filteredData.filter((item) => item._id !== id));
-        alert('Record deleted successfully');
+        toast.error('Record deleted successfully');
       } catch (error) {
         console.error('Error deleting record:', error);
-        alert('Failed to delete the record');
+        toast.error('Failed to delete the record');
       }
     }
   };
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false}/>
       {/* Header and Add Category button */}
       <div className="d-flex justify-content-between mb-2">
         <Typography variant="h4">Model</Typography>

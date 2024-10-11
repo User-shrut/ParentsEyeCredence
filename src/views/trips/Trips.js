@@ -188,12 +188,49 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
   );
 };
 
+
 const TripTable = ({ apiData, selectedColumns }) => {
+  const [addressData, setAddressData] = useState({});
+
+  // Function to get address based on latitude and longitude using Nominatim API
+  const getAddress = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+      );
+      if (response.data) {
+        return response.data.display_name; // Adjust based on the response structure
+      } else {
+        console.error("Error fetching address: No data found");
+        return 'Address not available';
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      return 'Address not available';
+    }
+  };
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      const newAddressData = {};
+      for (const trip of apiData.finalTrip) {
+        const startAddress = await getAddress(trip.startLatitude, trip.startLongitude);
+        const endAddress = await getAddress(trip.endLatitude, trip.endLongitude);
+        newAddressData[trip.deviceId] = { startAddress, endAddress };
+      }
+      setAddressData(newAddressData);
+    };
+
+    if (apiData?.finalTrip?.length > 0) {
+      fetchAddresses();
+    }
+  }, [apiData]);
+
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
-          {/* <CTableHeaderCell>Sr.No</CTableHeaderCell> */}
+          {/* Device Header Cell */}
           <CTableHeaderCell>Device</CTableHeaderCell>
 
           {/* Dynamically render table headers based on selected columns */}
@@ -202,37 +239,63 @@ const TripTable = ({ apiData, selectedColumns }) => {
           ))}
         </CTableRow>
       </CTableHead>
+
       <CTableBody>
-        {apiData?.finalTrip?.map((row, rowIndex) => (
-          <CTableRow key={row.id} className="custom-row">
-            {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-            <CTableDataCell>{row.deviceId}</CTableDataCell>
-            {/* Dynamically render table cells based on selected columns */}
-            {selectedColumns.map((column, index) => (
-              <CTableDataCell key={index}>   {column === 'Start Time' ? row.startTime :
-                column === 'End Time' ? row.endTime :
-                  column === 'Distance' ? row.distance :
-                  column === 'Total Distance' ? row.totalDistance :
-                    column === 'Maximum Speed' ? row.maxSpeed :
-                      column === 'Start Address' ? row.startAddress :
-                        column === 'End Address' ? row.endAddress :
-                          column === 'Driver' ? row.driverName :
-                            column === 'Device Name' ? row.device?.name :
-                              '--'}</CTableDataCell>
-            ))}
+        {/* Check if apiData and finalTrip exist and are not empty */}
+        {apiData?.finalTrip?.length > 0 ? (
+          apiData.finalTrip.map((row, rowIndex) => (
+            <CTableRow key={row.id || rowIndex} className="custom-row">
+              {/* Device ID Cell */}
+              <CTableDataCell>{row.name}</CTableDataCell>
+
+              {/* Dynamically render table cells based on selected columns */}
+              {selectedColumns.map((column, index) => (
+                <CTableDataCell key={index}>
+                  {column === 'Start Time' ? row.startTime
+                    : column === 'End Time' ? row.endTime
+                      : column === 'Distance' ? row.distance
+                        : column === 'Total Distance' ? row.totalDistance
+                          : column === 'Maximum Speed' ? row.maxSpeed
+                            : column === 'Average Speed' ? row.avgSpeed
+                              : column === 'Duration' ? row.duration
+                                : column === 'Start Address' ? addressData[row.deviceId]?.startAddress || 'Fetching...'
+                                  : column === 'End Address' ? addressData[row.deviceId]?.endAddress || 'Fetching...'
+                                    : column === 'Driver' ? row.driverName
+                                      : column === 'Device Name' ? row.device?.name || '--'
+                                        : '--'}
+                </CTableDataCell>
+              ))}
+            </CTableRow>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell colSpan={selectedColumns.length + 1}
+              style={{
+                backgroundColor: '#f8f9fa', // Light gray background
+                color: '#6c757d', // Darker text color
+                fontStyle: 'italic', // Italic font style
+                padding: '16px', // Extra padding for emphasis
+                textAlign: 'center', // Center the text
+                border: '1px dashed #dee2e6' // Dashed border to highlight it
+              }}
+            >
+              No data available
+            </CTableDataCell>
           </CTableRow>
-        ))}
+        )}
       </CTableBody>
     </CTable>
   );
 };
+
+
 
 const Trips = () => {
 
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [devices, setDevices] = useState([]);
-  const [columns] = useState(['Start Time',  'End Time', 'Start Address', 'End Address', 'Distance', 'Total Distance',  'Average Speed', 'Maximum Speed', 'Duration',]);
+  const [columns] = useState(['Start Time', 'End Time', 'Start Address', 'End Address', 'Distance', 'Total Distance', 'Average Speed', 'Maximum Speed', 'Duration',]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
   const token = Cookies.get('authToken'); //token
