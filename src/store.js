@@ -6,7 +6,7 @@ import deviceReducer from './features/devicesSlice.js';
 // Initial state and reducer for sidebar and theme
 const initialState = {
   sidebarShow: false,
-  theme: 'light',
+  // theme: 'light',
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {

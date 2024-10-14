@@ -69,7 +69,7 @@ const SearchDistance = ({ formData, handleInputChange, handleSubmit, devices, co
   };
   return (
     <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <Select
           isMulti
@@ -81,7 +81,7 @@ const SearchDistance = ({ formData, handleInputChange, handleSubmit, devices, co
         <CFormFeedback invalid>Please provide at least one device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
           isMulti
@@ -95,7 +95,7 @@ const SearchDistance = ({ formData, handleInputChange, handleSubmit, devices, co
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
       {/* Date Inputs for From Date and To Date */}
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -106,7 +106,7 @@ const SearchDistance = ({ formData, handleInputChange, handleSubmit, devices, co
         />
         <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
       </CCol>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="toDate">To Date</CFormLabel>
         <CFormInput
           type="datetime-local"

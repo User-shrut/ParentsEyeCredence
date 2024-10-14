@@ -82,7 +82,7 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
 
   return (
     <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -104,22 +104,36 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
           isMulti
           id="columns"
-          options={columns.map((column) => ({ value: column, label: column }))}
-          value={formData.Columns.map((column) => ({ value: column, label: column }))}
-          onChange={(selectedOptions) =>
-            handleInputChange('Columns', selectedOptions.map((option) => option.value))
+          options={[
+            { value: 'all', label: 'All Columns' }, // Add "All Columns" option
+            ...columns.map((column) => ({ value: column, label: column })),
+          ]}
+          value={
+            formData.Columns.length === columns.length
+              ? [{ value: 'all', label: 'All Columns' }] // Show "All Columns" if all columns are selected
+              : formData.Columns.map((column) => ({ value: column, label: column }))
           }
+          onChange={(selectedOptions) => {
+            if (selectedOptions.find(option => option.value === 'all')) {
+              // If "All Columns" is selected, select all available columns
+              handleInputChange('Columns', columns);
+            } else {
+              // Otherwise, update formData.Columns with selected values
+              handleInputChange('Columns', selectedOptions.map((option) => option.value));
+            }
+          }}
         />
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
 
+
       {/* Date Inputs for From Date and To Date */}
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -131,7 +145,7 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
         <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
       </CCol>
 
-      <CCol md={6}>
+      <CCol md={3}>
         <CFormLabel htmlFor="toDate">To Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -251,18 +265,39 @@ const TripTable = ({ apiData, selectedColumns }) => {
               {/* Dynamically render table cells based on selected columns */}
               {selectedColumns.map((column, index) => (
                 <CTableDataCell key={index}>
-                  {column === 'Start Time' ? row.startTime
-                    : column === 'End Time' ? row.endTime
-                      : column === 'Distance' ? row.distance
-                        : column === 'Total Distance' ? row.totalDistance
-                          : column === 'Maximum Speed' ? row.maxSpeed
-                            : column === 'Average Speed' ? row.avgSpeed
-                              : column === 'Duration' ? row.duration
-                                : column === 'Start Address' ? addressData[row.deviceId]?.startAddress || 'Fetching...'
-                                  : column === 'End Address' ? addressData[row.deviceId]?.endAddress || 'Fetching...'
-                                    : column === 'Driver' ? row.driverName
-                                      : column === 'Device Name' ? row.device?.name || '--'
-                                        : '--'}
+                  {column === 'Start Time' ? (
+                    // Add 6 hours 30 minutes to startTime
+                    new Date(new Date(row.startTime).setHours(new Date(row.startTime).getHours() + 6, new Date(row.startTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'End Time' ? (
+                    // Add 6 hours 30 minutes to endTime
+                    new Date(new Date(row.endTime).setHours(new Date(row.endTime).getHours() + 6, new Date(row.endTime).getMinutes() + 30))
+                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  ) : column === 'Distance' ? (
+                    // Convert distance from meters to kilometers and round to 2 decimal places
+                    (row.distance / 1000).toFixed(2) + ' km'
+                  ) : column === 'Total Distance' ? (
+                    // Convert totalDistance from meters to kilometers and round to 2 decimal places
+                    (row.totalDistance / 1000).toFixed(2) + ' km'
+                  ) : column === 'Maximum Speed' ? (
+                    // Convert maxSpeed from m/s to km/h and round to 2 decimal places
+                    (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+                  ) : column === 'Average Speed' ? (
+                    // Convert avgSpeed from m/s to km/h and round to 2 decimal places
+                    (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+                  ) : column === 'Duration' ? (
+                    row.duration
+                  ) : column === 'Start Address' ? (
+                    addressData[row.deviceId]?.startAddress || 'Fetching...'
+                  ) : column === 'End Address' ? (
+                    addressData[row.deviceId]?.endAddress || 'Fetching...'
+                  ) : column === 'Driver' ? (
+                    row.driverName
+                  ) : column === 'Device Name' ? (
+                    row.device?.name || '--'
+                  ) : (
+                    '--'
+                  )}
                 </CTableDataCell>
               ))}
             </CTableRow>
