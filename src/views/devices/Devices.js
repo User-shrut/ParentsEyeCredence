@@ -668,26 +668,7 @@ const Devices = () => {
           borderRadius: '10px',
         }}
       >
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{ width: '480px' }}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
+        
           <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
@@ -705,7 +686,7 @@ const Devices = () => {
             <CTableBody>
               {loading ? (
                 <CTableRow>
-                  <CTableDataCell colSpan="5" className="text-center">
+                  <CTableDataCell colSpan="15" className="text-center">
                     <div className="text-nowrap mb-2 text-center w-">
                       <p className="card-text placeholder-glow">
                         <span className="placeholder col-12" />
@@ -822,7 +803,7 @@ const Devices = () => {
               )}
             </CTableBody>
           </CTable>
-        )}
+        
       </TableContainer>
 
       {pageCount > 1 && (

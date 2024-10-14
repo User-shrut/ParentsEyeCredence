@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import {
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -25,9 +26,12 @@ import {
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Stepper,
+  Step,
+  StepLabel,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
-import { AiFillDelete } from 'react-icons/ai'
+import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Gmap from '../Googlemap/Gmap'
 import CloseIcon from '@mui/icons-material/Close'
@@ -35,6 +39,7 @@ import { GoogleMap, Marker, Polygon, useLoadScript } from '@react-google-maps/ap
 import { useSelector } from 'react-redux'
 import Select from 'react-select'
 import toast, { Toaster } from 'react-hot-toast'
+import { IoMdAdd } from 'react-icons/io'
 
 const Geofences = () => {
   const deviceData = useSelector((state) => state.device.data)
@@ -46,9 +51,21 @@ const Geofences = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
+  const [currentStep, setCurrentStep] = useState(0)
+  const steps = ['Select Geofence', 'Geofence Info']
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
+
+  // Go to the next step
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  }
+
+  // Go to the previous step
+  const handleBack = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+  }
 
   const PlaceType = [
     { value: 'ATM', label: 'ATM' },
@@ -236,7 +253,7 @@ const Geofences = () => {
         setAddModalOpen(false)
       }
     } catch (error) {
-      toast.error("An error occured")
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -273,7 +290,7 @@ const Geofences = () => {
         setEditModalOpen(false)
       }
     } catch (error) {
-      toast.error("An error occured")
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -306,7 +323,7 @@ const Geofences = () => {
         fetchGeofenceData()
       }
     } catch (error) {
-      toast.error("An error occured")
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -315,7 +332,7 @@ const Geofences = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Geofence</h2>
@@ -355,78 +372,108 @@ const Geofences = () => {
       <div className="row">
         <div className="col-12 col-md-6">
           <TableContainer component={Paper} style={{ maxHeight: '800px', marginBottom: '10px' }}>
-            {loading ? (
-              <>
-                <div className="text-nowrap mb-2" style={{ width: '240px' }}>
-                  <p className="card-text placeholder-glow">
-                    <span className="placeholder col-7" />
-                    <span className="placeholder col-4" />
-                    <span className="placeholder col-4" />
-                    <span className="placeholder col-6" />
-                    <span className="placeholder col-8" />
-                  </p>
-                  <p className="card-text placeholder-glow">
-                    <span className="placeholder col-7" />
-                    <span className="placeholder col-4" />
-                    <span className="placeholder col-4" />
-                    <span className="placeholder col-6" />
-                    <span className="placeholder col-8" />
-                  </p>
-                </div>
-              </>
-            ) : (
-              <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-                <CTableHead className="text-nowrap">
-                  <CTableRow>
-                    <CTableHeaderCell
-                      className=" text-center text-white bg-secondary">
-                      Geofence Name
-                    </CTableHeaderCell>
-                    <CTableHeaderCell
-                      className=" text-center text-white bg-secondary">
-                      Type
-                    </CTableHeaderCell>
-                    <CTableHeaderCell
-                      className=" text-center text-white bg-secondary">
-                      Vehicles
-                    </CTableHeaderCell>
+            <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+              <CTableHead className="text-nowrap">
+                <CTableRow>
+                  <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
+                    Geofence Name
+                  </CTableHeaderCell>
+                  <CTableHeaderCell className=" text-start text-white bg-secondary">
+                    Type
+                  </CTableHeaderCell>
+                  <CTableHeaderCell className=" text-center text-white bg-secondary">
+                    Vehicles
+                  </CTableHeaderCell>
 
-                    <CTableHeaderCell
-                      className=" text-center text-white bg-secondary">
-                      Actions
-                    </CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {data?.map((item, index) => (
+                  <CTableHeaderCell className=" text-center text-white bg-secondary">
+                    Actions
+                  </CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {loading ? (
+                  <>
+                    <div className="text-nowrap mb-2" style={{ width: '240px' }}>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-7" />
+                        <span className="placeholder col-4" />
+                        <span className="placeholder col-4" />
+                        <span className="placeholder col-6" />
+                        <span className="placeholder col-8" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-7" />
+                        <span className="placeholder col-4" />
+                        <span className="placeholder col-4" />
+                        <span className="placeholder col-6" />
+                        <span className="placeholder col-8" />
+                      </p>
+                    </div>
+                  </>
+                ) : data?.length > 0 ? (
+                  data?.map((item, index) => (
                     <CTableRow key={index}>
-                      <CTableDataCell className="text-center">{item.name}</CTableDataCell>
-                      <CTableDataCell className="text-center">{item.type}</CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        {item.deviceIds.map((device) => (
-                          <span>{device.name} ,</span>
-                        ))}
+                      <CTableDataCell className="ps-3 text-start p-0">{item.name}</CTableDataCell>
+                      <CTableDataCell className="text-start p-0">{item.type}</CTableDataCell>
+                      <CTableDataCell className="text-center p-0">
+                        <CFormSelect
+                          id="geofence"
+                          className=" text-center border-0"
+                          style={{ width: '120px' }}
+                        >
+                          <option value="">{item.deviceIds.length || '0'}</option>
+                          {Array.isArray(item.deviceIds) &&
+                            item.deviceIds.map((device, index) => (
+                              <option key={index} value={device.name}>
+                                {device.name}
+                              </option>
+                            ))}
+                        </CFormSelect>
                       </CTableDataCell>
                       <CTableDataCell
-                        className="text-center d-flex"
+                        className="text-center d-flex p-0"
                         style={{ justifyContent: 'center', alignItems: 'center' }}
                       >
                         <IconButton aria-label="edit" onClick={() => handleEditGeofence(item)}>
                           <RiEdit2Fill
-                            style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                            style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
                           />
                         </IconButton>
                         <IconButton aria-label="delete" onClick={() => deleteGeofenceSubmit(item)}>
-                          <AiFillDelete
-                            style={{ fontSize: '25px', color: 'red', margin: '5.3px' }}
-                          />
+                          <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
                         </IconButton>
                       </CTableDataCell>
                     </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            )}
+                  ))
+                ) : (
+                  <CTableRow>
+                    <CTableDataCell colSpan="8" className="text-center">
+                      <div
+                        className="d-flex flex-column justify-content-center align-items-center"
+                        style={{ height: '200px' }}
+                      >
+                        <p className="mb-0 fw-bold">
+                          "Oops! Looks like there's No Geofence Created.
+                          <br /> Maybe it's time to Create New Geofence!"
+                        </p>
+                        <div>
+                          <button
+                            onClick={() => setAddModalOpen(true)}
+                            variant="contained"
+                            className="btn btn-primary m-3 text-white"
+                          >
+                            <span>
+                              <IoMdAdd className="fs-5" />
+                            </span>{' '}
+                            Create Geofence
+                          </button>
+                        </div>
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                )}
+              </CTableBody>
+            </CTable>
           </TableContainer>
           {pageCount > 1 && (
             <ReactPaginate
@@ -454,7 +501,118 @@ const Geofences = () => {
         </div>
       </div>
 
-      <Modal
+      <Modal open={addModalOpen} onClose={handleAddModalClose}>
+        <Box
+          sx={{
+            ...style,
+            backgroundColor: '#f7f9fc',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '30px',
+          }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
+              <span role="img" aria-label="user">
+                <AiOutlineUserAdd className="fs-2" />
+              </span>{' '}
+              Add New Geofence
+            </Typography>
+            <IconButton onClick={handleAddModalClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          {/* Step-by-step form with progress indicator */}
+          <div>
+            <Stepper activeStep={currentStep} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {currentStep === 0 && (
+              <div className="mt-3">
+                {isLoaded ? (
+                  <GoogleMap
+                    mapContainerStyle={{ height: '400px', width: '100%' }}
+                    center={selectedLocation}
+                    zoom={13}
+                    onClick={onMapClick}
+                  >
+                    {polygonCoords.length > 0 && (
+                      <Polygon
+                        paths={polygonCoords}
+                        options={{
+                          fillColor: 'lightblue',
+                          fillOpacity: 0.5,
+                          strokeColor: 'blue',
+                          strokeOpacity: 1,
+                          strokeWeight: 2,
+                        }}
+                      />
+                    )}
+                    <Marker position={selectedLocation} />
+                  </GoogleMap>
+                ) : (
+                  <div>Loading Google Maps...</div>
+                )}
+              </div>
+            )}
+
+            {currentStep === 1 && (
+              <div className="mt-3">
+                <TextField
+                  fullWidth
+                  label="Geofence Name"
+                  name="name"
+                  value={formData.name !== undefined ? formData.name : ''}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+
+                <Select
+                  placeholder="Select Place Type..."
+                  value={PlaceType.find((option) => option.value === formData.type) || ''}
+                  onChange={(selectedOption) =>
+                    setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
+                  }
+                  options={PlaceType}
+                />
+
+                <Select
+                  isMulti
+                  options={deviceOptions}
+                  onChange={handleDeviceChange}
+                  value={selectedDevices}
+                  placeholder="Select devices"
+                />
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
+              {currentStep > 0 && (
+                <Button onClick={handleBack} variant="outlined">
+                  Back
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button onClick={handleNext} variant="contained" color="primary">
+                  Next
+                </Button>
+              ) : (
+                <Button onClick={handleAddGeofence} variant="contained" color="primary">
+                  Submit
+                </Button>
+              )}
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      {/* <Modal
         open={addModalOpen}
         onClose={handleAddModalClose}
         aria-labelledby="modal-modal-title"
@@ -466,7 +624,6 @@ const Geofences = () => {
               Add New Geofence
             </Typography>
             <IconButton
-              // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
               onClick={handleAddModalClose}
             >
               <CloseIcon />
@@ -477,13 +634,12 @@ const Geofences = () => {
               <Typography variant="subtitle1" style={{ marginTop: '20px' }}>
                 Select Geofence Location:
               </Typography>
-              {/* Check if Google Maps is loaded */}
               {isLoaded ? (
                 <GoogleMap
-                  mapContainerStyle={{ height: '300px', width: '100%', }}
+                  mapContainerStyle={{ height: '300px', width: '100%' }}
                   center={selectedLocation}
                   zoom={13}
-                  onClick={onMapClick} // Set marker on click
+                  onClick={onMapClick}
                 >
                   {polygonCoords.length > 0 && (
                     <Polygon
@@ -540,7 +696,7 @@ const Geofences = () => {
             </form>
           </DialogContent>
         </Box>
-      </Modal>
+      </Modal> */}
       <Modal
         open={editModalOpen}
         onClose={handleEditModalClose}
