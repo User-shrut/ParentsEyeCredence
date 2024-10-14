@@ -32,16 +32,13 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { useNavigate } from 'react-router-dom'
-import Loader from '../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import ReactPaginate from 'react-paginate'
 import { Label } from '@mui/icons-material'
 import toast, { Toaster } from 'react-hot-toast'
-
-const getStatusColor = (status) => (status === 'online' ? 'green' : 'red')
+import { jwtDecode } from 'jwt-decode'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -58,7 +55,7 @@ const Devices = () => {
   const myPassword = '123456'
   const [extendedPassword, setExtendedPassword] = useState()
   const [passwordCheck, setPasswordCheck] = useState(false)
-  const [extendedYear, setExtendedYear] = useState(null);
+  const [extendedYear, setExtendedYear] = useState(null)
 
   const [groups, setGroups] = useState([])
   const [users, setUsers] = useState([])
@@ -68,6 +65,7 @@ const Devices = () => {
   const [categories, setCategories] = useState([])
 
   const token = Cookies.get('authToken')
+  const decodedToken = jwtDecode(token)
 
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Device Info', 'Assign To', 'Subscription']
@@ -134,8 +132,6 @@ const Devices = () => {
       setFormData((prevData) => ({ ...prevData, [name]: value }))
     }
   }
-
- 
 
   // const handleEditSubmit = async () => {
   //   if (!selectedRow) {
@@ -270,14 +266,19 @@ const Devices = () => {
       extenddate: formData.extenddate || '',
     }
 
-    if(newRow){
+    if (newRow) {
       // Check for any required fields missing
-      if (!newRow.name ||!newRow.uniqueId ||!newRow.sim ||!newRow.model ||!newRow.category || !newRow.expirationdate) {
+      if (
+        !newRow.name ||
+        !newRow.uniqueId ||
+        !newRow.sim ||
+        !newRow.model ||
+        !newRow.category ||
+        !newRow.expirationdate
+      ) {
         toast.error('Please fill in all required fields.')
         return
       }
-
-      
     }
 
     try {
@@ -332,7 +333,7 @@ const Devices = () => {
       category: row.category,
       average: row.average,
       Driver: row.Driver._id,
-      geofences: row.geofences.map( geo => geo._id),
+      geofences: row.geofences.map((geo) => geo._id),
       groups: row.groups.map((group) => group._id),
       users: row.users.map((user) => user._id),
     })
@@ -580,47 +581,43 @@ const Devices = () => {
     }
   }
 
-
-
   const handleCheckPassword = () => {
     if (extendedPassword == myPassword) {
-      setPasswordCheck(true);
-    setExtendedPasswordModel(false);
-    alert('Password is correct');
-    
-    // Now update the expiration date based on the selected plan (years)
-    const ExpiryDate = formData.expirationdate;
-    if (ExpiryDate && extendedYear) {
-      const expiry = new Date(ExpiryDate);
-      const extendedDate = new Date(
-        expiry.setFullYear(expiry.getFullYear() + extendedYear)
-      )
-        .toISOString()
-        .split('T')[0]; // Format to yyyy-mm-dd
+      setPasswordCheck(true)
+      setExtendedPasswordModel(false)
+      alert('Password is correct')
 
-      // Now set the extended date
-      setFormData({
-        ...formData,
-        extenddate: extendedDate,
-        expirationdate: extendedDate,
-      });
+      // Now update the expiration date based on the selected plan (years)
+      const ExpiryDate = formData.expirationdate
+      if (ExpiryDate && extendedYear) {
+        const expiry = new Date(ExpiryDate)
+        const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + extendedYear))
+          .toISOString()
+          .split('T')[0] // Format to yyyy-mm-dd
 
-      setSelectedYears(null); // Reset the selected years after updating
+        // Now set the extended date
+        setFormData({
+          ...formData,
+          extenddate: extendedDate,
+          expirationdate: extendedDate,
+        })
+
+        setSelectedYears(null) // Reset the selected years after updating
+      }
+    } else {
+      alert('Password is not correct')
     }
-  } else {
-    alert('Password is not correct');
-  }
   }
 
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {
-    setExtendedYear(years); // new state to hold the selected number of years
-    setExtendedPasswordModel(true);
+    setExtendedYear(years) // new state to hold the selected number of years
+    setExtendedPasswordModel(true)
   }
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-        <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Devices</h2>
@@ -668,96 +665,101 @@ const Devices = () => {
           borderRadius: '10px',
         }}
       >
-        
-          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow>
-                {/* Skip the first column */}
-                {columns.slice(1).map((column, index) => (
-                  <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
-                    {column.Header}
-                  </CTableHeaderCell>
-                ))}
+        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow>
+              {/* Skip the first column */}
+              {columns.slice(1).map((column, index) => (
+                <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
+                  {column.Header}
+                </CTableHeaderCell>
+              ))}
+              {decodedToken.superadmin ? (
                 <CTableHeaderCell className="text-white text-center bg-secondary">
                   Actions
                 </CTableHeaderCell>
+              ) : null}
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
+              <CTableRow>
+                <CTableDataCell colSpan="15" className="text-center">
+                  <div className="text-nowrap mb-2 text-center w-">
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                  </div>
+                </CTableDataCell>
               </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {loading ? (
-                <CTableRow>
-                  <CTableDataCell colSpan="15" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              ) : data.length > 0 ? (
-                data.map((item) => (
-                  <CTableRow key={item._id}>
-                    {/* Skip the first field in the data row */}
-                    {columns.slice(1).map((column) => (
-                      <CTableDataCell key={column.accessor} className="text-center">
-                        {column.accessor === 'groups' ? (
-                          <CFormSelect
-                            id="groups"
-                            className=" text-center border-0"
-                            style={{ width: '100px' }}
-                          >
-                            <option>{item.groups.length || "0"}</option>
-                            {Array.isArray(item.groups) &&
-                              item.groups.map((group) => (
-                                <option key={group._id} value={group._id}>
-                                  {group.name || 'undefine group'}
-                                </option>
-                              ))}
-                          </CFormSelect>
-                        ) : column.accessor === 'geofences' ? (
-                          <CFormSelect
-                            id="geofence"
-                            className=" text-center border-0"
-                            style={{ width: '120px' }}
-                          >
-                            <option value="">{item.geofences.length || "0"}</option>
-                            {Array.isArray(item.geofences) &&
-                              item.geofences.map((geofence, index) => (
-                                <option key={index} value={geofence._id}>
-                                  {geofence.name}
-                                </option>
-                              ))}
-                          </CFormSelect>
-                        ) : column.accessor === 'users' ? (
-                          <CFormSelect
-                            id="users"
-                            className=" text-center border-0"
-                            style={{ width: '120px' }}
-                          >
-                            <option value="">{item.users.length || "0"}</option>
-                            {Array.isArray(item.users) &&
-                              item.users.map((user) => (
-                                <option key={user._id} value={user._id}>
-                                  {user.username}
-                                </option>
-                              ))}
-                          </CFormSelect>
-                        ) : column.accessor === 'Driver' ? (
-                          <div style={{ width: '120px' }}>{item[column.accessor].name || "N/A"}</div>
-                        ) : (
-                          item[column.accessor] ? item[column.accessor] : 'N/A'
-                        )}
-                      </CTableDataCell>
-                    ))}
+            ) : data.length > 0 ? (
+              data.map((item) => (
+                <CTableRow key={item._id}>
+                  {/* Skip the first field in the data row */}
+                  {columns.slice(1).map((column) => (
+                    <CTableDataCell key={column.accessor} className="text-center">
+                      {column.accessor === 'groups' ? (
+                        <CFormSelect
+                          id="groups"
+                          className=" text-center border-0"
+                          style={{ width: '100px' }}
+                        >
+                          <option>{item.groups.length || '0'}</option>
+                          {Array.isArray(item.groups) &&
+                            item.groups.map((group) => (
+                              <option key={group._id} value={group._id}>
+                                {group.name || 'undefine group'}
+                              </option>
+                            ))}
+                        </CFormSelect>
+                      ) : column.accessor === 'geofences' ? (
+                        <CFormSelect
+                          id="geofence"
+                          className=" text-center border-0"
+                          style={{ width: '120px' }}
+                        >
+                          <option value="">{item.geofences.length || '0'}</option>
+                          {Array.isArray(item.geofences) &&
+                            item.geofences.map((geofence, index) => (
+                              <option key={index} value={geofence._id}>
+                                {geofence.name}
+                              </option>
+                            ))}
+                        </CFormSelect>
+                      ) : column.accessor === 'users' ? (
+                        <CFormSelect
+                          id="users"
+                          className=" text-center border-0"
+                          style={{ width: '120px' }}
+                        >
+                          <option value="">{item.users.length || '0'}</option>
+                          {Array.isArray(item.users) &&
+                            item.users.map((user) => (
+                              <option key={user._id} value={user._id}>
+                                {user.username}
+                              </option>
+                            ))}
+                        </CFormSelect>
+                      ) : column.accessor === 'Driver' ? (
+                        <div style={{ width: '120px' }}>{item[column.accessor].name || 'N/A'}</div>
+                      ) : item[column.accessor] ? (
+                        item[column.accessor]
+                      ) : (
+                        'N/A'
+                      )}
+                    </CTableDataCell>
+                  ))}
+
+                  {decodedToken.superadmin ? (
                     <CTableDataCell className="text-center d-flex">
                       <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                         <RiEdit2Fill
@@ -772,38 +774,38 @@ const Devices = () => {
                         <AiFillDelete style={{ fontSize: '20px' }} />
                       </IconButton>
                     </CTableDataCell>
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan="15" className="text-center">
-                    <div
-                      className="d-flex flex-column justify-content-center align-items-center"
-                      style={{ height: '200px' }}
-                    >
-                      <p className="mb-0 fw-bold">
-                        "Oops! Looks like there's no device available.
-                        <br /> Maybe it's time to create some devices!"
-                      </p>
-                      <div>
-                        <button
-                          onClick={() => setAddModalOpen(true)}
-                          variant="contained"
-                          className="btn btn-primary m-3 text-white"
-                        >
-                          <span>
-                            <IoMdAdd className="fs-5" />
-                          </span>{' '}
-                          Add Device
-                        </button>
-                      </div>
-                    </div>
-                  </CTableDataCell>
+                  ) : null}
                 </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-        
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan="15" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's no device available.
+                      <br /> Maybe it's time to create some devices!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Add Device
+                      </button>
+                    </div>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
       </TableContainer>
 
       {pageCount > 1 && (
@@ -938,9 +940,7 @@ const Devices = () => {
                         onChange={handleInputChange}
                         label={col.Header}
                       >
-                        <MenuItem value=''>
-                            select driver...
-                          </MenuItem>
+                        <MenuItem value="">select driver...</MenuItem>
                         {drivers.map((driver) => (
                           <MenuItem key={driver._id} value={driver._id}>
                             {driver.name}
@@ -1176,9 +1176,7 @@ const Devices = () => {
                         onChange={handleInputChange}
                         label={col.Header}
                       >
-                        <MenuItem value=''>
-                            select driver...
-                          </MenuItem>
+                        <MenuItem value="">select driver...</MenuItem>
                         {drivers.map((driver) => (
                           <MenuItem key={driver._id} value={driver._id}>
                             {driver.name}
