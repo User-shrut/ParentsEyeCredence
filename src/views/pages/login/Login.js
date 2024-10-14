@@ -33,8 +33,8 @@ const Login = () => {
         // Store the JWT token in a cookie
 
         const cookieOptions = {
-          secure: true, // Only allow cookies over HTTPS
-          sameSite: 'Strict', // Strictly same-site cookie
+          secure: false, // Only allow cookies over HTTPS , so turn true
+          // sameSite: 'Strict', // Strictly same-site cookie
         }
 
         if (rememberMe) {
