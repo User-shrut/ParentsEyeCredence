@@ -139,7 +139,7 @@ const AppHeader = () => {
   const token = Cookies.get('authToken')
   const decodedToken = token ? jwtDecode(token) : null;
   const socket = io(`${import.meta.env.VITE_API_URL}`);
-  const userId = decodedToken.id;
+  const userId = decodedToken && decodedToken.id;
   const [notifications , setNotifications] = useState([]);
 
   const notificationSocket = () => {
