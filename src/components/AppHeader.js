@@ -46,6 +46,11 @@ import { AppHeaderDropdown } from './header/index'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './AppHeader.css'
 import TableColumnVisibility from './TableColumnVisibility.js'
+import NotificationDropdown from './header/NotificationDropdown.js'
+import { io } from 'socket.io-client';
+import notificationSound from '../../public/Google_Event.mp3';
+import Cookies from 'js-cookie';
+import { jwtDecode } from "jwt-decode";
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -125,6 +130,36 @@ const AppHeader = () => {
 
   // Check if the current page is the dashboard
   const isDashboard = location.pathname === '/dashboard'
+
+
+
+
+  // ################### notification code is here ##########
+
+  const token = Cookies.get('authToken')
+  const decodedToken = token ? jwtDecode(token) : null;
+  const socket = io(`${import.meta.env.VITE_API_URL}`);
+  const userId = decodedToken.id;
+  const [notifications , setNotifications] = useState([]);
+
+  const notificationSocket = () => {
+    const audio = new Audio(notificationSound);
+    console.log("this is notification function and i am waiting for notification")
+    socket.emit('registerUser', userId);
+    socket.on("alert", (data) => {
+      console.log("Alert", data);
+      audio.play();
+      setNotifications((prevNotifications) => [...prevNotifications, data])
+    });
+  }
+
+  useEffect(() => {
+    console.log("this is notification socket code");
+    notificationSocket();
+    
+  }, [])
+
+  // #########################################################
 
   return (
     <CHeader position="sticky" className=" p-0" ref={headerRef}>
@@ -218,11 +253,13 @@ const AppHeader = () => {
         )}
 
         <CHeaderNav className="ms-auto">
-          <CNavItem>
+          {/* <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
+
+          <NotificationDropdown notifications={notifications} />
         </CHeaderNav>
         <CHeaderNav>
 

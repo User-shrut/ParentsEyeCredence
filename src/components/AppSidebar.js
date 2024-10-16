@@ -80,9 +80,9 @@ const AppSidebar = () => {
   return (
     <CSidebar
       className="border-end xl"
-      style={{backgroundColor: 'rgb(248,249,255)' }}
-      // fontcolor="rgb(0,0,0)"
-      // colorScheme="grey"
+      // style={{backgroundColor: 'rgb(248,249,255)' }}
+      fontcolor="rgb(0,0,0)"
+      colorScheme="light"
       position="fixed"
       unfoldable={unfoldable}
       visible={sidebarShow}

@@ -17,16 +17,21 @@ import {
   CRow,
   CFormLabel,
   CFormFeedback,
+  CTooltip,
 } from '@coreui/react';
 import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
+const SearchStatus = ({ formData, handleInputChange, handleSubmit, groups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false); // State to manage button text
   const [buttonText, setButtonText] = useState('SHOW NOW');
   const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+
+
+
+
   const handleFormSubmit = (event) => {
     const form = event.currentTarget;
     console.log("handle submit ke pass hu");
@@ -55,6 +60,12 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
+
+
+
+
+
+
   return (
     <CForm
       className="row g-3 needs-validation"
@@ -62,7 +73,27 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={4}>
+      <CCol md={3}>
+        <CFormLabel htmlFor="devices">Groups</CFormLabel>
+        <CFormSelect
+          id="group"
+          required
+          onChange={(e) => {
+            const selectedGroup = e.target.value;
+            console.log("Selected Group ID:", selectedGroup);
+            getDevices(selectedGroup);
+          }}
+        >
+          <option value="">Choose a group...</option>
+          {groups.map((group) => (
+            <option key={group._id} value={group._id}>
+              {group.name}
+            </option>
+          ))}
+        </CFormSelect>
+        <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
+      </CCol>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -71,17 +102,21 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices.length > 0 ? (
-            devices.map((device) => (
-              <option key={device.id} value={device.deviceId}>{device.name}</option>
-            ))
-          ) : (
-            <option disabled>Loading devices...</option>
-          )}
+          {loading ? (<option>Loading devices...</option>) : (
+            devices?.length > 0 ? (
+              devices?.map((device) => (
+                <option key={device.id} value={device.deviceId}>{device.name}</option>
+              ))
+            ) : (
+              <option disabled>No Device in this Group</option>
+            )
+          )
+          }
+
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
-      <CCol md={4}>
+      <CCol md={3}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
@@ -100,7 +135,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, devices, colu
         </CFormSelect>
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
-      <CCol md={4}>
+      <CCol md={3}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
           isMulti
@@ -241,22 +276,43 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
               {/* Dynamically render table cells based on selected columns */}
               {selectedColumns.map((column, index) => (
                 <CTableDataCell key={index}>
-                  {column === 'Vehicle Status'
-                    ? row.vehicleStatus
+                  {column === 'Vehicle Status' ? (
+                    row.vehicleStatus === 'Idle' ? (
+                      <>
+                        <CTooltip content="Idle">
+                          <img src='public/status/idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                          {/* <span>Idle</span> */}
+                        </CTooltip>
+                      </>
+                    ) : row.vehicleStatus === 'Ignition Off' ? (
+                      <>
+                        <CTooltip content="Ignition Off">
+                          <img src='public/status/power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                          {/* <span>Ignition Off</span> */}
+                        </CTooltip>
+                      </>
+                    ) : row.vehicleStatus === 'Ignition On' ? (
+                      <>
+                        <CTooltip content="Ignition On">
+                          <img src='public/status/power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                          {/* <span>Ignition On</span> */}
+                        </CTooltip>
+                      </>
+                    ) : null)
                     : column === 'Start Date Time'
                       ? `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
                       : column === 'Start Address'
-                        ? row.startAddress
+                        ? newAddressData?.startAddress || 'Fetching...'
                         : column === 'End Date Time'
                           ? `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
                           : column === 'Distance'
                             ? row.distance
                             : column === 'Total Distance'
-                              ? row.distance
+                              ? (row.distance / 1000).toFixed(2) + ' km'
                               // : column === 'Maximum Speed'
                               //   ? row.maxSpeed
                               : column === 'End Address'
-                                ? row.endAddress
+                                ? newAddressData?.endAddress || 'Fetching...'
                                 : column === 'Driver Name'
                                   ? row.driverInfos?.driverName || '--'
                                   : column === 'Driver Phone No.'
@@ -302,7 +358,10 @@ const Status = () => {
 
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
+  const [groups, setGroups] = useState([]);
   const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const accessToken = Cookies.get('authToken');
   const [showMap, setShowMap] = useState(false); //show mapping data
   const [columns] = useState([
     'Vehicle Status',
@@ -319,11 +378,6 @@ const Status = () => {
 
     'Driver Name',
     'Driver Phone No.'
-    // 'Vehicle Status',
-
-    // 'Average Speed'
-
-
   ]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const token = Cookies.get('authToken'); //
@@ -333,29 +387,51 @@ const Status = () => {
   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
   const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
 
-  useEffect(() => {
-    const fetchDevices = async () => {
-      console.log("fetch device me aaya hu...");
-      try {
-        const response = await fetch('https://credence-tracker.onrender.com/device', {
-          method: 'GET',
+  const getDevices = async (selectedGroup) => {
+    const accessToken = Cookies.get('authToken');
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + accessToken,
           },
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data);
-        setDevices(data.devices); // Assuming the data returned contains device info
-      } catch (error) {
-        console.error('Error fetching devices:', error);
+        },
+      )
+      if (response.data.success) {
+        setDevices(response.data.data)
+        setLoading(false);
       }
-    };
-    fetchDevices();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setDevices([]);
+      setLoading(false);
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  const getGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setGroups(response.data.groups)
+        console.log("yaha tak thik hai")
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  useEffect(() => {
+    getGroups();
+  }, [])
+
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -397,7 +473,7 @@ const Status = () => {
   return (
     <>
       <CRow className="pt-3">
-        <h2 className="px-4">Status Report</h2>
+        <h2 className="px-4">Status</h2>
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
@@ -408,6 +484,9 @@ const Status = () => {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                groups={groups}
+                getDevices={getDevices}
+                loading={loading}
                 devices={devices}
                 showMap={showMap}
                 setShowMap={setShowMap}
