@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { io } from 'socket.io-client'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import axios from 'axios'
 
 // Define initial state
 const initialState = {
@@ -9,12 +9,42 @@ const initialState = {
   loading: false,
   error: null,
   deviceNames: [],
-  activeFilter: null, // Added state to track the current active filter
 }
 
-// WebSocket connection logic
-export const socket = io('https://credence-tracker.onrender.com', {
-  transports: ['websocket', 'polling'], // Specify transports (optional)
+// Fetch vehicle data from API with Basic Auth
+const fetchVehiclesFromAPI = async () => {
+  const positionsAPI = 'http://104.251.212.84/api/positions'
+  const auth = {
+    username: 'hbtrack',
+    password: '123456@',
+  }
+  const response = await axios.get(positionsAPI, { auth })
+  console.log('Length of positions API: ' + response.data.length)
+  return response.data
+}
+
+// Fetch device names API
+const fetchDevicesFromAPI = async () => {
+  const devicesAPI = 'http://104.251.212.84/api/devices'
+  const auth = {
+    username: 'hbtrack',
+    password: '123456@',
+  }
+  const response = await axios.get(devicesAPI, { auth })
+  console.log('Length of devices API: ' + response.data.length)
+  return response.data
+}
+
+// Fetch live vehicle data continuously in real-time
+export const fetchLiveVehicles = createAsyncThunk('liveFeatures/fetchLiveVehicles', async () => {
+  const positions = await fetchVehiclesFromAPI()
+  const devices = await fetchDevicesFromAPI()
+
+  // Merge positions with device names
+  return positions.map((position) => {
+    const device = devices.find((dev) => dev.id === position.deviceId)
+    return { ...position, name: device?.name, category: device?.category, groupId: device?.groupId }
+  })
 })
 
 // Create the slice with filtering logic
@@ -22,25 +52,7 @@ const liveFeaturesSlice = createSlice({
   name: 'liveFeatures',
   initialState,
   reducers: {
-    // Handle updating vehicles with data from WebSocket
-    setVehicles(state, action) {
-      state.vehicles = action.payload
-      // Reapply the active filter whenever vehicles are updated
-      if (state.activeFilter) {
-        // Reapply the active filter using the stored filter function
-        state.filteredVehicles = state.activeFilter(state.vehicles)
-      } else {
-        // Default behavior: show all vehicles if no filter is active
-        state.filteredVehicles = state.vehicles
-      }
-    },
-
-    // Handle WebSocket error
-    setError(state, action) {
-      state.error = action.payload
-    },
-
-    // Update logic for individual vehicle
+    //getting data live of single vehicle.
     updateSingleVehicle(state, action) {
       const updatedVehicle = action.payload
       if (state.singleVehicle?.deviceId === updatedVehicle.deviceId) {
@@ -48,102 +60,94 @@ const liveFeaturesSlice = createSlice({
       }
     },
 
-    // Selecting single vehicle
+    //selecting single vehicle
     setSingleVehicle(state, action) {
       const vehicleId = action.payload
       state.singleVehicle = state.vehicles.find((vehicle) => vehicle.deviceId === vehicleId)
     },
-
-    // Filtering logic (e.g., stopped, idle, running vehicles)
+    // Update vehicles from WebSocket
+    updateVehicles(state, action) {
+      state.vehicles = action.payload // Update vehicles with new data
+      state.filteredVehicles = action.payload // Optionally reset filtered vehicles
+    },
+    // Filtering logic
     filterAllVehicles(state) {
-      state.activeFilter = (vehicles) => vehicles // Store filter function
       state.filteredVehicles = state.vehicles
     },
     filterStoppedVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.attributes.ignition === false && vehicle.speed < 1) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === false && vehicle.speed < 1,
+      )
     },
     filterIdleVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.attributes.ignition === true && vehicle.speed < 2) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed < 2,
+      )
     },
     filterRunningVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter(
-          (vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
-        ) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) =>
+          vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
+      )
     },
     filterOverspeedVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 60) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 60,
+      )
     },
     filterInactiveVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => !(vehicle.attributes.ignition === true && vehicle.speed > 0)) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => !(vehicle.attributes.ignition === true && vehicle.speed > 0),
+      )
     },
     filterByCategory(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.category === action.payload) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.category === action.payload,
+      )
     },
     filterByGroup(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.groupId === action.payload) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.groupId === action.payload,
+      )
     },
     filterByGeofence(state, action) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.geofenceIds && vehicle.geofenceIds.includes(action.payload)) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter(
+        (vehicle) => vehicle.geofenceIds && vehicle.geofenceIds.includes(action.payload),
+      )
     },
     filterBySingleVehicle(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.name === action.payload) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter((vehicle) => vehicle.name === action.payload)
     },
     searchVehiclesByName(state, action) {
       const searchTerm = action.payload.toLowerCase() // Convert to lowercase for case-insensitive search
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.name.toLowerCase().includes(searchTerm)) // Store filter function
-      state.filteredVehicles = state.activeFilter(state.vehicles)
+      state.filteredVehicles = state.vehicles.filter((vehicle) =>
+        vehicle.name.toLowerCase().includes(searchTerm),
+      )
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchLiveVehicles.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchLiveVehicles.fulfilled, (state, action) => {
+        state.loading = false
+        state.vehicles = action.payload
+        state.filteredVehicles = action.payload // Initialize with all vehicles
+
+        state.deviceNames = action.payload.map((vehicle) => vehicle.name).filter(Boolean)
+      })
+      .addCase(fetchLiveVehicles.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
   },
 })
 
-// WebSocket event listeners
-export const initializeSocket = () => (dispatch) => {
-  // Handle connection event
-  socket.on('connect', () => {
-    console.log('Connected to the socket server')
-  })
-
-  // Handle disconnection event
-  socket.on('disconnect', () => {
-    console.log('Disconnected from the socket server')
-  })
-
-  // Listen for live vehicle data
-  socket.on('all device data', (data) => {
-    // console.log('Received data from custom event:', data)
-    dispatch(liveFeaturesSlice.actions.setVehicles(data))
-  })
-
-  // Listen for errors
-  socket.on('error', (error) => {
-    console.error('Socket error:', error)
-    dispatch(liveFeaturesSlice.actions.setError(error))
-  })
-
-  // Example of emitting an event to the server
-  socket.emit('client-message', { message: 'Hello from client!' })
-}
-
 // Export the actions
 export const {
-  setVehicles,
-  setError,
+  updateVehicles,
   filterAllVehicles,
   filterStoppedVehicles,
   filterIdleVehicles,
@@ -159,6 +163,8 @@ export const {
   updateSingleVehicle,
 } = liveFeaturesSlice.actions
 
+// Selector to get device names
 export const selectDeviceNames = (state) => state.liveFeatures.deviceNames
+
 // Export the reducer
 export default liveFeaturesSlice.reducer

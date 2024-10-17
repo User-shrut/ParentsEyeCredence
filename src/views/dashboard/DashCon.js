@@ -3,10 +3,15 @@ import classNames from 'classnames'
 import { FixedSizeList as List } from 'react-window'
 
 import {
+  CAvatar,
+  CButton,
+  CButtonGroup,
   CCard,
   CCardBody,
+  CCardFooter,
   CCardHeader,
   CCol,
+  CProgress,
   CRow,
   CTable,
   CTableBody,
@@ -15,17 +20,39 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
 import './DashCon.css'
-
+import {
+  cibCcAmex,
+  cibCcApplePay,
+  cibCcMastercard,
+  cibCcPaypal,
+  cibCcStripe,
+  cibCcVisa,
+  cibGoogle,
+  cibFacebook,
+  cibLinkedin,
+  cifBr,
+  cifEs,
+  cifFr,
+  cifIn,
+  cifPl,
+  cifUs,
+  cibTwitter,
+  cilCloudDownload,
+  cilPeople,
+  cilUser,
+  cilUserFemale,
+} from '@coreui/icons'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  fetchLiveVehicles,
   filterIdleVehicles,
   filterInactiveVehicles,
   filterOverspeedVehicles,
   filterRunningVehicles,
   filterStoppedVehicles,
-  initializeSocket,
 } from '../../features/LivetrackingDataSlice.js'
 
 import MainMap from '../Map/MapComponent'
@@ -35,57 +62,57 @@ import { MdGpsFixed, MdGpsNotFixed } from 'react-icons/md'
 import { IoIosArrowDown, IoMdBatteryCharging } from 'react-icons/io'
 
 // ================================CAR==================================
-import carGreen from '../../assets/vehicleList/Car/carGreen.svg'
-import carRed from '../../assets/vehicleList/Car/carRed.svg'
-import carYellow from '../../assets/vehicleList/Car/carYellow.svg'
-import carOrange from '../../assets/vehicleList/Car/carOrange.svg'
-import carGray from '../../assets/vehicleList/Car/carGray.svg'
+import carGreen from "../../assets/vehicleList/Car/carGreen.svg";
+import carRed from "../../assets/vehicleList/Car/carRed.svg";
+import carYellow from "../../assets/vehicleList/Car/carYellow.svg";
+import carOrange from "../../assets/vehicleList/Car/carOrange.svg";
+import carGray from "../../assets/vehicleList/Car/carGray.svg";
 
 //==============================BIKE========================================
-import bikeGreen from '../../assets/vehicleList/Bike/bikeGreen.svg'
-import bikeRed from '../../assets/vehicleList/Bike/bikeRed.svg'
-import bikeYellow from '../../assets/vehicleList/Bike/bikeYellow.svg'
-import bikeOrange from '../../assets/vehicleList/Bike/bikeOrange.svg'
-import bikeGray from '../../assets/vehicleList/Bike/bikeGray.svg'
+import bikeGreen from "../../assets/vehicleList/Bike/bikeGreen.svg";
+import bikeRed from "../../assets/vehicleList/Bike/bikeRed.svg";
+import bikeYellow from "../../assets/vehicleList/Bike/bikeYellow.svg";
+import bikeOrange from "../../assets/vehicleList/Bike/bikeOrange.svg";
+import bikeGray from "../../assets/vehicleList/Bike/bikeGray.svg";
 
-import busGreen from '../../assets/vehicleList/Bus/busGreen.svg'
-import busRed from '../../assets/vehicleList/Bus/busRed.svg'
-import busOrange from '../../assets/vehicleList/Bus/busOrange.svg'
-import busYellow from '../../assets/vehicleList/Bus/busYellow.svg'
-import busGray from '../../assets/vehicleList/Bus/busGray.svg'
+
+import busGreen from "../../assets/vehicleList/Bus/busGreen.svg";
+import busRed from "../../assets/vehicleList/Bus/busRed.svg";
+import busOrange from "../../assets/vehicleList/Bus/busOrange.svg";
+import busYellow from "../../assets/vehicleList/Bus/busYellow.svg";
+import busGray from "../../assets/vehicleList/Bus/busGray.svg";
 
 //==============================TRUCK========================================
-import truckGreen from '../../assets/vehicleList/Truck/truckGreen.svg'
-import truckRed from '../../assets/vehicleList/Truck/truckRed.svg'
-import truckYellow from '../../assets/vehicleList/Truck/truckYellow.svg'
-import truckOrange from '../../assets/vehicleList/Truck/truckOrange.svg'
-import truckGray from '../../assets/vehicleList/Truck/truckGray.svg'
+import truckGreen from "../../assets/vehicleList/Truck/truckGreen.svg";
+import truckRed from "../../assets/vehicleList/Truck/truckRed.svg";
+import truckYellow from "../../assets/vehicleList/Truck/truckYellow.svg";
+import truckOrange from "../../assets/vehicleList/Truck/truckOrange.svg";
+import truckGray from "../../assets/vehicleList/Truck/truckGray.svg";
 
 //==============================CRANE========================================
-import craneGreen from '../../assets/vehicleList/Crane/craneGreen.svg'
-import craneRed from '../../assets/vehicleList/Crane/craneRed.svg'
-import craneYellow from '../../assets/vehicleList/Crane/craneYellow.svg'
-import craneOrange from '../../assets/vehicleList/Crane/craneOrange.svg'
-import craneGray from '../../assets/vehicleList/Crane/craneGray.svg'
+import craneGreen from "../../assets/vehicleList/Crane/craneGreen.svg";
+import craneRed from "../../assets/vehicleList/Crane/craneRed.svg";
+import craneYellow from "../../assets/vehicleList/Crane/craneYellow.svg";
+import craneOrange from "../../assets/vehicleList/Crane/craneOrange.svg";
+import craneGray from "../../assets/vehicleList/Crane/craneGray.svg";
 
 //==============================JCB========================================
-import jcbGreen from '../../assets/vehicleList/JCB/jcbGreen.svg'
-import jcbRed from '../../assets/vehicleList/JCB/jcbRed.svg'
-import jcbYellow from '../../assets/vehicleList/JCB/jcbYellow.svg'
-import jcbOrange from '../../assets/vehicleList/JCB/jcbOrange.svg'
-import jcbGray from '../../assets/vehicleList/JCB/jcbGray.svg'
+import jcbGreen from "../../assets/vehicleList/JCB/jcbGreen.svg";
+import jcbRed from "../../assets/vehicleList/JCB/jcbRed.svg";
+import jcbYellow from "../../assets/vehicleList/JCB/jcbYellow.svg";
+import jcbOrange from "../../assets/vehicleList/JCB/jcbOrange.svg";
+import jcbGray from "../../assets/vehicleList/JCB/jcbGray.svg";
 
 //==============================AUTO========================================
-import autoGreen from '../../assets/vehicleList/Auto/autoGreen.svg'
-import autoRed from '../../assets/vehicleList/Auto/autoRed.svg'
-import autoYellow from '../../assets/vehicleList/Auto/autoYellow.svg'
-import autoOrange from '../../assets/vehicleList/Auto/autoOrange.svg'
-import autoGray from '../../assets/vehicleList/Auto/autoGray.svg'
+import autoGreen from "../../assets/vehicleList/Auto/autoGreen.svg";
+import autoRed from "../../assets/vehicleList/Auto/autoRed.svg";
+import autoYellow from "../../assets/vehicleList/Auto/autoYellow.svg";
+import autoOrange from "../../assets/vehicleList/Auto/autoOrange.svg";
+import autoGray from "../../assets/vehicleList/Auto/autoGray.svg";
 
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { useNavigate } from 'react-router-dom'
-import { io } from 'socket.io-client'
 dayjs.extend(duration)
 
 const Dashboard = () => {
@@ -95,9 +122,35 @@ const Dashboard = () => {
 
   // Fetch live vehicles when the component mounts
   useEffect(() => {
-    dispatch(initializeSocket())
-  }, [dispatch])
+    dispatch(fetchLiveVehicles())
 
+    // Setup WebSocket connection
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`)
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established')
+    }
+
+    socket.onmessage = (event) => {
+      const updatedVehicles = JSON.parse(event.data)
+      console.log("consoling",updatedVehicles)
+      dispatch(updateVehicles(updatedVehicles)) // Update Redux state with new data
+    }
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed')
+    }
+
+    // Clean up on component unmount
+    return () => {
+      socket.close()
+    }
+  }, [dispatch])
   const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
   const stoppedVehiclesCount = useSelector(
     (state) =>
@@ -262,16 +315,6 @@ const Dashboard = () => {
           <CCard className="mb-4">
             <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
             <CCardBody className="content">
-              <hr className="mt-0 mb-0" />
-
-              {/* <CRow>
-            <CCol sm={7} className="d-none d-md-block"></CCol>
-          </CRow> */}
-              <MainMap filteredVehicles={filteredVehicles} />
-
-              {/* <div className="mb-5"></div> */}
-
-              <br />
               <CRow className="justify-content-space-around">
                 <CCol xs={12} md={2} xl={2} className="count-col countallCol">
                   <div className="border-start border-start-4 border-start-error countAll py-1 px-3">
@@ -360,9 +403,16 @@ const Dashboard = () => {
                   </div>
                 </CCol>
               </CRow>
-              <hr />
-              <br />
+              <hr className="mt-0 mb-0" />
 
+              {/* <CRow>
+            <CCol sm={7} className="d-none d-md-block"></CCol>
+          </CRow> */}
+              <MainMap filteredVehicles={filteredVehicles} />
+
+              {/* <div className="mb-5"></div> */}
+
+              <br />
               <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
 
                 <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
@@ -506,7 +556,7 @@ const Dashboard = () => {
                         {/* Sr No. */}
                         {visibleColumns.srNo && (
                           <CTableDataCell className="text-center sr-no table-cell">
-                            {index + 1}
+                            <IoIosArrowDown /> &nbsp; {index + 1}
                           </CTableDataCell>
                         )}
                         {visibleColumns.vehicle && (
