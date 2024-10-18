@@ -1,31 +1,40 @@
 .table-container::-webkit-scrollbar {
-  display: none !important; /* Hides scrollbar for Chrome, Safari, and Edge */
+  display: none !important;
+  /* Hides scrollbar for Chrome, Safari, and Edge */
 }
 
 /* For Firefox */
 .table-container {
-  scrollbar-width: none !important; /* Hides scrollbar in Firefox */
+  scrollbar-width: none !important;
+  /* Hides scrollbar in Firefox */
+  width: 100%;
+  /* Ensure container takes full width */
 }
 
-.content{
+.vehiclesTable {
+  width: 100%;
+  /* Ensure table stretches to full width */
+}
+
+.content {
   padding-top: 0 !important;
 }
 
-.countldel
-{
+.countldel {
   border-left-color: yellow !important;
   margin-bottom: 5px;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-.countOverSpeed
-{
+
+.countOverSpeed {
   border-left-color: #eb6009 !important;
   margin-bottom: 5px;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-.countAll{
+
+.countAll {
   border-left-color: #0d6dec !important;
   margin-bottom: 5px;
   padding-top: 0 !important;
@@ -33,137 +42,158 @@
 }
 
 
-.countStop{
+.countStop {
   margin-bottom: 5px;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
 
-.countRun{
+.countRun {
   margin-bottom: 5px;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
 
-.allData{
+.allData {
   color: #0d6dec !important;
 }
-.runningData{
+
+.runningData {
   color: green !important;
 }
 
-.stopData{
+.stopData {
   color: red !important;
 }
 
-.inactiveData{
+.inactiveData {
   color: black !important;
 }
 
-.overspeedData{
+.overspeedData {
   color: #eb6009 !important;
 }
-.vehiclesTable
-{
+
+.vehiclesTable {
   height: 20rem !important;
-  width: 60% !important;
+  width: 100% !important;
   /* border: 1px solid white !important; */
 
 }
 
 
 .table-cell {
-  padding-right: 1rem !important; /* Adjust this value as needed */
+  padding-right: 1rem !important;
+  /* Adjust this value as needed */
 }
-.trans
-{
+
+.trans {
   transition: height 0.2s ease-in-out;
 }
+
 .table-row {
-  overflow: hidden; /* Prevent overflow when transitioning */
+  overflow: hidden;
+  /* Prevent overflow when transitioning */
 }
 
 .table-row.expanded {
-  transition: height 0.3s ease; /* Smooth transition for height */
+  transition: height 0.3s ease;
+  /* Smooth transition for height */
 }
 
 .table-row.collapsed {
   /* Adjust as needed for the collapsed state */
-  transition: 0.3s ease; /* Smooth transition for height */
+  transition: 0.3s ease;
+  /* Smooth transition for height */
 }
 
 .trans {
-  transition: 0.2s ease-in-out; /* Transition for opacity if needed */
+  transition: 0.2s ease-in-out;
+  /* Transition for opacity if needed */
 }
 
-.align{
+.align {
   /* display: flex; */
   align-self: center;
   justify-content: center;
 }
-.dashimg{
+
+.dashimg {
   height: 40px;
 }
-.upperdata{
+
+.upperdata {
   height: 45px;
 }
-.address, .last-update {
-  width: 25%; /* Adjust this value as per your requirement */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.status {
-  width: 15%; /* Adjust this value as per your requirement */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.speed {
-  width: 10%; /* Adjust this value as per your requirement */
+
+.address,
+.last-update {
+  width: 25%;
+  /* Adjust this value as per your requirement */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.device-name{
-  width: 2% !important; /* Adjust this value as per your requirement */
+.status {
+  width: 15%;
+  /* Adjust this value as per your requirement */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.speed {
+  width: 10%;
+  /* Adjust this value as per your requirement */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-name {
+  width: 2% !important;
+  /* Adjust this value as per your requirement */
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis;
 }
 
-.n{
+.n {
   font-size: 0.8rem;
 }
-.ld, td{
+
+.ld,
+td {
   font-size: 0.8rem;
 }
-.cd{
+
+.cd {
   font-size: 0.9rem;
 }
 
-.sp{
-  font-size: 0.9rem;
-}
-.d{
+.sp {
   font-size: 0.9rem;
 }
 
-.current-delay{
-  width: 2% !important; /* Adjust this value as per your requirement */
+.d {
+  font-size: 0.9rem;
+}
+
+.current-delay {
+  width: 2% !important;
+  /* Adjust this value as per your requirement */
   /* white-space: nowrap !important; */
   overflow: hidden !important;
   text-overflow: ellipsis;
 }
 
-.count-col{
+.count-col {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.countallCol
-{
+.countallCol {
   max-width: 9rem !important;
 }

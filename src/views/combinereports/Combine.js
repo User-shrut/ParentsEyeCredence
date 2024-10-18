@@ -471,7 +471,6 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
         <CDropdownMenu>
           <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
           <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
-          {/* <CDropdownItem onClick={handlePrintTable} >Print</CDropdownItem> */}
         </CDropdownMenu>
       </CDropdown>
 

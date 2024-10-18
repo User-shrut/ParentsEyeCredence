@@ -134,7 +134,7 @@ const Dashboard = () => {
 
     socket.onmessage = (event) => {
       const updatedVehicles = JSON.parse(event.data)
-      console.log("consoling",updatedVehicles)
+      console.log("consoling", updatedVehicles)
       dispatch(updateVehicles(updatedVehicles)) // Update Redux state with new data
     }
 
@@ -313,9 +313,9 @@ const Dashboard = () => {
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
+            {/* <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader> */}
             <CCardBody className="content">
-              <CRow className="justify-content-space-around">
+              <CRow className="justify-content-space-around px-5 py-1">
                 <CCol xs={12} md={2} xl={2} className="count-col countallCol">
                   <div className="border-start border-start-4 border-start-error countAll py-1 px-3">
                     <div className="text-body-secondary text-truncate small ">All</div>
@@ -413,9 +413,8 @@ const Dashboard = () => {
               {/* <div className="mb-5"></div> */}
 
               <br />
-              <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
-
-                <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
+              <div className="table-container" style={{ height: '53rem', overflowY: 'auto', width: '100%' }}>
+              <CTable className="my-3 border vehiclesTable mt-0" hover responsive style={{ width: '100%' }}>
                   <CTableHead
                     className="text-nowrap"
                     style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
