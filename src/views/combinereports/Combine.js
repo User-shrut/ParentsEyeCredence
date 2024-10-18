@@ -207,7 +207,7 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
   const getAddress = async (latitude, longitude) => {
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=2`
       );
       if (response.data) {
         console.log('Fetched address:', response.data.display_name);  // Debugging: log the address
@@ -280,21 +280,21 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
                     row.vehicleStatus === 'Idle' ? (
                       <>
                         <CTooltip content="Idle">
-                          <img src='public/status/idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                          <img src='src\assets\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
                           {/* <span>Idle</span> */}
                         </CTooltip>
                       </>
                     ) : row.vehicleStatus === 'Ignition Off' ? (
                       <>
                         <CTooltip content="Ignition Off">
-                          <img src='public/status/power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                          <img src='src\assets\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
                           {/* <span>Ignition Off</span> */}
                         </CTooltip>
                       </>
                     ) : row.vehicleStatus === 'Ignition On' ? (
                       <>
                         <CTooltip content="Ignition On">
-                          <img src='public/status/power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                          <img src='src\assets\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
                           {/* <span>Ignition On</span> */}
                         </CTooltip>
                       </>

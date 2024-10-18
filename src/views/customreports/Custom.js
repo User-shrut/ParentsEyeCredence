@@ -195,7 +195,7 @@ const SearchDistance = ({ formData, handleInputChange, handleSubmit, groups, dev
   );
 };
 
-const ShowDistance = ({ apiData, selectedColumns }) => {
+const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
   const [addressData, setAddressData] = useState({});
   const [newAddressData, setnewAddressData] = useState()
   // Function to get address based on latitude and longitude using Nominatim API
@@ -252,52 +252,71 @@ const ShowDistance = ({ apiData, selectedColumns }) => {
   if (newAddressData) {
     console.log(newAddressData);
   }
+
+  allDates && console.log("yaha bhi sahi hai dates", allDates)
+
+  const calculateTotalDistance = (row) => {
+    return allDates.reduce((total, date) => {
+      const distance = parseFloat(row[date]) || 0; // Convert to float and handle 'undefined' values
+      return total + distance;
+    }, 0); // Initial total is 0
+  };
+
+  const findDeviceName = (deviceId) => {
+    const device = devices.find((d) => d.deviceId === deviceId.toString());
+    return device ? device.name : 'Unknown Device';
+  };
+
+ 
   return (
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>Vehicle</CTableHeaderCell>
           {/* Dynamically render table headers based on selected columns */}
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
+          
+          {allDates?.map((date, index) => (
+          <CTableHeaderCell key={index}>{date}</CTableHeaderCell>
+        ))}
+        <CTableHeaderCell>Total Distance</CTableHeaderCell>
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {apiData?.data && apiData.data.length > 0 ? (
-          apiData.data.map((row, rowIndex) => (
-            <CTableRow key={row.id} className="custom-row">
-              {/* <CTableDataCell>{rowIndex + 1}</CTableDataCell> */}
-              {/* Dynamically render table cells based on selected columns */}
-              {selectedColumns.map((column, index) => (
-                <CTableDataCell key={index}>
-                  {column === 'Vehicle Status' ? (
-                    
-                    row.vehicleStatus === 'Idle' ? (
-                      <>
-                      </>
-                    ) : null)
-                    : '--'}
-                </CTableDataCell>
-              ))}
-            </CTableRow>
-          ))
-        ) : (
-          <CTableRow>
-            <CTableDataCell colSpan={selectedColumns.length + 1}
-              style={{
-                backgroundColor: '#f8f9fa', // Light gray background
-                color: '#6c757d', // Darker text color
-                fontStyle: 'italic', // Italic font style
-                padding: '16px', // Extra padding for emphasis
-                textAlign: 'center', // Center the text
-                border: '1px dashed #dee2e6' // Dashed border to highlight it
-              }}
-            >
-              No data available
+      {apiData?.data && apiData.data.length > 0 ? (
+      apiData.data.map((row, rowIndex) => (
+        <CTableRow key={row.deviceId} className="custom-row">
+          <CTableDataCell>{findDeviceName(row.deviceId)}</CTableDataCell>
+          
+          {/* Dynamically render table cells based on the date range */}
+          {allDates.map((date, index) => (
+            <CTableDataCell key={index}>
+              {/* Check if the date exists in the row, otherwise print '0' */}
+              {row[date] !== undefined ? `${row[date]} km` : '0 km'}
             </CTableDataCell>
-          </CTableRow>
-        )}
+          ))}
+           <CTableDataCell>
+                {calculateTotalDistance(row).toFixed(2)}<span> km</span>
+              </CTableDataCell>
+          
+        </CTableRow>
+      ))
+    ) : (
+      <CTableRow>
+        <CTableDataCell
+          colSpan={allDates.length + 1}
+          style={{
+            backgroundColor: '#f8f9fa', // Light gray background
+            color: '#6c757d', // Darker text color
+            fontStyle: 'italic', // Italic font style
+            padding: '16px', // Extra padding for emphasis
+            textAlign: 'center', // Center the text
+            border: '1px dashed #dee2e6' // Dashed border to highlight it
+          }}
+        >
+          No data available
+        </CTableDataCell>
+      </CTableRow>
+    )}
       </CTableBody>
     </CTable>
   );
@@ -328,6 +347,36 @@ const Distance = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const token = Cookies.get('authToken'); //
   const [apiData, setApiData] = useState();   //data from api
+
+
+  const [allDates, setAllDates] = useState([]);
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-CA'); // This formats as YYYY-MM-DD
+  };
+
+  useEffect(() => {
+    // Function to generate an array of dates between startDate and endDate
+    const generateDateArray = (start, end) => {
+      const arr = [];
+      let currentDate = new Date(start);
+      const lastDate = new Date(end);
+
+      while (currentDate <= lastDate) {
+        arr.push(formatDate(new Date(currentDate))); // Format date and add to array
+        currentDate.setDate(currentDate.getDate() + 1); // Increment date by one day
+      }
+
+      return arr;
+    };
+
+    // Ensure the dates are valid and create the date array
+    if (formData.FromDate && formData.ToDate) {
+      const dates = generateDateArray(formData.FromDate, formData.ToDate);
+      setAllDates(dates);
+      console.log("All formatted dates: ", dates);
+    }
+  }, [formData.FromDate, formData.ToDate]);
+  
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
@@ -456,7 +505,7 @@ const Distance = () => {
                 />
               </CCardHeader>
               <CCardBody>
-                <ShowDistance apiData={apiData} selectedColumns={selectedColumns} />
+                <ShowDistance apiData={apiData} allDates={allDates} devices={devices} selectedColumns={selectedColumns} />
               </CCardBody>
             </CCard>
           </CCol>
