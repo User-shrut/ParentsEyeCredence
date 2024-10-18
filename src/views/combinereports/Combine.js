@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   CButton,
   CCard,
@@ -18,10 +18,19 @@ import {
   CFormLabel,
   CFormFeedback,
   CTooltip,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
 } from '@coreui/react';
 import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import CIcon from '@coreui/icons-react';
+import { cilSettings } from '@coreui/icons';
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
 
 const SearchStatus = ({ formData, handleInputChange, handleSubmit, groups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -257,100 +266,217 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
   if (newAddressData) {
     console.log(newAddressData);
   }
-  return (
-    <CTable borderless className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          <CTableHeaderCell>SN</CTableHeaderCell>
-          {/* Dynamically render table headers based on selected columns */}
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
-      <CTableBody>
-        {apiData?.data && apiData.data.length > 0 ? (
-          apiData.data.map((row, rowIndex) => (
-            <CTableRow key={row.id} className="custom-row">
-              <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-              {/* Dynamically render table cells based on selected columns */}
-              {selectedColumns.map((column, index) => (
-                <CTableDataCell key={index}>
-                  {column === 'Vehicle Status' ? (
-                    row.vehicleStatus === 'Idle' ? (
-                      <>
-                        <CTooltip content="Idle">
-                          <img src='src\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
-                          {/* <span>Idle</span> */}
-                        </CTooltip>
-                      </>
-                    ) : row.vehicleStatus === 'Ignition Off' ? (
-                      <>
-                        <CTooltip content="Ignition Off">
-                          <img src='src\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
-                          {/* <span>Ignition Off</span> */}
-                        </CTooltip>
-                      </>
-                    ) : row.vehicleStatus === 'Ignition On' ? (
-                      <>
-                        <CTooltip content="Ignition On">
-                          <img src='src\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
-                          {/* <span>Ignition On</span> */}
-                        </CTooltip>
-                      </>
-                    ) : null)
-                    : column === 'Start Date Time'
-                      ? `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
-                      : column === 'Start Address'
-                        ? newAddressData?.startAddress || 'Fetching...'
-                        : column === 'End Date Time'
-                          ? `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
-                          : column === 'Distance'
-                            ? row.distance
-                            : column === 'Total Distance'
-                              ? (row.distance / 1000).toFixed(2) + ' km'
-                              // : column === 'Maximum Speed'
-                              //   ? row.maxSpeed
-                              : column === 'End Address'
-                                ? newAddressData?.endAddress || 'Fetching...'
-                                : column === 'Driver Name'
-                                  ? row.driverInfos?.driverName || '--'
-                                  : column === 'Driver Phone No.'
-                                    ? row.device?.name || '--'
-                                    : column === 'Vehicle Status'
-                                      ? row.vehicleStatus
-                                      : column === 'Duration'
-                                        ? row.time
-                                        // : column === 'Average Speed'
-                                        //   ? row.averageSpeed
-                                        : column === 'Start Coordinates'
-                                          ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
 
-                                          : column === 'End Coordinates'
-                                            ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-                                            : '--'}
-                </CTableDataCell>
-              ))}
-            </CTableRow>
-          ))
-        ) : (
+  const exportToExcel = () => {
+    const dataToExport = apiData.data.map((row, rowIndex) => {
+      const rowData = selectedColumns.reduce((acc, column) => {
+        if (column === 'Vehicle Status') {
+          if (row.vehicleStatus === 'Idle') {
+            acc[column] = 'Idle';
+          } else if (row.vehicleStatus === 'Ignition Off') {
+            acc[column] = 'Ignition Off';
+          } else if (row.vehicleStatus === 'Ignition On') {
+            acc[column] = 'Ignition On';
+          } else {
+            acc[column] = '--';
+          }
+        } else if (column === 'Start Date Time') {
+          acc[column] = `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+        } else if (column === 'End Date Time') {
+          acc[column] = `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+        } else if (column === 'Start Address') {
+          acc[column] = newAddressData?.startAddress || 'Fetching...';
+        } else if (column === 'End Address') {
+          acc[column] = newAddressData?.endAddress || 'Fetching...';
+        } else if (column === 'Distance') {
+          acc[column] = row.distance;
+        } else if (column === 'Total Distance') {
+          acc[column] = (row.distance / 1000).toFixed(2) + ' km';
+        } else if (column === 'Driver Name') {
+          acc[column] = row.driverInfos?.driverName || '--';
+        } else if (column === 'Driver Phone No.') {
+          acc[column] = row.device?.name || '--';
+        } else if (column === 'Duration') {
+          acc[column] = row.time;
+        } else if (column === 'Start Coordinates') {
+          acc[column] = `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
+        } else if (column === 'End Coordinates') {
+          acc[column] = `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
+        } else {
+          acc[column] = row[column] || '--'; // Fallback for other columns
+        }
+        return acc;
+      }, {});
+
+      return { SN: rowIndex + 1, ...rowData };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+    XLSX.writeFile(workbook, 'table_data.xlsx');
+  };
+
+
+  // Function to export table data to PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = ['SN',"devices", ...selectedColumns];
+    const tableRows = apiData.data.map((row, rowIndex) => {
+      const rowData = selectedColumns.map((column) => {
+        if (column === 'Vehicle Status') {
+          if (row.vehicleStatus === 'Idle') return 'Idle';
+          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off';
+          if (row.vehicleStatus === 'Ignition On') return 'Ignition On';
+          return '--';
+        } else if (column === 'Start Date Time') {
+          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+        } else if (column === 'End Date Time') {
+          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+        } else if (column === 'Start Address') {
+          return newAddressData?.startAddress || 'Fetching...';
+        } else if (column === 'End Address') {
+          return newAddressData?.endAddress || 'Fetching...';
+        } else if (column === 'Distance') {
+          return row.distance;
+        } else if (column === 'Total Distance') {
+          return (row.distance / 1000).toFixed(2) + ' km';
+        } else if (column === 'Driver Name') {
+          return row.driverInfos?.driverName || '--';
+        } else if (column === 'Driver Phone No.') {
+          return row.device?.name || '--';
+        } else if (column === 'Duration') {
+          return row.time;
+        } else if (column === 'Start Coordinates') {
+          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
+        } else if (column === 'End Coordinates') {
+          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
+        } else {
+          return row[column] || '--'; // Fallback for other columns
+        }
+      });
+      return [rowIndex + 1, ...rowData];
+    });
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save('table_data.pdf');
+  };
+
+
+  return (
+    <>
+
+      <CTable borderless className="custom-table">
+        <CTableHead>
           <CTableRow>
-            <CTableDataCell colSpan={selectedColumns.length + 1}
-              style={{
-                backgroundColor: '#f8f9fa', // Light gray background
-                color: '#6c757d', // Darker text color
-                fontStyle: 'italic', // Italic font style
-                padding: '16px', // Extra padding for emphasis
-                textAlign: 'center', // Center the text
-                border: '1px dashed #dee2e6' // Dashed border to highlight it
-              }}
-            >
-              No data available
-            </CTableDataCell>
+            <CTableHeaderCell>SN</CTableHeaderCell>
+            {/* Dynamically render table headers based on selected columns */}
+            {selectedColumns.map((column, index) => (
+              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+            ))}
           </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
+        </CTableHead>
+        <CTableBody>
+          {apiData?.data && apiData.data.length > 0 ? (
+            apiData.data.map((row, rowIndex) => (
+              <CTableRow key={row.id} className="custom-row">
+                <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                {/* Dynamically render table cells based on selected columns */}
+                {selectedColumns.map((column, index) => (
+                  <CTableDataCell key={index}>
+                    {column === 'Vehicle Status' ? (
+                      row.vehicleStatus === 'Idle' ? (
+                        <>
+                          <CTooltip content="Idle">
+                            <img src='src\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                            {/* <span>Idle</span> */}
+                          </CTooltip>
+                        </>
+                      ) : row.vehicleStatus === 'Ignition Off' ? (
+                        <>
+                          <CTooltip content="Ignition Off">
+                            <img src='src\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                            {/* <span>Ignition Off</span> */}
+                          </CTooltip>
+                        </>
+                      ) : row.vehicleStatus === 'Ignition On' ? (
+                        <>
+                          <CTooltip content="Ignition On">
+                            <img src='src\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                            {/* <span>Ignition On</span> */}
+                          </CTooltip>
+                        </>
+                      ) : null)
+                      : column === 'Start Date Time'
+                        ? `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
+                        : column === 'Start Address'
+                          ? newAddressData?.startAddress || 'Fetching...'
+                          : column === 'End Date Time'
+                            ? `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
+                            : column === 'Distance'
+                              ? row.distance
+                              : column === 'Total Distance'
+                                ? (row.distance / 1000).toFixed(2) + ' km'
+                                // : column === 'Maximum Speed'
+                                //   ? row.maxSpeed
+                                : column === 'End Address'
+                                  ? newAddressData?.endAddress || 'Fetching...'
+                                  : column === 'Driver Name'
+                                    ? row.driverInfos?.driverName || '--'
+                                    : column === 'Driver Phone No.'
+                                      ? row.device?.name || '--'
+                                      : column === 'Vehicle Status'
+                                        ? row.vehicleStatus
+                                        : column === 'Duration'
+                                          ? row.time
+                                          // : column === 'Average Speed'
+                                          //   ? row.averageSpeed
+                                          : column === 'Start Coordinates'
+                                            ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+
+                                            : column === 'End Coordinates'
+                                              ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
+                                              : '--'}
+                  </CTableDataCell>
+                ))}
+              </CTableRow>
+            ))
+          ) : (
+            <CTableRow>
+              <CTableDataCell colSpan={selectedColumns.length + 1}
+                style={{
+                  backgroundColor: '#f8f9fa', // Light gray background
+                  color: '#6c757d', // Darker text color
+                  fontStyle: 'italic', // Italic font style
+                  padding: '16px', // Extra padding for emphasis
+                  textAlign: 'center', // Center the text
+                  border: '1px dashed #dee2e6' // Dashed border to highlight it
+                }}
+              >
+                No data available
+              </CTableDataCell>
+            </CTableRow>
+          )}
+        </CTableBody>
+      </CTable>
+
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          {/* <CDropdownItem onClick={handlePrintTable} >Print</CDropdownItem> */}
+        </CDropdownMenu>
+      </CDropdown>
+
+    </>
+
   );
 };
 
@@ -470,6 +596,8 @@ const Status = () => {
     }
   };
 
+
+
   return (
     <>
       <CRow className="pt-3">
@@ -497,25 +625,32 @@ const Status = () => {
         </CCol>
       </CRow>
       {showMap && (
-        <CRow className="justify-content-center mt-4">
-          <CCol xs={12} className="px-4">
-            <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-                <strong>All Combine Report List {selectedDeviceName && `for ${selectedDeviceName}`}</strong> {/* Show the device name here */}
-                <CFormInput
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ width: '250px' }}
-                />
-              </CCardHeader>
-              <CCardBody>
-                <ShowStatus apiData={apiData} selectedColumns={selectedColumns} />
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
+        <>
+          <CRow className="justify-content-center mt-4">
+            <CCol xs={12} className="px-4">
+              <CCard className="p-0 mb-4 shadow-sm">
+                <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                  <strong>All Combine Report List {selectedDeviceName && `for ${selectedDeviceName}`}</strong> {/* Show the device name here */}
+                  <CFormInput
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ width: '250px' }}
+                  />
+                </CCardHeader>
+                <CCardBody>
+                  <ShowStatus apiData={apiData} selectedColumns={selectedColumns} />
+                </CCardBody>
+              </CCard>
+            </CCol>
+          </CRow>
+
+
+
+        </>
       )}
+
+
     </>
   );
 };
