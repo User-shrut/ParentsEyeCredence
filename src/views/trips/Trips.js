@@ -17,10 +17,16 @@ import {
   CRow,
   CFormLabel,
   CFormFeedback,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
 } from '@coreui/react';
 import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import CIcon from '@coreui/icons-react';
+import { cilSettings } from '@coreui/icons';
 
 const SearchTrip = ({ formData, handleInputChange, handleSubmit, groups, loading, devices, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -265,6 +271,7 @@ const TripTable = ({ apiData, selectedColumns }) => {
   }, [apiData]);
 
   return (
+    <>
     <CTable borderless className="custom-table">
       <CTableHead>
         <CTableRow>
@@ -344,6 +351,23 @@ const TripTable = ({ apiData, selectedColumns }) => {
         )}
       </CTableBody>
     </CTable>
+
+    <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem  >PDF</CDropdownItem>
+          <CDropdownItem  >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
+
+
+    </>
   );
 };
 
