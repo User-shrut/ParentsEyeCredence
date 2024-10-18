@@ -48,7 +48,7 @@ import './AppHeader.css'
 import TableColumnVisibility from './TableColumnVisibility.js'
 import NotificationDropdown from './header/NotificationDropdown.js'
 import { io } from 'socket.io-client';
-import notificationSound from '../../public/Google_Event.mp3';
+import notificationSound from '../../src/Google_Event.mp3';
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 

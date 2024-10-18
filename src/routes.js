@@ -24,6 +24,7 @@ const Trips = React.lazy(() => import('./views/trips/Trips'))
 const Statistics = React.lazy(() => import('./views/statistics/Statistics'))
 const Schedules = React.lazy(() => import('./views/schedules-reports/Schedules'))
 const Alerts = React.lazy(() => import('./views/alerts-events/Alerts'))
+const Day = React.lazy(() => import('./views/dayreports/Day'))
 const Summary = React.lazy(() => import('./views/summary/Summary'))
 const Customchart = React.lazy(() => import('./views/customchart/Customchart'))
 
@@ -66,6 +67,7 @@ const routes = [
   { path: '/idlereport', name: 'Statistics', element: Statistics },
   { path: '/sensorreports', name: 'Schedule', element: Schedules },
   { path: '/alerts-events', name: 'Alerts', element: Alerts },
+  { path: '/dayreport', name: 'Day Report', element: Day },  
   { path: '/vehiclereport', name: 'Summary', element: Summary },
   { path: '/geofencereport', name: 'Geofence Report', element: Customchart},
   { path: '/invoice', name: 'Invoice', element: InvoiceForm },
