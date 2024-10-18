@@ -224,7 +224,7 @@ const Driver = () => {
     const fetchDevices = async () => {
       console.log("fetch device me aaya hu...");
       try {
-        const response = await fetch('https://credence-tracker.onrender.com/device', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/device`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

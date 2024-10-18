@@ -21,7 +21,7 @@ import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
+const SearchStop = ({ formData, handleInputChange, handleSubmit, groups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [buttonText, setButtonText] = useState('SHOW NOW');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -70,6 +70,26 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
   return (
     <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
       <CCol md={3}>
+        <CFormLabel htmlFor="devices">Groups</CFormLabel>
+        <CFormSelect
+          id="group"
+          required
+          onChange={(e) => {
+            const selectedGroup = e.target.value;
+            console.log("Selected Group ID:", selectedGroup);
+            getDevices(selectedGroup);
+          }}
+        >
+          <option value="">Choose a group...</option>
+          {groups.map((group) => (
+            <option key={group._id} value={group._id}>
+              {group.name}
+            </option>
+          ))}
+        </CFormSelect>
+        <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
+      </CCol>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -78,15 +98,17 @@ const SearchStop = ({ formData, handleInputChange, handleSubmit, devices, column
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices.length > 0 ? (
-            devices.map((device) => (
-              <option key={device.id} value={device.deviceId}>
-                {device.name}
-              </option>
-            ))
-          ) : (
-            <option disabled>Loading devices...</option>
-          )}
+          {loading ? (<option>Loading devices...</option>) : (
+            devices?.length > 0 ? (
+              devices?.map((device) => (
+                <option key={device.id} value={device.deviceId}>{device.name}</option>
+              ))
+            ) : (
+              <option disabled>No Device in this Group</option>
+            )
+          )
+          }
+
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -246,26 +268,26 @@ const StopTable = ({ apiData, selectedColumns }) => {
                     // Show direction (course)
                     (row.course < 90 && row.course > 0) ? (
                       <>
-                        <img src="public/direction/up-right-arrow.gif" alt="North East" width="30" height="25" />
+                        <img src="src/direction/up-right-arrow.gif" alt="North East" width="30" height="25" />
                         <span>North East</span>
                       </>
                     ) : (row.course > 90 && row.course < 180) ? (
                       <>
-                        <img src="public/direction/up-left-arrow.gif" alt="North West" width="30" height="25" />
+                        <img src="src/direction/up-left-arrow.gif" alt="North West" width="30" height="25" />
                         <span>North West</span>
                       </>
                     ) : (row.course > 180 && row.course < 270) ? (
                       <>
-                        <img src="public/direction/down-left-arrow.gif" alt="South West" width="30" height="25" />
+                        <img src="src/direction/down-left-arrow.gif" alt="South West" width="30" height="25" />
                         <span>South West</span>
                       </>
                     ) : (
                       <>
-                        <img src="public/direction/down-right-arrow.gif" alt="South East" width="30" height="25" />
+                        <img src="src/direction/down-right-arrow.gif" alt="South East" width="30" height="25" />
                         <span>South East</span>
                       </>
                     )
-                  
+
                   ) : column === 'Location' ? (
                     // Show location
                     locationData[rowIndex] || 'Fetching location...'
@@ -313,34 +335,58 @@ const StopTable = ({ apiData, selectedColumns }) => {
 const Stops = () => {
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
+  const [groups, setGroups] = useState([]);
   const [devices, setDevices] = useState([]);
-  const [columns] = useState(['Speed', 'Ignition', 'Direction','Location', 'Arrival Time', 'Departure Time',]);
+  const [loading, setLoading] = useState(false);
+  const [columns] = useState(['Speed', 'Ignition', 'Direction', 'Location', 'Arrival Time', 'Departure Time',]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
   const token = Cookies.get('authToken'); //token
   const [apiData, setApiData] = useState();   //data from api
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const response = await fetch('https://credence-tracker.onrender.com/device', {
-          method: 'GET',
+  const getDevices = async (selectedGroup) => {
+    const accessToken = Cookies.get('authToken');
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + accessToken,
           },
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data)
-        setDevices(data.devices); // Assuming the data returned contains device info
-      } catch (error) {
-        console.error('Error fetching devices:', error);
+        },
+      )
+      if (response.data.success) {
+        setDevices(response.data.data)
+        setLoading(false);
       }
-    };
-    fetchDevices();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setDevices([]);
+      setLoading(false);
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  const getGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      })
+      if (response.data) {
+        setGroups(response.data.groups)
+        console.log("yaha tak thik hai")
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  useEffect(() => {
+    getGroups();
+  }, [])
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -397,6 +443,9 @@ const Stops = () => {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                groups={groups}
+                getDevices={getDevices}
+                loading={loading}
                 devices={devices}
                 columns={columns}
                 showMap={showMap}

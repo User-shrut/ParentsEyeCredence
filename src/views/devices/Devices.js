@@ -135,55 +135,6 @@ const Devices = () => {
     }
   }
 
- 
-
-  // const handleEditSubmit = async () => {
-  //   if (!selectedRow) {
-  //     alert('No row selected for editing')
-  //     return
-  //   }
-
-  //   const apiUrl = `https://credence-tracker.onrender.com/device/${selectedRow._id}`
-
-  //   // Exclude the 'isSelected' field from formData
-  //   const { isSelected, ...updatedData } = formData
-
-  //   try {
-  //     console.log('Sending request to:', apiUrl)
-  //     console.log('Request payload:', JSON.stringify(updatedData, null, 2))
-
-  //     const response = await fetch(apiUrl, {
-  //       method: 'PUT',
-  //       headers: {
-  //         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJkZXZpY2VsaW1pdCI6ZmFsc2UsIl9pZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsImVtYWlsIjoieWFzaEBnbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYiQxMCRCSHp0NnU0YnA0TTVLeFlhcDlTbFh1NDdyVWJ1S2xWVC9KUVZSTERscVBxVjgvUDc5OVdvaSIsInVzZXJuYW1lIjoieWFzaCIsImNyZWF0ZWRCeSI6IjY2ZjI4NDcwZGU4ZGRlMDVmNzRhN2Q5OCIsIm5vdGlmaWNhdGlvbiI6dHJ1ZSwiZGV2aWNlcyI6dHJ1ZSwiZHJpdmVyIjp0cnVlLCJncm91cHMiOnRydWUsImNhdGVnb3J5Ijp0cnVlLCJtb2RlbCI6dHJ1ZSwidXNlcnMiOnRydWUsInJlcG9ydCI6dHJ1ZSwic3RvcCI6dHJ1ZSwidHJpcHMiOnRydWUsImdlb2ZlbmNlIjp0cnVlLCJtYWludGVuYW5jZSI6dHJ1ZSwicHJlZmVyZW5jZXMiOnRydWUsImNvbWJpbmVkUmVwb3J0cyI6dHJ1ZSwiY3VzdG9tUmVwb3J0cyI6dHJ1ZSwiaGlzdG9yeSI6dHJ1ZSwic2NoZWR1bGVyZXBvcnRzIjp0cnVlLCJzdGF0aXN0aWNzIjp0cnVlLCJhbGVydHMiOnRydWUsInN1bW1hcnkiOnRydWUsImN1c3RvbUNoYXJ0cyI6dHJ1ZSwiX192IjowfSwiaWF0IjoxNzI3MzQ0OTc2fQ.yYjpV596hRjy4FuGzeBaUfZuNJ3LbUQL2XwyR0-6tsE`,
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(updatedData),
-  //     })
-
-  //     if (!response.ok) {
-  //       const errorResult = await response.json()
-  //       throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorResult.message}`)
-  //     }
-
-  //     const result = await response.json()
-  //     console.log('Update successful:', result)
-  //     alert('Updated successfully')
-
-  //     // Update local state with the modified row data
-  //     const updatedRows = rows.map((row) =>
-  //       row.id === selectedRow.id ? { ...row, ...updatedData } : row,
-  //     )
-  //     // Assuming you have a setFilteredRows or similar to update the state
-  //     setFilteredRows(updatedRows)
-
-  //     setEditModalOpen(false)
-  //     fetchData() // Refetch data to ensure the UI is up-to-date
-  //   } catch (error) {
-  //     console.error('Error updating row:', error.message)
-  //     alert('Error updating data')
-  //   }
-  // }
   const [rows, setRows] = useState([])
 
   // ###################### Fetch device Data ######################

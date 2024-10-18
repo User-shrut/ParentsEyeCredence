@@ -13,7 +13,7 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
 // Base API URL for CRUD operations
-const API_URL = 'https://credence-tracker.onrender.com/category';
+const API_URL = `${import.meta.env.VITE_API_URL}/category`;
 
 const Category = () => {
   const [data, setData] = useState([]); // Data from API
@@ -134,31 +134,6 @@ const Category = () => {
       console.error('Error adding category via axios:', error);
       toast.error("Error adding category  ."); // Show error alert for axios request
     }
-
-    // try {
-    //   // Fetch the latest category data from another API
-    //   const response = await fetch('https://credence-tracker.onrender.com/category', requestOptions);
-
-    //   if (!response.ok) {
-    //     throw new Error('Network response was not ok');
-    //   }
-
-    //   const newCategory = await response.json(); // Parse the JSON response
-    //   console.log('Add Form Submitted Successfully:', newCategory);
-
-    //   // Ensure you're correctly accessing categoryName
-    //   if (newCategory && newCategory.categoryName) {
-    //     // Update the data and filteredData states with the new category
-    //     setData((prevData) => [...prevData, newCategory]); // Add new category to the data
-    //     setFilteredData((prevFilteredData) => [...prevFilteredData, newCategory]); // Add new category to the filtered data
-    //     alert('Fetched new category data successfully!'); // Show success alert for fetch
-    //   }
-
-    //   handleAddModalClose(); // Close modal after successful submission
-    // } catch (error) {
-    //   console.error('Error adding category via fetch:', error);
-    // }
-
   };
 
 
@@ -183,7 +158,7 @@ const Category = () => {
     }
 
     // Use _id instead of id if that's your identifier
-    const apiUrl = `https://credence-tracker.onrender.com/category/${selectedRow._id}`;
+    const apiUrl = `${import.meta.env.VITE_API_URL}/category/${selectedRow._id}`;
     // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOmZhbHNlLCJkZXZpY2VzIjpmYWxzZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOmZhbHNlLCJzdG9wIjpmYWxzZSwidHJpcHMiOnRydWUsImdlb2ZlbmNlIjpmYWxzZSwibWFpbnRlbmFuY2UiOmZhbHNlLCJwcmVmZXJlbmNlcyI6ZmFsc2UsImNvbWJpbmVkUmVwb3J0cyI6ZmFsc2UsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5IjpmYWxzZSwic2NoZWR1bGVyZXBvcnRzIjpmYWxzZSwic3RhdGlzdGljcyI6ZmFsc2UsImFsZXJ0cyI6ZmFsc2UsInN1bW1hcnkiOmZhbHNlLCJjdXN0b21DaGFydHMiOmZhbHNlLCJfX3YiOjB9LCJpYXQiOjE3MjcxNzQzMjh9.mZcaQCnOwFXUm4E91VIzo2txOxV9OQs06rZ9wgV1-V8'; // Ensure the token is correct
 
     // Exclude the 'isSelected' field from formData
@@ -246,7 +221,7 @@ const Category = () => {
 
         // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZjI4YzVmMjgzZDg4NGQzYTQzZTcyMyIsInVzZXJzIjp0cnVlLCJzdXBlcmFkbWluIjpmYWxzZSwidXNlciI6eyJfaWQiOiI2NmYyOGM1ZjI4M2Q4ODRkM2E0M2U3MjMiLCJlbWFpbCI6Inlhc2hAZ21haWwuY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkQkh6dDZ1NGJwNE01S3hZYXA5U2xYdTQ3clVidUtsVlQvSlFWUkxEbHFQcVY4L1A3OTlXb2kiLCJ1c2VybmFtZSI6Inlhc2giLCJjcmVhdGVkQnkiOiI2NmYyODQ3MGRlOGRkZTA1Zjc0YTdkOTgiLCJub3RpZmljYXRpb24iOmZhbHNlLCJkZXZpY2VzIjpmYWxzZSwiZHJpdmVyIjpmYWxzZSwiZ3JvdXBzIjpmYWxzZSwiY2F0ZWdvcnkiOmZhbHNlLCJtb2RlbCI6ZmFsc2UsInVzZXJzIjp0cnVlLCJyZXBvcnQiOmZhbHNlLCJzdG9wIjpmYWxzZSwidHJpcHMiOnRydWUsImdlb2ZlbmNlIjpmYWxzZSwibWFpbnRlbmFuY2UiOmZhbHNlLCJwcmVmZXJlbmNlcyI6ZmFsc2UsImNvbWJpbmVkUmVwb3J0cyI6ZmFsc2UsImN1c3RvbVJlcG9ydHMiOmZhbHNlLCJoaXN0b3J5IjpmYWxzZSwic2NoZWR1bGVyZXBvcnRzIjpmYWxzZSwic3RhdGlzdGljcyI6ZmFsc2UsImFsZXJ0cyI6ZmFsc2UsInN1bW1hcnkiOmZhbHNlLCJjdXN0b21DaGFydHMiOmZhbHNlLCJfX3YiOjB9LCJpYXQiOjE3MjcxNzQzMjh9.mZcaQCnOwFXUm4E91VIzo2txOxV9OQs06rZ9wgV1-V8'; // Encode credentials in Base64
 
-        const response = await fetch(`https://credence-tracker.onrender.com/category/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/category/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

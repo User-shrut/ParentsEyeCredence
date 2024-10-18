@@ -76,7 +76,7 @@ const Model = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://credence-tracker.onrender.com/model', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/model`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -138,7 +138,7 @@ const Model = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('https://credence-tracker.onrender.com/model', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/model`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ const Model = () => {
     if (!currentItemId) return;
 
     try {
-      const response = await axios.put(`https://credence-tracker.onrender.com/model/${currentItemId}`, formData, {
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/model/${currentItemId}`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -189,7 +189,7 @@ const Model = () => {
   const handleDeleteSelected = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        await axios.delete(`https://credence-tracker.onrender.com/model/${id}`, {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/model/${id}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
