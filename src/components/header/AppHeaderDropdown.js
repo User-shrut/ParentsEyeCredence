@@ -37,6 +37,11 @@ const AppHeaderDropdown = () => {
   }else{
     navigate('/login');
   }
+
+  const logoutFunc = () => {
+    Cookies.remove('authToken')
+    navigate('/login')
+  }
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 fs-5 pe-0" caret={false}>
@@ -54,7 +59,7 @@ const AppHeaderDropdown = () => {
           <BiSupport className="me-3 fs-5" />
           Help & Support
         </CDropdownItem>
-        <CDropdownItem href="/#/login">
+        <CDropdownItem onClick={logoutFunc}>
           <CgLogOut className="me-3 fs-5" />
           Logout
         </CDropdownItem>

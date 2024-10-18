@@ -41,6 +41,7 @@ import {
 } from '@coreui/react';
 import Loader from '../../components/Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
+import { IoMdAdd } from 'react-icons/io';
 
 
 const Model = () => {
@@ -234,9 +235,6 @@ const Model = () => {
 
       {/* Table */}
       <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-        {loading ? ( // Show Loader when data is being fetched
-          <Loader /> // Replace this with your actual Loader component
-        ) : (
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
               <CTableRow>
@@ -245,7 +243,26 @@ const Model = () => {
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {Array.isArray(filteredData) && filteredData.length > 0 ? (
+              { loading ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="15" className="text-center">
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                    </div>
+                  </CTableDataCell>
+                </CTableRow>
+              ) : ( filteredData.length < 0 ? (
                 filteredData.map((item) => (
                   <CTableRow key={item._id}>
                     <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
@@ -268,12 +285,33 @@ const Model = () => {
                 ))
               ) : (
                 <CTableRow>
-                  <CTableDataCell colSpan={2} className="text-center">No data available</CTableDataCell>
+                  <CTableDataCell colSpan="2" className="text-center">
+                    <div
+                      className="d-flex flex-column justify-content-center align-items-center"
+                      style={{ height: '200px' }}
+                    >
+                      <p className="mb-0 fw-bold">
+                        "Oops! Looks like there's No Model available.
+                        <br /> Maybe it's time to create new Model!"
+                      </p>
+                      <div>
+                        <button
+                          onClick={() => setAddModalOpen(true)}
+                          variant="contained"
+                          className="btn btn-primary m-3 text-white"
+                        >
+                          <span>
+                            <IoMdAdd className="fs-5" />
+                          </span>{' '}
+                          Add Model
+                        </button>
+                      </div>
+                    </div>
+                  </CTableDataCell>
                 </CTableRow>
-              )}
+              ))}
             </CTableBody>
           </CTable>
-        )}
       </TableContainer>
 
 

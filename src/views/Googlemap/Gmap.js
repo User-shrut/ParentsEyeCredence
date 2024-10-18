@@ -460,7 +460,7 @@ import { CTooltip } from '@coreui/react';
 
 const containerStyle = {
   width: '100%',
-  height: '740px',
+  height: '500px',
   borderRadius: '10px',
   overflow: 'hidden',
   position: 'relative',

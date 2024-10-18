@@ -54,6 +54,7 @@ import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
 
 const Users = () => {
+  // somthing for testing
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -145,15 +146,15 @@ const Users = () => {
       devices: false,
       driver: false,
       groups: false,
-      category: false,
-      model: false,
+      // category: false,
+      // model: false,
       users: false,
       report: false,
       stop: false,
       travel: false,
       geofence: false,
       maintenance: false,
-      preferences: false,
+      // preferences: false,
       status: false,
       distance: false,
       history: false,
@@ -161,6 +162,7 @@ const Users = () => {
       idle: false,
       alerts: false,
       vehicle: false,
+      geofenceReport: false,
     },
     isAdmin: false,
   })
@@ -335,15 +337,15 @@ const Users = () => {
         devices: userData.devices,
         driver: userData.driver, // userData uses 'driver' instead of 'drivers'
         groups: userData.groups,
-        category: userData.category,
-        model: userData.model,
+        // category: userData.category,
+        // model: userData.model,
         users: userData.users,
         report: userData.report,
         stop: userData.stop,
         travel: userData.travel,
         geofence: userData.geofence,
         maintenance: userData.maintenance,
-        preferences: userData.preferences,
+        // preferences: userData.preferences,
         status: userData.status,
         distance: userData.distance,
         history: userData.history,
@@ -579,9 +581,6 @@ const Users = () => {
                           'driver',
                           'notification',
                           'maintenance',
-                          'preferences',
-                          'category',
-                          'model',
                         ].map(
                           (permission) =>
                             item[permission] && (
@@ -831,9 +830,6 @@ const Users = () => {
                               'driver',
                               'maintenance',
                               'notification',
-                              'preferences',
-                              'category',
-                              'model',
                             ].map((permission) => (
                               <FormControlLabel
                                 key={permission}
@@ -906,9 +902,6 @@ const Users = () => {
                                 'driver',
                                 'maintenance',
                                 'notification',
-                                'preferences',
-                                'category',
-                                'model',
                               ]
                                 .filter((permission) => availablePermissions[permission])
                                 .map((permission) => (
@@ -1133,10 +1126,7 @@ const Users = () => {
                             'geofence',
                             'driver',
                             'maintenance',
-                            'notification',
-                            'preferences',
-                            'category',
-                            'model',
+                            'notification'
                           ].map((permission) => (
                             <FormControlLabel
                               key={permission}

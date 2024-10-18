@@ -44,7 +44,6 @@ const Group = () => {
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
 
-
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
@@ -89,7 +88,6 @@ const Group = () => {
       setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-
     }
   }
 
@@ -127,7 +125,7 @@ const Group = () => {
         setAddModalOpen(false)
       }
     } catch (error) {
-      toast.error("An error occured")
+      toast.error('An error occured')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -137,7 +135,7 @@ const Group = () => {
 
   const EditGroupSubmit = async (e) => {
     e.preventDefault()
-    console.log(formData);
+    console.log(formData)
     try {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
@@ -166,37 +164,31 @@ const Group = () => {
     console.log(item)
     setEditModalOpen(true)
     setFormData({ ...item })
-    console.log("this is before edit", formData)
+    console.log('this is before edit', formData)
   }
-
 
   // ###################################################################
 
-
   // ###################### Delete Group ##############################
 
-
   const deleteGroupSubmit = async (item) => {
-    alert("you want to delete this group");
+    alert('you want to delete this group')
     console.log(item)
 
     try {
       const accessToken = Cookies.get('authToken')
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/group/${item._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          },
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/group/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      )
+      })
 
       if (response.status === 200) {
         toast.error('group is deleted successfully')
         fetchGroupData()
       }
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error('An error occurred')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
@@ -205,7 +197,7 @@ const Group = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Groups</h2>
@@ -246,88 +238,88 @@ const Group = () => {
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-        {loading ? (
-          <>
-            <div className="text-nowrap mb-2" style={{ width: "480px" }}>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-              <p className="card-text placeholder-glow">
-                <span className="placeholder col-7" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-4" />
-                <span className="placeholder col-6" />
-                <span className="placeholder col-8" />
-              </p>
-            </div>
-          </>
-        ) : (
-          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Group Name
-                </CTableHeaderCell>
+        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Group Name
+              </CTableHeaderCell>
 
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Actions
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {data.length > 0 ? (
-                data?.map((item, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
-                    <CTableDataCell
-                      className="text-center d-flex p-0"
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
-                        <RiEdit2Fill
-                          style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
-                        />
-                      </IconButton>
-                      <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
-                      </IconButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))) : (
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Actions
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
+              <>
                 <CTableRow>
                   <CTableDataCell colSpan="2" className="text-center">
-                    <div
-                      className="d-flex flex-column justify-content-center align-items-center"
-                      style={{ height: '200px' }}
-                    >
-                      <p className="mb-0 fw-bold">
-                        "Oops! Looks like there's no device available.
-                        <br /> Maybe it's time to create some devices!"
+                    <div className="text-nowrap mb-2 text-center w-">
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
                       </p>
-                      <div>
-                        <button
-                          onClick={() => setAddModalOpen(true)}
-                          variant="contained"
-                          className="btn btn-primary m-3 text-white"
-                        >
-                          <span>
-                            <IoMdAdd className="fs-5" />
-                          </span>{' '}
-                          Add Group
-                        </button>
-                      </div>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
+                      <p className="card-text placeholder-glow">
+                        <span className="placeholder col-12" />
+                      </p>
                     </div>
                   </CTableDataCell>
-                </CTableRow>)}
-            </CTableBody>
-          </CTable>
-        )}
+                </CTableRow>
+              </>
+            ) : data.length > 0 ? (
+              data?.map((item, index) => (
+                <CTableRow key={index}>
+                  <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
+                  <CTableDataCell
+                    className="text-center d-flex p-0"
+                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
+                      <RiEdit2Fill
+                        style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
+                      />
+                    </IconButton>
+                    <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
+                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
+                    </IconButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan="2" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's no Groups available.
+                      <br /> Maybe it's time to create some Groups!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Add Group
+                      </button>
+                    </div>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
       </TableContainer>
       {pageCount > 1 && (
         <ReactPaginate
@@ -376,7 +368,7 @@ const Group = () => {
                 <TextField
                   label="Group Name"
                   name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
+                  value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
@@ -419,7 +411,7 @@ const Group = () => {
                 <TextField
                   label="Group Name"
                   name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
+                  value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
@@ -436,7 +428,6 @@ const Group = () => {
           </DialogContent>
         </Box>
       </Modal>
-
     </div>
   )
 }

@@ -135,7 +135,7 @@ const _nav = (role, decodedToken) => {
             component: CNavTitle,
             name: 'Manage',
           },
-          (devices || users || groups || geofence || driver || notification || preferences || maintenance || category || model) &&
+          (devices || users || groups || geofence || driver || notification || preferences || maintenance ) &&
           {
             component: CNavGroup,
             name: 'Master',
@@ -151,10 +151,8 @@ const _nav = (role, decodedToken) => {
               geofence && { component: CNavItem, name: 'Geofences', to: '/geofences' },
               driver && { component: CNavItem, name: 'Driver', to: '/driver' },
               notification && { component: CNavItem, name: 'Notifications', to: '/notifications' },
-              preferences && { component: CNavItem, name: 'Preferences', to: '/preferences' },
+              // preferences && { component: CNavItem, name: 'Preferences', to: '/preferences' },
               maintenance && { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
-              category && { component: CNavItem, name: 'Category', to: '/category' },
-              model && { component: CNavItem, name: 'Model', to: '/model' },
             ].filter(Boolean),
           },
           (status || distance || history || stop || travel || idle || sensor || alerts || vehicle || geofenceReport) &&
@@ -227,16 +225,7 @@ const _nav = (role, decodedToken) => {
         </div>
       ),
     },
-    {
-      component: CNavItem,
-      name: 'LogOut',
-      to: '/login',
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <BiLogOutCircle style={{ marginRight: '15px', fontSize: '23px' }} />
-        </div>
-      ),
-    },
+    
   ]
 }
 
