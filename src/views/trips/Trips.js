@@ -22,7 +22,7 @@ import Select from 'react-select';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
+const SearchTrip = ({ formData, handleInputChange, handleSubmit, groups, loading, devices, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [buttonText, setButtonText] = useState('SHOW NOW');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -83,6 +83,26 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
   return (
     <CForm className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleFormSubmit}>
       <CCol md={3}>
+        <CFormLabel htmlFor="devices">Groups</CFormLabel>
+        <CFormSelect
+          id="group"
+          required
+          onChange={(e) => {
+            const selectedGroup = e.target.value;
+            console.log("Selected Group ID:", selectedGroup);
+            getDevices(selectedGroup);
+          }}
+        >
+          <option value="">Choose a group...</option>
+          {groups.map((group) => (
+            <option key={group._id} value={group._id}>
+              {group.name}
+            </option>
+          ))}
+        </CFormSelect>
+        <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
+      </CCol>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -91,15 +111,17 @@ const SearchTrip = ({ formData, handleInputChange, handleSubmit, devices, column
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {devices.length > 0 ? (
-            devices.map((device) => (
-              <option key={device.id} value={device.deviceId}>
-                {device.name}
-              </option>
-            ))
-          ) : (
-            <option disabled>Loading devices...</option>
-          )}
+          {loading ? (<option>Loading devices...</option>) : (
+            devices?.length > 0 ? (
+              devices?.map((device) => (
+                <option key={device.id} value={device.deviceId}>{device.name}</option>
+              ))
+            ) : (
+              <option disabled>No Device in this Group</option>
+            )
+          )
+          }
+
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -210,10 +232,11 @@ const TripTable = ({ apiData, selectedColumns }) => {
   const getAddress = async (latitude, longitude) => {
     try {
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=2`
       );
       if (response.data) {
-        return response.data.display_name; // Adjust based on the response structure
+        console.log('Fetched address:', response.data.display_name);  // Debugging: log the address
+        return response.data.display_name; // Return display_name
       } else {
         console.error("Error fetching address: No data found");
         return 'Address not available';
@@ -223,6 +246,7 @@ const TripTable = ({ apiData, selectedColumns }) => {
       return 'Address not available';
     }
   };
+
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -329,7 +353,9 @@ const Trips = () => {
 
   const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
   const [searchQuery, setSearchQuery] = useState('');
+  const [groups, setGroups] = useState([]);
   const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [columns] = useState(['Start Time', 'End Time', 'Start Address', 'End Address', 'Distance', 'Total Distance', 'Average Speed', 'Maximum Speed', 'Duration',]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [showMap, setShowMap] = useState(false); //show mapping data
@@ -338,34 +364,54 @@ const Trips = () => {
   const [apiData, setApiData] = useState();   //data from api
 
 
-
+  const getGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      })
+      if (response.data) {
+        setGroups(response.data.groups)
+        console.log("yaha tak thik hai")
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
 
   useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const response = await fetch('https://credence-tracker.onrender.com/device', {
-          method: 'GET',
+    getGroups();
+  }, [])
+
+
+
+  const getDevices = async (selectedGroup) => {
+    const accessToken = Cookies.get('authToken');
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + accessToken,
           },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data)
-        setDevices(data.devices); // Assuming the data returned contains device info
-      } catch (error) {
-        console.error('Error fetching devices:', error);
+        },
+      )
+      if (response.data.success) {
+        setDevices(response.data.data)
+        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setDevices([]);
+      setLoading(false);
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
 
 
-    fetchDevices();
-
-  }, []);
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -442,7 +488,10 @@ const Trips = () => {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                groups={groups}
                 devices={devices}
+                loading={loading}
+                getDevices={getDevices}
                 columns={columns}
                 showMap={showMap}
                 setShowMap={setShowMap}
