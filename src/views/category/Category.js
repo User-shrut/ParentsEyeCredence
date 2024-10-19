@@ -43,7 +43,7 @@ const Category = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-
+  const [filteredData, setFilteredData] = useState([]);
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
@@ -88,9 +88,26 @@ const Category = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterCategory = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (category) =>
+          category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchCategoryData()
   }, [])
+
+  useEffect(() => {
+    filterCategory(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -269,8 +286,8 @@ const Category = () => {
                   </CTableDataCell>
                 </CTableRow>
               </>
-            ) : data.length > 0 ? (
-              data?.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center p-0">{item.categoryName}</CTableDataCell>
                   <CTableDataCell

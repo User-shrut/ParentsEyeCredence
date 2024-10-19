@@ -27,9 +27,9 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // For table in PDF
-import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable' // For table in PDF
+import * as XLSX from 'xlsx'
 
 const SearchIdeal = ({
   formData,
@@ -276,35 +276,47 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
     fetchDataWithAddresses()
   }, [apiData])
 
-   // PDF Download Function
-   const downloadPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = ['SN', ...selectedColumns];
-    const tableRows = [];
+  // PDF Download Function
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+    const tableColumn = ['SN', ...selectedColumns]
+    const tableRows = []
 
     dataWithAddresses.forEach((row, rowIndex) => {
       row.data.forEach((nestedRow, nestedIndex) => {
         const rowData = [
           rowIndex + 1,
           ...selectedColumns.map((column) => {
-            if (column === 'Vehicle Status') return nestedRow.vehicleStatus;
-            if (column === 'Duration') return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
-            if (column === 'Location') return nestedRow.address || nestedRow.location;
-            if (column === 'Arrival Time') return new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
-              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (column === 'Departure Time') return new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
-              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (column === 'Total Duration') return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
-            return '--';
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus
+            if (column === 'Duration')
+              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+            if (column === 'Location') return nestedRow.address || nestedRow.location
+            if (column === 'Arrival Time')
+              return new Date(
+                new Date(nestedRow.arrivalTime).setHours(
+                  new Date(nestedRow.arrivalTime).getHours() + 6,
+                  new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                ),
+              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            if (column === 'Departure Time')
+              return new Date(
+                new Date(nestedRow.departureTime).setHours(
+                  new Date(nestedRow.departureTime).getHours() + 6,
+                  new Date(nestedRow.departureTime).getMinutes() + 30,
+                ),
+              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            if (column === 'Total Duration')
+              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
+            return '--'
           }),
-        ];
-        tableRows.push(rowData);
-      });
-    });
+        ]
+        tableRows.push(rowData)
+      })
+    })
 
-    autoTable(doc, { head: [tableColumn], body: tableRows });
-    doc.save('ideal-table.pdf');
-  };
+    autoTable(doc, { head: [tableColumn], body: tableRows })
+    doc.save('ideal-table.pdf')
+  }
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -313,143 +325,173 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
         return row.data.map((nestedRow, nestedIndex) => {
           const rowData = {
             SN: rowIndex + 1,
-          };
+          }
           selectedColumns.forEach((column) => {
-            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus;
-            if (column === 'Duration') rowData['Duration'] = new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
-            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location;
-            if (column === 'Arrival Time') rowData['Arrival Time'] = new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
-              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (column === 'Departure Time') rowData['Departure Time'] = new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
-              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (column === 'Total Duration') rowData['Total Duration'] = new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
-          });
-          return rowData;
-        });
-      })
-    );
+            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus
+            if (column === 'Duration')
+              rowData['Duration'] = new Date(nestedRow.durationSeconds * 1000)
+                .toISOString()
+                .substr(11, 8)
+            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location
+            if (column === 'Arrival Time')
+              rowData['Arrival Time'] = new Date(
+                new Date(nestedRow.arrivalTime).setHours(
+                  new Date(nestedRow.arrivalTime).getHours() + 6,
+                  new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                ),
+              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            if (column === 'Departure Time')
+              rowData['Departure Time'] = new Date(
+                new Date(nestedRow.departureTime).setHours(
+                  new Date(nestedRow.departureTime).getHours() + 6,
+                  new Date(nestedRow.departureTime).getMinutes() + 30,
+                ),
+              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            if (column === 'Total Duration')
+              rowData['Total Duration'] = new Date(row.totalDurationSeconds * 1000)
+                .toISOString()
+                .substr(11, 8)
+          })
+          return rowData
+        })
+      }),
+    )
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData');
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData')
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
 
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
 
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'ideal-table.xlsx');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'ideal-table.xlsx')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <>
-    <CTable bordered className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          <CTableHeaderCell>SN</CTableHeaderCell>
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
-
-      <CTableBody>
-        {dataWithAddresses?.length > 0 ? (
-          dataWithAddresses.map((row, rowIndex) =>
-            row.data?.length > 0 ? (
-              row.data.map((nestedRow, nestedIndex) => (
-                <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                  <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-
-                  {selectedColumns.map((column, index) => (
-                    <CTableDataCell key={index}>
-                      {column === 'Vehicle Status'
-                        ? nestedRow.vehicleStatus
-                        : column === 'Duration'
-                          ? // Convert duration from seconds to HH:mm:ss format
-                            new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
-                          : column === 'Location'
-                            ? // Display address if available, otherwise fallback to location
-                              nestedRow.address || nestedRow.location
-                            : column === 'Arrival Time'
-                              ? // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
-                                new Date(
-                                  new Date(nestedRow.arrivalTime).setHours(
-                                    new Date(nestedRow.arrivalTime).getHours() + 6,
-                                    new Date(nestedRow.arrivalTime).getMinutes() + 30,
-                                  ),
-                                ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                              : column === 'Departure Time'
-                                ? // Add 6 hours 30 minutes to departureTime and format to HH:mm
-                                  new Date(
-                                    new Date(nestedRow.departureTime).setHours(
-                                      new Date(nestedRow.departureTime).getHours() + 6,
-                                      new Date(nestedRow.departureTime).getMinutes() + 30,
-                                    ),
-                                  ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                : column === 'Total Duration'
-                                  ? // Convert total duration from seconds to HH:mm:ss format
-                                    new Date(row.totalDurationSeconds * 1000)
-                                      .toISOString()
-                                      .substr(11, 8)
-                                  : '--'}
-                    </CTableDataCell>
-                  ))}
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow key={`${row.deviceId}-empty`}>
-                <CTableDataCell
-                  colSpan={selectedColumns.length + 1}
-                  style={{
-                    backgroundColor: '#f8f9fa',
-                    color: '#6c757d',
-                    fontStyle: 'italic',
-                    padding: '16px',
-                    textAlign: 'center',
-                    border: '1px dashed #dee2e6',
-                  }}
-                >
-                  No data available for {row.deviceId}
-                </CTableDataCell>
-              </CTableRow>
-            ),
-          )
-        ) : (
+      <CTable bordered className="custom-table">
+        <CTableHead>
           <CTableRow>
-            <CTableDataCell
-              colSpan={selectedColumns.length + 1}
-              style={{
-                backgroundColor: '#f8f9fa',
-                color: '#6c757d',
-                fontStyle: 'italic',
-                padding: '16px',
-                textAlign: 'center',
-                border: '1px dashed #dee2e6',
-              }}
-            >
-              Data is loading...
-            </CTableDataCell>
+            <CTableHeaderCell>SN</CTableHeaderCell>
+            {selectedColumns.map((column, index) => (
+              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+            ))}
           </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
+        </CTableHead>
 
-    <CDropdown className="position-fixed bottom-0 end-0 m-3">
-        <CDropdownToggle color="secondary" style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}>
+        <CTableBody>
+          {dataWithAddresses?.length > 0 ? (
+            dataWithAddresses.map((row, rowIndex) =>
+              row.data?.length > 0 ? (
+                row.data.map((nestedRow, nestedIndex) => (
+                  <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
+                    <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+
+                    {selectedColumns.map((column, index) => (
+                      <CTableDataCell key={index}>
+                        {column === 'Vehicle Status'
+                          ? nestedRow.vehicleStatus
+                          : column === 'Duration'
+                            ? // Convert duration from seconds to HH:mm:ss format
+                              new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+                            : column === 'Location'
+                              ? // Display address if available, otherwise fallback to location
+                                nestedRow.address || nestedRow.location
+                              : column === 'Arrival Time'
+                                ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
+                                  new Date(
+                                    new Date(nestedRow.arrivalTime).setHours(
+                                      new Date(nestedRow.arrivalTime).getHours() + 6,
+                                      new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                                    ),
+                                  ).toLocaleString([], {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                  })
+                                : column === 'Departure Time'
+                                  ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
+                                    new Date(
+                                      new Date(nestedRow.departureTime).setHours(
+                                        new Date(nestedRow.departureTime).getHours() + 6,
+                                        new Date(nestedRow.departureTime).getMinutes() + 30,
+                                      ),
+                                    ).toLocaleString([], {
+                                      year: 'numeric',
+                                      month: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      hour12: false,
+                                    })
+                                  : column === 'Total Duration'
+                                    ? // Convert total duration from seconds to HH:mm:ss format
+                                      new Date(row.totalDurationSeconds * 1000)
+                                        .toISOString()
+                                        .substr(11, 8)
+                                    : '--'}
+                      </CTableDataCell>
+                    ))}
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow key={`${row.deviceId}-empty`}>
+                  <CTableDataCell
+                    colSpan={selectedColumns.length + 1}
+                    style={{
+                      backgroundColor: '#f8f9fa',
+                      color: '#6c757d',
+                      fontStyle: 'italic',
+                      padding: '16px',
+                      textAlign: 'center',
+                      border: '1px dashed #dee2e6',
+                    }}
+                  >
+                    No data available for {row.deviceId}
+                  </CTableDataCell>
+                </CTableRow>
+              ),
+            )
+          ) : (
+            <CTableRow>
+              <CTableDataCell
+                colSpan={selectedColumns.length + 1}
+                style={{
+                  backgroundColor: '#f8f9fa',
+                  color: '#6c757d',
+                  fontStyle: 'italic',
+                  padding: '16px',
+                  textAlign: 'center',
+                  border: '1px dashed #dee2e6',
+                }}
+              >
+                Data is loading...
+              </CTableDataCell>
+            </CTableRow>
+          )}
+        </CTableBody>
+      </CTable>
+
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
           <CIcon icon={cilSettings} />
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={downloadPDF} >PDF</CDropdownItem>
-          <CDropdownItem  onClick={downloadExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={downloadPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={downloadExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-
     </>
   )
 }
@@ -464,11 +506,11 @@ const Ideal = () => {
     Columns: [],
   })
   const [searchQuery, setSearchQuery] = useState('')
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [showMap, setShowMap] = useState(false) //show mapping data
-  const accessToken = Cookies.get('authToken');
+  const accessToken = Cookies.get('authToken')
   const [columns] = useState([
     // 'OUID',
     'Vehicle Status',
@@ -484,54 +526,54 @@ const Ideal = () => {
 
   const [apiData, setApiData] = useState() //data from api
 
-   // Get the selected device name from the device list based on formData.Devices
-   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
-   const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
- 
-   const getDevices = async (selectedGroup) => {
-     const accessToken = Cookies.get('authToken');
-     setLoading(true);
-     try {
-       const response = await axios.get(
-         `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
-         {
-           headers: {
-             Authorization: 'Bearer ' + accessToken,
-           },
-         },
-       )
-       if (response.data.success) {
-         setDevices(response.data.data)
-         setLoading(false);
-       }
-     } catch (error) {
-       console.error('Error fetching data:', error)
-       setDevices([]);
-       setLoading(false);
-       throw error // Re-throw the error for further handling if needed
-     }
-   }
- 
-   const getGroups = async () => {
-     try {
-       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
-         headers: {
-           Authorization: 'Bearer ' + accessToken,
-         },
-       })
-       if (response.data) {
-         setGroups(response.data.groups)
-         console.log("yaha tak thik hai")
-       }
-     } catch (error) {
-       console.error('Error fetching data:', error)
-       throw error // Re-throw the error for further handling if needed
-     }
-   }
- 
-   useEffect(() => {
-     getGroups();
-   }, [])
+  // Get the selected device name from the device list based on formData.Devices
+  const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
+  const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
+
+  const getDevices = async (selectedGroup) => {
+    const accessToken = Cookies.get('authToken')
+    setLoading(true)
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      )
+      if (response.data.success) {
+        setDevices(response.data.data)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setDevices([])
+      setLoading(false)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  const getGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setGroups(response.data.groups)
+        console.log('yaha tak thik hai')
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
+
+  useEffect(() => {
+    getGroups()
+  }, [])
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -622,7 +664,9 @@ const Ideal = () => {
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-                <strong>All Idle Report List {selectedDeviceName && `for ${selectedDeviceName}`} </strong>
+                <strong>
+                  All Idle Report List {selectedDeviceName && `for ${selectedDeviceName}`}{' '}
+                </strong>
                 <CFormInput
                   placeholder="Search..."
                   value={searchQuery}

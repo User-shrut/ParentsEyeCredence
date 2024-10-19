@@ -94,11 +94,26 @@ const Model = () => {
     }
   };
 
-
+  // ##################### Filter data by search query #######################
+  const filterModels = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (model) =>
+          model.modelName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    filterModels(searchQuery);
+  }, [data, searchQuery]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
@@ -137,7 +152,7 @@ const Model = () => {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/model`, formData, {
         headers: {
@@ -145,19 +160,19 @@ const Model = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       setData((prevData) => [...prevData, response.data]);
       setFilteredData((prevFilteredData) => [...prevFilteredData, response.data]);
       handleAddModalClose();
       fetchData(); // Optional: Fetch fresh data
-      
+
       toast.success('Successfully Added Model!'); // Show success alert
     } catch (error) {
       console.error('Error adding category:', error);
       toast.error("This didn't work."); // Show error alert
     }
   };
-  
+
 
   // #### PUT EDIT ####
 
@@ -207,7 +222,7 @@ const Model = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} />
       {/* Header and Add Category button */}
       <div className="d-flex justify-content-between mb-2">
         <Typography variant="h4">Model</Typography>
@@ -235,83 +250,83 @@ const Model = () => {
 
       {/* Table */}
       <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-          <CTable align="middle" className="mb-0 border" hover responsive>
-            <CTableHead className="text-nowrap">
+        <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">Model Name</CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
               <CTableRow>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">Model Name</CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell>
+                <CTableDataCell colSpan="15" className="text-center">
+                  <div className="text-nowrap mb-2 text-center w-">
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                  </div>
+                </CTableDataCell>
               </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              { loading ? (
-                <CTableRow>
-                  <CTableDataCell colSpan="15" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
+            ) : (filteredData.length < 0 ? (
+              filteredData.map((item) => (
+                <CTableRow key={item._id}>
+                  <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
+                  <CTableDataCell className="text-center">
+                    {/* Row layout for the icons */}
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
+                      <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
+                        <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
+                      </IconButton>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteSelected(item._id)}
+                        sx={{ color: 'red' }}
+                      >
+                        <AiFillDelete style={{ fontSize: '25px' }} />
+                      </IconButton>
                     </div>
                   </CTableDataCell>
                 </CTableRow>
-              ) : ( filteredData.length < 0 ? (
-                filteredData.map((item) => (
-                  <CTableRow key={item._id}>
-                    <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      {/* Row layout for the icons */}
-                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
-                        <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
-                          <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
-                        </IconButton>
-                        <IconButton
-                          aria-label="delete"
-                          onClick={() => handleDeleteSelected(item._id)}
-                          sx={{ color: 'red' }}
-                        >
-                          <AiFillDelete style={{ fontSize: '25px' }} />
-                        </IconButton>
-                      </div>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan="2" className="text-center">
-                    <div
-                      className="d-flex flex-column justify-content-center align-items-center"
-                      style={{ height: '200px' }}
-                    >
-                      <p className="mb-0 fw-bold">
-                        "Oops! Looks like there's No Model available.
-                        <br /> Maybe it's time to create new Model!"
-                      </p>
-                      <div>
-                        <button
-                          onClick={() => setAddModalOpen(true)}
-                          variant="contained"
-                          className="btn btn-primary m-3 text-white"
-                        >
-                          <span>
-                            <IoMdAdd className="fs-5" />
-                          </span>{' '}
-                          Add Model
-                        </button>
-                      </div>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan="2" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's No Model available.
+                      <br /> Maybe it's time to create new Model!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Add Model
+                      </button>
                     </div>
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            ))}
+          </CTableBody>
+        </CTable>
       </TableContainer>
 
 

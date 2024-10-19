@@ -47,9 +47,9 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
+  const [filteredData, setFilteredData] = useState([]);
 
   const style = {
     position: 'absolute',
@@ -95,9 +95,26 @@ const Group = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterGroups = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (group) =>
+          group.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchGroupData()
   }, [limit])
+
+  useEffect(() => {
+    filterGroups(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -276,8 +293,8 @@ const Group = () => {
                   </CTableDataCell>
                 </CTableRow>
               </>
-            ) : data.length > 0 ? (
-              data?.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
                   <CTableDataCell

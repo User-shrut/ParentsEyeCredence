@@ -67,7 +67,7 @@ const Notification = () => {
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
   const accessToken = Cookies.get('authToken')
-
+  const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState()
   const [devices, setDevices] = useState([])
@@ -160,9 +160,26 @@ const Notification = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterNotifications = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (notification) =>
+          notification.deviceId?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchNotificationData()
   }, [])
+
+  useEffect(() => {
+    filterNotifications(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -348,8 +365,8 @@ const Notification = () => {
                   </CTableDataCell>
                 </CTableRow>
               </>
-            ) : data.length > 0 ? (
-              data?.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center p-0">{item.deviceId?.name}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell>

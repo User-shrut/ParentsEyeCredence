@@ -55,7 +55,7 @@ const Driver = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-
+  const [filteredData, setFilteredData] = useState([]);
 
   const handleEditModalClose = () => {
     setEditModalOpen(false);
@@ -107,9 +107,27 @@ const Driver = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterDrivers = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (driver) =>
+          driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          driver.email.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchDriverData()
   }, [limit])
+
+  useEffect(() => {
+    filterDrivers(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -352,8 +370,8 @@ const Driver = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : data.length > 0 ? (
-              data?.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center">{item.name}</CTableDataCell>
                   <CTableDataCell className="text-center">{item.phone}</CTableDataCell>

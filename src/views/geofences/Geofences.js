@@ -53,7 +53,7 @@ const Geofences = () => {
   const [pageCount, setPageCount] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Select Geofence', 'Geofence Info']
-
+  const [filteredData, setFilteredData] = useState([]);
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
@@ -207,9 +207,26 @@ const Geofences = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterGeofences = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (geofences) =>
+          geofences.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchGeofenceData()
   }, [])
+
+  useEffect(() => {
+    filterGeofences(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -410,8 +427,8 @@ const Geofences = () => {
                       </p>
                     </div>
                   </>
-                ) : data?.length > 0 ? (
-                  data?.map((item, index) => (
+                ) : filteredData.length > 0 ? (
+                  filteredData?.map((item, index) => (
                     <CTableRow key={index}>
                       <CTableDataCell className="ps-3 text-start p-0">{item.name}</CTableDataCell>
                       <CTableDataCell className="text-start p-0">{item.type}</CTableDataCell>

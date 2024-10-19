@@ -69,7 +69,7 @@ const Devices = () => {
 
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Device Info', 'Assign To', 'Subscription']
-
+  const [filteredData, setFilteredData] = useState([]);
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
@@ -187,9 +187,26 @@ const Devices = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterDevices = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (device) =>
+          device.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchData()
   }, [limit])
+
+  useEffect(() => {
+    filterDevices(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -599,7 +616,7 @@ const Devices = () => {
         </div>
       </div>
 
-      
+
 
       <TableContainer
         component={Paper}
@@ -647,8 +664,8 @@ const Devices = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : data.length > 0 ? (
-              data.map((item) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
                   {/* Skip the first field in the data row */}
                   {columns.slice(1).map((column) => (

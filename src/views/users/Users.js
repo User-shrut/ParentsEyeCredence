@@ -66,6 +66,7 @@ const Users = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Personal Info', 'Permissions']
   const [isSuperAdmin, setSuperAdmin] = useState(false)
+  const [filteredData, setFilteredData] = useState([]);
 
   // Go to the next step
   const handleNext = () => {
@@ -125,9 +126,27 @@ const Users = () => {
     }
   }
 
+  // ##################### Filter data by search query #######################
+  const filterUsers = () => {
+    if (!searchQuery) {
+      setFilteredData(data); // No query, show all drivers
+    } else {
+      const filtered = data.filter(
+        (user) =>
+          user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   useEffect(() => {
     fetchUserData()
   }, [limit])
+
+  useEffect(() => {
+    filterUsers(searchQuery);
+  }, [data, searchQuery]);
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -560,8 +579,8 @@ const Users = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : data.length > 0 ? (
-              data?.map((item, index) => (
+            ) : filteredData.length > 0 ? (
+              filteredData?.map((item, index) => (
                 <CTableRow key={index} className="p-0">
                   <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
