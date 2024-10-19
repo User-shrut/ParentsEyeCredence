@@ -14,7 +14,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = (role, decodedToken) => {
 
-  let devices, users, driver, groups, geofence, notification, maintenance, preferences, category, model, status, distance, history, stop, travel, idle, sensor, alerts, dayreport,vehicle, geofenceReport;  
+  let devices, users, driver, groups, geofence, notification, maintenance, preferences, category, model, status, distance, history, stop, travel, idle, sensor, alerts, vehicle, geofenceReport;  
   console.log(decodedToken);
   
   if(role != 'superadmin'){
@@ -37,7 +37,6 @@ const _nav = (role, decodedToken) => {
       idle,
       sensor,
       alerts,
-      dayreport,
       vehicle,
       geofenceReport
     } = decodedToken.user);
@@ -90,7 +89,6 @@ const _nav = (role, decodedToken) => {
               { component: CNavItem, name: 'Driver', to: '/driver' },
               { component: CNavItem, name: 'Notifications', to: '/notifications' },
               { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
-              // { component: CNavItem, name: 'Preferences', to: '/preferences' },
               { component: CNavItem, name: 'Category', to: '/category' },
               { component: CNavItem, name: 'Model', to: '/model' },
             ],
@@ -112,7 +110,6 @@ const _nav = (role, decodedToken) => {
               { component: CNavItem, name: 'Idle Report', to: '/idlereport' },
               { component: CNavItem, name: 'Sensor Reports', to: '/sensorreports' },
               { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events' },
-              { component: CNavItem, name: 'Day Report', to: '/dayreport' },
               { component: CNavItem, name: 'Vehicle Reports', to: '/vehiclereport' },
               { component: CNavItem, name: 'Geofence Report', to: '/geofencereport' },
             ],
@@ -188,7 +185,6 @@ const _nav = (role, decodedToken) => {
                 to: '/sensorreports',
               },
               alerts && { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events' },
-              dayreport && { component: CNavItem, name: 'Day Reports', to: '/dayreport'},
               vehicle && { component: CNavItem, name: 'Vehicle Reports', to: '/vehiclereport' },
               geofenceReport && { component: CNavItem, name: 'Geofence Report', to: '/geofencereport' },
             ].filter(Boolean),
