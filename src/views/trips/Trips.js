@@ -272,87 +272,87 @@ const TripTable = ({ apiData, selectedColumns }) => {
 
   return (
     <>
-    <CTable borderless className="custom-table">
-      <CTableHead>
-        <CTableRow>
-          {/* Device Header Cell */}
-          <CTableHeaderCell>Device</CTableHeaderCell>
-
-          {/* Dynamically render table headers based on selected columns */}
-          {selectedColumns.map((column, index) => (
-            <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
-          ))}
-        </CTableRow>
-      </CTableHead>
-
-      <CTableBody>
-        {/* Check if apiData and finalTrip exist and are not empty */}
-        {apiData?.finalTrip?.length > 0 ? (
-          apiData.finalTrip.map((row, rowIndex) => (
-            <CTableRow key={row.id || rowIndex} className="custom-row">
-              {/* Device ID Cell */}
-              <CTableDataCell>{row.name}</CTableDataCell>
-
-              {/* Dynamically render table cells based on selected columns */}
-              {selectedColumns.map((column, index) => (
-                <CTableDataCell key={index}>
-                  {column === 'Start Time' ? (
-                    // Add 6 hours 30 minutes to startTime
-                    new Date(new Date(row.startTime).setHours(new Date(row.startTime).getHours() + 6, new Date(row.startTime).getMinutes() + 30))
-                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  ) : column === 'End Time' ? (
-                    // Add 6 hours 30 minutes to endTime
-                    new Date(new Date(row.endTime).setHours(new Date(row.endTime).getHours() + 6, new Date(row.endTime).getMinutes() + 30))
-                      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  ) : column === 'Distance' ? (
-                    // Convert distance from meters to kilometers and round to 2 decimal places
-                    (row.distance / 1000).toFixed(2) + ' km'
-                  ) : column === 'Total Distance' ? (
-                    // Convert totalDistance from meters to kilometers and round to 2 decimal places
-                    (row.totalDistance / 1000).toFixed(2) + ' km'
-                  ) : column === 'Maximum Speed' ? (
-                    // Convert maxSpeed from m/s to km/h and round to 2 decimal places
-                    (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
-                  ) : column === 'Average Speed' ? (
-                    // Convert avgSpeed from m/s to km/h and round to 2 decimal places
-                    (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
-                  ) : column === 'Duration' ? (
-                    row.duration
-                  ) : column === 'Start Address' ? (
-                    addressData[row.deviceId]?.startAddress || 'Fetching...'
-                  ) : column === 'End Address' ? (
-                    addressData[row.deviceId]?.endAddress || 'Fetching...'
-                  ) : column === 'Driver' ? (
-                    row.driverName
-                  ) : column === 'Device Name' ? (
-                    row.device?.name || '--'
-                  ) : (
-                    '--'
-                  )}
-                </CTableDataCell>
-              ))}
-            </CTableRow>
-          ))
-        ) : (
+      <CTable borderless className="custom-table">
+        <CTableHead>
           <CTableRow>
-            <CTableDataCell colSpan={selectedColumns.length + 1}
-              style={{
-                backgroundColor: '#f8f9fa', // Light gray background
-                color: '#6c757d', // Darker text color
-                fontStyle: 'italic', // Italic font style
-                padding: '16px', // Extra padding for emphasis
-                textAlign: 'center', // Center the text
-                border: '1px dashed #dee2e6' // Dashed border to highlight it
-              }}
-            >
-              No data available
-            </CTableDataCell>
-          </CTableRow>
-        )}
-      </CTableBody>
-    </CTable>
+            {/* Device Header Cell */}
+            <CTableHeaderCell>Device</CTableHeaderCell>
 
-    <CDropdown className="position-fixed bottom-0 end-0 m-3">
+            {/* Dynamically render table headers based on selected columns */}
+            {selectedColumns.map((column, index) => (
+              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+            ))}
+          </CTableRow>
+        </CTableHead>
+
+        <CTableBody>
+          {/* Check if apiData and finalTrip exist and are not empty */}
+          {apiData?.finalTrip?.length > 0 ? (
+            apiData.finalTrip.map((row, rowIndex) => (
+              <CTableRow key={row.id || rowIndex} className="custom-row">
+                {/* Device ID Cell */}
+                <CTableDataCell>{row.name}</CTableDataCell>
+
+                {/* Dynamically render table cells based on selected columns */}
+                {selectedColumns.map((column, index) => (
+                  <CTableDataCell key={index}>
+                    {column === 'Start Time' ? (
+                      // Add 6 hours 30 minutes to startTime
+                      new Date(new Date(row.startTime).setHours(new Date(row.startTime).getHours() + 6, new Date(row.startTime).getMinutes() + 30))
+                        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    ) : column === 'End Time' ? (
+                      // Add 6 hours 30 minutes to endTime
+                      new Date(new Date(row.endTime).setHours(new Date(row.endTime).getHours() + 6, new Date(row.endTime).getMinutes() + 30))
+                        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    ) : column === 'Distance' ? (
+                      // Convert distance from meters to kilometers and round to 2 decimal places
+                      (row.distance / 1000).toFixed(2) + ' km'
+                    ) : column === 'Total Distance' ? (
+                      // Convert totalDistance from meters to kilometers and round to 2 decimal places
+                      (row.totalDistance / 1000).toFixed(2) + ' km'
+                    ) : column === 'Maximum Speed' ? (
+                      // Convert maxSpeed from m/s to km/h and round to 2 decimal places
+                      (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+                    ) : column === 'Average Speed' ? (
+                      // Convert avgSpeed from m/s to km/h and round to 2 decimal places
+                      (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+                    ) : column === 'Duration' ? (
+                      row.duration
+                    ) : column === 'Start Address' ? (
+                      addressData[row.deviceId]?.startAddress || 'Fetching...'
+                    ) : column === 'End Address' ? (
+                      addressData[row.deviceId]?.endAddress || 'Fetching...'
+                    ) : column === 'Driver' ? (
+                      row.driverName
+                    ) : column === 'Device Name' ? (
+                      row.device?.name || '--'
+                    ) : (
+                      '--'
+                    )}
+                  </CTableDataCell>
+                ))}
+              </CTableRow>
+            ))
+          ) : (
+            <CTableRow>
+              <CTableDataCell colSpan={selectedColumns.length + 1}
+                style={{
+                  backgroundColor: '#f8f9fa', // Light gray background
+                  color: '#6c757d', // Darker text color
+                  fontStyle: 'italic', // Italic font style
+                  padding: '16px', // Extra padding for emphasis
+                  textAlign: 'center', // Center the text
+                  border: '1px dashed #dee2e6' // Dashed border to highlight it
+                }}
+              >
+                No data available
+              </CTableDataCell>
+            </CTableRow>
+          )}
+        </CTableBody>
+      </CTable>
+
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
           style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
