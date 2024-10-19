@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -17,51 +17,67 @@ import {
   CRow,
   CFormLabel,
   CFormFeedback,
-} from '@coreui/react';
-import Select from 'react-select';
-import Cookies from 'js-cookie';
-import axios from 'axios';
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
+} from '@coreui/react'
+import Select from 'react-select'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'; // For table in PDF
+import * as XLSX from 'xlsx';
 
-const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, columns, showMap, setShowMap }) => {
-  const [validated, setValidated] = useState(false);
-  const [showDateInputs, setShowDateInputs] = useState(false);
+const SearchIdeal = ({
+  formData,
+  handleInputChange,
+  handleSubmit,
+  groups,
+  devices,
+  getDevices,
+  columns,
+  showMap,
+  setShowMap,
+}) => {
+  const [validated, setValidated] = useState(false)
+  const [showDateInputs, setShowDateInputs] = useState(false)
   // State to manage button text
-  const [buttonText, setButtonText] = useState('SHOW NOW');
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+  const [buttonText, setButtonText] = useState('SHOW NOW')
+  const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
 
   const handleFormSubmit = (event) => {
-    const form = event.currentTarget;
-    console.log("handle submit ke pass hu");
+    const form = event.currentTarget
+    console.log('handle submit ke pass hu')
     if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+      event.preventDefault()
+      event.stopPropagation()
     } else {
-      event.preventDefault();
-      handleSubmit();
-      setShowMap(true); //Show the mapping
+      event.preventDefault()
+      handleSubmit()
+      setShowMap(true) //Show the mapping
     }
-    setValidated(true);
-  };
-
+    setValidated(true)
+  }
 
   const handlePeriodChange = (value) => {
-    handleInputChange('Periods', value);
-    setShowDateInputs(value === 'Custom');
-  };
-
-
+    handleInputChange('Periods', value)
+    setShowDateInputs(value === 'Custom')
+  }
 
   // Function to handle dropdown item clicks
   const handleDropdownClick = (text) => {
-    setButtonText(text); // Change button text based on the clicked item
-    setDropdownOpen(false); // Close the dropdown after selection
-    handleSubmit(); // Submit form
-    setShowMap(true); // Show the map when form is valid and submitted
-  };
+    setButtonText(text) // Change button text based on the clicked item
+    setDropdownOpen(false) // Close the dropdown after selection
+    handleSubmit() // Submit form
+    setShowMap(true) // Show the map when form is valid and submitted
+  }
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
+    setDropdownOpen((prev) => !prev)
+  }
 
   return (
     <CForm
@@ -70,6 +86,27 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
       validated={validated}
       onSubmit={handleFormSubmit}
     >
+      <CCol md={4}>
+        <CFormLabel htmlFor="devices">Groups</CFormLabel>
+        <CFormSelect
+          id="group"
+          required
+          onChange={(e) => {
+            const selectedGroup = e.target.value
+            console.log('Selected Group ID:', selectedGroup)
+            getDevices(selectedGroup)
+          }}
+        >
+          <option value="">Choose a group...</option>
+          {groups.map((group) => (
+            <option key={group._id} value={group._id}>
+              {group.name}
+            </option>
+          ))}
+        </CFormSelect>
+        <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
+      </CCol>
+
       <CCol md={4}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
@@ -81,7 +118,9 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
           <option value="">Choose a device...</option>
           {devices.length > 0 ? (
             devices.map((device) => (
-              <option key={device.id} value={device.deviceId}>{device.name}</option>
+              <option key={device.id} value={device.deviceId}>
+                {device.name}
+              </option>
             ))
           ) : (
             <option disabled>Loading devices...</option>
@@ -126,12 +165,15 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
               : formData.Columns.map((column) => ({ value: column, label: column }))
           }
           onChange={(selectedOptions) => {
-            if (selectedOptions.find(option => option.value === 'all')) {
+            if (selectedOptions.find((option) => option.value === 'all')) {
               // If "All Columns" is selected, select all available columns
-              handleInputChange('Columns', columns);
+              handleInputChange('Columns', columns)
             } else {
               // Otherwise, update formData.Columns with selected values
-              handleInputChange('Columns', selectedOptions.map((option) => option.value));
+              handleInputChange(
+                'Columns',
+                selectedOptions.map((option) => option.value),
+              )
             }
           }}
         />
@@ -165,71 +207,43 @@ const SearchIdeal = ({ formData, handleInputChange, handleSubmit, devices, colum
         </>
       )}
 
-      <CCol xs={12} >
+      <CCol xs={12}>
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+            <button
+              className="btn btn-primary "
+              type="button"
+              onClick={() => handleDropdownClick('SHOW NOW')}
+            >
               {buttonText}
             </button>
-            <button
-              type="button"
-              className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
-              onClick={toggleDropdown} // Toggle dropdown on click
-              aria-expanded={isDropdownOpen} // Update aria attribute
-            >
-              <span className="visually-hidden">Toggle Dropdown</span>
-            </button>
-            {isDropdownOpen && ( // Conditionally render dropdown menu
-              <ul className="dropdown-menu show ">
-                <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Show Now')}>
-                    Show Now
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Export')}>
-                    Export
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Email Reports')}>
-                    Email Reports
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href='' onClick={() => handleDropdownClick('Schedule')}>
-                    Schedule
-                  </a>
-                </li>
-              </ul>
-            )}
           </div>
         </div>
       </CCol>
     </CForm>
-  );
-};
+  )
+}
 
 const ShowIdeal = ({ apiData, selectedColumns }) => {
-  const [dataWithAddresses, setDataWithAddresses] = useState([]);
+  const [dataWithAddresses, setDataWithAddresses] = useState([])
 
   // Function to get address from latitude and longitude
   const getAddressFromLatLng = async (latitude, longitude) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
 
     try {
-      const response = await axios.get(url);
-      const address = response.data?.display_name || 'Address not found';
-      return address;
+      const response = await axios.get(url)
+      const address = response.data?.display_name || 'Address not found'
+      return address
     } catch (error) {
-      console.error('Error fetching address: ', error);
-      return 'Address not found';
+      console.error('Error fetching address: ', error)
+      return 'Address not found'
     }
-  };
+  }
 
   // Function to map over API data and fetch addresses
   const mapDataWithAddress = async () => {
-    if (!apiData || apiData.length === 0) return apiData;
+    if (!apiData || apiData.length === 0) return apiData
 
     const updatedData = await Promise.all(
       apiData.map(async (row) => {
@@ -237,36 +251,107 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
           const updatedNestedData = await Promise.all(
             row.data.map(async (nestedRow) => {
               if (nestedRow.location) {
-                const [latitude, longitude] = nestedRow.location.split(',');
-                const address = await getAddressFromLatLng(latitude.trim(), longitude.trim());
-                return { ...nestedRow, address }; // Attach address to nestedRow
+                const [latitude, longitude] = nestedRow.location.split(',')
+                const address = await getAddressFromLatLng(latitude.trim(), longitude.trim())
+                return { ...nestedRow, address } // Attach address to nestedRow
               }
-              return nestedRow;
-            })
-          );
-          return { ...row, data: updatedNestedData };
+              return nestedRow
+            }),
+          )
+          return { ...row, data: updatedNestedData }
         }
-        return row;
-      })
-    );
+        return row
+      }),
+    )
 
-    return updatedData;
-  };
+    return updatedData
+  }
 
   useEffect(() => {
     const fetchDataWithAddresses = async () => {
-      const updatedData = await mapDataWithAddress();
-      setDataWithAddresses(updatedData);
-    };
+      const updatedData = await mapDataWithAddress()
+      setDataWithAddresses(updatedData)
+    }
 
-    fetchDataWithAddresses();
-  }, [apiData]);
+    fetchDataWithAddresses()
+  }, [apiData])
+
+   // PDF Download Function
+   const downloadPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = ['SN', ...selectedColumns];
+    const tableRows = [];
+
+    dataWithAddresses.forEach((row, rowIndex) => {
+      row.data.forEach((nestedRow, nestedIndex) => {
+        const rowData = [
+          rowIndex + 1,
+          ...selectedColumns.map((column) => {
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus;
+            if (column === 'Duration') return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
+            if (column === 'Location') return nestedRow.address || nestedRow.location;
+            if (column === 'Arrival Time') return new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (column === 'Departure Time') return new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (column === 'Total Duration') return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
+            return '--';
+          }),
+        ];
+        tableRows.push(rowData);
+      });
+    });
+
+    autoTable(doc, { head: [tableColumn], body: tableRows });
+    doc.save('ideal-table.pdf');
+  };
+
+  // Excel Download Function
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(
+      dataWithAddresses.flatMap((row, rowIndex) => {
+        return row.data.map((nestedRow, nestedIndex) => {
+          const rowData = {
+            SN: rowIndex + 1,
+          };
+          selectedColumns.forEach((column) => {
+            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus;
+            if (column === 'Duration') rowData['Duration'] = new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
+            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location;
+            if (column === 'Arrival Time') rowData['Arrival Time'] = new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (column === 'Departure Time') rowData['Departure Time'] = new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (column === 'Total Duration') rowData['Total Duration'] = new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
+          });
+          return rowData;
+        });
+      })
+    );
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData');
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'ideal-table.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   return (
-    <CTable borderless className="custom-table">
+    <>
+    <CTable bordered className="custom-table">
       <CTableHead>
         <CTableRow>
-          <CTableHeaderCell>Devices</CTableHeaderCell>
+          <CTableHeaderCell>SN</CTableHeaderCell>
           {selectedColumns.map((column, index) => (
             <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
           ))}
@@ -279,34 +364,41 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
             row.data?.length > 0 ? (
               row.data.map((nestedRow, nestedIndex) => (
                 <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                  <CTableDataCell>{row.deviceId}</CTableDataCell>
+                  <CTableDataCell>{rowIndex + 1}</CTableDataCell>
 
                   {selectedColumns.map((column, index) => (
                     <CTableDataCell key={index}>
-                      {column === 'Vehicle Status' ? (
-                        nestedRow.vehicleStatus
-                      ) : column === 'Duration' ? (
-                        // Convert duration from seconds to HH:mm:ss format
-                        new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
-                      ) : column === 'Location' ? (
-                        // Display address if available, otherwise fallback to location
-                        nestedRow.address || nestedRow.location
-                      ) : column === 'Arrival Time' ? (
-                        // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
-                        new Date(new Date(nestedRow.arrivalTime).setHours(new Date(nestedRow.arrivalTime).getHours() + 6, new Date(nestedRow.arrivalTime).getMinutes() + 30))
-                          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      ) : column === 'Departure Time' ? (
-                        // Add 6 hours 30 minutes to departureTime and format to HH:mm
-                        new Date(new Date(nestedRow.departureTime).setHours(new Date(nestedRow.departureTime).getHours() + 6, new Date(nestedRow.departureTime).getMinutes() + 30))
-                          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      ) : column === 'Total Duration' ? (
-                        // Convert total duration from seconds to HH:mm:ss format
-                        new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
-                      ) : (
-                        '--'
-                      )}
+                      {column === 'Vehicle Status'
+                        ? nestedRow.vehicleStatus
+                        : column === 'Duration'
+                          ? // Convert duration from seconds to HH:mm:ss format
+                            new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+                          : column === 'Location'
+                            ? // Display address if available, otherwise fallback to location
+                              nestedRow.address || nestedRow.location
+                            : column === 'Arrival Time'
+                              ? // Add 6 hours 30 minutes to arrivalTime and format to HH:mm
+                                new Date(
+                                  new Date(nestedRow.arrivalTime).setHours(
+                                    new Date(nestedRow.arrivalTime).getHours() + 6,
+                                    new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                                  ),
+                                ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                              : column === 'Departure Time'
+                                ? // Add 6 hours 30 minutes to departureTime and format to HH:mm
+                                  new Date(
+                                    new Date(nestedRow.departureTime).setHours(
+                                      new Date(nestedRow.departureTime).getHours() + 6,
+                                      new Date(nestedRow.departureTime).getMinutes() + 30,
+                                    ),
+                                  ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                : column === 'Total Duration'
+                                  ? // Convert total duration from seconds to HH:mm:ss format
+                                    new Date(row.totalDurationSeconds * 1000)
+                                      .toISOString()
+                                      .substr(11, 8)
+                                  : '--'}
                     </CTableDataCell>
-
                   ))}
                 </CTableRow>
               ))
@@ -326,7 +418,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                   No data available for {row.deviceId}
                 </CTableDataCell>
               </CTableRow>
-            )
+            ),
           )
         ) : (
           <CTableRow>
@@ -341,23 +433,42 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                 border: '1px dashed #dee2e6',
               }}
             >
-              No data available
+              Data is loading...
             </CTableDataCell>
           </CTableRow>
         )}
       </CTableBody>
     </CTable>
-  );
-};
 
+    <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle color="secondary" style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}>
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={downloadPDF} >PDF</CDropdownItem>
+          <CDropdownItem  onClick={downloadExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
 
+    </>
+  )
+}
 
 const Ideal = () => {
-
-  const [formData, setFormData] = useState({ Devices: '', Details: '', Periods: '', FromDate: '', ToDate: '', Columns: [] });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [devices, setDevices] = useState([]);
-  const [showMap, setShowMap] = useState(false); //show mapping data
+  const [formData, setFormData] = useState({
+    Devices: '',
+    Details: '',
+    Periods: '',
+    FromDate: '',
+    ToDate: '',
+    Columns: [],
+  })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [groups, setGroups] = useState([]);
+  const [devices, setDevices] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [showMap, setShowMap] = useState(false) //show mapping data
+  const accessToken = Cookies.get('authToken');
   const [columns] = useState([
     // 'OUID',
     'Vehicle Status',
@@ -365,115 +476,138 @@ const Ideal = () => {
     'Location',
     'Arrival Time',
     'Departure Time',
-    'Total Duration'
-  ]);
+    'Total Duration',
+  ])
 
+  const [selectedColumns, setSelectedColumns] = useState([])
+  const token = Cookies.get('authToken') //
 
-  const [selectedColumns, setSelectedColumns] = useState([]);
-  const token = Cookies.get('authToken'); //
+  const [apiData, setApiData] = useState() //data from api
 
-  const [apiData, setApiData] = useState();   //data from api
-
-  useEffect(() => {
-    const fetchDevices = async () => {
-
-      console.log("fetch device me aaya hu...")
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/device`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data)
-        setDevices(data.devices); // Assuming the data returned contains device info
-      } catch (error) {
-        console.error('Error fetching devices:', error);
-      }
-    };
-
-    fetchDevices();
-  }, []);
+   // Get the selected device name from the device list based on formData.Devices
+   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
+   const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
+ 
+   const getDevices = async (selectedGroup) => {
+     const accessToken = Cookies.get('authToken');
+     setLoading(true);
+     try {
+       const response = await axios.get(
+         `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+         {
+           headers: {
+             Authorization: 'Bearer ' + accessToken,
+           },
+         },
+       )
+       if (response.data.success) {
+         setDevices(response.data.data)
+         setLoading(false);
+       }
+     } catch (error) {
+       console.error('Error fetching data:', error)
+       setDevices([]);
+       setLoading(false);
+       throw error // Re-throw the error for further handling if needed
+     }
+   }
+ 
+   const getGroups = async () => {
+     try {
+       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+         headers: {
+           Authorization: 'Bearer ' + accessToken,
+         },
+       })
+       if (response.data) {
+         setGroups(response.data.groups)
+         console.log("yaha tak thik hai")
+       }
+     } catch (error) {
+       console.error('Error fetching data:', error)
+       throw error // Re-throw the error for further handling if needed
+     }
+   }
+ 
+   useEffect(() => {
+     getGroups();
+   }, [])
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-    }));
+    }))
 
     if (name === 'Columns') {
-      setSelectedColumns(value);
+      setSelectedColumns(value)
     }
-  };
+  }
 
   const handleSubmit = async () => {
-
     console.log('DataAll', formData)
 
     // Convert the dates to ISO format if they're provided
-    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
-    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
-
+    const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : ''
+    const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : ''
 
     const body = {
       deviceId: formData.Devices, // Use the device ID from the form data
       period: formData.Periods, // Use the selected period from the form data
       FromDate: fromDate,
       ToDate: toDate,
-    };
+    }
 
     // console.log(token);
     // console.log(body);
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/reports/idleSummary?deviceIds=${body.deviceId}&period=${body.period}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`, // Replace with your actual token
-          'Content-Type': 'application/json',
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/reports/idleSummary?deviceIds=${body.deviceId}&period=${body.period}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Replace with your actual token
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      )
 
       // console.log(response.data.deviceDataByStatus[0]);
 
-      console.log("All Status reports");
+      console.log('All Status reports')
 
       if (response.status == 200) {
         console.log(response.data.data)
-        console.log("done in all")
-        console.log(response.data.data);
-        setApiData(response.data.data);
+        console.log('done in all')
+        console.log(response.data.data)
+        setApiData(response.data.data)
       }
 
       // Assuming the data returned is what you want to display in the table
-      console.log('Form submitted with data:', body);
+      console.log('Form submitted with data:', body)
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error submitting form:', error)
     }
-  };
-
+  }
 
   return (
     <>
-      <CRow className='pt-3'>
-        <h2 className='px-4'>Idle Report</h2>
-        <CCol xs={12} md={12} className='px-4'>
-          <CCard className="mb-4 p-0 shadow-lg rounded" >
+      <CRow className="pt-3">
+        <h2 className="px-4">Idle Report</h2>
+        <CCol xs={12} md={12} className="px-4">
+          <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Idle Report</strong>
-
             </CCardHeader>
             <CCardBody>
               <SearchIdeal
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                groups={groups}
+                getDevices={getDevices}
                 devices={devices}
+                loading={loading}
                 showMap={showMap}
                 setShowMap={setShowMap}
                 columns={columns}
@@ -485,10 +619,10 @@ const Ideal = () => {
 
       {showMap && (
         <CRow className="justify-content-center mt-4">
-          <CCol xs={12} className="px-4" >
-            <CCard className='p-0 mb-4 shadow-sm'>
+          <CCol xs={12} className="px-4">
+            <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
-                <strong>All Idle Report List</strong>
+                <strong>All Idle Report List {selectedDeviceName && `for ${selectedDeviceName}`} </strong>
                 <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
@@ -503,9 +637,8 @@ const Ideal = () => {
           </CCol>
         </CRow>
       )}
-
     </>
-  );
-};
+  )
+}
 
-export default Ideal;
+export default Ideal

@@ -45,7 +45,7 @@ const Devices = () => {
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
   const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(10);
   const [pageCount, setPageCount] = useState()
 
   const [data, setData] = useState([])
@@ -189,7 +189,7 @@ const Devices = () => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [limit])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -599,15 +599,7 @@ const Devices = () => {
         </div>
       </div>
 
-      <div className="mb-2 d-md-none">
-        <input
-          type="search"
-          className="form-control"
-          placeholder="search here...."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      
 
       <TableContainer
         component={Paper}
@@ -761,29 +753,45 @@ const Devices = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
-
-      {pageCount > 1 && (
-        <div className="">
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
-            pageCount={pageCount} // Set based on the total pages from the API
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            marginPagesDisplayed={2}
-            containerClassName="pagination justify-content-center"
-            pageClassName="page-item"
-            pageLinkClassName="page-link"
-            previousClassName="page-item"
-            previousLinkClassName="page-link"
-            nextClassName="page-item"
-            nextLinkClassName="page-link"
-            activeClassName="active"
-          />
+      <div className='d-flex justify-content-center align-items-center'>
+        <div className="d-flex">
+          {/* Pagination */}
+          <div className="me-3"> {/* Adds margin to the right of pagination */}
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={5}
+              pageCount={pageCount} // Set based on the total pages from the API
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              marginPagesDisplayed={2}
+              containerClassName="pagination justify-content-center "
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              activeClassName="active"
+            />
+          </div>
+          {/* Form Control */}
+          <div style={{ width: "90px" }}>
+            <CFormSelect
+              aria-label="Default select example"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              options={[
+                { label: '10', value: '10' },
+                { label: '50', value: '50' },
+                { label: '500', value: '500' },
+                { label: '5000', value: '5000' }
+              ]}
+            />
+          </div>
         </div>
-      )}
+      </div>
 
       <Modal open={addModalOpen} onClose={handleModalClose}>
         <Box

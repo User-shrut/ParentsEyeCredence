@@ -19,6 +19,7 @@ import { Select, MenuItem, } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -61,10 +62,10 @@ const Driver = () => {
     setFormData({})
   }
   const handleAddModalClose = () => {
-   setAddModalOpen(false)
-   setFormData({});
+    setAddModalOpen(false)
+    setFormData({});
   }
-    
+
 
   const style = {
     position: 'absolute',
@@ -108,7 +109,7 @@ const Driver = () => {
 
   useEffect(() => {
     fetchDriverData()
-  }, [])
+  }, [limit])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -142,7 +143,7 @@ const Driver = () => {
     } catch (error) {
       toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
-      
+
     }
   }
 
@@ -250,7 +251,7 @@ const Driver = () => {
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Driver</h2>
@@ -288,70 +289,70 @@ const Driver = () => {
       </div>
 
 
-      
+
       <TableContainer
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-          <CTable align="middle" className="mb-0 border" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow className='bg-body-tertiary'>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Driver Name
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
-                  Mobile No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                 className=" text-center text-white bg-secondary">
-                  Email
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Vehicle no.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Lic. No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Aadhar No.
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Address
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  className=" text-center text-white bg-secondary">
-                  Actions
-                </CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
+        <CTable align="middle" className="mb-0 border" hover responsive>
+          <CTableHead className="text-nowrap">
+            <CTableRow className='bg-body-tertiary'>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Driver Name
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Mobile No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Email
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Vehicle no.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Lic. No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Aadhar No.
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Address
+              </CTableHeaderCell>
+              <CTableHeaderCell
+                className=" text-center text-white bg-secondary">
+                Actions
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
 
             {loading ? (
-                <CTableRow>
-                  <CTableDataCell colSpan="8" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              ) : data.length > 0 ? (
+              <CTableRow>
+                <CTableDataCell colSpan="8" className="text-center">
+                  <div className="text-nowrap mb-2 text-center w-">
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            ) : data.length > 0 ? (
               data?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center">{item.name}</CTableDataCell>
@@ -376,57 +377,74 @@ const Driver = () => {
                   </CTableDataCell>
                 </CTableRow>
               ))) : (
-                <CTableRow>
-                  <CTableDataCell colSpan="8" className="text-center">
-                    <div
-                      className="d-flex flex-column justify-content-center align-items-center"
-                      style={{ height: '200px' }}
-                    >
-                      <p className="mb-0 fw-bold">
-                        "Oops! Looks like there's nobody here yet.
-                        <br /> Maybe it's time to invite some drivers!"
-                      </p>
-                      <div>
-                        <button
-                          onClick={() => setAddModalOpen(true)}
-                          variant="contained"
-                          className="btn btn-primary m-3 text-white"
-                        >
-                          <span>
-                            <IoMdAdd className="fs-5" />
-                          </span>{' '}
-                          Add Driver
-                        </button>
-                      </div>
+              <CTableRow>
+                <CTableDataCell colSpan="8" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's nobody here yet.
+                      <br /> Maybe it's time to invite some drivers!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Add Driver
+                      </button>
                     </div>
-                  </CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
       </TableContainer>
-      {pageCount > 1 && (
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel="next >"
-          onPageChange={handlePageClick}
-          pageRangeDisplayed={5}
-          pageCount={pageCount} // Set based on the total pages from the API
-          previousLabel="< previous"
-          renderOnZeroPageCount={null}
-          marginPagesDisplayed={2}
-          containerClassName="pagination justify-content-center"
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          previousClassName="page-item"
-          previousLinkClassName="page-link"
-          nextClassName="page-item"
-          nextLinkClassName="page-link"
-          activeClassName="active"
-        />
-      )}
-
-      {/* Add Modal */}
+      <div className='d-flex justify-content-center align-items-center'>
+        <div className="d-flex">
+          {/* Pagination */}
+          <div className="me-3"> {/* Adds margin to the right of pagination */}
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={5}
+              pageCount={pageCount} // Set based on the total pages from the API
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              marginPagesDisplayed={2}
+              containerClassName="pagination justify-content-center"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              activeClassName="active"
+            />
+          </div>
+          {/* Form Control */}
+          <div style={{ width: "90px" }}>
+            <CFormSelect
+              aria-label="Default select example"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              options={[
+                { label: '10', value: '10' },
+                { label: '50', value: '50' },
+                { label: '500', value: '500' },
+                { label: '5000', value: '5000' }
+              ]}
+            />
+          </div>
+        </div>
+      </div>
 
       <Modal
         open={addModalOpen}
@@ -617,8 +635,8 @@ const Driver = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
-                
-                   <TextField
+
+                <TextField
                   select // Set the select prop to true
                   label="Vehicle List" // This will be the label for the TextField
                   name="vehicle no."

@@ -27,6 +27,7 @@ import {
   Step,
   StepLabel,
   InputAdornment,
+  Select,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
@@ -60,7 +61,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(18)
+  const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Personal Info', 'Permissions']
@@ -126,7 +127,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUserData()
-  }, [])
+  }, [limit])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -475,196 +476,197 @@ const Users = () => {
   //  ####################################################
 
   return (
-    <>
-      <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
-        <Toaster position="top-center" reverseOrder={false} />
-        <div>
-          <div className="d-flex justify-content-between mb-2">
+    <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
+      <Toaster position="top-center" reverseOrder={false} />
+      <div>
+        <div className="d-flex justify-content-between mb-2">
+          <div>
+            <h3>Users</h3>
+          </div>
+
+          <div className="d-flex">
+            <div className="me-3 d-none d-md-block">
+              <input
+                type="search"
+                className="form-control"
+                placeholder="search here...."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             <div>
-              <h3>Users</h3>
+              <button
+                onClick={() => setAddModalOpen(true)}
+                variant="contained"
+                className="btn btn-primary"
+              >
+                Add User
+              </button>
             </div>
-
-            <div className="d-flex">
-              <div className="me-3 d-none d-md-block">
-                <input
-                  type="search"
-                  className="form-control"
-                  placeholder="search here...."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div>
-                <button
-                  onClick={() => setAddModalOpen(true)}
-                  variant="contained"
-                  className="btn btn-primary"
-                >
-                  Add User
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="mb-2 d-md-none">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here...."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
           </div>
         </div>
+        <div className="mb-2 d-md-none">
+          <input
+            type="search"
+            className="form-control"
+            placeholder="search here...."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
 
-        <div className="flex-grow-1 rounded-3 overflow-hidden">
-          <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-            <CTableHead className="text-nowrap ">
+      <div className="flex-grow-1 rounded-3 overflow-hidden">
+        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <CTableHead className="text-nowrap ">
+            <CTableRow>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Name
+              </CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white bg-secondary">
+                Email
+              </CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white bg-secondary">
+                Mobile No.
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Master Permissions
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Reports Permissions
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Actions
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
               <CTableRow>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">
-                  Name
-                </CTableHeaderCell>
-                <CTableHeaderCell className="text-center text-white bg-secondary">
-                  Email
-                </CTableHeaderCell>
-                <CTableHeaderCell className="text-center text-white bg-secondary">
-                  Mobile No.
-                </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">
-                  Master Permissions
-                </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">
-                  Reports Permissions
-                </CTableHeaderCell>
-                <CTableHeaderCell className=" text-center text-white bg-secondary">
-                  Actions
-                </CTableHeaderCell>
+                <CTableDataCell colSpan="6" className="text-center">
+                  <div className="text-nowrap mb-2 text-center w-">
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                    <p className="card-text placeholder-glow">
+                      <span className="placeholder col-12" />
+                    </p>
+                  </div>
+                </CTableDataCell>
               </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {loading ? (
-                <CTableRow>
-                  <CTableDataCell colSpan="6" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
+            ) : data.length > 0 ? (
+              data?.map((item, index) => (
+                <CTableRow key={index} className="p-0">
+                  <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0">
+                    {item.mobile || 'N/A'}
+                  </CTableDataCell>
+
+                  {/* Master Column */}
+                  <CTableDataCell className="text-center p-0">
+                    <CFormSelect id="periods" className="w-75 text-center border-0">
+                      <option value="">Master</option>
+                      {[
+                        'users',
+                        'groups',
+                        'devices',
+                        'geofence',
+                        'driver',
+                        'notification',
+                        'maintenance',
+                      ].map(
+                        (permission) =>
+                          item[permission] && (
+                            <option key={permission} value={permission}>
+                              {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            </option>
+                          ),
+                      )}
+                    </CFormSelect>
+                  </CTableDataCell>
+
+                  {/* Reports Column */}
+                  <CTableDataCell className="align-items-center p-0">
+                    <CFormSelect id="periods" className="w-75 text-center border-0">
+                      <option value="">Reports</option>
+                      {[
+                        'history',
+                        'stop',
+                        'travel',
+                        'status',
+                        'distance',
+                        'idle',
+                        'sensor',
+                        'alerts',
+                        'vehicle',
+                        'geofenceReport',
+                      ].map(
+                        (permission) =>
+                          item[permission] && (
+                            <option key={permission} value={permission}>
+                              {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            </option>
+                          ),
+                      )}
+                    </CFormSelect>
+                  </CTableDataCell>
+                  <CTableDataCell
+                    className="text-center d-flex p-0"
+                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
+                      <RiEdit2Fill
+                        style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                      />
+                    </IconButton>
+                    <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
+                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
+                    </IconButton>
                   </CTableDataCell>
                 </CTableRow>
-              ) : data.length > 0 ? (
-                data?.map((item, index) => (
-                  <CTableRow key={index} className="p-0">
-                    <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
-                    <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
-                    <CTableDataCell className="text-center p-0">
-                      {item.mobile || 'N/A'}
-                    </CTableDataCell>
-
-                    {/* Master Column */}
-                    <CTableDataCell className="text-center p-0">
-                      <CFormSelect id="periods" className="w-75 text-center border-0">
-                        <option value="">Master</option>
-                        {[
-                          'users',
-                          'groups',
-                          'devices',
-                          'geofence',
-                          'driver',
-                          'notification',
-                          'maintenance',
-                        ].map(
-                          (permission) =>
-                            item[permission] && (
-                              <option key={permission} value={permission}>
-                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              </option>
-                            ),
-                        )}
-                      </CFormSelect>
-                    </CTableDataCell>
-
-                    {/* Reports Column */}
-                    <CTableDataCell className="align-items-center p-0">
-                      <CFormSelect id="periods" className="w-75 text-center border-0">
-                        <option value="">Reports</option>
-                        {[
-                          'history',
-                          'stop',
-                          'travel',
-                          'status',
-                          'distance',
-                          'idle',
-                          'sensor',
-                          'alerts',
-                          'vehicle',
-                          'geofenceReport',
-                        ].map(
-                          (permission) =>
-                            item[permission] && (
-                              <option key={permission} value={permission}>
-                                {permission.charAt(0).toUpperCase() + permission.slice(1)}
-                              </option>
-                            ),
-                        )}
-                      </CFormSelect>
-                    </CTableDataCell>
-                    <CTableDataCell
-                      className="text-center d-flex p-0"
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
-                        <RiEdit2Fill
-                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
-                        />
-                      </IconButton>
-                      <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
-                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
-                      </IconButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan="6" className="text-center">
-                    <div
-                      className="d-flex flex-column justify-content-center align-items-center"
-                      style={{ height: '200px' }}
-                    >
-                      <p className="mb-0 fw-bold">
-                        "Oops! Looks like there's nobody here yet.
-                        <br /> Maybe it's time to invite some awesome users!"
-                      </p>
-                      <div>
-                        <button
-                          onClick={() => setAddModalOpen(true)}
-                          variant="contained"
-                          className="btn btn-primary m-3 text-white"
-                        >
-                          <span>
-                            <IoMdAdd className="fs-5" />
-                          </span>{' '}
-                          Add User
-                        </button>
-                      </div>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan="6" className="text-center">
+                  <div
+                    className="d-flex flex-column justify-content-center align-items-center"
+                    style={{ height: '200px' }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      "Oops! Looks like there's nobody here yet.
+                      <br /> Maybe it's time to invite some awesome users!"
+                    </p>
+                    <div>
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        variant="contained"
+                        className="btn btn-primary m-3 text-white"
+                      >
+                        <span>
+                          <IoMdAdd className="fs-5" />
+                        </span>{' '}
+                        Add User
+                      </button>
                     </div>
-                  </CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-        </div>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
+      </div>
+      <div className='d-flex justify-content-center align-items-center'>
 
-        {pageCount > 1 && (
-          <div className="">
+        <div className="d-flex">
+          {/* Pagination */}
+          <div className="me-3"> {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
@@ -684,7 +686,21 @@ const Users = () => {
               activeClassName="active"
             />
           </div>
-        )}
+          {/* Form Control */}
+          <div style={{ width: "90px" }}>
+            <CFormSelect
+              aria-label="Default select example"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              options={[
+                { label: '10', value: '10' },
+                { label: '50', value: '50' },
+                { label: '500', value: '500' },
+                { label: '5000', value: '5000' }
+              ]}
+            />
+          </div>
+        </div>
       </div>
 
       <Modal open={addModalOpen} onClose={handleModalClose}>
@@ -1204,7 +1220,7 @@ const Users = () => {
           </div>
         </Box>
       </Modal>
-    </>
+    </div>
   )
 }
 

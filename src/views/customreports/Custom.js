@@ -283,7 +283,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
     autoTable(doc, {
       head: [headers],
       body: tableData,
-      styles: { fontSize: 8 },
+      styles: { fontSize: 5 , fontWeight: 'bold'},
       margin: { top: 10 },
     })
 
@@ -315,7 +315,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
 
   return (
     <>
-      <CTable borderless className="custom-table">
+      <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>Vehicle</CTableHeaderCell>

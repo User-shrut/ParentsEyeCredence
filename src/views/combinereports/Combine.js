@@ -366,7 +366,7 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
   return (
     <>
 
-      <CTable borderless className="custom-table">
+      <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>SN</CTableHeaderCell>
@@ -408,11 +408,11 @@ const ShowStatus = ({ apiData, selectedColumns }) => {
                         </>
                       ) : null)
                       : column === 'Start Date Time'
-                        ? `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
+                        ? `${row.startDateTime.slice(0, 10)} , ${row.startDateTime.slice(12, 16)}`
                         : column === 'Start Address'
                           ? newAddressData?.startAddress || 'Fetching...'
                           : column === 'End Date Time'
-                            ? `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`
+                            ? `${row.endDateTime.slice(0, 10)} , ${row.startDateTime.slice(12, 16)}`
                             : column === 'Distance'
                               ? row.distance
                               : column === 'Total Distance'
