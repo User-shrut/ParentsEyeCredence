@@ -83,7 +83,7 @@ const Driver = () => {
   // ##################### getting data  ###################
   const fetchDriverData = async (page = 1) => {
     const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/driver?page=${page}&limit=${limit}`
+    const url = `${import.meta.env.VITE_API_URL}/driver?page=${page}&limit=${limit}&search=${searchQuery}`
 
     try {
       const response = await axios.get(url, {
@@ -114,8 +114,13 @@ const Driver = () => {
     } else {
       const filtered = data.filter(
         (driver) =>
-          driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          driver.email.toLowerCase().includes(searchQuery.toLowerCase())
+          driver?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (String(driver?.phone)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (String(driver?.email)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          driver?.device?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (String(driver?.licenseNumber)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (String(driver?.aadharNumber)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          driver?.address?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -123,7 +128,7 @@ const Driver = () => {
 
   useEffect(() => {
     fetchDriverData()
-  }, [limit])
+  }, [limit, searchQuery]);
 
   useEffect(() => {
     filterDrivers(searchQuery);
@@ -135,6 +140,7 @@ const Driver = () => {
     setLoading(true)
     fetchDriverData(page)
   }
+  
 
   // #########################################################################
 

@@ -72,7 +72,7 @@ const Group = () => {
   // ##################### getting data  ###################
   const fetchGroupData = async (page = 1) => {
     const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/group?page=${page}&limit=${limit}`
+    const url = `${import.meta.env.VITE_API_URL}/group?page=${page}&limit=${limit}&search=${searchQuery}`
 
     try {
       const response = await axios.get(url, {
@@ -110,7 +110,7 @@ const Group = () => {
 
   useEffect(() => {
     fetchGroupData()
-  }, [limit])
+  }, [limit,searchQuery])
 
   useEffect(() => {
     filterGroups(searchQuery);

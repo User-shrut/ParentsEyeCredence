@@ -104,7 +104,7 @@ const Users = () => {
   // ###############get users ###################
   const fetchUserData = async (page = 1) => {
     const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/user?page=${page}&limit=${limit}`
+    const url = `${import.meta.env.VITE_API_URL}/user?page=${page}&limit=${limit}&search=${searchQuery}`
 
     try {
       const response = await axios.get(url, {
@@ -133,8 +133,9 @@ const Users = () => {
     } else {
       const filtered = data.filter(
         (user) =>
-          user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchQuery.toLowerCase())
+          user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user?.mobile?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -142,7 +143,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUserData()
-  }, [limit])
+  }, [limit,searchQuery])
 
   useEffect(() => {
     filterUsers(searchQuery);

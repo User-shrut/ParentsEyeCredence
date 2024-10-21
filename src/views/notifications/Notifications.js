@@ -137,7 +137,7 @@ const Notification = () => {
 
   // ##################### getting data  ###################
   const fetchNotificationData = async (page = 1) => {
-    const url = `${import.meta.env.VITE_API_URL}/notifications?page=${page}&limit=${limit}`
+    const url = `${import.meta.env.VITE_API_URL}/notifications?page=${page}&limit=${limit}&search=${searchQuery}`
 
     try {
       const response = await axios.get(url, {
@@ -167,7 +167,8 @@ const Notification = () => {
     } else {
       const filtered = data.filter(
         (notification) =>
-          notification.deviceId?.name.toLowerCase().includes(searchQuery.toLowerCase())
+          notification.deviceId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          notification.type?.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -175,7 +176,7 @@ const Notification = () => {
 
   useEffect(() => {
     fetchNotificationData()
-  }, [])
+  }, [searchQuery])
 
   useEffect(() => {
     filterNotifications(searchQuery);
@@ -331,9 +332,9 @@ const Notification = () => {
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Device Name
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              {/* <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Chennel
-              </CTableHeaderCell>
+              </CTableHeaderCell> */}
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Notifications
               </CTableHeaderCell>
@@ -369,7 +370,7 @@ const Notification = () => {
               filteredData?.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center p-0">{item.deviceId?.name}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell>
+                  {/* <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell> */}
                   <CTableDataCell className="text-center p-0 ">
                     <CFormSelect
                       id="type"

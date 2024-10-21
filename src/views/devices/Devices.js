@@ -142,7 +142,7 @@ const Devices = () => {
     setLoading(true) // Start loading
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,11 +165,8 @@ const Devices = () => {
           installationdate: device.installationdate || 'N/A',
           expirationdate: device.expirationdate || 'N/A',
           extenddate: device.extenddate || 'N/A',
-
           groups: device.groups || [],
-
           users: device.users || [],
-
           geofences: device.geofences || [],
         }))
 
@@ -194,7 +191,11 @@ const Devices = () => {
     } else {
       const filtered = data.filter(
         (device) =>
-          device.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+          device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.uniqueId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.sim.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.category.toLowerCase().includes(searchQuery.toLowerCase()) 
       );
       setFilteredData(filtered);
     }
@@ -202,7 +203,7 @@ const Devices = () => {
 
   useEffect(() => {
     fetchData()
-  }, [limit])
+  }, [limit,searchQuery])
 
   useEffect(() => {
     filterDevices(searchQuery);

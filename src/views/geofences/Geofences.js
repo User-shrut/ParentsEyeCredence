@@ -184,7 +184,7 @@ const Geofences = () => {
   // ######################### get geofences ##############################################
   const fetchGeofenceData = async (page = 1) => {
     const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/geofence?page=${page}&limit=${limit}`
+    const url = `${import.meta.env.VITE_API_URL}/geofence?page=${page}&limit=${limit}&search=${searchQuery}`
 
     try {
       const response = await axios.get(url, {
@@ -214,7 +214,9 @@ const Geofences = () => {
     } else {
       const filtered = data.filter(
         (geofences) =>
-          geofences.name.toLowerCase().includes(searchQuery.toLowerCase())
+          geofences.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          geofences.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          geofences.deviceIds.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -222,7 +224,7 @@ const Geofences = () => {
 
   useEffect(() => {
     fetchGeofenceData()
-  }, [])
+  }, [limit, searchQuery])
 
   useEffect(() => {
     filterGeofences(searchQuery);

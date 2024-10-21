@@ -416,7 +416,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                     day: '2-digit',
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                    hour12: false,
+                                    hour12: true,
                                   })
                                 : column === 'Departure Time'
                                   ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
@@ -430,7 +430,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                       month: '2-digit',
                                       hour: '2-digit',
                                       minute: '2-digit',
-                                      hour12: false,
+                                      hour12: true,
                                     })
                                   : column === 'Total Duration'
                                     ? // Convert total duration from seconds to HH:mm:ss format
