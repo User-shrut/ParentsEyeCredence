@@ -19,6 +19,10 @@ import { Select, MenuItem, } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -45,6 +49,11 @@ import DialpadIcon from '@mui/icons-material/Dialpad';
 import HomeIcon from '@mui/icons-material/Home';
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast';
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react';
+import { cilSettings } from '@coreui/icons';
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -140,7 +149,7 @@ const Driver = () => {
     setLoading(true)
     fetchDriverData(page)
   }
-  
+
 
   // #########################################################################
 
@@ -270,6 +279,66 @@ const Driver = () => {
 
     fetchDevices();
   }, []);
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      const rowData = {
+        'SN': rowIndex + 1, // Include row index as SN
+        'Driver Name': item.name || 'N/A',
+        'Mobile No.': item.phone || 'N/A',
+        'Email': item.email || 'N/A',
+        'Vehicle No.': item.device || 'N/A',
+        'Lic. No.': item.licenseNumber || 'N/A',
+        'Aadhar No.': item.aadharNumber || 'N/A',
+        'Address': item.address || 'N/A',
+        'Actions': '' // Actions column is usually empty in Excel
+      };
+
+      return rowData;
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Drivers Data');
+
+    // Write the Excel file
+    XLSX.writeFile(workbook, 'drivers_data.xlsx');
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = [
+      'SN',
+      'Driver Name',
+      'Mobile No.',
+      'Email',
+      'Vehicle No.',
+      'Lic. No.',
+      'Aadhar No.',
+      'Address',
+      'Actions'
+    ];
+
+    const tableRows = filteredData.map((item, index) => {
+      return [
+        index + 1,
+        item.name || '--',
+        item.phone || '--',
+        item.email || '--',
+        item.device || '--',
+        item.licenseNumber || '--',
+        item.aadharNumber || '--',
+        item.address || '--',
+        '' // Actions column is usually empty in PDF
+      ];
+    });
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save('drivers_data.pdf');
+  };
 
   //  ###############################################################
 
@@ -430,6 +499,18 @@ const Driver = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
       <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}

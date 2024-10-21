@@ -20,6 +20,10 @@ import {
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CDropdown,
+  CDropdownMenu,
+  CDropdownItem,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -37,6 +41,11 @@ import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -102,7 +111,7 @@ const Group = () => {
     } else {
       const filtered = data.filter(
         (group) =>
-          group.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+          group.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -110,7 +119,7 @@ const Group = () => {
 
   useEffect(() => {
     fetchGroupData()
-  }, [limit,searchQuery])
+  }, [limit, searchQuery])
 
   useEffect(() => {
     filterGroups(searchQuery);
@@ -213,6 +222,72 @@ const Group = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      // Define the master permissions and reports permissions by filtering the relevant fields
+      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => item[permission]) // Filter permissions that are true
+        .join(', ') || 'N/A'; // Join the filtered permissions or set 'N/A' if empty
+
+      const reportsPermissions = [
+        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
+      ]
+        .filter((permission) => item[permission]) // Filter permissions that are true
+        .join(', ') || 'N/A'; // Join the filtered permissions or set 'N/A' if empty
+
+      // Define row data for each item in the filteredData array
+      const rowData = {
+        SN: rowIndex + 1,               // Serial Number
+        Name: item.username || 'N/A',   // Name of the user
+        Email: item.email || 'N/A',     // User's email
+        'Mobile No.': item.mobile || 'N/A', // User's mobile number
+        'Master Permissions': masterPermissions, // Master permissions as a comma-separated string
+        'Reports Permissions': reportsPermissions // Reports permissions as a comma-separated string
+      };
+
+      return rowData; // Return row data in the correct format
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport); // Convert data to worksheet format
+    const workbook = XLSX.utils.book_new(); // Create a new workbook
+
+    // Append the worksheet to the workbook with the sheet name 'User Data'
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'User Data');
+
+    // Write the Excel file to the client's computer
+    XLSX.writeFile(workbook, 'user_data.xlsx');
+  };
+
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Define the table headers
+    const tableColumn = ['SN', 'Group Name', 'Actions'];
+
+    // Map over your filteredData to create rows
+    const tableRows = filteredData.map((item, rowIndex) => {
+      const rowData = [
+        rowIndex + 1,                // Serial Number
+        item.name || '--',            // Group Name
+        'Edit/Delete'                 // Actions (for simplicity, displaying 'Edit/Delete')
+      ];
+      return rowData;
+    });
+
+    // Create table using autoTable
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20
+    });
+
+    // Save the PDF
+    doc.save('group_data.pdf');
+  };
 
   //  ###############################################################
 
@@ -342,8 +417,20 @@ const Group = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
-      <div className='d-flex justify-content-center align-items-center'>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
 
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
+      <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}
           <div className="me-3"> {/* Adds margin to the right of pagination */}

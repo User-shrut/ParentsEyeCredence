@@ -20,6 +20,10 @@ import {
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -37,6 +41,11 @@ import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const notificationTypes = [
   'statusOnline',
@@ -283,6 +292,56 @@ const Notification = () => {
     console.log('this is form data...', formData)
   }, [formData])
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Define the columns based on the CTable structure
+    const tableColumn = ['SN', 'Device Name', 'Notifications'];
+
+    // Generate rows of data for the PDF
+    const tableRows = filteredData.map((item, index) => {
+      // Define how to extract the data for each column
+      const rowData = [
+        index + 1, // Serial Number
+        item.deviceId?.name || '--', // Device Name
+        item.type.length || '--', // Notifications (assuming type length is what you want here)
+        // 'Actions' // Placeholder for Actions, you might want to define specific actions here
+      ];
+
+      return rowData;
+    });
+
+    // Use autoTable to create the table in the PDF
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+
+    // Save the generated PDF
+    doc.save('table_data.pdf');
+  };
+
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      const rowData = {
+        SN: rowIndex + 1, // Include row index as SN
+        'Device Name': item.deviceId?.name || 'N/A', // Device Name
+        'Notifications': item.type.length || '0', // Notifications count
+        // 'Actions': 'N/A' // Placeholder for Actions, adjust as needed
+      };
+
+      return rowData;
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+
+    // Write the Excel file
+    XLSX.writeFile(workbook, 'table_data.xlsx');
+  };
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -431,6 +490,18 @@ const Notification = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
       <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}

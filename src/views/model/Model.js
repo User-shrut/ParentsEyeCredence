@@ -38,11 +38,19 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableDataCell,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
 } from '@coreui/react';
 import Loader from '../../components/Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
 import { IoMdAdd } from 'react-icons/io';
-
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react';
+import { cilSettings } from '@coreui/icons';
 
 const Model = () => {
   const [data, setData] = useState([]);
@@ -77,7 +85,7 @@ const Model = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/model`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/model?search=${searchQuery}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -109,7 +117,7 @@ const Model = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     filterModels(searchQuery);
@@ -219,7 +227,52 @@ const Model = () => {
       }
     }
   };
+  const exportToPDF = () => {
+    const doc = new jsPDF();
 
+    // Define the table columns based on the CTable structure
+    const tableColumn = ['SN', 'Model Name'];
+
+    // Map through the filteredData (assuming it contains the data to be exported)
+    const tableRows = filteredData.map((item, rowIndex) => {
+      // Extract relevant data for each column
+      const rowData = [
+        rowIndex + 1,                      // Serial Number
+        item.modelName || '--',            // Model Name
+        // 'Edit/Delete'                       // Placeholder for Actions
+      ];
+
+      return rowData;
+    });
+
+    // Use autoTable to create the PDF table
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+
+    // Save the PDF document
+    doc.save('model_data.pdf');
+  };
+
+  const exportToExcel = () => {
+    // Prepare the data for Excel
+    const tableData = filteredData.map((item, index) => ({
+      SN: index + 1,
+      'Model Name': item.modelName || '--',
+      // 'Actions': 'Edit/Delete' // Placeholder for actions
+    }));
+
+    // Create a new workbook and a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Models');
+
+    // Define the file name
+    const fileName = 'model_data.xlsx';
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, fileName);
+  };
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -277,7 +330,7 @@ const Model = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : (filteredData.length < 0 ? (
+            ) : (filteredData.length > 0 ? (
               filteredData.map((item) => (
                 <CTableRow key={item._id}>
                   <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
@@ -328,7 +381,18 @@ const Model = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
-
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
 
       {/* Add Modal */}
       <Modal open={addModalOpen} onClose={handleAddModalClose}>
