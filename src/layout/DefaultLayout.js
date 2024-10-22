@@ -1,15 +1,8 @@
 import React, { useEffect } from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
-import { useDispatch } from 'react-redux'
-import { fetchDeviceData } from '../features/devicesSlice';
 
 const DefaultLayout = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    // Fetch device data when the app loads
-    dispatch(fetchDeviceData());
-  }, [dispatch]);
+  
   return (
     <div>
 

@@ -67,6 +67,7 @@ const Users = () => {
   const steps = ['Personal Info', 'Permissions']
   const [isSuperAdmin, setSuperAdmin] = useState(false)
   const [filteredData, setFilteredData] = useState([]);
+  const [groups, setGroups] = useState([])
 
   // Go to the next step
   const handleNext = () => {
@@ -126,6 +127,38 @@ const Users = () => {
     }
   }
 
+
+
+  const fetchGroups = async () => {
+    const accessToken = Cookies.get('authToken')
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const data = await response.json()
+      console.log('groups: ', data.groups)
+      setGroups(data.groups) // Assuming the API returns { groups: [...] }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+  useEffect(() => {
+    fetchGroups();
+  }, [])
+
+
+
+
   // ##################### Filter data by search query #######################
   const filterUsers = () => {
     if (!searchQuery) {
@@ -143,7 +176,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUserData()
-  }, [limit,searchQuery])
+  }, [limit, searchQuery])
 
   useEffect(() => {
     filterUsers(searchQuery);
@@ -162,20 +195,18 @@ const Users = () => {
     email: '',
     mobile: '',
     password: '',
+    groupsAssigned: [],
     permissions: {
       notification: false,
       devices: false,
       driver: false,
       groups: false,
-      // category: false,
-      // model: false,
       users: false,
       report: false,
       stop: false,
       travel: false,
       geofence: false,
       maintenance: false,
-      // preferences: false,
       status: false,
       distance: false,
       history: false,
@@ -217,10 +248,15 @@ const Users = () => {
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
+
+
+
+    console.log("this is value: ", formData);
   }
 
   // Handle permission changes
@@ -260,24 +296,25 @@ const Users = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-    const phonePattern = /^[0-9]{10}$/
+    // const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+    // const phonePattern = /^[0-9]{10}$/
 
-    if (!emailPattern.test(formData.email)) {
-      toast.error('Please enter a valid email address')
-      return
-    }
+    // if (!emailPattern.test(formData.email)) {
+    //   toast.error('Please enter a valid email address')
+    //   return
+    // }
 
-    if (!phonePattern.test(formData.mobile)) {
-      toast.error('Please enter a valid 10-digit phone number')
-      return
-    }
+    // if (!phonePattern.test(formData.mobile)) {
+    //   toast.error('Please enter a valid 10-digit phone number')
+    //   return
+    // }
 
     const dataToSubmit = {
       username: formData.username,
       mobile: formData.mobile,
       email: formData.email,
       password: formData.password,
+      groupsAssigned: formData.groupsAssigned,
       ...formData.permissions,
     }
 
@@ -353,6 +390,7 @@ const Users = () => {
       username: userData.username,
       email: userData.email,
       mobile: userData.mobile,
+      groupsAssigned: userData.groupsAssigned,
       permissions: {
         notification: userData.notification,
         devices: userData.devices,
@@ -390,6 +428,7 @@ const Users = () => {
       email: formData.email,
       mobile: formData.mobile,
       password: formData.password,
+      groupsAssigned: formData.groupsAssigned,
       ...formData.permissions,
     }
 
@@ -830,6 +869,22 @@ const Users = () => {
                     ),
                   }}
                 />
+                <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
+                  <InputLabel>Groups</InputLabel>
+                  <Select
+                    name="groupsAssigned" // Should match the key in formData
+                    value={formData.groupsAssigned || []} // This is already an array in formData
+                    onChange={handleInputChange}
+                    label="Groups"
+                    multiple
+                  >
+                    {groups.map((group) => (
+                      <MenuItem key={group._id} value={group._id}>
+                        {group.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             )}
 
@@ -1128,6 +1183,23 @@ const Users = () => {
                     ),
                   }}
                 />
+
+                <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
+                  <InputLabel>{"Group"}</InputLabel>
+                  <Select
+                    name="groupsAssigned"
+                    value={formData.groupsAssigned || []}
+                    onChange={handleInputChange}
+                    label={"Groups"}
+                    multiple
+                  >
+                    {groups?.map((group) => (
+                      <MenuItem key={group._id} value={group._id}>
+                        {group.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             )}
 

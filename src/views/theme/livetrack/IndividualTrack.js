@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { GlobalContext } from '../../../Context/Context'
 import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 import axios from 'axios'
 import useVehicleTracker from './useVehicleTracker'
@@ -243,7 +242,6 @@ const IndividualTrack = () => {
   const { deviceId, category, name } = useParams()
   const { vehicleData, loading, error } = useVehicleTracker(deviceId)
   const [individualSalesMan, setIndividualSalesMan] = useState(null)
-  const { salesManList, selectedSalesMan } = useContext(GlobalContext)
   const [address, setAddress] = useState(null)
   const previousPosition = useRef(null) // Ref to store the previous position
   const [path, setPath] = useState([]) // State for polyline path

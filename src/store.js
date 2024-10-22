@@ -2,7 +2,6 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import liveFeaturesReducer from './features/LivetrackingDataSlice.js'
 import vehicleReducer from './features/vehicleSlice.js'
 import columnVisibilityReducer from './features/columnVisibilitySlice.js'
-import deviceReducer from './features/devicesSlice.js';
 // Initial state and reducer for sidebar and theme
 const initialState = {
   sidebarShow: false,
@@ -23,8 +22,7 @@ const rootReducer = combineReducers({
   liveFeatures: liveFeaturesReducer,
   sidebar: changeState, // Add your sidebar/theme reducer here
   vehicle: vehicleReducer,
-  columnVisibility: columnVisibilityReducer,
-  device: deviceReducer,
+  columnVisibility: columnVisibilityReducer
 })
 
 // Create the Redux store

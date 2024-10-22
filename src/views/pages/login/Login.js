@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -31,7 +31,7 @@ const Login = () => {
       // Store the token and navigate on success
       if (token) {
         // Store the JWT token in a cookie
-
+        Cookies.set('crdntl', JSON.stringify(credentials));
         const cookieOptions = {
           secure: false, // Only allow cookies over HTTPS , so turn true
           // sameSite: 'Strict', // Strictly same-site cookie
@@ -43,8 +43,6 @@ const Login = () => {
 
         Cookies.set('authToken', token, cookieOptions)
         navigate('/dashboard')
-        toast.success('successfully logged in')
-        alert('successfully logged in')
 
       } else {
         alert(response.data.message)
@@ -56,7 +54,7 @@ const Login = () => {
   }
   return (
     <>
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="loginContainer bg-white">
         <div className="row" style={{ height: '100vh', width: '100%', overflow: 'hidden' }}>
           <div className="d-none d-lg-block col-md-6 p-0">

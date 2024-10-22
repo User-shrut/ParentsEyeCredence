@@ -540,18 +540,7 @@ const Notification = () => {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                <InputLabel>Channel</InputLabel>
-                <Select
-                  name="type"
-                  value={formData.channel || []}
-                  onChange={(e) => setFormData({ ...formData, channel: e.target.value })}
-                  label="Select Channel..."
-                >
-                  <MenuItem value="web">Web</MenuItem>
-                  <MenuItem value="mobile">Mobile</MenuItem>
-                </Select>
-              </FormControl>
+             
               <Button
                 variant="contained"
                 color="primary"
@@ -610,18 +599,7 @@ const Notification = () => {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                <InputLabel>Channel</InputLabel>
-                <Select
-                  name="type"
-                  value={formData.channel || []}
-                  onChange={(e) => setFormData({ ...formData, channel: e.target.value })}
-                  label="Select Channel..."
-                >
-                  <MenuItem value="web">Web</MenuItem>
-                  <MenuItem value="mobile">Mobile</MenuItem>
-                </Select>
-              </FormControl>
+              
               <Button
                 variant="contained"
                 color="primary"
