@@ -24,6 +24,10 @@ import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlinePlus } from 'react-icons/ai'
 import SearchIcon from '@mui/icons-material/Search'
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -39,6 +43,11 @@ import ReactPaginate from 'react-paginate'
 import { Label } from '@mui/icons-material'
 import toast, { Toaster } from 'react-hot-toast'
 import { jwtDecode } from 'jwt-decode'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -195,7 +204,7 @@ const Devices = () => {
           device.uniqueId.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.sim.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          device.category.toLowerCase().includes(searchQuery.toLowerCase()) 
+          device.category.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -203,7 +212,7 @@ const Devices = () => {
 
   useEffect(() => {
     fetchData()
-  }, [limit,searchQuery])
+  }, [limit, searchQuery])
 
   useEffect(() => {
     filterDevices(searchQuery);
@@ -587,6 +596,81 @@ const Devices = () => {
     setExtendedPasswordModel(true)
   }
 
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      const rowData = columns.slice(1).reduce((acc, column) => {
+        const accessor = column.accessor;
+
+        // Handle specific columns based on the column's accessor
+        if (accessor === 'groups') {
+          acc[column.Header] = item.groups.length || '0';
+        } else if (accessor === 'geofences') {
+          acc[column.Header] = item.geofences.length || '0';
+        } else if (accessor === 'users') {
+          acc[column.Header] = item.users.length || '0';
+        } else if (accessor === 'Driver') {
+          acc[column.Header] = item.Driver?.name || 'N/A';
+        } else if (accessor === 'device') {
+          acc[column.Header] = item.device?.name || 'N/A';
+        } else {
+          acc[column.Header] = item[accessor] || 'N/A';  // Fallback for other columns
+        }
+
+        return acc;
+      }, {});
+
+      return { SN: rowIndex + 1, ...rowData }; // Include row index as SN
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+
+    // Write the Excel file
+    XLSX.writeFile(workbook, 'table_data.xlsx');
+  };
+
+
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Define the table headers from the columns prop (skip the first one as per the UI logic)
+    const tableColumn = ['SN', ...columns.slice(1).map(column => column.Header)];
+
+    // Build the table rows using the filteredData array
+    const tableRows = filteredData.map((item, rowIndex) => {
+      const rowData = columns.slice(1).map((column) => {
+        const accessor = column.accessor;
+
+        // Handle specific columns and their logic
+        if (accessor === 'groups') {
+          return item.groups.length || '0';
+        } else if (accessor === 'geofences') {
+          return item.geofences.length || '0';
+        } else if (accessor === 'users') {
+          return item.users.length || '0';
+        } else if (accessor === 'Driver') {
+          return item.Driver?.name || 'N/A';
+        } else if (accessor === 'device') {
+          return item.device?.name || 'N/A';
+        } else {
+          return item[accessor] || 'N/A';  // Fallback for other columns
+        }
+      });
+      return [rowIndex + 1, ...rowData];
+    });
+
+    // Generate the PDF using the autoTable plugin
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save('table_data.pdf');
+  };
+
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -771,6 +855,18 @@ const Devices = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
       <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}

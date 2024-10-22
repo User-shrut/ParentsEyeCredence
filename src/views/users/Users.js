@@ -32,6 +32,10 @@ import {
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
 import {
+  CDropdown,
+  CDropdownMenu,
+  CDropdownItem,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -53,6 +57,11 @@ import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
 
 const Users = () => {
   // somthing for testing
@@ -531,6 +540,74 @@ const Users = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => item[permission])
+        .join(', ') || 'N/A';
+
+      const reportsPermissions = [
+        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
+      ]
+        .filter((permission) => item[permission])
+        .join(', ') || 'N/A';
+
+      // Define row data
+      const rowData = {
+        SN: rowIndex + 1,
+        Name: item.username || 'N/A',
+        Email: item.email || 'N/A',
+        'Mobile No.': item.mobile || 'N/A',
+        'Master Permissions': masterPermissions,
+        'Reports Permissions': reportsPermissions
+      };
+
+      return rowData; // Return row data in the correct format
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'User Data');
+
+    // Write the Excel file
+    XLSX.writeFile(workbook, 'user_data.xlsx');
+  };
+
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = ['SN', 'Name', 'Email', 'Mobile No.', 'Master Permissions', 'Reports Permissions', 'Actions'];
+
+    const tableRows = filteredData.map((row, rowIndex) => {
+      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A';
+
+      const reportsPermissions = [
+        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
+      ]
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A';
+
+      const rowData = [
+        row.username || '--',
+        row.email || '--',
+        row.mobile || 'N/A',
+        masterPermissions,
+        reportsPermissions,
+        'Edit/Delete' // Placeholder for action buttons
+      ];
+
+      return [rowIndex + 1, ...rowData];
+    });
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save('user_data.pdf');
+  };
 
   //  ####################################################
 
@@ -721,8 +798,20 @@ const Users = () => {
           </CTableBody>
         </CTable>
       </div>
-      <div className='d-flex justify-content-center align-items-center'>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
 
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
+      <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}
           <div className="me-3"> {/* Adds margin to the right of pagination */}

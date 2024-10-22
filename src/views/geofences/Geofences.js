@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CFormSelect,
   CTable,
   CTableBody,
@@ -40,6 +44,11 @@ import { useSelector } from 'react-redux'
 import Select from 'react-select'
 import toast, { Toaster } from 'react-hot-toast'
 import { IoMdAdd } from 'react-icons/io'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const Geofences = () => {
   const deviceData = useSelector((state) => state.device.data)
@@ -346,6 +355,52 @@ const Geofences = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      // Define row data for each item in the filteredData array
+      const rowData = {
+        SN: rowIndex + 1,               // Serial Number
+        'Geofence Name': item.name || 'N/A',   // Name of the geofence
+        'Type': item.type || 'N/A',     // Type of the geofence
+        'Vehicles': (item.deviceIds.length || 0).toString(), // Number of vehicles
+        'Actions': '--'                 // Actions can be left as '--' or customized if needed
+      };
+
+      return rowData; // Return row data in the correct format
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport); // Convert data to worksheet format
+    const workbook = XLSX.utils.book_new(); // Create a new workbook
+
+    // Append the worksheet to the workbook with the sheet name 'Geofence Data'
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Geofence Data');
+
+    // Write the Excel file to the client's computer
+    XLSX.writeFile(workbook, 'geofence_data.xlsx');
+  };
+
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles', 'Actions'];
+
+    // Extracting the relevant data for PDF export
+    const tableRows = filteredData.map((item, index) => {
+      const vehicleCount = item.deviceIds.length || '0'; // Count of vehicles
+      return [
+        index + 1, // Serial Number
+        item.name, // Geofence Name
+        item.type, // Type
+        vehicleCount, // Vehicles
+        '--' // Actions column can be left blank or customized as needed
+      ];
+    });
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save('geofence_data.pdf');
+  };
 
   //  ###############################################################
 
@@ -494,6 +549,19 @@ const Geofences = () => {
               </CTableBody>
             </CTable>
           </TableContainer>
+          <CDropdown className="position-fixed bottom-0 end-0 m-3">
+            <CDropdownToggle
+              color="secondary"
+              style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+            >
+              <CIcon icon={cilSettings} />
+
+            </CDropdownToggle>
+            <CDropdownMenu>
+              <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+              <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+            </CDropdownMenu>
+          </CDropdown>
           {pageCount > 1 && (
             <ReactPaginate
               breakLabel="..."

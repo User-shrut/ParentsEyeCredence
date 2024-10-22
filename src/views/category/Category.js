@@ -17,6 +17,10 @@ import {
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -33,6 +37,11 @@ import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
+import * as XLSX from 'xlsx'; // For Excel export
+import jsPDF from 'jspdf'; // For PDF export
+import 'jspdf-autotable'; // For table formatting in PDF.
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const Category = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -206,6 +215,48 @@ const Category = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+  const exportToExcel = () => {
+    // Map filtered data into the format required for export
+    const dataToExport = filteredData.map((item, rowIndex) => {
+      const rowData = {
+        SN: rowIndex + 1,                       // Serial Number
+        'Category Name': item.categoryName || 'N/A', // Category Name
+        // 'Actions': 'Edit, Delete'               // Actions placeholder (can be detailed if necessary)
+      };
+
+      return rowData;
+    });
+
+    // Create worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Category Data');
+
+    // Write the Excel file
+    XLSX.writeFile(workbook, 'category_data.xlsx');
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    // Define the columns based on the CTableHeaderCell names
+    const tableColumn = ['SN', 'Category Name']; // Adjust columns based on your table
+    const tableRows = filteredData.map((item, index) => {
+      // Each row will include the index, category name, and action placeholders
+      return [
+        index + 1,                       // Serial Number
+        item.categoryName,               // Category Name
+        // 'Edit, Delete'                   // Actions placeholder (could be detailed if necessary)
+      ];
+    });
+
+    // Create the PDF table with the defined columns and rows
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    // Save the generated PDF
+    doc.save('category_data.pdf');
+  };
+
 
   //  ###############################################################
 
@@ -335,6 +386,18 @@ const Category = () => {
           </CTableBody>
         </CTable>
       </TableContainer>
+      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+        <CDropdownToggle
+          color="secondary"
+          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+        >
+          <CIcon icon={cilSettings} />
+        </CDropdownToggle>
+        <CDropdownMenu>
+          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+        </CDropdownMenu>
+      </CDropdown>
       {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
