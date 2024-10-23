@@ -31,11 +31,14 @@ import { cilSettings } from '@coreui/icons'
 import * as XLSX from 'xlsx' // For Excel export
 import jsPDF from 'jspdf' // For PDF export 
 import autoTable from 'jspdf-autotable'
+import { auto } from '@popperjs/core'
 
 const SearchDistance = ({
   formData,
   handleInputChange,
   handleSubmit,
+  users, 
+  getGroups,
   groups,
   devices,
   loading,
@@ -48,6 +51,10 @@ const SearchDistance = ({
   const [showDateInputs, setShowDateInputs] = useState(false) // State to manage button text
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
+  const [selectedU, setSelectedU] = useState();
+  const [selectedG, setSelectedG] = useState();
+
+
   const allDevicesOption = { value: 'all', label: 'All Devices' } // Define an option for "All Devices"
   const convertToDesiredFormat = (inputDate) => {
     const date = new Date(inputDate) // Create a Date object with the given input
@@ -105,22 +112,56 @@ const SearchDistance = ({
       onSubmit={handleFormSubmit}
     >
       <CCol md={3}>
+        <CFormLabel htmlFor="devices">User</CFormLabel>
+        <CFormSelect
+          id="user"
+          required
+          value={selectedU}
+          onChange={(e) => {
+            const selectedUser = e.target.value;
+            setSelectedU(selectedUser)
+            console.log("Selected user:", selectedUser);
+            getGroups(selectedUser);
+          }}
+        >
+          <option value="">Choose a user...</option>
+          {loading ? (<option>Loading Users...</option>) : (
+            users?.length > 0 ? (
+              users?.map((user) => (
+                <option key={user._id} value={user._id}>{user.username}</option>
+              ))
+            ) : (
+              <option disabled>No Users in this Account</option>
+            )
+          )
+          }
+        </CFormSelect>
+      </CCol>
+      <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
         <CFormSelect
           id="group"
           required
+          value={selectedG}
           onChange={(e) => {
-            const selectedGroup = e.target.value
-            console.log('Selected Group ID:', selectedGroup)
-            getDevices(selectedGroup)
+            const selectedGroup = e.target.value;
+            setSelectedG(selectedGroup);
+            console.log("Selected Group ID:", selectedGroup);
+            getDevices(selectedGroup);
           }}
         >
           <option value="">Choose a group...</option>
-          {groups.map((group) => (
-            <option key={group._id} value={group._id}>
-              {group.name}
-            </option>
-          ))}
+
+          {loading ? (<option>Loading Groups...</option>) : (
+            groups?.length > 0 ? (
+              groups?.map((group) => (
+                <option key={group._id} value={group._id}>{group.name}</option>
+              ))
+            ) : (
+              <option disabled>No Groups in this User</option>
+            )
+          )
+          }
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -270,7 +311,9 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
 
   // Export to PDF function
   const exportToPDF = () => {
-    const doc = new jsPDF()
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
 
     const tableData = apiData.data.map((row) => [
       findDeviceName(row.deviceId),
@@ -283,7 +326,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
     autoTable(doc, {
       head: [headers],
       body: tableData,
-      styles: { fontSize: 5 , fontWeight: 'bold'},
+      styles: { fontSize: 5, fontWeight: 'bold' },
       margin: { top: 10 },
     })
 
@@ -315,7 +358,8 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
 
   return (
     <>
-      <CTable bordered className="custom-table">
+    <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <CTable bordered className="custom-table" >
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>Vehicle</CTableHeaderCell>
@@ -365,6 +409,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
           )}
         </CTableBody>
       </CTable>
+      </div>
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle color="secondary" style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}>
@@ -390,7 +435,8 @@ const Distance = () => {
     Columns: [],
   }) // Change Devices to an array
   const [searchQuery, setSearchQuery] = useState('')
-  const [groups, setGroups] = useState([])
+  const [users, setUsers] = useState();
+  const [groups, setGroups] = useState([]);
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
   const accessToken = Cookies.get('authToken')
@@ -468,25 +514,51 @@ const Distance = () => {
     }
   }
 
-  const getGroups = async () => {
+  const getGroups = async (selectedUser) => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
         headers: {
           Authorization: 'Bearer ' + accessToken,
         },
       })
       if (response.data) {
-        setGroups(response.data.groups)
-        console.log('yaha tak thik hai')
+        setGroups(response.data.groupsAssigned)
+        setLoading(false);
+        console.log("yaha tak thik hai")
       }
     } catch (error) {
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
+      setLoading(false);
+    }
+  }
+
+
+  const getUser = async () => {
+    setLoading(true);
+    setGroups([]);
+    setDevices([]);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setUsers(response.data.users)
+        setLoading(false);
+        console.log("yaha tak thik hai")
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    getGroups()
+    getUser();
   }, [])
 
   const handleInputChange = (name, value) => {
@@ -540,6 +612,8 @@ const Distance = () => {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                users={users}
+                getGroups={getGroups}
                 groups={groups}
                 getDevices={getDevices}
                 loading={loading}
