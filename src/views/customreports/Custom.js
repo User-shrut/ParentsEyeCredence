@@ -192,7 +192,7 @@ const SearchDistance = ({
         <CFormFeedback invalid>Please provide valid devices.</CFormFeedback>
       </CCol>
       {/* Date Inputs for From Date and To Date */}
-      <CCol md={3}>
+      <CCol md={2}>
         <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -203,7 +203,7 @@ const SearchDistance = ({
         />
         <CFormFeedback invalid>Please provide a valid from date.</CFormFeedback>
       </CCol>
-      <CCol md={3}>
+      <CCol md={2}>
         <CFormLabel htmlFor="toDate">To Date</CFormLabel>
         <CFormInput
           type="datetime-local"
@@ -601,7 +601,6 @@ const Distance = () => {
   return (
     <>
       <CRow className="pt-3">
-        <h2 className="px-4">Distance</h2>
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

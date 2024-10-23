@@ -217,7 +217,7 @@
 //               <DeleteIcon />
 //             </IconButton>
 //           </CTooltip>
-          
+
 //         </div>
 //       </LoadScript>
 //     </div>
@@ -436,12 +436,12 @@
 //                     strokeWeight: 2,
 //                   }}
 //                 />
-              
+
 //             ))}
 
 //           </GoogleMap>
 
-          
+
 //         </div>
 //       </LoadScript>
 //     </div>
@@ -451,12 +451,13 @@
 // export default Gmap;
 
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleMap, Polygon, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CropDinIcon from '@mui/icons-material/CropDin';
 import PolylineIcon from '@mui/icons-material/Polyline';
 import { CTooltip } from '@coreui/react';
+import { Marker } from 'react-leaflet';
 
 const containerStyle = {
   width: '100%',
@@ -479,6 +480,8 @@ const fullscreenContainerStyle = {
 
 const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik';
 
+const markerPosition = { lat: 37.7749, lng: -122.4194 };
+
 const Gmap = ({ data }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -491,7 +494,7 @@ const Gmap = ({ data }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const mapContainerRef = useRef(null);
 
-  const geofences = data.filter(
+  const geofences = data?.filter(
     (geofence) => geofence.area.length > 0 && geofence.area.every((point) => point.lat && point.lng)
   );
   console.log('geofence hai ye ', geofences);
@@ -522,25 +525,26 @@ const Gmap = ({ data }) => {
   return (
     <div ref={mapContainerRef} style={containerStyle}>
       <div style={{ position: 'relative' }}>
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={12}
-        >
-          
-          {geofences.map((geofence, index) => (
-            <Polygon
-              key={index}
-              path={geofence.area.map(({ lat, lng }) => ({ lat, lng }))}
-              options={{
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-              }}
-            />
-          ))}
+        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
+          {geofences && geofences.length > 0 ? (
+            geofences.map((geofence, index) => (
+              <Polygon
+                key={index}
+                path={geofence.area.map(({ lat, lng }) => ({ lat, lng }))}
+                options={{
+                  fillColor: '#FF0000',
+                  fillOpacity: 0.35,
+                  strokeColor: '#FF0000',
+                  strokeOpacity: 0.8,
+                  strokeWeight: 2,
+                }}
+              />
+            ))
+          ) : (
+            <div>No geofence data available</div>
+          )}
+
+          <MarkerF position={markerPosition} />
         </GoogleMap>
       </div>
     </div>

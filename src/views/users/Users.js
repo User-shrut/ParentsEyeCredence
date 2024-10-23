@@ -603,7 +603,9 @@ const Users = () => {
   const exportToPDF = async () => {
 
 
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
     const tableColumn = ['SN', 'Name', 'Email', 'Mobile No.', 'Master Permissions', 'Reports Permissions'];
 
     const tableRows = filteredData?.map((row, rowIndex) => {

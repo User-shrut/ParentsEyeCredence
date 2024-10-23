@@ -309,7 +309,9 @@ const Driver = () => {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
     const tableColumn = [
       'SN',
       'Driver Name',
@@ -336,7 +338,7 @@ const Driver = () => {
       ];
     });
 
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable(tableColumn, tableRows, { startY: 15 });
     doc.save('drivers_data.pdf');
   };
 

@@ -637,7 +637,9 @@ const Devices = () => {
 
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
 
     // Define the table headers from the columns prop (skip the first one as per the UI logic)
     const tableColumn = ['SN', ...columns.slice(1).map(column => column.Header)];

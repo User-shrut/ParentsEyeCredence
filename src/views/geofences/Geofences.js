@@ -49,9 +49,10 @@ import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
+import { auto } from '@popperjs/core'
 
 const Geofences = () => {
-  const deviceData = useSelector((state) => state.device.data)
+  const [deviceData , setDeviceData] = useState();
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -139,7 +140,7 @@ const Geofences = () => {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '40%',
-    maxHeight: '90vh',
+    height: auto,
     BorderRadius: '10px',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -216,6 +217,24 @@ const Geofences = () => {
     }
   }
 
+
+  const fetchDeviceData = async () => {
+    const token = Cookies.get('authToken')
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    if(response.data){
+      setDeviceData(response.data);
+    }
+  }
+
+  useEffect(() => {
+    fetchDeviceData();
+  },[])
+
   // ##################### Filter data by search query #######################
   const filterGeofences = () => {
     if (!searchQuery) {
@@ -278,6 +297,7 @@ const Geofences = () => {
         fetchGeofenceData()
         setFormData({})
         setPolygonCoords([])
+        setSelectedDevices([]);
         setAddModalOpen(false)
       }
     } catch (error) {
@@ -584,7 +604,7 @@ const Geofences = () => {
           )}
         </div>
         <div className="col-12 col-md-6">
-          <div style={{ flex: 1 }}>{data.length > 0 && <Gmap data={data} />}</div>
+          <div style={{ flex: 1 }}><Gmap data={data} /></div>
         </div>
       </div>
 
@@ -667,6 +687,13 @@ const Geofences = () => {
                     setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
                   }
                   options={PlaceType}
+                  styles={{
+                    container: (base) => ({
+                      ...base,
+                      marginTop: '20px',
+                      marginBottom: '20px',
+                    }),
+                  }}
                 />
 
                 <Select
@@ -675,6 +702,13 @@ const Geofences = () => {
                   onChange={handleDeviceChange}
                   value={selectedDevices}
                   placeholder="Select devices"
+                  styles={{
+                    container: (base) => ({
+                      ...base,
+                      marginTop: '20px',
+                      marginBottom: '20px',
+                    }),
+                  }}
                 />
               </div>
             )}
@@ -912,6 +946,13 @@ const Geofences = () => {
                   setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
                 }
                 options={PlaceType}
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                  }),
+                }} 
               />
 
               <Select
@@ -920,6 +961,13 @@ const Geofences = () => {
                 onChange={handleDeviceChange}
                 value={selectedDevices}
                 placeholder="Select devices"
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                  }),
+                }}
               />
 
               <Button
