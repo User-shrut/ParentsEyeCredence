@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import ReactPaginate from 'react-paginate'
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import {
   TableContainer,
   Paper,
@@ -58,8 +60,7 @@ import { jwtDecode } from 'jwt-decode'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
 import CIcon from '@coreui/icons-react'
-import { cilSettings } from '@coreui/icons'
-import * as XLSX from 'xlsx'; // For Excel export
+import { cilSettings } from '@coreui/icons';
 import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 
@@ -77,7 +78,6 @@ const Users = () => {
   const [isSuperAdmin, setSuperAdmin] = useState(false)
   const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
-  const [exportData, setExportData] = useState([]);
 
   // Go to the next step
   const handleNext = () => {
@@ -545,111 +545,102 @@ const Users = () => {
 
 
   const exportToExcel = async () => {
+    // Create a new workbook and add a worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('User Data');
+  
+    // Define the headers
+    worksheet.columns = [
+      { header: 'SN', key: 'sn', width: 5 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Mobile No.', key: 'mobile', width: 15 },
+      { header: 'Master Permissions', key: 'masterPermissions', width: 40 },
+      { header: 'Reports Permissions', key: 'reportsPermissions', width: 40 }
+    ];
+  
+    // Add custom styles to headers
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true,size: 14, color: { argb: 'FFFFFFFF' } };  // White font
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF6C757D' },  // Background color set to #6C757D
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+    });
+  
     // Map filtered data into the format required for export
-
-    const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/user`
-
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: 'Bearer ' + accessToken,
-        },
-      })
-
-      if (response.data.users) {
-        const dataToExport = response.data.users.map((item, rowIndex) => {
-          const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-            .filter((permission) => item[permission])
-            .join(', ') || 'N/A';
-
-          const reportsPermissions = [
-            'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
-          ]
-            .filter((permission) => item[permission])
-            .join(', ') || 'N/A';
-
-          // Define row data
-          const rowData = {
-            SN: rowIndex + 1,
-            Name: item.username || 'N/A',
-            Email: item.email || 'N/A',
-            'Mobile No.': item.mobile || 'N/A',
-            'Master Permissions': masterPermissions,
-            'Reports Permissions': reportsPermissions
-          };
-
-          return rowData; // Return row data in the correct format
-        });
-
-        // Create worksheet and workbook
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-
-        // Append the worksheet to the workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'User Data');
-
-        // Write the Excel file
-        XLSX.writeFile(workbook, 'user_data.xlsx');
-      }
-    } catch (e) {
-      console.log(e)
-    }
-
-
-
+    filteredData?.forEach((item, rowIndex) => {
+      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => item[permission])
+        .join(', ') || 'N/A';
+  
+      const reportsPermissions = [
+        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
+      ]
+        .filter((permission) => item[permission])
+        .join(', ') || 'N/A';
+  
+      // Add rows with mapped data
+      worksheet.addRow({
+        sn: rowIndex + 1,
+        name: item.username || 'N/A',
+        email: item.email || 'N/A',
+        mobile: item.mobile || 'N/A',
+        masterPermissions,
+        reportsPermissions
+      });
+    });
+  
+    // Write the Excel file to a Blob and save it
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, 'user_data.xlsx');
   };
 
 
   const exportToPDF = async () => {
 
-    const accessToken = Cookies.get('authToken')
-    const url = `${import.meta.env.VITE_API_URL}/user`
 
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: 'Bearer ' + accessToken,
-        },
-      })
+    const doc = new jsPDF();
+    const tableColumn = ['SN', 'Name', 'Email', 'Mobile No.', 'Master Permissions', 'Reports Permissions'];
 
-      if (response.data.users) {
-        const doc = new jsPDF();
-        const tableColumn = ['SN', 'Name', 'Email', 'Mobile No.', 'Master Permissions', 'Reports Permissions', 'Actions'];
+    const tableRows = filteredData?.map((row, rowIndex) => {
+      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A';
 
-        const tableRows = response.data.users?.map((row, rowIndex) => {
-          const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-            .filter((permission) => row[permission])
-            .join(', ') || 'N/A';
+      const reportsPermissions = [
+        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
+      ]
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A';
 
-          const reportsPermissions = [
-            'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
-          ]
-            .filter((permission) => row[permission])
-            .join(', ') || 'N/A';
+      const rowData = [
+        row.username || '--',
+        row.email || '--',
+        row.mobile || 'N/A',
+        masterPermissions,
+        reportsPermissions
+      ];
 
-          const rowData = [
-            row.username || '--',
-            row.email || '--',
-            row.mobile || 'N/A',
-            masterPermissions,
-            reportsPermissions,
-            'Edit/Delete' // Placeholder for action buttons
-          ];
+      return [rowIndex + 1, ...rowData];
+    });
 
-          return [rowIndex + 1, ...rowData];
-        });
+    const columnStyles = {
+      2: { cellWidth: 35 } // Index 2 is the 'Email' column, setting width to 60 units (adjust as needed)
+    };
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      columnStyles: columnStyles,
+    });
+    doc.save('user_data.pdf');
 
-        doc.autoTable(tableColumn, tableRows, { startY: 20 });
-        doc.save('user_data.pdf');
-      }
-    } catch (e) {
-      console.log(e)
-    }
+  }
 
-
-
-  };
 
   //  ####################################################
 
