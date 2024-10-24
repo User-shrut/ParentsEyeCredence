@@ -601,14 +601,20 @@ const Devices = () => {
     const dataToExport = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).reduce((acc, column) => {
         const accessor = column.accessor;
-
+    
         // Handle specific columns based on the column's accessor
         if (accessor === 'groups') {
-          acc[column.Header] = item.groups.length || '0';
+          acc[column.Header] = item.groups && item.groups.length > 0 
+            ? item.groups.map(group => group.name).join(', ')  // Join group names if there are multiple
+            : "N/A";
         } else if (accessor === 'geofences') {
-          acc[column.Header] = item.geofences.length || '0';
+          acc[column.Header] = item.geofences && item.geofences.length > 0 
+            ? item.geofences.map(geofence => geofence.name).join(', ')  // Join geofence names if there are multiple
+            : "N/A";
         } else if (accessor === 'users') {
-          acc[column.Header] = item.users.length || '0';
+          acc[column.Header] = item.users && item.users.length > 0 
+            ? item.users.map(user => user.username).join(', ')  // Join usernames if there are multiple
+            : "N/A";
         } else if (accessor === 'Driver') {
           acc[column.Header] = item.Driver?.name || 'N/A';
         } else if (accessor === 'device') {
@@ -616,10 +622,10 @@ const Devices = () => {
         } else {
           acc[column.Header] = item[accessor] || 'N/A';  // Fallback for other columns
         }
-
+    
         return acc;
       }, {});
-
+    
       return { SN: rowIndex + 1, ...rowData }; // Include row index as SN
     });
 
@@ -648,14 +654,20 @@ const Devices = () => {
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).map((column) => {
         const accessor = column.accessor;
-
+    
         // Handle specific columns and their logic
         if (accessor === 'groups') {
-          return item.groups.length || '0';
+          return item.groups && item.groups.length > 0 
+            ? item.groups.map(group => group.name).join(', ') // Join group names if there are multiple
+            : 'N/A'; // Return '0' if no groups are present
         } else if (accessor === 'geofences') {
-          return item.geofences.length || '0';
+          return item.geofences && item.geofences.length > 0 
+            ? item.geofences.map(geofence => geofence.name).join(', ') // Join geofence names if there are multiple
+            : 'N/A'; // Return '0' if no geofences are present
         } else if (accessor === 'users') {
-          return item.users.length || '0';
+          return item.users && item.users.length > 0 
+            ? item.users.map(user => user.username).join(', ') // Join usernames if there are multiple
+            : 'N/A'; // Return '0' if no users are present
         } else if (accessor === 'Driver') {
           return item.Driver?.name || 'N/A';
         } else if (accessor === 'device') {
@@ -664,11 +676,16 @@ const Devices = () => {
           return item[accessor] || 'N/A';  // Fallback for other columns
         }
       });
-      return [rowIndex + 1, ...rowData];
+      return [rowIndex + 1, ...rowData]; // Include row index as the first element
     });
 
     // Generate the PDF using the autoTable plugin
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      autoSize: true, // Automatically adjust column width based on content
+    });
     doc.save('table_data.pdf');
   };
 

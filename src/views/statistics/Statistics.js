@@ -35,7 +35,10 @@ const SearchIdeal = ({
   formData,
   handleInputChange,
   handleSubmit,
-  groups,
+  users, 
+  groups, 
+  getGroups,
+  loading,
   devices,
   getDevices,
   columns,
@@ -44,6 +47,8 @@ const SearchIdeal = ({
 }) => {
   const [validated, setValidated] = useState(false)
   const [showDateInputs, setShowDateInputs] = useState(false)
+  const [selectedU, setSelectedU] = useState();
+  const [selectedG, setSelectedG] = useState();
   // State to manage button text
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
@@ -86,28 +91,62 @@ const SearchIdeal = ({
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={4}>
+      <CCol md={2}>
+        <CFormLabel htmlFor="devices">User</CFormLabel>
+        <CFormSelect
+          id="user"
+          required
+          value={selectedU}
+          onChange={(e) => {
+            const selectedUser = e.target.value;
+            setSelectedU(selectedUser)
+            console.log("Selected user:", selectedUser);
+            getGroups(selectedUser);
+          }}
+        >
+          <option value="">Choose a user...</option>
+          {loading ? (<option>Loading Users...</option>) : (
+            users?.length > 0 ? (
+              users?.map((user) => (
+                <option key={user._id} value={user._id}>{user.username}</option>
+              ))
+            ) : (
+              <option disabled>No Users in this Account</option>
+            )
+          )
+          }
+        </CFormSelect>
+      </CCol>
+      <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
         <CFormSelect
           id="group"
           required
+          value={selectedG}
           onChange={(e) => {
-            const selectedGroup = e.target.value
-            console.log('Selected Group ID:', selectedGroup)
-            getDevices(selectedGroup)
+            const selectedGroup = e.target.value;
+            setSelectedG(selectedGroup);
+            console.log("Selected Group ID:", selectedGroup);
+            getDevices(selectedGroup);
           }}
         >
           <option value="">Choose a group...</option>
-          {groups.map((group) => (
-            <option key={group._id} value={group._id}>
-              {group.name}
-            </option>
-          ))}
+
+          {loading ? (<option>Loading Groups...</option>) : (
+            groups?.length > 0 ? (
+              groups?.map((group) => (
+                <option key={group._id} value={group._id}>{group.name}</option>
+              ))
+            ) : (
+              <option disabled>No Groups in this User</option>
+            )
+          )
+          }
         </CFormSelect>
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+      <CCol md={2}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
         <CFormSelect
           id="devices"
@@ -130,7 +169,7 @@ const SearchIdeal = ({
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+      <CCol md={2}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
         <CFormSelect
           id="periods"
@@ -150,7 +189,7 @@ const SearchIdeal = ({
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-      <CCol md={4}>
+      <CCol md={3}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
           isMulti
@@ -389,59 +428,62 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
           {dataWithAddresses?.length > 0 ? (
             dataWithAddresses.map((row, rowIndex) =>
               row.data?.length > 0 ? (
-                row.data.map((nestedRow, nestedIndex) => (
-                  <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                    <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-
-                    {selectedColumns.map((column, index) => (
-                      <CTableDataCell key={index}>
-                        {column === 'Vehicle Status'
-                          ? nestedRow.vehicleStatus
-                          : column === 'Duration'
-                            ? // Convert duration from seconds to HH:mm:ss format
-                              new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
-                            : column === 'Location'
-                              ? // Display address if available, otherwise fallback to location
-                                nestedRow.address || nestedRow.location
-                              : column === 'Arrival Time'
-                                ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
-                                  new Date(
-                                    new Date(nestedRow.arrivalTime).setHours(
-                                      new Date(nestedRow.arrivalTime).getHours() + 6,
-                                      new Date(nestedRow.arrivalTime).getMinutes() + 30,
-                                    ),
-                                  ).toLocaleString([], {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: true,
-                                  })
-                                : column === 'Departure Time'
-                                  ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
+                // Filter nested rows where vehicleStatus is 'Idle'
+                row.data
+                  .filter((nestedRow) => nestedRow.vehicleStatus === 'Idle') // Filter only 'Idle' status
+                  .map((nestedRow, nestedIndex) => (
+                    <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
+                      <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+            
+                      {selectedColumns.map((column, index) => (
+                        <CTableDataCell key={index}>
+                          {column === 'Vehicle Status'
+                            ? nestedRow.vehicleStatus
+                            : column === 'Duration'
+                              ? // Convert duration from seconds to HH:mm:ss format
+                                new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+                              : column === 'Location'
+                                ? // Display address if available, otherwise fallback to location
+                                  nestedRow.address || nestedRow.location
+                                : column === 'Arrival Time'
+                                  ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
                                     new Date(
-                                      new Date(nestedRow.departureTime).setHours(
-                                        new Date(nestedRow.departureTime).getHours() + 6,
-                                        new Date(nestedRow.departureTime).getMinutes() + 30,
+                                      new Date(nestedRow.arrivalTime).setHours(
+                                        new Date(nestedRow.arrivalTime).getHours() + 6,
+                                        new Date(nestedRow.arrivalTime).getMinutes() + 30,
                                       ),
                                     ).toLocaleString([], {
                                       year: 'numeric',
                                       month: '2-digit',
+                                      day: '2-digit',
                                       hour: '2-digit',
                                       minute: '2-digit',
                                       hour12: true,
                                     })
-                                  : column === 'Total Duration'
-                                    ? // Convert total duration from seconds to HH:mm:ss format
-                                      new Date(row.totalDurationSeconds * 1000)
-                                        .toISOString()
-                                        .substr(11, 8)
-                                    : '--'}
-                      </CTableDataCell>
-                    ))}
-                  </CTableRow>
-                ))
+                                  : column === 'Departure Time'
+                                    ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
+                                      new Date(
+                                        new Date(nestedRow.departureTime).setHours(
+                                          new Date(nestedRow.departureTime).getHours() + 6,
+                                          new Date(nestedRow.departureTime).getMinutes() + 30,
+                                        ),
+                                      ).toLocaleString([], {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                      })
+                                    : column === 'Total Duration'
+                                      ? // Convert total duration from seconds to HH:mm:ss format
+                                        new Date(row.totalDurationSeconds * 1000)
+                                          .toISOString()
+                                          .substr(11, 8)
+                                      : '--'}
+                        </CTableDataCell>
+                      ))}
+                    </CTableRow>
+                  ))
               ) : (
                 <CTableRow key={`${row.deviceId}-empty`}>
                   <CTableDataCell
@@ -458,8 +500,9 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                     No data available for {row.deviceId}
                   </CTableDataCell>
                 </CTableRow>
-              ),
+              )
             )
+            
           ) : (
             <CTableRow>
               <CTableDataCell
@@ -506,6 +549,7 @@ const Ideal = () => {
     Columns: [],
   })
   const [searchQuery, setSearchQuery] = useState('')
+  const [users, setUsers] = useState();
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
@@ -554,25 +598,49 @@ const Ideal = () => {
     }
   }
 
-  const getGroups = async () => {
+  const getGroups = async (selectedUser) => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
         headers: {
           Authorization: 'Bearer ' + accessToken,
         },
       })
       if (response.data) {
-        setGroups(response.data.groups)
-        console.log('yaha tak thik hai')
+        setGroups(response.data.groupsAssigned)
+        setLoading(false);
+        console.log("yaha tak thik hai")
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
     }
   }
+  const getUser = async () => {
+    setLoading(true);
+    setGroups([]);
+    setDevices([]);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setUsers(response.data.users)
+        setLoading(false);
+        console.log("yaha tak thik hai")
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      throw error
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    getGroups()
+    getUser();
   }, [])
 
   const handleInputChange = (name, value) => {
@@ -646,6 +714,8 @@ const Ideal = () => {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
+                users={users}
+                getGroups={getGroups}
                 groups={groups}
                 getDevices={getDevices}
                 devices={devices}

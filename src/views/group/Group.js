@@ -226,28 +226,12 @@ const Group = () => {
   const exportToExcel = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
-      // Define the master permissions and reports permissions by filtering the relevant fields
-      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-        .filter((permission) => item[permission]) // Filter permissions that are true
-        .join(', ') || 'N/A'; // Join the filtered permissions or set 'N/A' if empty
-
-      const reportsPermissions = [
-        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
-      ]
-        .filter((permission) => item[permission]) // Filter permissions that are true
-        .join(', ') || 'N/A'; // Join the filtered permissions or set 'N/A' if empty
-
-      // Define row data for each item in the filteredData array
       const rowData = {
-        SN: rowIndex + 1,               // Serial Number
-        Name: item.username || 'N/A',   // Name of the user
-        Email: item.email || 'N/A',     // User's email
-        'Mobile No.': item.mobile || 'N/A', // User's mobile number
-        'Master Permissions': masterPermissions, // Master permissions as a comma-separated string
-        'Reports Permissions': reportsPermissions // Reports permissions as a comma-separated string
+        SN: rowIndex + 1,
+        Name: item.name || 'N/A',
       };
 
-      return rowData; // Return row data in the correct format
+      return rowData;
     });
 
     // Create worksheet and workbook
@@ -255,25 +239,23 @@ const Group = () => {
     const workbook = XLSX.utils.book_new(); // Create a new workbook
 
     // Append the worksheet to the workbook with the sheet name 'User Data'
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'User Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Group Data');
 
     // Write the Excel file to the client's computer
-    XLSX.writeFile(workbook, 'user_data.xlsx');
+    XLSX.writeFile(workbook, 'group_data.xlsx');
   };
-
 
   const exportToPDF = () => {
     const doc = new jsPDF();
 
     // Define the table headers
-    const tableColumn = ['SN', 'Group Name', 'Actions'];
+    const tableColumn = ['SN', 'Group Name'];
 
     // Map over your filteredData to create rows
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = [
         rowIndex + 1,                // Serial Number
         item.name || '--',            // Group Name
-        'Edit/Delete'                 // Actions (for simplicity, displaying 'Edit/Delete')
       ];
       return rowData;
     });

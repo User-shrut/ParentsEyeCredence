@@ -362,6 +362,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
       <CTable bordered className="custom-table" >
         <CTableHead>
           <CTableRow>
+            <CTableHeaderCell>Sr No.</CTableHeaderCell>
             <CTableHeaderCell>Vehicle</CTableHeaderCell>
             {/* Dynamically render table headers based on selected columns */}
 
@@ -375,6 +376,7 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
           {apiData?.data && apiData.data.length > 0 ? (
             apiData.data.map((row, rowIndex) => (
               <CTableRow key={row.deviceId} className="custom-row">
+                <CTableDataCell>{rowIndex}</CTableDataCell>
                 <CTableDataCell>{findDeviceName(row.deviceId)}</CTableDataCell>
 
                 {/* Dynamically render table cells based on the date range */}

@@ -271,7 +271,12 @@ const Driver = () => {
         }
         const data = await response.json();
         console.log(data);
-        setDevices(data.devices); // Assuming the data returned contains device info
+        const mappedDevices = data.devices.map((device) => ({
+          deviceId: device.deviceId,
+          name: device.name,
+        }));
+
+        setDevices(mappedDevices); // Assuming the data returned contains device info
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
@@ -635,7 +640,7 @@ const Driver = () => {
                   {devices.length > 0 ? (
                     devices.map((device) => (
                       <MenuItem key={device.deviceId} value={device.deviceId}> {/* Replace 'device.id' and 'device.name' with actual properties */}
-                        {device.deviceId}
+                        {device.name}
                       </MenuItem>
                     ))
                   ) : (

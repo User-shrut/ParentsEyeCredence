@@ -66,6 +66,7 @@ const Geofences = () => {
   const [filteredData, setFilteredData] = useState([]);
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
+  const [deviceOptions, setDeviceOptions] = useState();
 
   // Go to the next step
   const handleNext = () => {
@@ -157,10 +158,6 @@ const Geofences = () => {
     console.log('abe yaar device data nh hai')
   }
 
-  const deviceOptions = deviceData?.devices?.map((device) => ({
-    value: device.deviceId,
-    label: device.name,
-  }))
 
   const [selectedDevices, setSelectedDevices] = useState([])
 
@@ -228,6 +225,11 @@ const Geofences = () => {
     })
     if(response.data){
       setDeviceData(response.data);
+
+      setDeviceOptions(response.data.devices?.map((device) => ({
+        value: device.deviceId,
+        label: device.name,
+      })))
     }
   }
 
@@ -383,8 +385,7 @@ const Geofences = () => {
         SN: rowIndex + 1,               // Serial Number
         'Geofence Name': item.name || 'N/A',   // Name of the geofence
         'Type': item.type || 'N/A',     // Type of the geofence
-        'Vehicles': (item.deviceIds.length || 0).toString(), // Number of vehicles
-        'Actions': '--'                 // Actions can be left as '--' or customized if needed
+        'Vehicles': (item.deviceIds.map( device => device.name).join( ) || "N/A"), // Number of vehicles
       };
 
       return rowData; // Return row data in the correct format
@@ -404,7 +405,7 @@ const Geofences = () => {
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles', 'Actions'];
+    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles'];
 
     // Extracting the relevant data for PDF export
     const tableRows = filteredData.map((item, index) => {
@@ -413,8 +414,7 @@ const Geofences = () => {
         index + 1, // Serial Number
         item.name, // Geofence Name
         item.type, // Type
-        vehicleCount, // Vehicles
-        '--' // Actions column can be left blank or customized as needed
+        (item.deviceIds.map( device => device.name).join( ) || "N/A")
       ];
     });
 
@@ -464,7 +464,7 @@ const Geofences = () => {
       </div>
 
       <div className="row">
-        <div className="col-12 col-md-6">
+        <div className="col-12 col-md-6 position-relative">
           <TableContainer component={Paper} style={{ maxHeight: '800px', marginBottom: '10px' }}>
             <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
               <CTableHead className="text-nowrap">
@@ -569,7 +569,7 @@ const Geofences = () => {
               </CTableBody>
             </CTable>
           </TableContainer>
-          <CDropdown className="position-fixed bottom-0 end-0 m-3">
+          <CDropdown className="position-absolute bottom-0 start-0 m-3">
             <CDropdownToggle
               color="secondary"
               style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}

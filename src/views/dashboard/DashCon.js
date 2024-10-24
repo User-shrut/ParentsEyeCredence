@@ -87,12 +87,28 @@ import { useNavigate } from 'react-router-dom'
 import { io } from 'socket.io-client'
 dayjs.extend(duration)
 import Cookies from 'js-cookie'
+import ReactPaginate from 'react-paginate'
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const credentials = Cookies.get('crdntl');
   const { filteredVehicles } = useSelector((state) => state.liveFeatures)
   const [filter, setFilter] = useState('all')
+
+
+  // pagination code 
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
+  const pageCount = Math.ceil(filteredVehicles.length / itemsPerPage);
+
+  const currentVehicles = filteredVehicles.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
+  };
 
   // Fetch live vehicles when the component mounts
   useEffect(() => {
@@ -507,12 +523,12 @@ const Dashboard = () => {
 
                   <CTableBody>
                     {filteredVehicles.length > 0 ? (
-                      filteredVehicles.map((item, index) => (
+                      currentVehicles.map((item, index) => (
                         <CTableRow key={index} className={`table-row collapsed trans`}>
                           {/* Sr No. */}
                           {visibleColumns.srNo && (
                             <CTableDataCell className="text-center sr-no table-cell">
-                              {index + 1}
+                              {currentPage * itemsPerPage + index + 1}
                             </CTableDataCell>
                           )}
                           {visibleColumns.vehicle && (
@@ -781,6 +797,26 @@ const Dashboard = () => {
                     )}
                   </CTableBody>
                 </CTable>
+                <div className="mt-3"> {/* Adds margin to the right of pagination */}
+                  <ReactPaginate
+                    breakLabel="..."
+                    nextLabel="next >"
+                    onPageChange={handlePageClick}
+                    pageRangeDisplayed={5}
+                    pageCount={pageCount} // Total number of pages
+                    previousLabel="< previous"
+                    renderOnZeroPageCount={null}
+                    marginPagesDisplayed={2}
+                    containerClassName="pagination justify-content-center"
+                    pageClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousClassName="page-item"
+                    previousLinkClassName="page-link"
+                    nextClassName="page-item"
+                    nextLinkClassName="page-link"
+                    activeClassName="active"
+                  />
+                </div>
               </div>
             </CCardBody>
           </CCard>

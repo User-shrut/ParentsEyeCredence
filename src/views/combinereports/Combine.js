@@ -101,7 +101,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           }}
         >
           <option value="">Choose a user...</option>
-          {loading ? (<option>Loading Users...</option>) : (
+          {loading ? (<option disabled>Loading Users...</option>) : (
             users?.length > 0 ? (
               users?.map((user) => (
                 <option key={user._id} value={user._id}>{user.username}</option>
@@ -128,7 +128,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
         >
           <option value="">Choose a group...</option>
 
-          {loading ? (<option>Loading Groups...</option>) : (
+          {loading ? (<option disabled>Loading Groups...</option>) : (
             groups?.length > 0 ? (
               groups?.map((group) => (
                 <option key={group._id} value={group._id}>{group.name}</option>
@@ -150,7 +150,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           onChange={(e) => handleInputChange('Devices', e.target.value)}
         >
           <option value="">Choose a device...</option>
-          {loading ? (<option>Loading devices...</option>) : (
+          {loading ? (<option disabled>Loading devices...</option>) : (
             devices?.length > 0 ? (
               devices?.map((device) => (
                 <option key={device.id} value={device.deviceId}>{device.name}</option>
@@ -172,7 +172,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           value={formData.Periods}
           onChange={(e) => handlePeriodChange(e.target.value)}
         >
-          <option value="">Choose a period...</option>
+          <option value="" disabled>Choose a period...</option>
           <option value="Today">Today</option>
           <option value="Yesterday">Yesterday</option>
           <option value="This Week">This Week</option>
@@ -309,15 +309,15 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Table Data');
-  
+
     // Optional: Add vehicle name as a title above the table
     const vehicleName = "Your Vehicle Name Here"; // Replace with actual vehicle name if available
     worksheet.addRow([`Vehicle Name: ${vehicleName}`]).font = { bold: true, size: 14 };
-  
+
     // Create header row
     const header = ['SN', ...selectedColumns];
     const headerRow = worksheet.addRow(header);
-  
+
     // Apply header styles
     headerRow.font = { bold: true };
     headerRow.eachCell((cell) => {
@@ -331,7 +331,7 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
         bold: true,
       };
     });
-  
+
     // Populate data rows
     const dataToExport = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.reduce((acc, column) => {
@@ -381,24 +381,24 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
         }
         return acc;
       }, {});
-  
+
       return { SN: rowIndex + 1, ...rowData };
     });
-  
+
     // Add data rows to the worksheet
     dataToExport.forEach(data => worksheet.addRow(data));
-  
+
     // Adjust column widths
     worksheet.columns.forEach(column => {
       if (column.values && column.values.length) { // Check if column.values is defined and has length
         const maxLength = Math.max(
-          column.header ? column.header.length : 0, 
+          column.header ? column.header.length : 0,
           ...column.values.map(val => (val ? String(val).length : 0))
         );
         column.width = maxLength < 15 ? 15 : maxLength; // Set a minimum width
       }
     });
-  
+
     // Write the file
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
@@ -458,7 +458,7 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
   return (
     <>
 
-      <CTable bordered className="custom-table" style={{overflowX: auto}}>
+      <CTable bordered className="custom-table" style={{ overflowX: auto }}>
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>SN</CTableHeaderCell>
@@ -475,61 +475,64 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
                 <CTableDataCell>{rowIndex + 1}</CTableDataCell>
                 {/* Dynamically render table cells based on selected columns */}
                 {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index}>
-                    {column === 'Vehicle Status' ? (
-                      row.vehicleStatus === 'Idle' ? (
-                        <>
-                          <CTooltip content="Idle">
-                            <img src='src\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
-                            {/* <span>Idle</span> */}
-                          </CTooltip>
-                        </>
-                      ) : row.vehicleStatus === 'Ignition Off' ? (
-                        <>
-                          <CTooltip content="Ignition Off">
-                            <img src='src\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
-                            {/* <span>Ignition Off</span> */}
-                          </CTooltip>
-                        </>
-                      ) : row.vehicleStatus === 'Ignition On' ? (
-                        <>
-                          <CTooltip content="Ignition On">
-                            <img src='src\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
-                            {/* <span>Ignition On</span> */}
-                          </CTooltip>
-                        </>
-                      ) : null)
-                      : column === 'Start Date Time'
-                        ? `${row.startDateTime.slice(0, 10)} , ${row.startDateTime.slice(12, 16)}`
-                        : column === 'Start Address'
-                          ? newAddressData?.startAddress || 'Fetching...'
-                          : column === 'End Date Time'
-                            ? `${row.endDateTime.slice(0, 10)} , ${row.startDateTime.slice(12, 16)}`
-                            : column === 'Distance'
-                              ? row.distance
-                              : column === 'Total Distance'
-                                ? (row.distance / 1000).toFixed(2) + ' km'
-                                // : column === 'Maximum Speed'
-                                //   ? row.maxSpeed
-                                : column === 'End Address'
-                                  ? newAddressData?.endAddress || 'Fetching...'
-                                  : column === 'Driver Name'
-                                    ? row.driverInfos?.driverName || '--'
-                                    : column === 'Driver Phone No.'
-                                      ? row.device?.name || '--'
-                                      : column === 'Vehicle Status'
-                                        ? row.vehicleStatus
-                                        : column === 'Duration'
-                                          ? row.time
-                                          // : column === 'Average Speed'
-                                          //   ? row.averageSpeed
-                                          : column === 'Start Coordinates'
-                                            ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+                  <>
+                    <CTableDataCell>{index}</CTableDataCell>
+                    <CTableDataCell key={index}>
+                      {column === 'Vehicle Status' ? (
+                        row.vehicleStatus === 'Idle' ? (
+                          <>
+                            <CTooltip content="Idle">
+                              <img src='src\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                              {/* <span>Idle</span> */}
+                            </CTooltip>
+                          </>
+                        ) : row.vehicleStatus === 'Ignition Off' ? (
+                          <>
+                            <CTooltip content="Ignition Off">
+                              <img src='src\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                              {/* <span>Ignition Off</span> */}
+                            </CTooltip>
+                          </>
+                        ) : row.vehicleStatus === 'Ignition On' ? (
+                          <>
+                            <CTooltip content="Ignition On">
+                              <img src='src\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                              {/* <span>Ignition On</span> */}
+                            </CTooltip>
+                          </>
+                        ) : null)
+                        : column === 'Start Date Time'
+                          ? `${row.startDateTime.slice(0, 10)} , ${row.startDateTime.slice(11, 16)}`
+                          : column === 'Start Address'
+                            ? newAddressData?.startAddress || 'Fetching...'
+                            : column === 'End Date Time'
+                              ? `${row.endDateTime.slice(0, 10)} , ${row.endDateTime.slice(11, 16)}`
+                              : column === 'Distance'
+                                ? row.distance
+                                : column === 'Total Distance'
+                                  ? (row.distance / 1000).toFixed(2) + ' km'
+                                  // : column === 'Maximum Speed'
+                                  //   ? row.maxSpeed
+                                  : column === 'End Address'
+                                    ? newAddressData?.endAddress || 'Fetching...'
+                                    : column === 'Driver Name'
+                                      ? row.driverInfos?.driverName || '--'
+                                      : column === 'Driver Phone No.'
+                                        ? row.device?.name || '--'
+                                        : column === 'Vehicle Status'
+                                          ? row.vehicleStatus
+                                          : column === 'Duration'
+                                            ? row.time
+                                            // : column === 'Average Speed'
+                                            //   ? row.averageSpeed
+                                            : column === 'Start Coordinates'
+                                              ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
 
-                                            : column === 'End Coordinates'
-                                              ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-                                              : '--'}
-                  </CTableDataCell>
+                                              : column === 'End Coordinates'
+                                                ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
+                                                : '--'}
+                    </CTableDataCell>
+                  </>
                 ))}
               </CTableRow>
             ))

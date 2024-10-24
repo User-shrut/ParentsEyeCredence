@@ -521,6 +521,7 @@ const TripTable = ({ apiData, selectedColumns }) => {
 }
 
 const Trips = () => {
+  const accessToken = Cookies.get('authToken')
   const [formData, setFormData] = useState({
     Devices: '',
     Details: '',
@@ -597,7 +598,7 @@ const Trips = () => {
 
 
   const getDevices = async (selectedGroup) => {
-    const accessToken = Cookies.get('authToken')
+    
     setLoading(true)
     try {
       const response = await axios.get(
