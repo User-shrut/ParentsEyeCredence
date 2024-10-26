@@ -26,6 +26,7 @@ import {
   filterRunningVehicles,
   filterStoppedVehicles,
   initializeSocket,
+  socket,
 } from '../../features/LivetrackingDataSlice.js'
 
 import MainMap from '../Map/MapComponent'
@@ -117,6 +118,11 @@ const Dashboard = () => {
     dispatch(initializeSocket(credentials))
 
     console.log("after initialize socket");
+
+
+    return () => {
+      socket.disconnect();
+    }
   }, [])
 
   const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
