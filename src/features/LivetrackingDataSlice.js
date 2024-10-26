@@ -117,9 +117,8 @@ const liveFeaturesSlice = createSlice({
 // WebSocket event listeners
 export const initializeSocket = (credentials) => (dispatch) => {
 
-  console.log(credentials)
   const convertedCredentialsIntoObject = JSON.parse(credentials);
-  console.log(convertedCredentialsIntoObject)
+
   // Handle connection event
   socket.on('connect', () => {
     console.log('Connected to the socket server')

@@ -120,9 +120,9 @@ const Dashboard = () => {
     console.log("after initialize socket");
 
 
-    return () => {
-      socket.disconnect();
-    }
+    // return () => {
+    //   socket.disconnect();
+    // }
   }, [])
 
   const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
