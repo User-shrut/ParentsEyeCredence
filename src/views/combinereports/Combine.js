@@ -34,6 +34,9 @@ import 'jspdf-autotable'; // For table formatting in PDF
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { auto } from '@popperjs/core';
+import idel from "src/status/idel.png";
+import ignitionOff from "src/status/power-off.png";
+import ignitionOn from "src/status/power-on.png";
 
 const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups, getGroups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -248,7 +251,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
   );
 };
 
-const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
+const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumns }) => {
   const [addressData, setAddressData] = useState({});
   const [newAddressData, setnewAddressData] = useState()
   // Function to get address based on latitude and longitude using Nominatim API
@@ -469,89 +472,90 @@ const ShowStatus = ({ apiData, selectedDeviceName, selectedColumns }) => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {apiData?.data && apiData.data.length > 0 ? (
-            apiData.data.map((row, rowIndex) => (
-              <CTableRow key={row.id} className="custom-row">
-                <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-                {/* Dynamically render table cells based on selected columns */}
-                {selectedColumns.map((column, index) => (
-                  <>
-                    <CTableDataCell>{index}</CTableDataCell>
-                    <CTableDataCell key={index}>
-                      {column === 'Vehicle Status' ? (
-                        row.vehicleStatus === 'Idle' ? (
-                          <>
-                            <CTooltip content="Idle">
-                              <img src='src\status\idel.png' alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
-                              {/* <span>Idle</span> */}
-                            </CTooltip>
-                          </>
-                        ) : row.vehicleStatus === 'Ignition Off' ? (
-                          <>
-                            <CTooltip content="Ignition Off">
-                              <img src='src\status\power-off.png' alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
-                              {/* <span>Ignition Off</span> */}
-                            </CTooltip>
-                          </>
-                        ) : row.vehicleStatus === 'Ignition On' ? (
-                          <>
-                            <CTooltip content="Ignition On">
-                              <img src='src\status\power-on.png' alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
-                              {/* <span>Ignition On</span> */}
-                            </CTooltip>
-                          </>
-                        ) : null)
-                        : column === 'Start Date Time'
-                          ? `${row.startDateTime.slice(0, 10)} , ${row.startDateTime.slice(11, 16)}`
-                          : column === 'Start Address'
-                            ? newAddressData?.startAddress || 'Fetching...'
-                            : column === 'End Date Time'
-                              ? `${row.endDateTime.slice(0, 10)} , ${row.endDateTime.slice(11, 16)}`
-                              : column === 'Distance'
-                                ? row.distance
-                                : column === 'Total Distance'
-                                  ? (row.distance / 1000).toFixed(2) + ' km'
-                                  // : column === 'Maximum Speed'
-                                  //   ? row.maxSpeed
-                                  : column === 'End Address'
-                                    ? newAddressData?.endAddress || 'Fetching...'
-                                    : column === 'Driver Name'
-                                      ? row.driverInfos?.driverName || '--'
-                                      : column === 'Driver Phone No.'
-                                        ? row.device?.name || '--'
-                                        : column === 'Vehicle Status'
-                                          ? row.vehicleStatus
-                                          : column === 'Duration'
-                                            ? row.time
-                                            // : column === 'Average Speed'
-                                            //   ? row.averageSpeed
-                                            : column === 'Start Coordinates'
-                                              ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+          {statusLoading ? (<div>loading...</div>) : (
 
-                                              : column === 'End Coordinates'
-                                                ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-                                                : '--'}
-                    </CTableDataCell>
-                  </>
-                ))}
+            apiData?.data && apiData.data.length > 0 ? (
+              apiData.data.map((row, rowIndex) => (
+                <CTableRow key={row.id} className="custom-row">
+                  <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                  {/* Dynamically render table cells based on selected columns */}
+                  {selectedColumns.map((column, index) => (
+                    <>
+                      <CTableDataCell key={index}>
+                        {column === 'Vehicle Status' ? (
+                          row.vehicleStatus === 'Idle' ? (
+                            <>
+                              <CTooltip content="Idle">
+                                <img src={idel} alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                                {/* <span>Idle</span> */}
+                              </CTooltip>
+                            </>
+                          ) : row.vehicleStatus === 'Ignition Off' ? (
+                            <>
+                              <CTooltip content="Ignition Off">
+                                <img src={ignitionOff} alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                                {/* <span>Ignition Off</span> */}
+                              </CTooltip>
+                            </>
+                          ) : row.vehicleStatus === 'Ignition On' ? (
+                            <>
+                              <CTooltip content="Ignition On">
+                                <img src={ignitionOn} alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                                {/* <span>Ignition On</span> */}
+                              </CTooltip>
+                            </>
+                          ) : null)
+                          : column === 'Start Date Time'
+                            ? `${row.startDateTime.slice(0, 10)} , ${row.startDateTime.slice(11, 16)}`
+                            : column === 'Start Address'
+                              ? newAddressData?.startAddress || 'Fetching...'
+                              : column === 'End Date Time'
+                                ? `${row.endDateTime.slice(0, 10)} , ${row.endDateTime.slice(11, 16)}`
+                                : column === 'Distance'
+                                  ? row.distance
+                                  : column === 'Total Distance'
+                                    ? (row.distance / 1000).toFixed(2) + ' km'
+                                    // : column === 'Maximum Speed'
+                                    //   ? row.maxSpeed
+                                    : column === 'End Address'
+                                      ? newAddressData?.endAddress || 'Fetching...'
+                                      : column === 'Driver Name'
+                                        ? row.driverInfos?.driverName || '--'
+                                        : column === 'Driver Phone No.'
+                                          ? row.device?.name || '--'
+                                          : column === 'Vehicle Status'
+                                            ? row.vehicleStatus
+                                            : column === 'Duration'
+                                              ? row.time
+                                              // : column === 'Average Speed'
+                                              //   ? row.averageSpeed
+                                              : column === 'Start Coordinates'
+                                                ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+
+                                                : column === 'End Coordinates'
+                                                  ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
+                                                  : '--'}
+                      </CTableDataCell>
+                    </>
+                  ))}
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan={selectedColumns.length + 1}
+                  style={{
+                    backgroundColor: '#f8f9fa', // Light gray background
+                    color: '#6c757d', // Darker text color
+                    fontStyle: 'italic', // Italic font style
+                    padding: '16px', // Extra padding for emphasis
+                    textAlign: 'center', // Center the text
+                    border: '1px dashed #dee2e6' // Dashed border to highlight it
+                  }}
+                >
+                  No data available
+                </CTableDataCell>
               </CTableRow>
-            ))
-          ) : (
-            <CTableRow>
-              <CTableDataCell colSpan={selectedColumns.length + 1}
-                style={{
-                  backgroundColor: '#f8f9fa', // Light gray background
-                  color: '#6c757d', // Darker text color
-                  fontStyle: 'italic', // Italic font style
-                  padding: '16px', // Extra padding for emphasis
-                  textAlign: 'center', // Center the text
-                  border: '1px dashed #dee2e6' // Dashed border to highlight it
-                }}
-              >
-                No data available
-              </CTableDataCell>
-            </CTableRow>
-          )}
+            ))}
         </CTableBody>
       </CTable>
 
@@ -603,6 +607,8 @@ const Status = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const token = Cookies.get('authToken'); //
   const [apiData, setApiData] = useState();   //data from api
+  const [statusLoading, setStatusLoading] = useState(false);
+
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
@@ -632,7 +638,7 @@ const Status = () => {
     }
   }
 
-  const getGroups = async (selectedUser) => {
+  const getGroups = async (selectedUser = "") => {
     setLoading(true);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
@@ -640,21 +646,23 @@ const Status = () => {
           Authorization: 'Bearer ' + accessToken,
         },
       })
-      if (response.data) {
+      if (response.data.groupsAssigned) {
         setGroups(response.data.groupsAssigned)
         setLoading(false);
-        console.log("yaha tak thik hai")
+        console.log("perticular user ke groups")
+      } else if (response.data.groups) {
+        setGroups(response.data.groups)
+        setLoading(false);
+        console.log("all groups")
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-      setLoading(false);
     }
   }
   const getUser = async () => {
     setLoading(true);
-    setGroups([]);
-    setDevices([]);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
@@ -675,6 +683,7 @@ const Status = () => {
 
   useEffect(() => {
     getUser();
+    getGroups();
   }, [])
 
 
@@ -689,6 +698,8 @@ const Status = () => {
   };
 
   const handleSubmit = async () => {
+
+    setStatusLoading(true);
     console.log('DataAll', formData);
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : '';
     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : '';
@@ -709,8 +720,10 @@ const Status = () => {
       if (response.status == 200) {
         console.log(response.data.data);
         setApiData(response.data);
+        setStatusLoading(false);
       }
     } catch (error) {
+      setStatusLoading(false);
       console.error('Error submitting form:', error);
     }
   };
@@ -759,7 +772,7 @@ const Status = () => {
                   />
                 </CCardHeader>
                 <CCardBody>
-                  <ShowStatus apiData={apiData} selectedDeviceName={selectedDeviceName} selectedColumns={selectedColumns} />
+                  <ShowStatus apiData={apiData} statusLoading={statusLoading} selectedDeviceName={selectedDeviceName} selectedColumns={selectedColumns} />
                 </CCardBody>
               </CCard>
             </CCol>

@@ -491,7 +491,7 @@ const Dashboard = () => {
                           className="bg-body-tertiary text-center satellite table-cell"
                           style={{ position: 'sticky', top: 0 }}
                         >
-                          Sat
+                          GPS
                         </CTableHeaderCell>
                       )}
                       {visibleColumns.ig && (
@@ -507,7 +507,7 @@ const Dashboard = () => {
                           className="bg-body-tertiary text-center gps table-cell"
                           style={{ position: 'sticky', top: 0 }}
                         >
-                          GPS
+                          GSM
                         </CTableHeaderCell>
                       )}
                       {visibleColumns.power && (

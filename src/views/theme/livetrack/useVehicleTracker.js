@@ -12,7 +12,7 @@ const useVehicleTracker = (deviceId) => {
     const fetchVehicleData = async () => {
       try {
         setLoading(true) // Set loading state to true before fetching
-        const positionsAPI = `http://104.251.212.84/api/positions?deviceId=${deviceId}`
+        const positionsAPI = `http://63.142.251.13:8082/api/positions?deviceId=${deviceId}`
         const auth = {
           username: 'hbtrack',
           password: '123456@',
