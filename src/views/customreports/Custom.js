@@ -37,7 +37,7 @@ const SearchDistance = ({
   formData,
   handleInputChange,
   handleSubmit,
-  users, 
+  users,
   getGroups,
   groups,
   devices,
@@ -231,7 +231,7 @@ const SearchDistance = ({
   )
 }
 
-const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
+const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, devices }) => {
   const [addressData, setAddressData] = useState({})
   const [newAddressData, setnewAddressData] = useState()
   // Function to get address based on latitude and longitude using Nominatim API
@@ -358,60 +358,75 @@ const ShowDistance = ({ apiData, selectedColumns, allDates, devices }) => {
 
   return (
     <>
-    <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-      <CTable bordered className="custom-table" >
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell>Sr No.</CTableHeaderCell>
-            <CTableHeaderCell>Vehicle</CTableHeaderCell>
-            {/* Dynamically render table headers based on selected columns */}
-
-            {allDates?.map((date, index) => (
-              <CTableHeaderCell key={index}>{date}</CTableHeaderCell>
-            ))}
-            <CTableHeaderCell>Total Distance</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {apiData?.data && apiData.data.length > 0 ? (
-            apiData.data.map((row, rowIndex) => (
-              <CTableRow key={row.deviceId} className="custom-row">
-                <CTableDataCell>{rowIndex}</CTableDataCell>
-                <CTableDataCell>{findDeviceName(row.deviceId)}</CTableDataCell>
-
-                {/* Dynamically render table cells based on the date range */}
-                {allDates.map((date, index) => (
-                  <CTableDataCell key={index}>
-                    {/* Check if the date exists in the row, otherwise print '0' */}
-                    {row[date] !== undefined ? `${row[date]} km` : '0 km'}
-                  </CTableDataCell>
-                ))}
-                <CTableDataCell>
-                  {calculateTotalDistance(row).toFixed(2)}
-                  <span> km</span>
-                </CTableDataCell>
-              </CTableRow>
-            ))
-          ) : (
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <CTable bordered className="custom-table" >
+          <CTableHead>
             <CTableRow>
+              <CTableHeaderCell style={{ width: "70px", minWidth: "70px" }}>Sr No.</CTableHeaderCell>
+              <CTableHeaderCell>Vehicle</CTableHeaderCell>
+              {/* Dynamically render table headers based on selected columns */}
+
+              {allDates?.map((date, index) => (
+                <CTableHeaderCell key={index} style={{ width: "110px", minWidth: "110px" }}>{date}</CTableHeaderCell>
+              ))}
+              <CTableHeaderCell>Total Distance</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {distanceLoading ? (<CTableRow>
               <CTableDataCell
-                colSpan={allDates.length + 1}
+                colSpan={allDates.length + 3}
                 style={{
-                  backgroundColor: '#f8f9fa', // Light gray background
-                  color: '#6c757d', // Darker text color
-                  fontStyle: 'italic', // Italic font style
-                  padding: '16px', // Extra padding for emphasis
-                  textAlign: 'center', // Center the text
-                  border: '1px dashed #dee2e6', // Dashed border to highlight it
+                  backgroundColor: '#f8f9fa',
+                  color: '#6c757d',
+                  fontStyle: 'italic',
+                  padding: '16px',
+                  textAlign: 'center',
+                  border: '1px dashed #dee2e6',
                 }}
               >
-                No data available
+                Data is loading....
               </CTableDataCell>
-            </CTableRow>
-          )}
-        </CTableBody>
-      </CTable>
-      </div>
+            </CTableRow>) : (
+              apiData?.data && apiData.data.length > 0 ? (
+                apiData.data.map((row, rowIndex) => (
+                  <CTableRow key={row.deviceId} className="custom-row">
+                    <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                    <CTableDataCell>{findDeviceName(row.deviceId)}</CTableDataCell>
+
+                    {/* Dynamically render table cells based on the date range */}
+                    {allDates.map((date, index) => (
+                      <CTableDataCell key={index} >
+                        {/* Check if the date exists in the row, otherwise print '0' */}
+                        {row[date] !== undefined ? `${row[date]} km` : '0 km'}
+                      </CTableDataCell>
+                    ))}
+                    <CTableDataCell>
+                      {calculateTotalDistance(row).toFixed(2)}
+                      <span> km</span>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              ) : (
+                <CTableRow>
+                  <CTableDataCell
+                    colSpan={allDates.length + 1}
+                    style={{
+                      backgroundColor: '#f8f9fa', // Light gray background
+                      color: '#6c757d', // Darker text color
+                      fontStyle: 'italic', // Italic font style
+                      padding: '16px', // Extra padding for emphasis
+                      textAlign: 'center', // Center the text
+                      border: '1px dashed #dee2e6', // Dashed border to highlight it
+                    }}
+                  >
+                    No data available
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+          </CTableBody>
+        </CTable>
+      </div >
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle color="secondary" style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}>
@@ -459,6 +474,7 @@ const Distance = () => {
   const [selectedColumns, setSelectedColumns] = useState([])
   const token = Cookies.get('authToken') //
   const [apiData, setApiData] = useState() //data from api
+  const [distanceLoading, setDistanceLoading] = useState(false);
 
   const [allDates, setAllDates] = useState([])
   const formatDate = (date) => {
@@ -516,7 +532,7 @@ const Distance = () => {
     }
   }
 
-  const getGroups = async (selectedUser) => {
+  const getGroups = async (selectedUser = "") => {
     setLoading(true);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
@@ -524,23 +540,25 @@ const Distance = () => {
           Authorization: 'Bearer ' + accessToken,
         },
       })
-      if (response.data) {
+      if (response.data.groupsAssigned) {
         setGroups(response.data.groupsAssigned)
         setLoading(false);
-        console.log("yaha tak thik hai")
+        console.log("perticular user ke groups")
+      } else if (response.data.groups) {
+        setGroups(response.data.groups)
+        setLoading(false);
+        console.log("all groups")
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-      setLoading(false);
     }
   }
 
 
   const getUser = async () => {
     setLoading(true);
-    setGroups([]);
-    setDevices([]);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
@@ -561,6 +579,7 @@ const Distance = () => {
 
   useEffect(() => {
     getUser();
+    getGroups();
   }, [])
 
   const handleInputChange = (name, value) => {
@@ -574,6 +593,7 @@ const Distance = () => {
   }
 
   const handleSubmit = async () => {
+    setDistanceLoading(true);
     console.log('DataAll', formData)
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString().slice(0, 10) : '' // Change to YYYY-MM-DD
     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString().slice(0, 10) : '' // Change to YYYY-MM-DD
@@ -594,8 +614,10 @@ const Distance = () => {
       if (response.status === 200) {
         console.log(response.data.data)
         setApiData(response.data)
+        setDistanceLoading(false);
       }
     } catch (error) {
+      setDistanceLoading(false);
       console.error('Error submitting form:', error)
     }
   }
@@ -646,6 +668,7 @@ const Distance = () => {
               <CCardBody>
                 <ShowDistance
                   apiData={apiData}
+                  distanceLoading={distanceLoading}
                   allDates={allDates}
                   devices={devices}
                   selectedColumns={selectedColumns}

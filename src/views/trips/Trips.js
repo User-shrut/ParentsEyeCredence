@@ -459,10 +459,10 @@ const TripTable = ({ apiData, selectedColumns }) => {
                           })
                         : column === 'Distance'
                           ? // Convert distance from meters to kilometers and round to 2 decimal places
-                            (row.distance / 1000).toFixed(2) + ' km'
+                            row.distance
                           : column === 'Total Distance'
                             ? // Convert totalDistance from meters to kilometers and round to 2 decimal places
-                              (row.totalDistance / 1000).toFixed(2) + ' km'
+                              row.totalDistance
                             : column === 'Maximum Speed'
                               ? // Convert maxSpeed from m/s to km/h and round to 2 decimal places
                                 (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
@@ -539,10 +539,10 @@ const Trips = () => {
     'Start Time',
     'Start Address',
     'Average Speed',
-    'Distance',
     'End Time',
     'End Address',
     'Maximum Speed',
+    'Distance',
     'Total Distance',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])

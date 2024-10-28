@@ -472,7 +472,21 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {statusLoading ? (<div>loading...</div>) : (
+          {statusLoading ? (<CTableRow>
+            <CTableDataCell
+              colSpan={selectedColumns.length + 1}
+              style={{
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontStyle: 'italic',
+                padding: '16px',
+                textAlign: 'center',
+                border: '1px dashed #dee2e6',
+              }}
+            >
+              Data is loading....
+            </CTableDataCell>
+          </CTableRow>) : (
 
             apiData?.data && apiData.data.length > 0 ? (
               apiData.data.map((row, rowIndex) => (

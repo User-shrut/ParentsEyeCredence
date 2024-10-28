@@ -404,7 +404,8 @@ const StopTable = ({ apiData, selectedColumns }) => {
                   <CTableDataCell key={index}>
                     {column === 'Speed' ? (
                       // Convert speed from m/s to km/h and format to 2 decimal places
-                      (row.speed * 3.6).toFixed(2) + ' km/h'
+                      // (row.speed * 3.6).toFixed(2) + ' km/h'
+                      row.speed.toFixed(2) + ' km/h'
                     ) : column === 'Ignition' ? (
                       // Show 'ON' or 'OFF' based on ignition status
                       row.ignition ? (
