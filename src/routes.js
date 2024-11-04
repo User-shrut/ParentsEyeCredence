@@ -5,32 +5,32 @@ const LiveTrack = React.lazy(() => import('./views/theme/livetrack/LiveTrack'))
 const IndividualTrack = React.lazy(() => import('./views/theme/livetrack/IndividualTrack.js'))
 
 // master
-const Devices = React.lazy(() => import('./views/devices/Devices'))
-const Users = React.lazy(() => import('./views/users/Users'))
-const Group = React.lazy(() => import('./views/group/Group'))
-const Geofences = React.lazy(() => import('./views/geofences/Geofences'))
-const Driver = React.lazy(() => import('./views/driver/Driver'))
-const Notifications = React.lazy(() => import('./views/notifications/Notifications'))
-const Maintenance = React.lazy(() => import('./views/maintenance/Maintenance'))
+const Devices = React.lazy(() => import('./views/Master/devices/Devices.js'))
+const Users = React.lazy(() => import('./views/Master/users/Users.js'))
+const Group = React.lazy(() => import('./views/Master/group/Group.js'))
+const Geofences = React.lazy(() => import('./views/Master/geofences/Geofences.js'))
+const Driver = React.lazy(() => import('./views/Master/driver/Driver.js'))
+const Notifications = React.lazy(() => import('./views/Master/notifications/Notifications.js'))
+const Maintenance = React.lazy(() => import('./views/Master/maintenance/Maintenance.js'))
 const Preferences = React.lazy(() => import('./views/preferences/Preferences'))
-const Category = React.lazy(() => import('./views/category/Category'))
-const Model= React.lazy(() => import('./views/model/Model'))
+const Category = React.lazy(() => import('./views/Master/category/Category.js'))
+const Model= React.lazy(() => import('./views/Master/model/Model.js'))
 // reports
-const Combine = React.lazy(() => import('./views/combinereports/Combine'))
-const Custom = React.lazy(() => import('./views/customreports/Custom'))
-const History = React.lazy(() => import('./views/history/History'))
-const Stops = React.lazy(() => import('./views/stops/Stops'))
-const Trips = React.lazy(() => import('./views/trips/Trips'))
-const Statistics = React.lazy(() => import('./views/statistics/Statistics'))
-const Schedules = React.lazy(() => import('./views/schedules-reports/Schedules'))
-const Alerts = React.lazy(() => import('./views/alerts-events/Alerts'))
-const Summary = React.lazy(() => import('./views/summary/Summary'))
-const Customchart = React.lazy(() => import('./views/customchart/Customchart'))
+const Combine = React.lazy(() => import('./views/Reports/StatusReports/StatusReport.js'))
+const Custom = React.lazy(() => import('./views/Reports/DistanceReport/DistanceReport.js'))
+const History = React.lazy(() => import('./views/Reports/HistoryReport/HistoryReport.js'))
+const Stops = React.lazy(() => import('./views/Reports/StopsReport/StopsReport.js'))
+const Trips = React.lazy(() => import('./views/Reports/TravelReport/TravelReport.js'))
+const IdleReport = React.lazy(() => import('./views/Reports/IdleReport/IdleReport.js'))
+const Schedules = React.lazy(() => import('./views/Reports/SensorReport/SensorReport.js'))
+const Alerts = React.lazy(() => import('./views/Reports/alerts-events/Alerts.js'))
+const Summary = React.lazy(() => import('./views/Reports/VehicleReport/VehicleReport.js'))
+const Customchart = React.lazy(() => import('./views/Reports/GeofenceReport/GeofenceReport.js'))
 
 // expense management
-const InvoiceForm = React.lazy(() => import('./views/ManageOrder/Invoice'))
-const Po = React.lazy(() => import('./views/ManageOrder/PO'))
-const InventoryManagment = React.lazy(() => import('./views/ManageOrder/InventoryManage'))
+const InvoiceForm = React.lazy(() => import('./views/ExpenseManagement/Invoice.js'))
+const Po = React.lazy(() => import('./views/ExpenseManagement/PO.js'))
+const InventoryManagment = React.lazy(() => import('./views/ExpenseManagement/InventoryManage.js'))
 
 // additional
 const ChatBot = React.lazy(() => import('./views/theme/chatbot/ChatBot'))
@@ -63,7 +63,7 @@ const routes = [
   { path: '/history', name: 'History', element: History },
   { path: '/stops', name: 'Stops', element: Stops },
   { path: '/travelsreport', name: 'Trips', element: Trips },
-  { path: '/idlereport', name: 'Statistics', element: Statistics },
+  { path: '/idlereport', name: 'Idle', element: IdleReport },
   { path: '/sensorreports', name: 'Schedule', element: Schedules },
   { path: '/alerts-events', name: 'Alerts', element: Alerts },
   { path: '/vehiclereport', name: 'Summary', element: Summary },
