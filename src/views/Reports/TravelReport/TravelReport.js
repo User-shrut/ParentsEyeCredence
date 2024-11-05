@@ -35,8 +35,8 @@ const SearchTrip = ({
   formData,
   handleInputChange,
   handleSubmit,
-  users, 
-  groups, 
+  users,
+  groups,
   getGroups,
   loading,
   devices,
@@ -110,7 +110,7 @@ const SearchTrip = ({
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-       <CCol md={2}>
+      <CCol md={2}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
         <CFormSelect
           id="user"
@@ -266,22 +266,24 @@ const TripTable = ({ apiData, selectedColumns }) => {
   // Function to get address based on latitude and longitude using Nominatim API
   const getAddress = async (latitude, longitude) => {
     try {
+      const apiKey = 'DG2zGt0KduHmgSi2kifd';  // Replace with your actual MapTiler API key
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=2`,
-      )
-      if (response.data) {
-        console.log('Fetched address:', response.data.display_name) // Debugging: log the address
-        return response.data.display_name // Return display_name
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
+      );
+
+      if (response.data && response.data.features && response.data.features.length > 0) {
+        const address = response.data.features[0].place_name;  // MapTiler's address field
+        console.log('Fetched address:', address);  // Debugging: log the address
+        return address;  // Return place_name from MapTiler response
       } else {
-        console.error('Error fetching address: No data found')
-        return 'Address not available'
+        console.error('Error fetching address: No data found');
+        return 'Address not available';
       }
     } catch (error) {
-      console.error('Error:', error.message)
-      return 'Address not available'
+      console.error('Error:', error.message);
+      return 'Address not available';
     }
-  }
-
+  };
   useEffect(() => {
     const fetchAddresses = async () => {
       const newAddressData = {}
@@ -429,10 +431,25 @@ const TripTable = ({ apiData, selectedColumns }) => {
                   <CTableDataCell key={index}>
                     {column === 'Start Time'
                       ? // Add 6 hours 30 minutes to startTime
+                      new Date(
+                        new Date(row.startTime).setHours(
+                          new Date(row.startTime).getHours() + 6,
+                          new Date(row.startTime).getMinutes() + 30,
+                        ),
+                      ).toLocaleString([], {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                      })
+                      : column === 'End Time'
+                        ? // Add 6 hours 30 minutes to endTime
                         new Date(
-                          new Date(row.startTime).setHours(
-                            new Date(row.startTime).getHours() + 6,
-                            new Date(row.startTime).getMinutes() + 30,
+                          new Date(row.endTime).setHours(
+                            new Date(row.endTime).getHours() + 6,
+                            new Date(row.endTime).getMinutes() + 30,
                           ),
                         ).toLocaleString([], {
                           year: 'numeric',
@@ -442,33 +459,18 @@ const TripTable = ({ apiData, selectedColumns }) => {
                           minute: '2-digit',
                           hour12: false,
                         })
-                      : column === 'End Time'
-                        ? // Add 6 hours 30 minutes to endTime
-                          new Date(
-                            new Date(row.endTime).setHours(
-                              new Date(row.endTime).getHours() + 6,
-                              new Date(row.endTime).getMinutes() + 30,
-                            ),
-                          ).toLocaleString([], {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                          })
                         : column === 'Distance'
                           ? // Convert distance from meters to kilometers and round to 2 decimal places
-                            row.distance
+                          row.distance
                           : column === 'Total Distance'
                             ? // Convert totalDistance from meters to kilometers and round to 2 decimal places
-                              row.totalDistance
+                            row.totalDistance
                             : column === 'Maximum Speed'
                               ? // Convert maxSpeed from m/s to km/h and round to 2 decimal places
-                                (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+                              (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
                               : column === 'Average Speed'
                                 ? // Convert avgSpeed from m/s to km/h and round to 2 decimal places
-                                  (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+                                (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
                                 : column === 'Duration'
                                   ? row.duration
                                   : column === 'Start Address'
@@ -497,7 +499,7 @@ const TripTable = ({ apiData, selectedColumns }) => {
                   border: '1px dashed #dee2e6', // Dashed border to highlight it
                 }}
               >
-                No data available
+                Data is loading...
               </CTableDataCell>
             </CTableRow>
           )}
@@ -603,7 +605,7 @@ const Trips = () => {
 
 
   const getDevices = async (selectedGroup) => {
-    
+
     setLoading(true)
     try {
       const response = await axios.get(
@@ -688,7 +690,7 @@ const Trips = () => {
   return (
     <>
       <CRow className="pt-3">
-      
+
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

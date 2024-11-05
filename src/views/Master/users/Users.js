@@ -78,6 +78,7 @@ const Users = () => {
   const [isSuperAdmin, setSuperAdmin] = useState(false)
   const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
+  const [currentPage , setCurrentPage] = useState(1)
 
   // Go to the next step
   const handleNext = () => {
@@ -195,6 +196,7 @@ const Users = () => {
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
     let page = e.selected + 1
+    setCurrentPage(page)
     setLoading(true)
     fetchUserData(page)
   }
@@ -688,6 +690,9 @@ const Users = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap ">
             <CTableRow>
+            <CTableHeaderCell className=" text-center text-white bg-secondary">
+                SN
+              </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Name
               </CTableHeaderCell>
@@ -708,9 +713,11 @@ const Users = () => {
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
+       
           <CTableBody>
             {loading ? (
               <CTableRow>
+
                 <CTableDataCell colSpan="6" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
@@ -731,6 +738,7 @@ const Users = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index} className="p-0">
+                  <CTableDataCell className='text-center p-0'>{(currentPage - 1)  * limit + index + 1}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">
