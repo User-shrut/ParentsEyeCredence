@@ -59,6 +59,7 @@ const Group = () => {
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
   const [filteredData, setFilteredData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const style = {
     position: 'absolute',
@@ -128,6 +129,7 @@ const Group = () => {
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
     let page = e.selected + 1
+    setCurrentPage(page)
     setLoading(true)
     fetchGroupData(page)
   }
@@ -319,6 +321,10 @@ const Group = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
+            <CTableHeaderCell className=" text-center text-white bg-secondary">
+                SN
+              </CTableHeaderCell>
+
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Group Name
               </CTableHeaderCell>
@@ -353,6 +359,7 @@ const Group = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index}>
+                  <CTableDataCell className="text-center p-0">{(currentPage -1 ) * limit + index+1}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
                   <CTableDataCell
                     className="text-center d-flex p-0"

@@ -67,6 +67,7 @@ const Geofences = () => {
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
   const [deviceOptions, setDeviceOptions] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Go to the next step
   const handleNext = () => {
@@ -263,6 +264,7 @@ const Geofences = () => {
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
     let page = e.selected + 1
+    setCurrentPage(page)
     setLoading(true)
     fetchGeofenceData(page)
   }
@@ -469,6 +471,9 @@ const Geofences = () => {
             <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
               <CTableHead className="text-nowrap">
                 <CTableRow>
+                <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
+                    SN
+                  </CTableHeaderCell>
                   <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
                     Geofence Name
                   </CTableHeaderCell>
@@ -507,6 +512,7 @@ const Geofences = () => {
                 ) : filteredData.length > 0 ? (
                   filteredData?.map((item, index) => (
                     <CTableRow key={index}>
+                      <CTableDataCell className="ps-3 text-start p-0">{(currentPage - 1) * limit + index+1}</CTableDataCell>
                       <CTableDataCell className="ps-3 text-start p-0">{item.name}</CTableDataCell>
                       <CTableDataCell className="text-start p-0">{item.type}</CTableDataCell>
                       <CTableDataCell className="text-center p-0">

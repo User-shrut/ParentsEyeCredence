@@ -5,7 +5,7 @@ const CustomChart = () => {
   return (
     <>
       <div className="CustomChart">
-        <h1>Custom Chart (geofence )</h1>
+        <h1>Geofence Reports</h1>
       </div>
     </>
   )

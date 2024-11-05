@@ -257,12 +257,15 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
   // Function to get address based on latitude and longitude using Nominatim API
   const getAddress = async (latitude, longitude) => {
     try {
+      const apiKey = 'DG2zGt0KduHmgSi2kifd';  // Replace with your actual MapTiler API key
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=2`
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
       );
-      if (response.data) {
-        console.log('Fetched address:', response.data.display_name);  // Debugging: log the address
-        return response.data.display_name; // Return display_name
+  
+      if (response.data && response.data.features && response.data.features.length > 0) {
+        const address = response.data.features[0].place_name;
+        console.log('Fetched address:', address);  // Debugging: log the address
+        return address; // Return place_name from the features array
       } else {
         console.error("Error fetching address: No data found");
         return 'Address not available';
@@ -272,6 +275,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
       return 'Address not available';
     }
   };
+  
   useEffect(() => {
     const fetchAddresses = async () => {
       // Fetch all addresses concurrently

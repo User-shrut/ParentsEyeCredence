@@ -305,6 +305,7 @@ const Model = () => {
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
+            <CTableHeaderCell className=" text-center text-white bg-secondary">SN</CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">Model Name</CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell>
             </CTableRow>
@@ -330,8 +331,9 @@ const Model = () => {
                 </CTableDataCell>
               </CTableRow>
             ) : (filteredData.length > 0 ? (
-              filteredData.map((item) => (
+              filteredData.map((item , index) => (
                 <CTableRow key={item._id}>
+                  <CTableDataCell className="text-center">{ index+1}</CTableDataCell>
                   <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
                   <CTableDataCell className="text-center">
                     {/* Row layout for the icons */}

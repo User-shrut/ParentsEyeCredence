@@ -53,6 +53,7 @@ const Category = () => {
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
   const [filteredData, setFilteredData] = useState([]);
+  const [currentPage , setCurrentPage] = useState(1)
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => setAddModalOpen(false)
 
@@ -121,6 +122,7 @@ const Category = () => {
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
     let page = e.selected + 1
+    setCurrentPage(page)
     setLoading(true)
     fetchCategoryData(page)
   }
@@ -306,6 +308,10 @@ const Category = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
+            <CTableHeaderCell className=" text-center text-white bg-secondary">
+               SN
+              </CTableHeaderCell>
+
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Category Name
               </CTableHeaderCell>
@@ -340,6 +346,7 @@ const Category = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index}>
+                  <CTableDataCell className="text-center p-0">{(currentPage - 1) * limit + index+1}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.categoryName}</CTableDataCell>
                   <CTableDataCell
                     className="text-center d-flex p-0"
