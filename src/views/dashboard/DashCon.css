@@ -3,6 +3,10 @@
   /* Hides scrollbar for Chrome, Safari, and Edge */
 }
 
+.gutter-0{
+  --bs-gutter-x: 0 !important;
+}
+
 /* For Firefox */
 .table-container {
   scrollbar-width: none !important;

@@ -28,7 +28,11 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx';
+import upLeft from "src/direction/up-left-arrow.gif";
+import upRight from "src/direction/up-right-arrow.gif";
+import downLeft from "src/direction/down-left-arrow.gif";
+import downRight from "src/direction/down-right-arrow.gif";
 // import { saveAs } from 'file-saver';
 
 const SearchStop = ({
@@ -393,9 +397,8 @@ const StopTable = ({ apiData, selectedColumns }) => {
         </CTableHead>
 
         <CTableBody>
-          {/* Check if apiData and finalDeviceDataByStopage exist and are not empty */}
           {apiData?.finalDeviceDataByStopage?.length > 0 ? (
-            apiData.finalDeviceDataByStopage.map((row, rowIndex) => (
+            apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
               <CTableRow key={row.id || rowIndex} className="custom-row">
                 <CTableDataCell>{rowIndex + 1}</CTableDataCell>
 
@@ -418,7 +421,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       row.course < 90 && row.course > 0 ? (
                         <>
                           <img
-                            src="src/direction/up-right-arrow.gif"
+                            src={upRight}
                             alt="North East"
                             width="30"
                             height="25"
@@ -428,7 +431,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       ) : row.course > 90 && row.course < 180 ? (
                         <>
                           <img
-                            src="src/direction/up-left-arrow.gif"
+                            src={upLeft}
                             alt="North West"
                             width="30"
                             height="25"
@@ -438,7 +441,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       ) : row.course > 180 && row.course < 270 ? (
                         <>
                           <img
-                            src="src/direction/down-left-arrow.gif"
+                            src={downLeft}
                             alt="South West"
                             width="30"
                             height="25"
@@ -448,7 +451,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       ) : (
                         <>
                           <img
-                            src="src/direction/down-right-arrow.gif"
+                            src={downRight}
                             alt="South East"
                             width="30"
                             height="25"
@@ -674,10 +677,7 @@ const Stops = () => {
         },
       )
       // console.log(response.data.deviceDataByTrips[0]);
-      if (response.status == 201) {
-        console.log(response.data.finalDeviceDataByStopage)
-        console.log('done in all')
-        console.log(response.data)
+      if (response.status == 200) {
         setApiData(response.data)
       }
       // Assuming the data returned is what you want to display in the table

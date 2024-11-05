@@ -16,8 +16,14 @@ $sidebar-width: 16rem;
   min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
 }
 
+// .sidebar-brand-full {
+//   margin-left: 3px;
+// }
+
 .sidebar-brand-full {
-  margin-left: 3px;
+  margin-left: 5px;
+  object-fit: contain;
+  cursor: pointer;
 }
 
 .sidebar-header {

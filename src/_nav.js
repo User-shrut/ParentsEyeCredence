@@ -56,16 +56,6 @@ const _nav = (role, decodedToken) => {
         </div>
       ),
     },
-    {
-      component: CNavItem,
-      name: 'Live Tracking',
-      to: '/livetrack',
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <IoLocationOutline style={{ marginLeft: '0px', marginRight: '15px', fontSize: '23px' }} />
-        </div>
-      ),
-    },
     ...(role == 'superadmin'
       ? [
           {

@@ -43,9 +43,9 @@ import ReactPaginate from 'react-paginate'
 import { Label } from '@mui/icons-material'
 import toast, { Toaster } from 'react-hot-toast'
 import { jwtDecode } from 'jwt-decode'
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 
@@ -54,8 +54,9 @@ const Devices = () => {
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [pageCount, setPageCount] = useState()
+  const [currentItems, setCurrentItems] = useState([]);
 
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -78,7 +79,7 @@ const Devices = () => {
 
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Device Info', 'Assign To', 'Subscription']
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([])
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
@@ -96,6 +97,22 @@ const Devices = () => {
   const handleBack = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
+
+
+   // pagination code
+   useEffect(() => {
+    const currentI = data.slice(
+      currentPage * limit,
+      (currentPage + 1) * limit
+    );
+    setCurrentItems(currentI);
+
+    console.log(currentItems);
+  }, [currentPage, limit, data]);
+   
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected); 
+  };
 
   const columns = [
     { Header: 'Device Id', accessor: '_id' },
@@ -142,49 +159,130 @@ const Devices = () => {
     }
   }
 
-
   const [rows, setRows] = useState([])
 
   // ###################### Fetch device Data ######################
 
-  const fetchData = async (page = 1) => {
+  function compareAndMerge(oldApi, newApi) {
+    const oldApiMap = {};
+    const mergedData = [];
+  
+    // Create a map for old API devices using uniqueId for quick lookup
+    oldApi.forEach(oldDevice => {
+      oldApiMap[oldDevice.uniqueId] = oldDevice;
+    });
+  
+    // Iterate over new API devices and merge with old API if a match is found
+    newApi.forEach(newDevice => {
+      const matchingOldDevice = oldApiMap[newDevice.uniqueId];
+  
+      if (matchingOldDevice) {
+        // Merge old and new API data
+        mergedData.push({
+          name: matchingOldDevice.name || newDevice.name,
+          uniqueId: matchingOldDevice.uniqueId,
+          sim: newDevice.sim || matchingOldDevice.phone,
+          speed: newDevice.speed || "",
+          average: newDevice.average || (matchingOldDevice.attributes ? matchingOldDevice.attributes.avg111111 : ""),
+          users: newDevice.users || [],
+          groups: newDevice.groups || [],
+          driver: newDevice.Driver || null,
+          geofences: newDevice.geofences || [],
+          model: matchingOldDevice.model || newDevice.model,
+          category: matchingOldDevice.category || newDevice.category,
+          installationDate: newDevice.installationdate || null,
+          expirationDate: newDevice.expirationdate || null,
+          extendDate: newDevice.extenddate || null,
+          lastUpdate: newDevice.lastUpdate || matchingOldDevice.lastUpdate,
+        });
+  
+        // Remove the old device from the map, so it's not added again later
+        delete oldApiMap[newDevice.uniqueId];
+      } else {
+        // If no matching old device, add the new device directly
+        mergedData.push({
+          name: newDevice.name,
+          uniqueId: newDevice.uniqueId,
+          sim: newDevice.sim,
+          speed: newDevice.speed || "",
+          average: newDevice.average || "",
+          users: newDevice.users || [],
+          groups: newDevice.groups || [],
+          driver: newDevice.Driver || null,
+          geofences: newDevice.geofences || [],
+          model: newDevice.model,
+          category: newDevice.category,
+          installationDate: newDevice.installationdate || null,
+          expirationDate: newDevice.expirationdate || null,
+          extendDate: newDevice.extenddate || null,
+          lastUpdate: newDevice.lastUpdate || null,
+        });
+      }
+    });
+  
+    // Add any remaining old devices that were not matched by new API
+    Object.values(oldApiMap).forEach(oldDevice => {
+      mergedData.push({
+        name: oldDevice.name,
+        uniqueId: oldDevice.uniqueId,
+        sim: oldDevice.phone,
+        speed: "", // Old API doesn't have speed info
+        average: oldDevice.attributes ? oldDevice.attributes.avg111111 : "",
+        users: [],
+        groups: [],
+        driver: null,
+        geofences: [],
+        model: oldDevice.model,
+        category: oldDevice.category,
+        installationDate: null,
+        expirationDate: null,
+        extendDate: null,
+        lastUpdate: oldDevice.lastUpdate,
+      });
+    });
+  
+    return mergedData;
+  }
+
+  const fetchData = async () => {
     setLoading(true) // Start loading
     try {
-      let oldApi;
-      let newApi;
+      if (decodedToken.superadmin) {
+        const username = 'hbtrack'
+        const password = '123456@'
+        const authtoken = btoa(`${username}:${password}`)
 
-      // if (decodedToken.superadmin) {
-      //   const username = "hbtrack";
-      //   const password = "123456@";
-      //   const authtoken = btoa(`${username}:${password}`);
-
-      //   oldApi = await axios.get(
-      //     `http://63.142.251.13:8082/api/devices`,
-      //     {
-      //       headers: {
-      //         Authorization: `Basic ${authtoken}`,
-      //       },
-      //     },
-      //   );
-
-      //   newApi = await axios.get(
-      //     `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
-      //     {
-      //       headers: {
-      //         Authorization: `Bearer ${token}`,
-      //       },
-      //     },
-      //   );
-
-      // } else {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
-          {
+        const [oldApiResponse, newApiResponse] = await Promise.all([
+          axios.get(`http://63.142.251.13:8082/api/devices`, {
+            headers: {
+              Authorization: `Basic ${authtoken}`,
+            },
+          }),
+          axios.get(`${import.meta.env.VITE_API_URL}/device`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+          }),
+        ])
+
+        // Process responses if needed
+        const oldApiData = oldApiResponse.data
+        const newApiData = newApiResponse.data.devices
+
+        console.log("oldApiData: ",oldApiData)
+        console.log("newApiData: ",newApiData)
+
+        const result = compareAndMerge(oldApiData, newApiData)
+
+        console.log(" merge data hai : ", result)
+        setData(result)
+
+      } else {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        )
+        })
 
         // Access the devices array from the response
         if (response.data && Array.isArray(response.data.devices)) {
@@ -207,15 +305,11 @@ const Devices = () => {
           }))
 
           setData(deviceData)
-          setPageCount(response.data.totalPages)
         } else {
           console.error('Expected an array but got:', response.data)
           toast.error('Unexpected data format received.')
         }
-      
-
-
-
+      }
     } catch (error) {
       console.error('Fetch data error:', error)
       toast.error('An error occurred while fetching data.')
@@ -224,37 +318,35 @@ const Devices = () => {
     }
   }
 
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
+  
+
   // ##################### Filter data by search query #######################
   const filterDevices = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(currentItems)
     } else {
-      const filtered = data.filter(
+      const filtered = currentItems?.filter(
         (device) =>
-          device.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          device.uniqueId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          device.sim.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          device.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          device.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
+          device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.uniqueId?.includes(searchQuery) ||
+          device.sim?.includes(searchQuery) ||
+          device.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          device.category?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredData(filtered)
     }
-  };
-
-  useEffect(() => {
-    fetchData()
-  }, [limit, searchQuery])
-
-  useEffect(() => {
-    filterDevices(searchQuery);
-  }, [data, searchQuery]);
-
-  const handlePageClick = (e) => {
-    console.log(e.selected + 1)
-    let page = e.selected + 1
-    setLoading(true)
-    fetchData(page)
   }
+
+
+  useEffect(() => {
+    filterDevices(searchQuery)
+  }, [currentItems, searchQuery])
+
 
   // ###############################################################
   // ######################  Add Device API Function ######################
@@ -288,20 +380,16 @@ const Devices = () => {
 
     if (newRow) {
       // Check for any required fields missing
-      if (
-        !newRow.name ||
-        !newRow.uniqueId ||
-        !newRow.sim
-      ) {
+      if (!newRow.name || !newRow.uniqueId || !newRow.sim) {
         toast.error('Please fill in all required fields.')
         return
       }
     }
 
     try {
-      const username = "hbtrack";
-      const password = "123456@";
-      const token1 = btoa(`${username}:${password}`);
+      const username = 'hbtrack'
+      const password = '123456@'
+      const token1 = btoa(`${username}:${password}`)
       const oldresponse = await axios.post(oldapiUrl, oldRow, {
         headers: {
           Authorization: `Basic ${token1}`,
@@ -645,84 +733,85 @@ const Devices = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).reduce((acc, column) => {
-        const accessor = column.accessor;
+        const accessor = column.accessor
 
         // Handle specific columns based on the column's accessor
         if (accessor === 'groups') {
-          acc[column.Header] = item.groups && item.groups.length > 0
-            ? item.groups.map(group => group.name).join(', ')  // Join group names if there are multiple
-            : "N/A";
+          acc[column.Header] =
+            item.groups && item.groups.length > 0
+              ? item.groups.map((group) => group.name).join(', ') // Join group names if there are multiple
+              : 'N/A'
         } else if (accessor === 'geofences') {
-          acc[column.Header] = item.geofences && item.geofences.length > 0
-            ? item.geofences.map(geofence => geofence.name).join(', ')  // Join geofence names if there are multiple
-            : "N/A";
+          acc[column.Header] =
+            item.geofences && item.geofences.length > 0
+              ? item.geofences.map((geofence) => geofence.name).join(', ') // Join geofence names if there are multiple
+              : 'N/A'
         } else if (accessor === 'users') {
-          acc[column.Header] = item.users && item.users.length > 0
-            ? item.users.map(user => user.username).join(', ')  // Join usernames if there are multiple
-            : "N/A";
+          acc[column.Header] =
+            item.users && item.users.length > 0
+              ? item.users.map((user) => user.username).join(', ') // Join usernames if there are multiple
+              : 'N/A'
         } else if (accessor === 'Driver') {
-          acc[column.Header] = item.Driver?.name || 'N/A';
+          acc[column.Header] = item.Driver?.name || 'N/A'
         } else if (accessor === 'device') {
-          acc[column.Header] = item.device?.name || 'N/A';
+          acc[column.Header] = item.device?.name || 'N/A'
         } else {
-          acc[column.Header] = item[accessor] || 'N/A';  // Fallback for other columns
+          acc[column.Header] = item[accessor] || 'N/A' // Fallback for other columns
         }
 
-        return acc;
-      }, {});
+        return acc
+      }, {})
 
-      return { SN: rowIndex + 1, ...rowData }; // Include row index as SN
-    });
+      return { SN: rowIndex + 1, ...rowData } // Include row index as SN
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+    const workbook = XLSX.utils.book_new()
 
     // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data')
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'table_data.xlsx');
-  };
-
-
+    XLSX.writeFile(workbook, 'table_data.xlsx')
+  }
 
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Define the table headers from the columns prop (skip the first one as per the UI logic)
-    const tableColumn = ['SN', ...columns.slice(1).map(column => column.Header)];
+    const tableColumn = ['SN', ...columns.slice(1).map((column) => column.Header)]
 
     // Build the table rows using the filteredData array
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).map((column) => {
-        const accessor = column.accessor;
+        const accessor = column.accessor
 
         // Handle specific columns and their logic
         if (accessor === 'groups') {
           return item.groups && item.groups.length > 0
-            ? item.groups.map(group => group.name).join(', ') // Join group names if there are multiple
-            : 'N/A'; // Return '0' if no groups are present
+            ? item.groups.map((group) => group.name).join(', ') // Join group names if there are multiple
+            : 'N/A' // Return '0' if no groups are present
         } else if (accessor === 'geofences') {
           return item.geofences && item.geofences.length > 0
-            ? item.geofences.map(geofence => geofence.name).join(', ') // Join geofence names if there are multiple
-            : 'N/A'; // Return '0' if no geofences are present
+            ? item.geofences.map((geofence) => geofence.name).join(', ') // Join geofence names if there are multiple
+            : 'N/A' // Return '0' if no geofences are present
         } else if (accessor === 'users') {
           return item.users && item.users.length > 0
-            ? item.users.map(user => user.username).join(', ') // Join usernames if there are multiple
-            : 'N/A'; // Return '0' if no users are present
+            ? item.users.map((user) => user.username).join(', ') // Join usernames if there are multiple
+            : 'N/A' // Return '0' if no users are present
         } else if (accessor === 'Driver') {
-          return item.Driver?.name || 'N/A';
+          return item.Driver?.name || 'N/A'
         } else if (accessor === 'device') {
-          return item.device?.name || 'N/A';
+          return item.device?.name || 'N/A'
         } else {
-          return item[accessor] || 'N/A';  // Fallback for other columns
+          return item[accessor] || 'N/A' // Fallback for other columns
         }
-      });
-      return [rowIndex + 1, ...rowData]; // Include row index as the first element
-    });
+      })
+      return [rowIndex + 1, ...rowData] // Include row index as the first element
+    })
 
     // Generate the PDF using the autoTable plugin
     doc.autoTable({
@@ -730,10 +819,9 @@ const Devices = () => {
       body: tableRows,
       startY: 20,
       autoSize: true, // Automatically adjust column width based on content
-    });
-    doc.save('table_data.pdf');
-  };
-
+    })
+    doc.save('table_data.pdf')
+  }
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -753,8 +841,8 @@ const Devices = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {
-            decodedToken.superadmin && (<div>
+          {decodedToken.superadmin && (
+            <div>
               <button
                 onClick={() => setAddModalOpen(true)}
                 variant="contained"
@@ -762,13 +850,10 @@ const Devices = () => {
               >
                 Add Device
               </button>
-            </div>)
-          }
-
+            </div>
+          )}
         </div>
       </div>
-
-
 
       <TableContainer
         component={Paper}
@@ -783,7 +868,7 @@ const Devices = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              {/* Skip the first column */}
+              <CTableHeaderCell className="text-center text-white bg-secondary">Sr No</CTableHeaderCell>
               {columns.slice(1).map((column, index) => (
                 <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
                   {column.Header}
@@ -798,7 +883,7 @@ const Devices = () => {
           </CTableHead>
           <CTableBody>
             {loading ? (
-              <CTableRow>
+              <CTableRow key="loading">
                 <CTableDataCell colSpan="15" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
@@ -819,7 +904,7 @@ const Devices = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
-                  {/* Skip the first field in the data row */}
+                  <CTableDataCell>{(currentPage) * limit + index + 1}</CTableDataCell>
                   {columns.slice(1).map((column) => (
                     <CTableDataCell key={column.accessor} className="text-center">
                       {column.accessor === 'groups' ? (
@@ -828,7 +913,7 @@ const Devices = () => {
                           className=" text-center border-0"
                           style={{ width: '100px' }}
                         >
-                          <option>{item.groups.length || '0'}</option>
+                          <option>{item.groups?.length || '0'}</option>
                           {Array.isArray(item.groups) &&
                             item.groups.map((group) => (
                               <option key={group._id} value={group._id}>
@@ -842,7 +927,7 @@ const Devices = () => {
                           className=" text-center border-0"
                           style={{ width: '120px' }}
                         >
-                          <option value="">{item.geofences.length || '0'}</option>
+                          <option value="">{item.geofences?.length || '0'}</option>
                           {Array.isArray(item.geofences) &&
                             item.geofences.map((geofence, index) => (
                               <option key={index} value={geofence._id}>
@@ -856,7 +941,7 @@ const Devices = () => {
                           className=" text-center border-0"
                           style={{ width: '120px' }}
                         >
-                          <option value="">{item.users.length || '0'}</option>
+                          <option value="">{item.users?.length || '0'}</option>
                           {Array.isArray(item.users) &&
                             item.users.map((user) => (
                               <option key={user._id} value={user._id}>
@@ -865,7 +950,7 @@ const Devices = () => {
                             ))}
                         </CFormSelect>
                       ) : column.accessor === 'Driver' ? (
-                        <div style={{ width: '120px' }}>{item[column.accessor].name || 'N/A'}</div>
+                        <div style={{ width: '120px' }}>{item[column.accessor]?.name || 'N/A'}</div>
                       ) : item[column.accessor] ? (
                         item[column.accessor]
                       ) : (
@@ -899,10 +984,7 @@ const Devices = () => {
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
                   >
-                    <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's no device available."
-                    </p>
-
+                    <p className="mb-0 fw-bold">"Oops! Looks like there's no device available."</p>
                   </div>
                 </CTableDataCell>
               </CTableRow>
@@ -918,20 +1000,22 @@ const Devices = () => {
           <CIcon icon={cilSettings} />
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      <div className='d-flex justify-content-center align-items-center'>
+      <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3"> {/* Adds margin to the right of pagination */}
+          <div className="me-3">
+            {' '}
+            {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={pageCount} // Set based on the total pages from the API
+              pageCount={Math.ceil(data.length / limit)} // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}
@@ -946,7 +1030,7 @@ const Devices = () => {
             />
           </div>
           {/* Form Control */}
-          <div style={{ width: "90px" }}>
+          <div style={{ width: '90px' }}>
             <CFormSelect
               aria-label="Default select example"
               value={limit}
@@ -955,7 +1039,7 @@ const Devices = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: '5000', value: '5000' }
+                { label: '1000', value: '1000' },
               ]}
             />
           </div>

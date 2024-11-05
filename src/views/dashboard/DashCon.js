@@ -287,7 +287,7 @@ const Dashboard = () => {
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
-      <CRow>
+      <CRow className='gutter-0'>
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
