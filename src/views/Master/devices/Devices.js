@@ -150,41 +150,72 @@ const Devices = () => {
   const fetchData = async (page = 1) => {
     setLoading(true) // Start loading
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      let oldApi;
+      let newApi;
+
+      // if (decodedToken.superadmin) {
+      //   const username = "hbtrack";
+      //   const password = "123456@";
+      //   const authtoken = btoa(`${username}:${password}`);
+
+      //   oldApi = await axios.get(
+      //     `http://63.142.251.13:8082/api/devices`,
+      //     {
+      //       headers: {
+      //         Authorization: `Basic ${authtoken}`,
+      //       },
+      //     },
+      //   );
+
+      //   newApi = await axios.get(
+      //     `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     },
+      //   );
+
+      // } else {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/device?page=${page}&limit=${limit}&search=${searchQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      )
+        )
 
-      // Access the devices array from the response
-      if (response.data && Array.isArray(response.data.devices)) {
-        const deviceData = response.data.devices.map((device) => ({
-          _id: device._id || 'N/A',
-          name: device.name || 'N/A',
-          uniqueId: device.uniqueId || 'N/A',
-          sim: device.sim || 'N/A', //
-          speed: device.speed || 'N/A',
-          average: device.average || 'N/A',
-          model: device.model || 'N/A',
-          category: device.category || 'N/A',
-          Driver: device.Driver || 'N/A',
-          installationdate: device.installationdate || 'N/A',
-          expirationdate: device.expirationdate || 'N/A',
-          extenddate: device.extenddate || 'N/A',
-          groups: device.groups || [],
-          users: device.users || [],
-          geofences: device.geofences || [],
-        }))
+        // Access the devices array from the response
+        if (response.data && Array.isArray(response.data.devices)) {
+          const deviceData = response.data.devices.map((device) => ({
+            _id: device._id || 'N/A',
+            name: device.name || 'N/A',
+            uniqueId: device.uniqueId || 'N/A',
+            sim: device.sim || 'N/A', //
+            speed: device.speed || 'N/A',
+            average: device.average || 'N/A',
+            model: device.model || 'N/A',
+            category: device.category || 'N/A',
+            Driver: device.Driver || 'N/A',
+            installationdate: device.installationdate || 'N/A',
+            expirationdate: device.expirationdate || 'N/A',
+            extenddate: device.extenddate || 'N/A',
+            groups: device.groups || [],
+            users: device.users || [],
+            geofences: device.geofences || [],
+          }))
 
-        setData(deviceData)
-        setPageCount(response.data.totalPages)
-      } else {
-        console.error('Expected an array but got:', response.data)
-        toast.error('Unexpected data format received.')
-      }
+          setData(deviceData)
+          setPageCount(response.data.totalPages)
+        } else {
+          console.error('Expected an array but got:', response.data)
+          toast.error('Unexpected data format received.')
+        }
+      
+
+
+
     } catch (error) {
       console.error('Fetch data error:', error)
       toast.error('An error occurred while fetching data.')
@@ -229,10 +260,18 @@ const Devices = () => {
   // ######################  Add Device API Function ######################
 
   const handleAddSubmit = async () => {
+    const oldapiUrl = `http://63.142.251.13:8082/api/devices`
     const apiUrl = `${import.meta.env.VITE_API_URL}/device`
+    const oldRow = {
+      name: formData.name || '',
+      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
+      phone: formData.sim || '',
+      model: formData.model || '',
+      category: formData.category || '',
+    }
     const newRow = {
       name: formData.name || '',
-      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '', // Trim whitespace
+      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
       sim: formData.sim || '',
       groups: Array.isArray(formData.groups) ? formData.groups : [],
       users: Array.isArray(formData.users) ? formData.users : [],
@@ -252,10 +291,7 @@ const Devices = () => {
       if (
         !newRow.name ||
         !newRow.uniqueId ||
-        !newRow.sim ||
-        !newRow.model ||
-        !newRow.category ||
-        !newRow.expirationdate
+        !newRow.sim
       ) {
         toast.error('Please fill in all required fields.')
         return
@@ -263,6 +299,15 @@ const Devices = () => {
     }
 
     try {
+      const username = "hbtrack";
+      const password = "123456@";
+      const token1 = btoa(`${username}:${password}`);
+      const oldresponse = await axios.post(oldapiUrl, oldRow, {
+        headers: {
+          Authorization: `Basic ${token1}`,
+          'Content-Type': 'application/json',
+        },
+      })
       const response = await axios.post(apiUrl, newRow, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -272,7 +317,7 @@ const Devices = () => {
 
       console.log('Raw response:', response)
 
-      if (response.status == 201) {
+      if (oldresponse.status == 200 && response.status == 201) {
         console.log('Record created successfully:')
         toast.success('Record created successfully')
         handleModalClose()
@@ -601,18 +646,18 @@ const Devices = () => {
     const dataToExport = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).reduce((acc, column) => {
         const accessor = column.accessor;
-    
+
         // Handle specific columns based on the column's accessor
         if (accessor === 'groups') {
-          acc[column.Header] = item.groups && item.groups.length > 0 
+          acc[column.Header] = item.groups && item.groups.length > 0
             ? item.groups.map(group => group.name).join(', ')  // Join group names if there are multiple
             : "N/A";
         } else if (accessor === 'geofences') {
-          acc[column.Header] = item.geofences && item.geofences.length > 0 
+          acc[column.Header] = item.geofences && item.geofences.length > 0
             ? item.geofences.map(geofence => geofence.name).join(', ')  // Join geofence names if there are multiple
             : "N/A";
         } else if (accessor === 'users') {
-          acc[column.Header] = item.users && item.users.length > 0 
+          acc[column.Header] = item.users && item.users.length > 0
             ? item.users.map(user => user.username).join(', ')  // Join usernames if there are multiple
             : "N/A";
         } else if (accessor === 'Driver') {
@@ -622,10 +667,10 @@ const Devices = () => {
         } else {
           acc[column.Header] = item[accessor] || 'N/A';  // Fallback for other columns
         }
-    
+
         return acc;
       }, {});
-    
+
       return { SN: rowIndex + 1, ...rowData }; // Include row index as SN
     });
 
@@ -654,18 +699,18 @@ const Devices = () => {
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).map((column) => {
         const accessor = column.accessor;
-    
+
         // Handle specific columns and their logic
         if (accessor === 'groups') {
-          return item.groups && item.groups.length > 0 
+          return item.groups && item.groups.length > 0
             ? item.groups.map(group => group.name).join(', ') // Join group names if there are multiple
             : 'N/A'; // Return '0' if no groups are present
         } else if (accessor === 'geofences') {
-          return item.geofences && item.geofences.length > 0 
+          return item.geofences && item.geofences.length > 0
             ? item.geofences.map(geofence => geofence.name).join(', ') // Join geofence names if there are multiple
             : 'N/A'; // Return '0' if no geofences are present
         } else if (accessor === 'users') {
-          return item.users && item.users.length > 0 
+          return item.users && item.users.length > 0
             ? item.users.map(user => user.username).join(', ') // Join usernames if there are multiple
             : 'N/A'; // Return '0' if no users are present
         } else if (accessor === 'Driver') {
@@ -708,15 +753,18 @@ const Devices = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-primary"
-            >
-              Add Device
-            </button>
-          </div>
+          {
+            decodedToken.superadmin && (<div>
+              <button
+                onClick={() => setAddModalOpen(true)}
+                variant="contained"
+                className="btn btn-primary"
+              >
+                Add Device
+              </button>
+            </div>)
+          }
+
         </div>
       </div>
 
@@ -852,21 +900,9 @@ const Devices = () => {
                     style={{ height: '200px' }}
                   >
                     <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's no device available.
-                      <br /> Maybe it's time to create some devices!"
+                      "Oops! Looks like there's no device available."
                     </p>
-                    <div>
-                      <button
-                        onClick={() => setAddModalOpen(true)}
-                        variant="contained"
-                        className="btn btn-primary m-3 text-white"
-                      >
-                        <span>
-                          <IoMdAdd className="fs-5" />
-                        </span>{' '}
-                        Add Device
-                      </button>
-                    </div>
+
                   </div>
                 </CTableDataCell>
               </CTableRow>

@@ -12,7 +12,6 @@ const Geofences = React.lazy(() => import('./views/Master/geofences/Geofences.js
 const Driver = React.lazy(() => import('./views/Master/driver/Driver.js'))
 const Notifications = React.lazy(() => import('./views/Master/notifications/Notifications.js'))
 const Maintenance = React.lazy(() => import('./views/Master/maintenance/Maintenance.js'))
-const Preferences = React.lazy(() => import('./views/preferences/Preferences'))
 const Category = React.lazy(() => import('./views/Master/category/Category.js'))
 const Model= React.lazy(() => import('./views/Master/model/Model.js'))
 // reports
@@ -54,10 +53,8 @@ const routes = [
   { path: '/maintenance', name: 'Maintenance', element: Maintenance },
   { path: '/driver', name: 'Driver', element: Driver },
   { path: '/users', name: 'Users', element: Users },
-  { path: '/preferences', name: 'Preferences', element: Preferences},
   { path: '/category', name: 'Category', element: Category},
   { path: '/model', name: 'Model', element: Model},
-  { path: '/preferences', name: 'Preferences', element: Preferences},
   { path: '/statusreports', name: 'Combine', element:Combine },
   { path: '/distancereports', name: 'Custom', element: Custom},
   { path: '/history', name: 'History', element: History },

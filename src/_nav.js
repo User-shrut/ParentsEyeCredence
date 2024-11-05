@@ -14,7 +14,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = (role, decodedToken) => {
 
-  let devices, users, driver, groups, geofence, notification, maintenance, preferences, category, model, status, distance, history, stop, travel, idle, sensor, alerts, vehicle, geofenceReport;  
+  let devices, users, driver, groups, geofence, notification, maintenance, category, model, status, distance, history, stop, travel, idle, sensor, alerts, vehicle, geofenceReport;  
   console.log(decodedToken);
   
   if(role != 'superadmin'){
@@ -26,7 +26,6 @@ const _nav = (role, decodedToken) => {
       geofence,
       notification,
       maintenance,
-      preferences,
       category,
       model,
       status,
@@ -134,7 +133,7 @@ const _nav = (role, decodedToken) => {
             component: CNavTitle,
             name: 'Manage',
           },
-          (devices || users || groups || geofence || driver || notification || preferences || maintenance ) &&
+          (devices || users || groups || geofence || driver || notification || maintenance ) &&
           {
             component: CNavGroup,
             name: 'Master',
@@ -150,7 +149,6 @@ const _nav = (role, decodedToken) => {
               geofence && { component: CNavItem, name: 'Geofences', to: '/geofences' },
               driver && { component: CNavItem, name: 'Driver', to: '/driver' },
               notification && { component: CNavItem, name: 'Notifications', to: '/notifications' },
-              // preferences && { component: CNavItem, name: 'Preferences', to: '/preferences' },
               maintenance && { component: CNavItem, name: 'Maintenance', to: '/maintenance' },
             ].filter(Boolean),
           },

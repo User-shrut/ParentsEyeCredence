@@ -435,7 +435,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
         } else if (column === 'Distance') {
           return row.distance;
         } else if (column === 'Total Distance') {
-          return (row.distance / 1000).toFixed(2) + ' km';
+          return (row.totalKm / 1000).toFixed(2) + ' km';
         } else if (column === 'Driver Name') {
           return row.driverInfos?.driverName || '--';
         } else if (column === 'Driver Phone No.') {
@@ -528,7 +528,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                                 : column === 'Distance'
                                   ? row.distance
                                   : column === 'Total Distance'
-                                    ? (row.distance / 1000).toFixed(2) + ' km'
+                                    ? (row.distance/1000).toFixed(2) + ' km'
                                     // : column === 'Maximum Speed'
                                     //   ? row.maxSpeed
                                     : column === 'End Address'
