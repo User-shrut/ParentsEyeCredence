@@ -120,12 +120,12 @@ const Dashboard = () => {
     console.log("after initialize socket");
 
 
-    // return () => {
-    //   socket.disconnect();
-    // }
+    return () => {
+      socket.off('all device data')
+    }
   }, [])
 
-  const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
+  
   const stoppedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
@@ -150,6 +150,8 @@ const Dashboard = () => {
         )
       }).length,
   )
+
+  const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length) + inactiveVehiclesCount;
 
   const idleVehiclesCount = useSelector(
     (state) =>

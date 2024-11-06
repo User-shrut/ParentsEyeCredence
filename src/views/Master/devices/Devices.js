@@ -179,6 +179,8 @@ const Devices = () => {
       if (matchingOldDevice) {
         // Merge old and new API data
         mergedData.push({
+          id: matchingOldDevice.id,
+          _id: newDevice._id,
           name: matchingOldDevice.name || newDevice.name,
           uniqueId: matchingOldDevice.uniqueId,
           sim: newDevice.sim || matchingOldDevice.phone,
@@ -201,6 +203,7 @@ const Devices = () => {
       } else {
         // If no matching old device, add the new device directly
         mergedData.push({
+          _id: newDevice._id,
           name: newDevice.name,
           uniqueId: newDevice.uniqueId,
           sim: newDevice.sim,
@@ -223,6 +226,7 @@ const Devices = () => {
     // Add any remaining old devices that were not matched by new API
     Object.values(oldApiMap).forEach(oldDevice => {
       mergedData.push({
+        id: oldDevice.id,
         name: oldDevice.name,
         uniqueId: oldDevice.uniqueId,
         sim: oldDevice.phone,
@@ -446,10 +450,10 @@ const Devices = () => {
       expirationdate: row.expirationdate,
       category: row.category,
       average: row.average,
-      Driver: row.Driver._id,
-      geofences: row.geofences.map((geo) => geo._id),
-      groups: row.groups.map((group) => group._id),
-      users: row.users.map((user) => user._id),
+      Driver: row.Driver?._id,
+      geofences: row.geofences?.map((geo) => geo._id),
+      groups: row.groups?.map((group) => group._id),
+      users: row.users?.map((user) => user._id),
     })
     setEditModalOpen(true)
   }
@@ -458,50 +462,115 @@ const Devices = () => {
     e.preventDefault()
     setLoading(true)
 
-    console.log('Data to submit:', formData) // Log the data to be submitted
+    console.log('Data to submit:', formData)
 
     try {
       // API call
-      const accessToken = Cookies.get('authToken')
+      const accessToken = Cookies.get('authToken');
+      const username = 'hbtrack'
+      const password = '123456@'
+      const token1 = btoa(`${username}:${password}`)
+      const oldPutApi = `http://63.142.251.13:8082/api/devices`;
+      const newPutApi = `${import.meta.env.VITE_API_URL}/device`;
+      const oldPostApi = `http://63.142.251.13:8082/api/devices`;
+      const newPostApi = `${import.meta.env.VITE_API_URL}/device`;
+      let response1;
+      let response2;
 
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/device/${formData._id}`,
-        formData,
-        {
+
+      const oldRow = {
+        id: formData.id,
+        name: formData.name || '',
+        uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
+        phone: formData.sim || '',
+        model: formData.model || '',
+        category: formData.category || '',
+      }
+      const newRow = {
+        name: formData.name || '',
+        uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
+        sim: formData.sim || '',
+        groups: Array.isArray(formData.groups) ? formData.groups : [],
+        users: Array.isArray(formData.users) ? formData.users : [],
+        Driver: formData.Driver || '',
+        speed: formData.speed || '',
+        average: formData.average || '',
+        geofences: Array.isArray(formData.geofences) ? formData.geofences : [],
+        model: formData.model || '',
+        category: formData.category || '',
+        installationdate: formData.installationdate || '',
+        expirationdate: formData.expirationdate || '',
+        extenddate: formData.extenddate || '',
+      }
+
+
+
+      if (formData.id && formData._id) {
+        // Call both old PUT API and new PUT API
+        response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
+          headers: {
+            Authorization: `Basic ${token1}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        response2 = await axios.put(`${newPutApi}/${formData._id}`, newRow, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
-        },
-      )
+        });
+  
+      } else if (formData.id && !formData._id) {
+        // Call old PUT API and new POST API
+        response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
+          headers: {
+            Authorization: `Basic ${token1}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        response2 = await axios.post(newPostApi, newRow, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+      } else if (!formData.id && formData._id) {
+        // Call old POST API and new PUT API
+        response1 =  await axios.post(oldPostApi, oldRow, {
+          headers: {
+            Authorization: `Basic ${token1}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        response2 = await axios.put(`${newPutApi}/${formData._id}`, newRow, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
 
       // Check if the response status is in the 2xx range
-      if (response.status === 200) {
+      if (response1.status == 200 && (response2.status == 200 || response2.status == 201)) {
         toast.success('User is edited successfully')
-        setEditModalOpen(false)
-        fetchData()
-        setLoading(false)
+        setEditModalOpen(false);
+        fetchData();
+        setLoading(false);
 
         setFormData({})
       } else {
         // Handle other response statuses
-        toast.error(`Error: ${response.status} - ${response.statusText}`)
+        toast.error(`Error: ${response1.status} - ${response1.statusText}`)
         setLoading(false)
       }
     } catch (error) {
-      // Handle error from the server or network error
-      console.error('Error during submission:', error) // Log the error for debugging
+      console.error('Error during submission:', error) 
       let errorMessage = 'An error occurred'
 
-      // Check if the error response exists
-      if (error.response) {
-        // If the server responded with a status other than 2xx
-        errorMessage = error.response.data.message || error.response.data || 'An error occurred'
-      } else if (error.request) {
-        // If the request was made but no response was received
-        errorMessage = 'Network error: Please try again later'
-      }
-
-      // Show an alert with the error message
       toast.error(errorMessage)
     }
   }
@@ -509,26 +578,73 @@ const Devices = () => {
   // ########################################################################
   // ######################## Delete Device API function #######################
 
-  const handleDeleteSelected = async (id) => {
+  const handleDeleteSelected = async (item) => {
+    console.log(item)
     const confirmed = window.confirm('Are you sure you want to delete this record?')
     if (!confirmed) return
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/device/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    const accessToken = Cookies.get('authToken');
+      const username = 'hbtrack'
+      const password = '123456@'
+      const token1 = btoa(`${username}:${password}`)
+      const oldDeleteApi = `http://63.142.251.13:8082/api/devices`;
+      const newDeleteApi = `${import.meta.env.VITE_API_URL}/device`;
+      let response1;
+      let response2;
 
-      if (response.ok) {
-        toast.error('Record deleted successfully')
-        fetchData()
-      } else {
-        const result = await response.json()
-        toast.error(`Unable to delete record: ${result.message || response.statusText}`)
+
+    try {
+      if (item.id && item._id) {
+  
+        response1 = await axios.delete(`${oldDeleteApi}/${item.id}`, {
+          headers: {
+            Authorization: `Basic ${token1}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        response2 = await axios.delete(`${newDeleteApi}/${item._id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response1.status == 204 && response2.status == 200) {
+          toast.error('Record deleted successfully')
+          fetchData()
+        } 
+  
+      } else if (item.id && !item._id) {
+
+        response1 = await axios.delete(`${oldDeleteApi}/${item.id}`, {
+          headers: {
+            Authorization: `Basic ${token1}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response1.status == 204) {
+          toast.error('Record deleted successfully')
+          fetchData()
+        } 
+  
+  
+      } else if (!item.id && item._id) {
+  
+        response2 = await axios.delete(`${newDeleteApi}/${item._id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response2.status == 200) {
+          toast.error('Record deleted successfully')
+          fetchData()
+        } 
       }
+
     } catch (error) {
       console.error('Error during DELETE request:', error)
       toast.error('Unable to delete record. Please check the console for more details.')
@@ -968,7 +1084,7 @@ const Devices = () => {
                       </IconButton>
                       <IconButton
                         aria-label="delete"
-                        onClick={() => handleDeleteSelected(item._id)}
+                        onClick={() => handleDeleteSelected(item)}
                         sx={{ marginRight: '10px', color: 'red' }}
                       >
                         <AiFillDelete style={{ fontSize: '20px' }} />

@@ -27,6 +27,7 @@ import { VscAccount } from 'react-icons/vsc'
 import { BiSupport } from 'react-icons/bi'
 import { CgLogOut } from 'react-icons/cg'
 import { useNavigate } from 'react-router-dom'
+import { socket } from '../../features/LivetrackingDataSlice'
 
 const AppHeaderDropdown = () => {
   const token = Cookies.get('authToken')
@@ -41,6 +42,7 @@ const AppHeaderDropdown = () => {
   const logoutFunc = () => {
     Cookies.remove('authToken')
     Cookies.remove('crdntl')
+    socket.disconnect();
     navigate('/login')
     window.location.reload();
   }

@@ -47,6 +47,7 @@ import { HiOutlineStatusOnline } from 'react-icons/hi'
 import { RxLapTimer } from 'react-icons/rx'
 import dayjs from 'dayjs'
 import './map.css'
+import { useNavigate } from 'react-router-dom'
 
 // Define map icons
 const mapIcons = {
@@ -137,6 +138,11 @@ const getVehicleIcon = (vehicle) => {
 }
 
 const MainMap = ({ filteredVehicles }) => {
+  const navigate = useNavigate();
+  const handleClickOnTrack = (vehicle) => {
+    console.log('trcak clicked')
+    navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
+  }
   return (
     <MapContainer
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
@@ -203,8 +209,14 @@ const MainMap = ({ filteredVehicles }) => {
                       </strong>{' '}
                       {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
                     </div>
+                    <div>
+                    <button className="btn btn-primary" onClick={() => handleClickOnTrack(vehicle)}>
+                      Live Track
+                    </button>
+                  </div>
                   </div>
                   {/* <strong></strong> {device.lastUpdate} km/h */}
+                  
                 </div>
               </Popup>
             </Marker>
