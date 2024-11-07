@@ -984,7 +984,7 @@ const Devices = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              <CTableHeaderCell className="text-center text-white bg-secondary">Sr No</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white bg-secondary">SN</CTableHeaderCell>
               {columns.slice(1).map((column, index) => (
                 <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
                   {column.Header}
