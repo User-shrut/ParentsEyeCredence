@@ -102,10 +102,13 @@ const Alerts = () => {
         component={Paper}
         style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
       >
-        <CTable align="middle" className="mb-0 border" hover responsive>
+        <CTable align="middle" className="mb-0 border" hover responsive >
           <CTableHead className="text-nowrap">
             <CTableRow className="bg-body-tertiary">
               <CTableHeaderCell className=" text-start ps-4 text-white bg-secondary">
+                SN 
+              </CTableHeaderCell>
+              <CTableHeaderCell className=" text-start text-white bg-secondary">
                 Device Name
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-start text-white bg-secondary">
@@ -145,6 +148,7 @@ const Alerts = () => {
             ) : data.length > 0 ? (
               data?.map((item, index) => (
                 <CTableRow key={index}>
+                  <CTableDataCell className="text-start ps-4">{index + 1}</CTableDataCell>
                   <CTableDataCell className="text-start ps-4">{item.name}</CTableDataCell>
                   <CTableDataCell className="text-start">{item.type}</CTableDataCell>
                   <CTableDataCell className="text-center">show location</CTableDataCell>
@@ -159,7 +163,7 @@ const Alerts = () => {
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
                   >
-                    <p className="mb-0 fw-bold">"no alert are available"</p>
+                    <p className="mb-0 fw-bold">"No Alerts are Available"</p>
                   </div>
                 </CTableDataCell>
               </CTableRow>
