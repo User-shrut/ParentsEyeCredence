@@ -30,6 +30,8 @@ import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
 import * as XLSX from 'xlsx'
+import Loader from '../../../components/Loader/Loader'
+import '../style/remove-gutter.css';
 
 const SearchTrip = ({
   formData,
@@ -487,7 +489,7 @@ const TripTable = ({ apiData, selectedColumns }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow>
+            <CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
@@ -497,9 +499,12 @@ const TripTable = ({ apiData, selectedColumns }) => {
                   padding: '16px', // Extra padding for emphasis
                   textAlign: 'center', // Center the text
                   border: '1px dashed #dee2e6', // Dashed border to highlight it
+                  height: '100px',
                 }}
               >
-                Data is loading...
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Loader />
+                </div>
               </CTableDataCell>
             </CTableRow>
           )}
@@ -689,7 +694,7 @@ const Trips = () => {
 
   return (
     <>
-      <CRow className="pt-3">
+      <CRow className="pt-3 gutter-0">
 
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
@@ -717,7 +722,7 @@ const Trips = () => {
       </CRow>
 
       {showMap && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

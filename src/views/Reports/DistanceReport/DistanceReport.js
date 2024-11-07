@@ -32,6 +32,8 @@ import * as XLSX from 'xlsx' // For Excel export
 import jsPDF from 'jspdf' // For PDF export 
 import autoTable from 'jspdf-autotable'
 import { auto } from '@popperjs/core'
+import Loader from '../../../components/Loader/Loader'
+import '../style/remove-gutter.css';
 
 const SearchDistance = ({
   formData,
@@ -373,7 +375,7 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {distanceLoading ? (<CTableRow>
+            {distanceLoading ? (<CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
                 colSpan={allDates.length + 3}
                 style={{
@@ -383,9 +385,12 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
                   padding: '16px',
                   textAlign: 'center',
                   border: '1px dashed #dee2e6',
+                  height: '100px',
                 }}
               >
-                Data is loading....
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Loader />
+                </div>
               </CTableDataCell>
             </CTableRow>) : (
               apiData?.data && apiData.data.length > 0 ? (
@@ -624,7 +629,7 @@ const Distance = () => {
 
   return (
     <>
-      <CRow className="pt-3">
+      <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
@@ -650,7 +655,7 @@ const Distance = () => {
         </CCol>
       </CRow>
       {showMap && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

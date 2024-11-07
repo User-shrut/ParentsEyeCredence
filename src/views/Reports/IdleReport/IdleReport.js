@@ -30,13 +30,15 @@ import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
 import * as XLSX from 'xlsx'
+import Loader from '../../../components/Loader/Loader'
+import '../style/remove-gutter.css';
 
 const SearchIdeal = ({
   formData,
   handleInputChange,
   handleSubmit,
-  users, 
-  groups, 
+  users,
+  groups,
   getGroups,
   loading,
   devices,
@@ -434,51 +436,51 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                   .map((nestedRow, nestedIndex) => (
                     <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
                       <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-            
+
                       {selectedColumns.map((column, index) => (
                         <CTableDataCell key={index}>
                           {column === 'Vehicle Status'
                             ? nestedRow.vehicleStatus
                             : column === 'Duration'
                               ? // Convert duration from seconds to HH:mm:ss format
-                                new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+                              new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
                               : column === 'Location'
                                 ? // Display address if available, otherwise fallback to location
-                                  nestedRow.address || nestedRow.location
+                                nestedRow.address || nestedRow.location
                                 : column === 'Arrival Time'
                                   ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
+                                  new Date(
+                                    new Date(nestedRow.arrivalTime).setHours(
+                                      new Date(nestedRow.arrivalTime).getHours() + 6,
+                                      new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                                    ),
+                                  ).toLocaleString([], {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                  })
+                                  : column === 'Departure Time'
+                                    ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
                                     new Date(
-                                      new Date(nestedRow.arrivalTime).setHours(
-                                        new Date(nestedRow.arrivalTime).getHours() + 6,
-                                        new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                                      new Date(nestedRow.departureTime).setHours(
+                                        new Date(nestedRow.departureTime).getHours() + 6,
+                                        new Date(nestedRow.departureTime).getMinutes() + 30,
                                       ),
                                     ).toLocaleString([], {
                                       year: 'numeric',
                                       month: '2-digit',
-                                      day: '2-digit',
                                       hour: '2-digit',
                                       minute: '2-digit',
                                       hour12: true,
                                     })
-                                  : column === 'Departure Time'
-                                    ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
-                                      new Date(
-                                        new Date(nestedRow.departureTime).setHours(
-                                          new Date(nestedRow.departureTime).getHours() + 6,
-                                          new Date(nestedRow.departureTime).getMinutes() + 30,
-                                        ),
-                                      ).toLocaleString([], {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: true,
-                                      })
                                     : column === 'Total Duration'
                                       ? // Convert total duration from seconds to HH:mm:ss format
-                                        new Date(row.totalDurationSeconds * 1000)
-                                          .toISOString()
-                                          .substr(11, 8)
+                                      new Date(row.totalDurationSeconds * 1000)
+                                        .toISOString()
+                                        .substr(11, 8)
                                       : '--'}
                         </CTableDataCell>
                       ))}
@@ -502,9 +504,9 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                 </CTableRow>
               )
             )
-            
+
           ) : (
-            <CTableRow>
+            <CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
@@ -514,9 +516,12 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                   padding: '16px',
                   textAlign: 'center',
                   border: '1px dashed #dee2e6',
+                  height: '100px',
                 }}
               >
-                Data is loading...
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Loader />
+                </div>
               </CTableDataCell>
             </CTableRow>
           )}
@@ -707,7 +712,7 @@ const Ideal = () => {
 
   return (
     <>
-      <CRow className="pt-3">
+      <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
@@ -734,7 +739,7 @@ const Ideal = () => {
       </CRow>
 
       {showMap && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

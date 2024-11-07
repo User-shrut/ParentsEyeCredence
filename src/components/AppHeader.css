@@ -1,7 +1,10 @@
-.toggle-container
-{
+.toggle-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-direction: row;
+}
+
+.filter-btn {
+  color: white !important;
 }

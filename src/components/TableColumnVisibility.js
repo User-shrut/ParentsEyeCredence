@@ -55,7 +55,7 @@ const TableColumnVisibility = () => {
 
   return (
     <div>
-      <Button onClick={handleReset}>Filter Columns</Button>
+      <Button className='filter-btn' onClick={handleReset}>Filter Columns</Button>
       <Modal
         open={open}
         onClose={handleClose}

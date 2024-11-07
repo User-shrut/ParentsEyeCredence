@@ -19,8 +19,9 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import Select from 'react-select';
+import '../style/remove-gutter.css';
 
-const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns, showMap, setShowMap  }) => {
+const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
   const [showDateInputs, setShowDateInputs] = useState(false);
 
@@ -107,7 +108,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please provide valid details.</CFormFeedback>
       </CCol> */}
 
-        <CCol md={6}>
+      <CCol md={6}>
         <CFormLabel htmlFor="type">Type</CFormLabel>
         <CFormSelect
           id="type"
@@ -150,7 +151,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
-     
+
       {/* <CCol md={4}>
         <CFormLabel htmlFor="columns">Columns</CFormLabel>
         <Select
@@ -346,14 +347,14 @@ const Validation = () => {
 
   return (
     <>
-      <CRow className='pt-3'>
+      <CRow className='pt- gutter-0'>
         <h2 className="px-4">Vehicle</h2>
 
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
               <strong>Vehicle Report</strong>
-              
+
             </CCardHeader>
             <CCardBody>
               <CustomStyles
@@ -372,24 +373,24 @@ const Validation = () => {
       </CRow>
 
       {showMap && (
-      <CRow className="justify-content-center mt-4">
-        <CCol xs={12} className="px-4">
-          <CCard className='p-0 mb-4 shadow-sm'>
-            <CCardHeader  className="bg-secondary text-white d-flex justify-content-between align-items-center">
-              <strong>All Summary Report List</strong>
-              <CFormInput
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '250px' }}
-              />
-            </CCardHeader>
-            <CCardBody>
-              <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+        <CRow className="justify-content-center mt-4 gutter-0">
+          <CCol xs={12} className="px-4">
+            <CCard className='p-0 mb-4 shadow-sm'>
+              <CCardHeader className="bg-secondary text-white d-flex justify-content-between align-items-center">
+                <strong>All Summary Report List</strong>
+                <CFormInput
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '250px' }}
+                />
+              </CCardHeader>
+              <CCardBody>
+                <CustomStyles1 rows={rows} selectedColumns={selectedColumns} />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
       )}
 
     </>
