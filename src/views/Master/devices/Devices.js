@@ -48,15 +48,17 @@ import jsPDF from 'jspdf' // For PDF export
 import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
+import AddDeviceModal from './AddDeviceForm'
+import EditDeviceModal from './EditDeviceForm'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false) // Modal for adding a new row
   const [formData, setFormData] = useState({})
   const [loading, setLoading] = useState(false)
-  const [currentPage, setCurrentPage] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [currentItems, setCurrentItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0)
+  const [limit, setLimit] = useState(20)
+  const [currentItems, setCurrentItems] = useState([])
 
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -98,21 +100,17 @@ const Devices = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0))
   }
 
+  // pagination code
+  useEffect(() => {
+    const currentI = data.slice(currentPage * limit, (currentPage + 1) * limit)
+    setCurrentItems(currentI)
 
-   // pagination code
-   useEffect(() => {
-    const currentI = data.slice(
-      currentPage * limit,
-      (currentPage + 1) * limit
-    );
-    setCurrentItems(currentI);
+    console.log(currentItems)
+  }, [currentPage, limit, data])
 
-    console.log(currentItems);
-  }, [currentPage, limit, data]);
-   
   const handlePageClick = (event) => {
-    setCurrentPage(event.selected); 
-  };
+    setCurrentPage(event.selected)
+  }
 
   const columns = [
     { Header: 'Device Id', accessor: '_id' },
@@ -138,7 +136,7 @@ const Devices = () => {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '35%',
-    height: 'auto',
+    height: '100vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
@@ -164,18 +162,18 @@ const Devices = () => {
   // ###################### Fetch device Data ######################
 
   function compareAndMerge(oldApi, newApi) {
-    const oldApiMap = {};
-    const mergedData = [];
-  
+    const oldApiMap = {}
+    const mergedData = []
+
     // Create a map for old API devices using uniqueId for quick lookup
-    oldApi.forEach(oldDevice => {
-      oldApiMap[oldDevice.uniqueId] = oldDevice;
-    });
-  
+    oldApi.forEach((oldDevice) => {
+      oldApiMap[oldDevice.uniqueId] = oldDevice
+    })
+
     // Iterate over new API devices and merge with old API if a match is found
-    newApi.forEach(newDevice => {
-      const matchingOldDevice = oldApiMap[newDevice.uniqueId];
-  
+    newApi.forEach((newDevice) => {
+      const matchingOldDevice = oldApiMap[newDevice.uniqueId]
+
       if (matchingOldDevice) {
         // Merge old and new API data
         mergedData.push({
@@ -184,8 +182,10 @@ const Devices = () => {
           name: matchingOldDevice.name || newDevice.name,
           uniqueId: matchingOldDevice.uniqueId,
           sim: newDevice.sim || matchingOldDevice.phone,
-          speed: newDevice.speed || "",
-          average: newDevice.average || (matchingOldDevice.attributes ? matchingOldDevice.attributes.avg111111 : ""),
+          speed: newDevice.speed || '',
+          average:
+            newDevice.average ||
+            (matchingOldDevice.attributes ? matchingOldDevice.attributes.avg111111 : ''),
           users: newDevice.users || [],
           groups: newDevice.groups || [],
           driver: newDevice.Driver || null,
@@ -196,10 +196,10 @@ const Devices = () => {
           expirationDate: newDevice.expirationdate || null,
           extendDate: newDevice.extenddate || null,
           lastUpdate: newDevice.lastUpdate || matchingOldDevice.lastUpdate,
-        });
-  
+        })
+
         // Remove the old device from the map, so it's not added again later
-        delete oldApiMap[newDevice.uniqueId];
+        delete oldApiMap[newDevice.uniqueId]
       } else {
         // If no matching old device, add the new device directly
         mergedData.push({
@@ -207,8 +207,8 @@ const Devices = () => {
           name: newDevice.name,
           uniqueId: newDevice.uniqueId,
           sim: newDevice.sim,
-          speed: newDevice.speed || "",
-          average: newDevice.average || "",
+          speed: newDevice.speed || '',
+          average: newDevice.average || '',
           users: newDevice.users || [],
           groups: newDevice.groups || [],
           driver: newDevice.Driver || null,
@@ -219,19 +219,19 @@ const Devices = () => {
           expirationDate: newDevice.expirationdate || null,
           extendDate: newDevice.extenddate || null,
           lastUpdate: newDevice.lastUpdate || null,
-        });
+        })
       }
-    });
-  
+    })
+
     // Add any remaining old devices that were not matched by new API
-    Object.values(oldApiMap).forEach(oldDevice => {
+    Object.values(oldApiMap).forEach((oldDevice) => {
       mergedData.push({
         id: oldDevice.id,
         name: oldDevice.name,
         uniqueId: oldDevice.uniqueId,
         sim: oldDevice.phone,
-        speed: "", // Old API doesn't have speed info
-        average: oldDevice.attributes ? oldDevice.attributes.avg111111 : "",
+        speed: '', // Old API doesn't have speed info
+        average: oldDevice.attributes ? oldDevice.attributes.avg111111 : '',
         users: [],
         groups: [],
         driver: null,
@@ -242,10 +242,10 @@ const Devices = () => {
         expirationDate: null,
         extendDate: null,
         lastUpdate: oldDevice.lastUpdate,
-      });
-    });
-  
-    return mergedData;
+      })
+    })
+
+    return mergedData
   }
 
   const fetchData = async () => {
@@ -273,14 +273,13 @@ const Devices = () => {
         const oldApiData = oldApiResponse.data
         const newApiData = newApiResponse.data.devices
 
-        console.log("oldApiData: ",oldApiData)
-        console.log("newApiData: ",newApiData)
+        console.log('oldApiData: ', oldApiData)
+        console.log('newApiData: ', newApiData)
 
         const result = compareAndMerge(oldApiData, newApiData)
 
-        console.log(" merge data hai : ", result)
+        console.log(' merge data hai : ', result)
         setData(result)
-
       } else {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
           headers: {
@@ -322,12 +321,9 @@ const Devices = () => {
     }
   }
 
-
   useEffect(() => {
-    fetchData();
+    fetchData()
   }, [])
-
-  
 
   // ##################### Filter data by search query #######################
   const filterDevices = () => {
@@ -346,94 +342,10 @@ const Devices = () => {
     }
   }
 
-
   useEffect(() => {
     filterDevices(searchQuery)
   }, [currentItems, searchQuery])
 
-
-  // ###############################################################
-  // ######################  Add Device API Function ######################
-
-  const handleAddSubmit = async () => {
-    const oldapiUrl = `http://63.142.251.13:8082/api/devices`
-    const apiUrl = `${import.meta.env.VITE_API_URL}/device`
-    const oldRow = {
-      name: formData.name || '',
-      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
-      phone: formData.sim || '',
-      model: formData.model || '',
-      category: formData.category || '',
-    }
-    const newRow = {
-      name: formData.name || '',
-      uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
-      sim: formData.sim || '',
-      groups: Array.isArray(formData.groups) ? formData.groups : [],
-      users: Array.isArray(formData.users) ? formData.users : [],
-      Driver: formData.Driver || '',
-      speed: formData.speed || '',
-      average: formData.average || '',
-      geofences: Array.isArray(formData.geofences) ? formData.geofences : [],
-      model: formData.model || '',
-      category: formData.category || '',
-      installationdate: formData.installationdate || '',
-      expirationdate: formData.expirationdate || '',
-      extenddate: formData.extenddate || '',
-    }
-
-    if (newRow) {
-      // Check for any required fields missing
-      if (!newRow.name || !newRow.uniqueId || !newRow.sim) {
-        toast.error('Please fill in all required fields.')
-        return
-      }
-    }
-
-    try {
-      const username = 'hbtrack'
-      const password = '123456@'
-      const token1 = btoa(`${username}:${password}`)
-      const oldresponse = await axios.post(oldapiUrl, oldRow, {
-        headers: {
-          Authorization: `Basic ${token1}`,
-          'Content-Type': 'application/json',
-        },
-      })
-      const response = await axios.post(apiUrl, newRow, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      console.log('Raw response:', response)
-
-      if (oldresponse.status == 200 && response.status == 201) {
-        console.log('Record created successfully:')
-        toast.success('Record created successfully')
-        handleModalClose()
-        fetchData()
-      } else {
-        const contentType = response.headers.get('content-type')
-        let responseBody
-
-        if (contentType && contentType.includes('application/json')) {
-          responseBody = await response.json()
-        } else {
-          responseBody = await response.text()
-        }
-
-        console.error('Error Response:', responseBody)
-        toast.error(`Unable to create record: ${responseBody.message || response.statusText}`)
-      }
-    } catch (error) {
-      console.error('Error during POST request:', error)
-      toast.error('Unable to create record')
-    }
-  }
-
-  // #######################################################################
   // #########################  Edit Device API function #######################
 
   const handleEditIconClick = (row) => {
@@ -466,17 +378,16 @@ const Devices = () => {
 
     try {
       // API call
-      const accessToken = Cookies.get('authToken');
+      const accessToken = Cookies.get('authToken')
       const username = 'hbtrack'
       const password = '123456@'
       const token1 = btoa(`${username}:${password}`)
-      const oldPutApi = `http://63.142.251.13:8082/api/devices`;
-      const newPutApi = `${import.meta.env.VITE_API_URL}/device`;
-      const oldPostApi = `http://63.142.251.13:8082/api/devices`;
-      const newPostApi = `${import.meta.env.VITE_API_URL}/device`;
-      let response1;
-      let response2;
-
+      const oldPutApi = `http://63.142.251.13:8082/api/devices`
+      const newPutApi = `${import.meta.env.VITE_API_URL}/device`
+      const oldPostApi = `http://63.142.251.13:8082/api/devices`
+      const newPostApi = `${import.meta.env.VITE_API_URL}/device`
+      let response1
+      let response2
 
       const oldRow = {
         id: formData.id,
@@ -503,8 +414,6 @@ const Devices = () => {
         extenddate: formData.extenddate || '',
       }
 
-
-
       if (formData.id && formData._id) {
         // Call both old PUT API and new PUT API
         response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
@@ -512,15 +421,14 @@ const Devices = () => {
             Authorization: `Basic ${token1}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
+
         response2 = await axios.put(`${newPutApi}/${formData._id}`, newRow, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
       } else if (formData.id && !formData._id) {
         // Call old PUT API and new POST API
         response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
@@ -528,38 +436,37 @@ const Devices = () => {
             Authorization: `Basic ${token1}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
+
         response2 = await axios.post(newPostApi, newRow, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
       } else if (!formData.id && formData._id) {
         // Call old POST API and new PUT API
-        response1 =  await axios.post(oldPostApi, oldRow, {
+        response1 = await axios.post(oldPostApi, oldRow, {
           headers: {
             Authorization: `Basic ${token1}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
+
         response2 = await axios.put(`${newPutApi}/${formData._id}`, newRow, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        });
+        })
       }
 
       // Check if the response status is in the 2xx range
       if (response1.status == 200 && (response2.status == 200 || response2.status == 201)) {
         toast.success('User is edited successfully')
-        setEditModalOpen(false);
-        fetchData();
-        setLoading(false);
+        setEditModalOpen(false)
+        fetchData()
+        setLoading(false)
 
         setFormData({})
       } else {
@@ -568,7 +475,7 @@ const Devices = () => {
         setLoading(false)
       }
     } catch (error) {
-      console.error('Error during submission:', error) 
+      console.error('Error during submission:', error)
       let errorMessage = 'An error occurred'
 
       toast.error(errorMessage)
@@ -583,68 +490,60 @@ const Devices = () => {
     const confirmed = window.confirm('Are you sure you want to delete this record?')
     if (!confirmed) return
 
-    const accessToken = Cookies.get('authToken');
-      const username = 'hbtrack'
-      const password = '123456@'
-      const token1 = btoa(`${username}:${password}`)
-      const oldDeleteApi = `http://63.142.251.13:8082/api/devices`;
-      const newDeleteApi = `${import.meta.env.VITE_API_URL}/device`;
-      let response1;
-      let response2;
-
+    const accessToken = Cookies.get('authToken')
+    const username = 'hbtrack'
+    const password = '123456@'
+    const token1 = btoa(`${username}:${password}`)
+    const oldDeleteApi = `http://63.142.251.13:8082/api/devices`
+    const newDeleteApi = `${import.meta.env.VITE_API_URL}/device`
+    let response1
+    let response2
 
     try {
       if (item.id && item._id) {
-  
         response1 = await axios.delete(`${oldDeleteApi}/${item.id}`, {
           headers: {
             Authorization: `Basic ${token1}`,
             'Content-Type': 'application/json',
           },
-        });
-  
+        })
+
         response2 = await axios.delete(`${newDeleteApi}/${item._id}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        });
+        })
 
         if (response1.status == 204 && response2.status == 200) {
           toast.error('Record deleted successfully')
           fetchData()
-        } 
-  
+        }
       } else if (item.id && !item._id) {
-
         response1 = await axios.delete(`${oldDeleteApi}/${item.id}`, {
           headers: {
             Authorization: `Basic ${token1}`,
             'Content-Type': 'application/json',
           },
-        });
+        })
 
         if (response1.status == 204) {
           toast.error('Record deleted successfully')
           fetchData()
-        } 
-  
-  
+        }
       } else if (!item.id && item._id) {
-  
         response2 = await axios.delete(`${newDeleteApi}/${item._id}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        });
+        })
 
         if (response2.status == 200) {
           toast.error('Record deleted successfully')
           fetchData()
-        } 
+        }
       }
-
     } catch (error) {
       console.error('Error during DELETE request:', error)
       toast.error('Unable to delete record. Please check the console for more details.')
@@ -970,7 +869,6 @@ const Devices = () => {
           )}
         </div>
       </div>
-
       <TableContainer
         component={Paper}
         sx={{
@@ -984,7 +882,9 @@ const Devices = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              <CTableHeaderCell className="text-center text-white bg-secondary">SN</CTableHeaderCell>
+              <CTableHeaderCell className="text-center text-white bg-secondary">
+                Sr No
+              </CTableHeaderCell>
               {columns.slice(1).map((column, index) => (
                 <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
                   {column.Header}
@@ -1000,7 +900,7 @@ const Devices = () => {
           <CTableBody>
             {loading ? (
               <CTableRow key="loading">
-                <CTableDataCell colSpan="15" className="text-center">
+                <CTableDataCell colSpan="16" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
                       <span className="placeholder col-12" />
@@ -1020,7 +920,7 @@ const Devices = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell>{(currentPage) * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell>{currentPage * limit + index + 1}</CTableDataCell>
                   {columns.slice(1).map((column) => (
                     <CTableDataCell key={column.accessor} className="text-center">
                       {column.accessor === 'groups' ? (
@@ -1079,7 +979,7 @@ const Devices = () => {
                     <CTableDataCell className="text-center d-flex">
                       <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                         <RiEdit2Fill
-                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
                         />
                       </IconButton>
                       <IconButton
@@ -1152,504 +1052,62 @@ const Devices = () => {
               value={limit}
               onChange={(e) => setLimit(e.target.value)}
               options={[
-                { label: '10', value: '10' },
+                { label: '20', value: '20' },
                 { label: '50', value: '50' },
-                { label: '500', value: '500' },
-                { label: '1000', value: '1000' },
+                { label: '100', value: '100' },
+                { label: '200', value: '200' },
               ]}
             />
           </div>
         </div>
       </div>
-
-      <Modal open={addModalOpen} onClose={handleModalClose}>
-        <Box
-          sx={{
-            ...style,
-            backgroundColor: '#f7f9fc',
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-            borderRadius: '12px',
-            padding: '30px',
-          }}
-        >
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
-              <span role="img" aria-label="device">
-                <AiOutlinePlus className="fs-2" />
-              </span>{' '}
-              Add Device
-            </Typography>
-            <IconButton onClick={handleModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </div>
-
-          {/* Step-by-step form with progress indicator */}
-          <div>
-            <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            {/* Step 1: General Information */}
-            {currentStep === 0 &&
-              columns.map((col) => {
-                if (
-                  col.accessor === 'name' ||
-                  col.accessor === 'uniqueId' ||
-                  col.accessor === 'sim' ||
-                  col.accessor === 'speed' ||
-                  col.accessor === 'average'
-                ) {
-                  return (
-                    <TextField
-                      key={col.accessor}
-                      label={col.Header}
-                      variant="outlined"
-                      name={col.accessor}
-                      value={formData[col.accessor] || ''}
-                      onChange={handleInputChange}
-                      fullWidth
-                      sx={{ marginBottom: 2 }}
-                    />
-                  )
-                }
-                return null // Return null for columns that don't match the condition
-              })}
-
-            {/* Step 2: device assign to user, groups, geofence etc  */}
-            {currentStep === 1 &&
-              columns.map((col) => {
-                if (col.accessor == 'users') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {users.map((user) => (
-                          <MenuItem key={user._id} value={user._id}>
-                            {user.username}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'groups') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {groups.map((group) => (
-                          <MenuItem key={group._id} value={group._id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'Driver') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        <MenuItem value="">select driver...</MenuItem>
-                        {drivers.map((driver) => (
-                          <MenuItem key={driver._id} value={driver._id}>
-                            {driver.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'geofences') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {areas.map((geofence) => (
-                          <MenuItem key={geofence._id} value={geofence._id}>
-                            {geofence.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'model') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {models.map((model) => (
-                          <MenuItem key={model.modelName} value={model.modelName}>
-                            {model.modelName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'category') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {categories.map((category) => (
-                          <MenuItem key={category.categoryName} value={category.categoryName}>
-                            {category.categoryName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                }
-                return null
-              })}
-
-            {currentStep === 2 &&
-              columns.map((col) => {
-                if (col.accessor === 'installationdate') {
-                  return (
-                    <>
-                      <label>Installation date: </label>
-                      <TextField
-                        key={col.accessor}
-                        type="date"
-                        name={col.accessor}
-                        value={formData[col.accessor] || ''}
-                        onChange={handleInputChange}
-                        fullWidth
-                      />
-                    </>
-                  )
-                } else if (col.accessor === 'expirationdate') {
-                  return (
-                    <FormControl fullWidth sx={{ marginY: 2 }} key={col.accessor}>
-                      <InputLabel>Expiration Plans</InputLabel>
-                      <Select
-                        onChange={(e) => {
-                          handleYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false)
-                        }}
-                        label="Expiration Options"
-                      >
-                        <MenuItem value={1}>1 Year</MenuItem>
-                        <MenuItem value={2}>2 Years</MenuItem>
-                        <MenuItem value={3}>3 Years</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )
-                }
-
-                // Always return null if no conditions are met
-                return null
-              })}
-
-            {/* Navigation buttons */}
-            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
-              {currentStep > 0 && (
-                <Button onClick={handleBack} variant="outlined">
-                  Back
-                </Button>
-              )}
-              {currentStep < steps.length - 1 ? (
-                <Button onClick={handleNext} variant="contained" color="primary">
-                  Next
-                </Button>
-              ) : (
-                <Button onClick={handleAddSubmit} variant="contained" color="primary">
-                  Submit
-                </Button>
-              )}
-            </div>
-          </div>
-        </Box>
-      </Modal>
-      <Modal open={editModalOpen} onClose={handleModalClose}>
-        <Box
-          sx={{
-            ...style,
-            backgroundColor: '#f7f9fc',
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-            borderRadius: '12px',
-            padding: '30px',
-          }}
-        >
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
-              <span role="img" aria-label="device">
-                <AiOutlinePlus className="fs-2" />
-              </span>{' '}
-              Update Device
-            </Typography>
-            <IconButton onClick={handleModalClose}>
-              <CloseIcon />
-            </IconButton>
-          </div>
-
-          {/* Step-by-step form with progress indicator */}
-          <div>
-            <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            {/* Step 1: General Information */}
-            {currentStep === 0 &&
-              columns.map((col) => {
-                if (
-                  col.accessor === 'name' ||
-                  col.accessor === 'uniqueId' ||
-                  col.accessor === 'sim' ||
-                  col.accessor === 'speed' ||
-                  col.accessor === 'average'
-                ) {
-                  return (
-                    <TextField
-                      key={col.accessor}
-                      label={col.Header}
-                      variant="outlined"
-                      name={col.accessor}
-                      value={formData[col.accessor] || ''}
-                      onChange={handleInputChange}
-                      fullWidth
-                      sx={{ marginBottom: 2 }}
-                    />
-                  )
-                }
-                return null // Return null for columns that don't match the condition
-              })}
-
-            {/* Step 2: device assign to user, groups, geofence etc  */}
-            {currentStep === 1 &&
-              columns.map((col) => {
-                if (col.accessor == 'users') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {users.map((user) => (
-                          <MenuItem key={user._id} value={user._id}>
-                            {user.username}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'groups') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {groups.map((group) => (
-                          <MenuItem key={group._id} value={group._id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'Driver') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        <MenuItem value="">select driver...</MenuItem>
-                        {drivers.map((driver) => (
-                          <MenuItem key={driver._id} value={driver._id}>
-                            {driver.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'geofences') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                        multiple
-                      >
-                        {areas.map((geofence) => (
-                          <MenuItem key={geofence._id} value={geofence._id}>
-                            {geofence.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'model') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {models.map((model) => (
-                          <MenuItem key={model} value={model.modelName}>
-                            {model.modelName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                } else if (col.accessor === 'category') {
-                  return (
-                    <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {categories.map((category) => (
-                          <MenuItem key={category} value={category.categoryName}>
-                            {category.categoryName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )
-                }
-                return null
-              })}
-
-            {currentStep === 2 &&
-              columns.map((col) => {
-                if (col.accessor === 'installationdate') {
-                  return (
-                    <div className="mt-3">
-                      <label>Installation date: </label>
-                      <TextField
-                        key={col.accessor}
-                        name={col.accessor}
-                        value={formData[col.accessor] || ''}
-                        onChange={handleInputChange}
-                        fullWidth
-                        disabled
-                      />
-                    </div>
-                  )
-                } else if (col.accessor === 'expirationdate') {
-                  return (
-                    <div className="mt-3">
-                      <label>Expiration Date: </label>
-                      <TextField
-                        key={col.accessor}
-                        name={col.accessor}
-                        value={formData[col.accessor]}
-                        onChange={handleInputChange}
-                        fullWidth
-                        disabled
-                      />
-                    </div>
-                  )
-                } else if (col.accessor === 'extenddate') {
-                  return (
-                    <div className="mt-3">
-                      <label>Extend Plan: </label>
-                      <br />
-                      <Select
-                        onChange={(e) => {
-                          handleExtendYearSelection(parseInt(e.target.value))
-                          setShowExpirationDropdown(false)
-                        }}
-                        fullWidth
-                      >
-                        <MenuItem value={1}>1 Year</MenuItem>
-                        <MenuItem value={2}>2 Years</MenuItem>
-                        <MenuItem value={3}>3 Years</MenuItem>
-                      </Select>
-                    </div>
-                  )
-                }
-
-                // Always return null if no conditions are met
-                return null
-              })}
-
-            {/* Navigation buttons */}
-            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
-              {currentStep > 0 && (
-                <Button onClick={handleBack} variant="outlined">
-                  Back
-                </Button>
-              )}
-              {currentStep < steps.length - 1 ? (
-                <Button onClick={handleNext} variant="contained" color="primary">
-                  Next
-                </Button>
-              ) : (
-                <Button onClick={handleEditSubmit} variant="contained" color="primary">
-                  Submit
-                </Button>
-              )}
-            </div>
-          </div>
-        </Box>
-      </Modal>
-
+      {addModalOpen && (
+        <AddDeviceModal
+          open={addModalOpen}
+          handleClose={handleModalClose}
+          style={style}
+          token={token}
+          fetchData={fetchData}
+          currentStep={currentStep}
+          steps={steps}
+          columns={columns}
+          formData={formData}
+          users={users}
+          groups={groups}
+          drivers={drivers}
+          areas={areas}
+          models={models}
+          categories={categories}
+          handleInputChange={handleInputChange}
+          handleNext={handleNext}
+          handleBack={handleBack}
+          handleYearSelection={handleYearSelection}
+          setShowExpirationDropdown={setShowExpirationDropdown}
+        />
+      )}
+      <EditDeviceModal
+        editModalOpen={editModalOpen}
+        handleModalClose={handleModalClose}
+        currentStep={currentStep}
+        style={style}
+        handleNext={handleNext}
+        handleBack={handleBack}
+        handleEditIconClick={handleEditIconClick}
+        handleEditSubmit={handleEditSubmit}
+        columns={columns}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        users={users}
+        groups={groups}
+        drivers={drivers}
+        areas={areas}
+        models={models}
+        categories={categories}
+        steps={steps}
+        handleExtendYearSelection={handleExtendYearSelection}
+        setShowExpirationDropdown={setShowExpirationDropdown}
+      />
+      
       <Modal open={extendedPasswordModel} onClose={handleModalClose}>
         <Box sx={style} style={{ height: '30%' }}>
           <Box
