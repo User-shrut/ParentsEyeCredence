@@ -21,6 +21,7 @@ import {
   CDropdownToggle,
   CDropdownMenu,
   CDropdownItem,
+  CTooltip,
 } from '@coreui/react'
 import Select from 'react-select'
 import Cookies from 'js-cookie'
@@ -29,7 +30,10 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx';
+import idel from "src/status/idel.png";
+import ignitionOff from "src/status/power-off.png";
+import ignitionOn from "src/status/power-on.png";
 
 const SearchIdeal = ({
   formData,
@@ -430,7 +434,6 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
               row.data?.length > 0 ? (
                 // Filter nested rows where vehicleStatus is 'Idle'
                 row.data
-                  .filter((nestedRow) => nestedRow.vehicleStatus === 'Idle') // Filter only 'Idle' status
                   .map((nestedRow, nestedIndex) => (
                     <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
                       <CTableDataCell>{rowIndex + 1}</CTableDataCell>
@@ -438,7 +441,29 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                       {selectedColumns.map((column, index) => (
                         <CTableDataCell key={index}>
                           {column === 'Vehicle Status'
-                            ? nestedRow.vehicleStatus
+                            ? (
+                              nestedRow.vehicleStatus === 'Idle' ? (
+                                <>
+                                  <CTooltip content="Idle">
+                                    <img src={idel} alt='idle' width='40' height='40' style={{ marginRight: '10px' }} />
+                                    {/* <span>Idle</span> */}
+                                  </CTooltip>
+                                </>
+                              ) : nestedRow.vehicleStatus === 'Ignition Off' ? (
+                                <>
+                                  <CTooltip content="Ignition Off">
+                                    <img src={ignitionOff} alt='off' width='40' height='40' style={{ marginRight: '10px' }} />
+                                    {/* <span>Ignition Off</span> */}
+                                  </CTooltip>
+                                </>
+                              ) : nestedRow.vehicleStatus === 'Ignition On' ? (
+                                <>
+                                  <CTooltip content="Ignition On">
+                                    <img src={ignitionOn} alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                                    {/* <span>Ignition On</span> */}
+                                  </CTooltip>
+                                </>
+                              ) : null)
                             : column === 'Duration'
                               ? // Convert duration from seconds to HH:mm:ss format
                                 new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)

@@ -883,7 +883,7 @@ const Devices = () => {
           <CTableHead className="text-nowrap">
             <CTableRow>
               <CTableHeaderCell className="text-center text-white bg-secondary">
-                Sr No
+                SN
               </CTableHeaderCell>
               {columns.slice(1).map((column, index) => (
                 <CTableHeaderCell key={index} className="text-center text-white bg-secondary">

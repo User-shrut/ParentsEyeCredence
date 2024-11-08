@@ -28,9 +28,9 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import CIcon from '@coreui/icons-react';
 import { cilSettings } from '@coreui/icons';
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { auto } from '@popperjs/core';
@@ -40,9 +40,9 @@ import ignitionOn from "src/status/power-on.png";
 
 const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups, getGroups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
-  const [showDateInputs, setShowDateInputs] = useState(false); // State to manage button text
+  const [showDateInputs, setShowDateInputs] = useState(false);
   const [buttonText, setButtonText] = useState('SHOW NOW');
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedU, setSelectedU] = useState();
   const [selectedG, setSelectedG] = useState();
 
@@ -77,10 +77,6 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
-
-
-
-
 
 
   return (
