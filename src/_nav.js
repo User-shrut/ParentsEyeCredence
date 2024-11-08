@@ -11,12 +11,12 @@ import { FaCarOn, FaUserGroup } from 'react-icons/fa6'
 import { GrHostMaintenance, GrUserWorker } from 'react-icons/gr'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdEventNote, MdOutlineCategory, MdSensors } from 'react-icons/md'
-import { TbCategory } from 'react-icons/tb';
-import { GiPathDistance } from "react-icons/gi";
-import { TbReportAnalytics } from "react-icons/tb";
+import { TbCategory } from 'react-icons/tb'
+import { GiPathDistance } from 'react-icons/gi'
+import { TbReportAnalytics } from 'react-icons/tb'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import { RiPinDistanceFill } from 'react-icons/ri'
-import { PiMapPinAreaFill } from "react-icons/pi";
+import { PiMapPinAreaFill } from 'react-icons/pi'
 
 const _nav = (role, decodedToken) => {
   let devices,
@@ -207,7 +207,7 @@ const _nav = (role, decodedToken) => {
                 to: '/distancereports',
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <GiPathDistance  style={{ marginRight: '15px', fontSize: '20px' }} />
+                    <GiPathDistance style={{ marginRight: '15px', fontSize: '20px' }} />
                   </div>
                 ),
               },
@@ -312,6 +312,7 @@ const _nav = (role, decodedToken) => {
           {
             component: CNavTitle,
             name: 'Manage',
+            
           },
           (devices || users || groups || geofence || driver || notification || maintenance) && {
             component: CNavGroup,
@@ -322,41 +323,76 @@ const _nav = (role, decodedToken) => {
               </div>
             ),
             items: [
-              devices && { component: CNavItem, name: 'Devices', to: '/devices', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaCar style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              users && { component: CNavItem, name: 'Users', to: '/users', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaUserAlt style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              groups && { component: CNavItem, name: 'Group', to: '/group', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaUserGroup style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              geofence && { component: CNavItem, name: 'Geofences', to: '/geofences', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <PiMapPinAreaFill style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              driver && { component: CNavItem, name: 'Driver', to: '/driver', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <GrUserWorker style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              notification && { component: CNavItem, name: 'Notifications', to: '/notifications', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <IoMdNotifications style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              maintenance && { component: CNavItem, name: 'Maintenance', to: '/maintenance', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <GrHostMaintenance style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
+              devices && {
+                component: CNavItem,
+                name: 'Devices',
+                to: '/devices',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaCar style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              users && {
+                component: CNavItem,
+                name: 'Users',
+                to: '/users',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaUserAlt style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              groups && {
+                component: CNavItem,
+                name: 'Group',
+                to: '/group',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaUserGroup style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              geofence && {
+                component: CNavItem,
+                name: 'Geofences',
+                to: '/geofences',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <PiMapPinAreaFill style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              driver && {
+                component: CNavItem,
+                name: 'Driver',
+                to: '/driver',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <GrUserWorker style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              notification && {
+                component: CNavItem,
+                name: 'Notifications',
+                to: '/notifications',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <IoMdNotifications style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              maintenance && {
+                component: CNavItem,
+                name: 'Maintenance',
+                to: '/maintenance',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <GrHostMaintenance style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
             ].filter(Boolean),
           },
           (status ||
@@ -394,30 +430,50 @@ const _nav = (role, decodedToken) => {
                 to: '/distancereports',
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <GiPathDistance  style={{ marginRight: '15px', fontSize: '20px' }} />
+                    <GiPathDistance style={{ marginRight: '15px', fontSize: '20px' }} />
                   </div>
                 ),
               },
-              history && { component: CNavItem, name: 'History', to: '/history', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaHistory style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              stop && { component: CNavItem, name: 'Stops', to: '/stops', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <BsFillSignStopFill style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ),  },
-              travel && { component: CNavItem, name: 'Travels Report', to: '/travelsreport', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <RiPinDistanceFill style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              idle && { component: CNavItem, name: 'Idle Report', to: '/idlereport', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaStopwatch style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
+              history && {
+                component: CNavItem,
+                name: 'History',
+                to: '/history',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaHistory style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              stop && {
+                component: CNavItem,
+                name: 'Stops',
+                to: '/stops',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <BsFillSignStopFill style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              travel && {
+                component: CNavItem,
+                name: 'Travels Report',
+                to: '/travelsreport',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <RiPinDistanceFill style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              idle && {
+                component: CNavItem,
+                name: 'Idle Report',
+                to: '/idlereport',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaStopwatch style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
               sensor && {
                 component: CNavItem,
                 name: 'Sensor Reports',
@@ -428,16 +484,26 @@ const _nav = (role, decodedToken) => {
                   </div>
                 ),
               },
-              alerts && { component: CNavItem, name: 'Alerts/Events', to: '/alerts-events', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <MdEventNote style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
-              vehicle && { component: CNavItem, name: 'Vehicle Reports', to: '/vehiclereport', icon: (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaCarOn style={{ marginRight: '15px', fontSize: '20px' }} />
-                </div>
-              ), },
+              alerts && {
+                component: CNavItem,
+                name: 'Alerts/Events',
+                to: '/alerts-events',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <MdEventNote style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
+              vehicle && {
+                component: CNavItem,
+                name: 'Vehicle Reports',
+                to: '/vehiclereport',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FaCarOn style={{ marginRight: '15px', fontSize: '20px' }} />
+                  </div>
+                ),
+              },
               geofenceReport && {
                 component: CNavItem,
                 name: 'Geofence Report',
