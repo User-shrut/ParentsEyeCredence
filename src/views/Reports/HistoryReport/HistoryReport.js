@@ -20,6 +20,7 @@ import {
   CTooltip,
 } from '@coreui/react';
 import MapComponent from '../../Map/MapComponent';
+import '../style/remove-gutter.css';
 
 // Form component for custom styles and handling input
 const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices }) => {
@@ -294,7 +295,7 @@ const Validation = () => {
 
   return (
     <>
-      <CRow className='pt-3'>
+      <CRow className='pt-3 gutter-0'>
         <h2 className="px-4">History Reports</h2>
 
         <CCol xs={12} md={12} className="px-4">
@@ -310,7 +311,7 @@ const Validation = () => {
       </CRow>
 
       {showForm && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} md={12} className="px-4" >
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
@@ -330,7 +331,7 @@ const Validation = () => {
       )}
 
       {showTable && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} md={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-warning text-white">

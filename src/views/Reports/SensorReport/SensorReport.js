@@ -18,6 +18,7 @@ import {
   CFormLabel,
   CFormFeedback,
 } from '@coreui/react';
+import '../style/remove-gutter.css';
 
 const SimpleTable = ({ data }) => {
   return (
@@ -52,7 +53,7 @@ const Validation = () => {
       {/* <h3>Scheduled Reports</h3>
       <SimpleTable data={sampleData} /> */}
 
-      <CRow className='pt-3'>
+      <CRow className='pt-3 gutter-0'>
         <h2 className="px-4">Sensor Report</h2>
 
         <CCol xs={12} md={12} className="px-4">
@@ -63,10 +64,10 @@ const Validation = () => {
             <SimpleTable data={sampleData} />
           </CCard>
         </CCol>
-</CRow>
+      </CRow>
 
-      </>
-      );
+    </>
+  );
 };
 
-      export default Validation;
+export default Validation;

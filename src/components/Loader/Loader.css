@@ -1,3 +1,13 @@
+/* .loaderScreen {
+  height: 100dvh;
+  width: 100dvw;
+  background-color: rgba(35, 35, 35, 0.5);
+  scroll-behavior: none;
+  overflow: hidden;
+  z-index: 9999;
+} */
+
+
 .loaderContainer {
   display: flex;
   justify-content: center;

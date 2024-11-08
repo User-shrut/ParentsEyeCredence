@@ -33,14 +33,16 @@ import upLeft from "src/direction/up-left-arrow.gif";
 import upRight from "src/direction/up-right-arrow.gif";
 import downLeft from "src/direction/down-left-arrow.gif";
 import downRight from "src/direction/down-right-arrow.gif";
+import Loader from '../../../components/Loader/Loader'
+import '../style/remove-gutter.css';
 // import { saveAs } from 'file-saver';
 
 const SearchStop = ({
   formData,
   handleInputChange,
   handleSubmit,
-  users, 
-  groups, 
+  users,
+  groups,
   getGroups,
   devices,
   loading,
@@ -103,7 +105,7 @@ const SearchStop = ({
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-       <CCol md={2}>
+      <CCol md={2}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
         <CFormSelect
           id="user"
@@ -503,7 +505,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow>
+            <CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
@@ -513,9 +515,12 @@ const StopTable = ({ apiData, selectedColumns }) => {
                   padding: '16px',
                   textAlign: 'center',
                   border: '1px dashed #dee2e6',
+                  height: '100px',
                 }}
               >
-                Data is loading....
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Loader />
+                </div>
               </CTableDataCell>
             </CTableRow>
           )}
@@ -564,7 +569,7 @@ const Stops = () => {
   const [showMap, setShowMap] = useState(false) //show mapping data
   const accessToken = Cookies.get('authToken')
   const [apiData, setApiData] = useState() //data from api
- 
+
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
   const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
@@ -688,7 +693,7 @@ const Stops = () => {
   }
   return (
     <div>
-      <CRow className="pt-3">
+      <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
             <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
@@ -714,7 +719,7 @@ const Stops = () => {
         </CCol>
       </CRow>
       {showMap && (
-        <CRow className="justify-content-center mt-4">
+        <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">

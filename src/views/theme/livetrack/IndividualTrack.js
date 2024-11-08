@@ -96,6 +96,8 @@ import autoOrange from '../../../assets/vehicleList/Auto/autoOrange.svg'
 import autoGray from '../../../assets/vehicleList/Auto/autoGray.svg'
 import Draggable from 'react-draggable'
 
+import '../../Reports/style/remove-gutter.css'
+
 const mapIcons = {
   bus: {
     red: busredSvg,
@@ -357,10 +359,16 @@ const IndividualTrack = () => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
+        const apiKey = 'DG2zGt0KduHmgSi2kifd';  // Replace with your actual MapTiler API key
         const response = await axios.get(
-          `https://us1.locationiq.com/v1/reverse.php?key=pk.23e7282ce5839ef4196426bbd0fd0def&lat=${individualSalesMan?.latitude}&lon=${individualSalesMan?.longitude}&format=json`,
-        )
-        setAddress(response.data)
+          `https://api.maptiler.com/geocoding/${individualSalesMan?.longitude},${individualSalesMan?.latitude}.json?key=${apiKey}`
+        );
+        if (response.data.features.length === 7) {
+          setAddress(response.data.features[1].place_name_en)
+        } else {
+          setAddress(response.data.features[0].place_name_en)
+        }
+        console.log(response.data)
       } catch (error) {
         console.error('Error fetching the address:', error)
         setAddress('Error fetching address')
@@ -374,7 +382,7 @@ const IndividualTrack = () => {
 
   return (
     <>
-      <div className="row">
+      <div className="row gutter-0">
         <div className="col-12">
           <div className="individualMap">
             <MapContainer
@@ -410,7 +418,7 @@ const IndividualTrack = () => {
                       <div className="col">
                         <strong>Address</strong>
                         {address
-                          ? ` : ${address.address?.road}, ${address.address?.village}, ${address.address?.state_district}, ${address.address?.state}, ${address.address?.country}, ${address.address?.postcode}`
+                          ? ` : ${address}`
                           : ' : Address of User'}
                       </div>
 
