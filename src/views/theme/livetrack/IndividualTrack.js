@@ -359,10 +359,10 @@ const IndividualTrack = () => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const apiKey = 'DG2zGt0KduHmgSi2kifd';  // Replace with your actual MapTiler API key
+        const apiKey = 'DG2zGt0KduHmgSi2kifd' // Replace with your actual MapTiler API key
         const response = await axios.get(
-          `https://api.maptiler.com/geocoding/${individualSalesMan?.longitude},${individualSalesMan?.latitude}.json?key=${apiKey}`
-        );
+          `https://api.maptiler.com/geocoding/${individualSalesMan?.longitude},${individualSalesMan?.latitude}.json?key=${apiKey}`,
+        )
         if (response.data.features.length === 7) {
           setAddress(response.data.features[1].place_name_en)
         } else {
@@ -383,23 +383,70 @@ const IndividualTrack = () => {
   return (
     <>
       <div className="row gutter-0">
-        <div className="col-12">
-          <div className="individualMap">
+        <div className="col-12 position-relative">
+          <div className="individualMap position-relative border border-5 ">
             <MapContainer
               center={[21.1458, 79.0882]} // Default center in case data isn't available
               zoom={13}
-              style={{ height: '650px', marginTop: '7px' }}
+              style={{ height: '87vh', marginTop: '7px', border: "1px solid black", borderRadius: "5px" }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; RocketSales, HB Gadget Solutions Nagpur"
+                attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
               />
 
-              <Draggable>
-                <CCard className="mb-4 parametersContainer" style={{ zIndex: '9999' }}>
-                  <CCardHeader>Tasks</CCardHeader>
+              <Draggable bounds="parent">
+                <CCard className="mb-4 parametersContainer shadow" style={{ zIndex: '555' }}>
                   <CCardBody>
-                    <div className="name">
+                    <div className="row">
+                      <div className="col-7 mt-3">
+                        <h6 className="fw-bold text-decoration-underline">
+                          {name ? name : 'User Name'}
+                        </h6>
+                        <p>{address ? `${address}` : 'Address of User'}</p>
+                      </div>
+                      <div className="col-5">
+                        <img
+                          src={selectImage(
+                            category,
+                            individualSalesMan?.speed,
+                            individualSalesMan?.attributes?.ignition,
+                          )}
+                          className="nimg "
+                          alt="vehicle"
+                        />
+                      </div>
+                    </div>
+                    <div className="row gap-1 justify-content-center">
+                      <div className="col-2 text-center attribute shadow">
+                        <strong>{`${individualSalesMan?.attributes?.ignition ? 'On' : 'Off'}`}</strong>
+                        <br />
+                        <p className="p-0 m-0">Ignition</p>
+                      </div>
+                      <div className="col-2 text-center attribute shadow">
+                        <strong>{`${Math.round(individualSalesMan?.speed)}`}</strong>
+                        <small> km/h</small>
+                        <br />
+                        <p className="p-0 m-0">Speed</p>
+                      </div>
+                      <div className="col-2 text-center attribute shadow">
+                        <strong>{`${Math.round(individualSalesMan?.attributes?.distance)}`}</strong>
+                        <br />
+                        <p className="p-0 m-0">Distance</p>
+                      </div>
+                      <div className="col-2 text-center attribute shadow">
+                        <strong>{`${category}`}</strong>
+                        <br />
+                        <p className="p-0 m-0">
+                          <small>Category</small>
+                        </p>
+                      </div>
+                    </div>
+                    {/* <div className="name">
+                      <div>
+                        <h6>{name ? name : 'User Name'}</h6>
+                        <p>{address ? `${address}` : 'Address of User'}</p>
+                      </div>
                       <div className="nameImage">
                         <img
                           src={selectImage(
@@ -411,17 +458,9 @@ const IndividualTrack = () => {
                           alt="vehicle"
                         />
                       </div>
-                      <div>{name ? name : 'User Name'}</div>
                     </div>
 
                     <div className="parameters">
-                      <div className="col">
-                        <strong>Address</strong>
-                        {address
-                          ? ` : ${address}`
-                          : ' : Address of User'}
-                      </div>
-
                       <div className="col">
                         <strong>Ignition</strong>
                         {` : ${individualSalesMan?.attributes?.ignition ? 'On' : 'Off'}`}
@@ -442,7 +481,7 @@ const IndividualTrack = () => {
                         <strong>Category</strong>
                         {` : ${category}`}
                       </div>
-                    </div>
+                    </div> */}
                   </CCardBody>
                 </CCard>
               </Draggable>

@@ -84,7 +84,7 @@ const liveFeaturesSlice = createSlice({
     },
     filterInactiveVehicles(state) {
       state.activeFilter = (vehicles) =>
-        state.activeFilter = (vehicles) => vehicles.filter(vehicle => !vehicle.attributes.ignition || vehicle.speed === 0); // Store filter function
+        vehicles.filter((vehicle) => !(vehicle.status == "online"));
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterByCategory(state, action) {

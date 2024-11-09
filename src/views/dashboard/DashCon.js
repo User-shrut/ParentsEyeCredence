@@ -17,9 +17,9 @@ import {
 } from '@coreui/react'
 import './DashCon.css'
 
-
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  filterAllVehicles,
   filterIdleVehicles,
   filterInactiveVehicles,
   filterOverspeedVehicles,
@@ -91,41 +91,38 @@ import Cookies from 'js-cookie'
 import ReactPaginate from 'react-paginate'
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
-  const credentials = Cookies.get('crdntl');
+  const dispatch = useDispatch()
+  const credentials = Cookies.get('crdntl')
   const { filteredVehicles } = useSelector((state) => state.liveFeatures)
   const [filter, setFilter] = useState('all')
 
-
-  // pagination code 
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
-  const pageCount = Math.ceil(filteredVehicles.length / itemsPerPage);
+  // pagination code
+  const [currentPage, setCurrentPage] = useState(0)
+  const itemsPerPage = 10
+  const pageCount = Math.ceil(filteredVehicles.length / itemsPerPage)
 
   const currentVehicles = filteredVehicles.slice(
     currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+    (currentPage + 1) * itemsPerPage,
+  )
 
   const handlePageClick = (event) => {
-    setCurrentPage(event.selected);
-  };
+    setCurrentPage(event.selected)
+  }
 
   // Fetch live vehicles when the component mounts
   useEffect(() => {
-    console.log("before initialize socket");
-    console.log("credentials: ", credentials);
+    console.log('before initialize socket')
+    console.log('credentials: ', credentials)
     dispatch(initializeSocket(credentials))
 
-    console.log("after initialize socket");
-
+    console.log('after initialize socket')
 
     return () => {
       socket.off('all device data')
     }
   }, [])
 
-  
   const stoppedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
@@ -146,12 +143,13 @@ const Dashboard = () => {
         const now = dayjs()
         const duration = dayjs.duration(now.diff(lastUpdate))
         return (
-          duration.asHours() > 24 || !(vehicle.attributes.ignition === true && vehicle.speed > 0)
+          duration.asHours() > 24 || !(vehicle.status == "online")
         )
       }).length,
   )
 
-  const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length) + inactiveVehiclesCount;
+  const allVehiclesCount =
+    useSelector((state) => state.liveFeatures.vehicles.length) + inactiveVehiclesCount
 
   const idleVehiclesCount = useSelector(
     (state) =>
@@ -283,13 +281,13 @@ const Dashboard = () => {
   const visibleColumns = useSelector((state) => state.columnVisibility)
 
   useEffect(() => {
-    console.log("filtered vehicle", filteredVehicles);
+    console.log('filtered vehicle', filteredVehicles)
   }, [filteredVehicles])
 
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
-      <CRow className='gutter-0'>
+      <CRow className="gutter-0">
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
@@ -306,7 +304,12 @@ const Dashboard = () => {
               <br />
               <CRow className="justify-content-space-around">
                 <CCol xs={12} md={2} xl={2} className="count-col countallCol">
-                  <div className="border-start border-start-4 border-start-error countAll py-1 px-3">
+                  <div
+                    className="border-start border-start-4 border-start-error countAll py-1 px-3"
+                    onClick={() => {
+                      dispatch(filterAllVehicles())
+                    }}
+                  >
                     <div className="text-body-secondary text-truncate small ">All</div>
                     <div className="fs-5 fw-semibold allData">{allVehiclesCount}</div>
                   </div>
@@ -783,7 +786,8 @@ const Dashboard = () => {
                             </button>
                           </CTableDataCell>
                         </CTableRow>
-                      ))) : (
+                      ))
+                    ) : (
                       <CTableRow>
                         <CTableDataCell colSpan="15" className="text-center">
                           <div className="text-nowrap mb-2 text-center w-">
@@ -805,7 +809,9 @@ const Dashboard = () => {
                     )}
                   </CTableBody>
                 </CTable>
-                <div className="mt-3"> {/* Adds margin to the right of pagination */}
+                <div className="mt-3">
+                  {' '}
+                  {/* Adds margin to the right of pagination */}
                   <ReactPaginate
                     breakLabel="..."
                     nextLabel="next >"

@@ -1,6 +1,16 @@
 .parametersContainer{
-  width: 300px;
-  float: right;
+  width: 400px;
+  position: absolute;
+  top: 2%;
+  right: 1%; 
+  transform: translateY(-50%);
+  background-color: rgba(255, 254, 254, 0.932);
+  border-radius: 15px;
+  
+}
+
+.individualMap{
+  max-height: 500px !important;
 }
 
 .parameters
@@ -17,13 +27,22 @@
   flex-direction: row;
   gap: 15px;
   align-items: center;
-  font-weight: 600;
+ 
 }
 
 .nameImage{
-  width: 50px;
+  min-width: 50px;
+  box-sizing: border-box;
 }
 
 .nimg{
   width: 100%;
+}
+
+.attribute{
+  background-color: #e9e8e8;
+  border: 1px solid grey;
+  border-radius: 10px;
+  padding: 5px 0px;
+  /* color: white; */
 }
