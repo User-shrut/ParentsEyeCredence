@@ -172,7 +172,7 @@ const AppHeader = () => {
         </CHeaderToggler>
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
-            <CNavLink to="/dashboard" as={NavLink}>
+            <CNavLink id='header-dashboard' to="/dashboard" as={NavLink}>
               Dashboard
             </CNavLink>
           </CNavItem>
@@ -181,7 +181,7 @@ const AppHeader = () => {
         {isDashboard && (
           <CHeaderNav className="ms-auto">
             <select
-              className="form-select"
+              className="form-select header-inputs"
               aria-label="Default select example"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -200,7 +200,7 @@ const AppHeader = () => {
         {isDashboard && (
           <CHeaderNav className="ms-auto">
             <select
-              className="form-select"
+              className="form-select header-inputs"
               aria-label="Default select example"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}

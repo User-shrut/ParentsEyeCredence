@@ -361,14 +361,14 @@ const IndividualTrack = () => {
       try {
         const apiKey = 'DG2zGt0KduHmgSi2kifd' // Replace with your actual MapTiler API key
         const response = await axios.get(
-          `https://api.maptiler.com/geocoding/${individualSalesMan?.longitude},${individualSalesMan?.latitude}.json?key=${apiKey}`,
-        )
-        if (response.data.features.length === 7) {
-          setAddress(response.data.features[1].place_name_en)
-        } else {
+          `https://api.maptiler.com/geocoding/${individualSalesMan?.longitude},${individualSalesMan?.latitude}.json?key=${apiKey}`
+        );
+        if (response.data.features.length <= 5) {
           setAddress(response.data.features[0].place_name_en)
+        } else {
+          setAddress(response.data.features[1].place_name_en)
         }
-        console.log(response.data)
+        // console.log(response.data)
       } catch (error) {
         console.error('Error fetching the address:', error)
         setAddress('Error fetching address')

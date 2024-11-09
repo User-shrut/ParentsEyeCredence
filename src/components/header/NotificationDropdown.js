@@ -27,7 +27,7 @@ const NotificationDropdown = ({ notifications }) => {
       </CDropdownToggle>
       <CDropdownMenu className="pt-2" placement="bottom-end" style={{ width: '200px' }}>
         {notifications.map((notification, index) => (
-          <CDropdownItem key={index} style={{fontSize: "12px"}}>{notification.message}</CDropdownItem>
+          <CDropdownItem key={index} style={{ fontSize: "12px" }}>{notification.message}</CDropdownItem>
         ))}
       </CDropdownMenu>
     </CDropdown>
