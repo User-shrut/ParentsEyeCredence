@@ -28,6 +28,7 @@ import {
   initializeSocket,
   socket,
 } from '../../features/LivetrackingDataSlice.js'
+import { setNewAddress } from '../../features/addressSlice.js'
 
 import MainMap from '../Map/MapComponent'
 import { PiEngineFill } from 'react-icons/pi'
@@ -89,12 +90,18 @@ import { io } from 'socket.io-client'
 dayjs.extend(duration)
 import Cookies from 'js-cookie'
 import ReactPaginate from 'react-paginate'
+import axios from 'axios'
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const credentials = Cookies.get('crdntl');
   const { filteredVehicles } = useSelector((state) => state.liveFeatures)
+  const { newAddress } = useSelector((state) => state.address)
   const [filter, setFilter] = useState('all')
+  const [address, setAddress] = useState({});
+
+
+
 
 
   // pagination code 
@@ -125,7 +132,7 @@ const Dashboard = () => {
     }
   }, [])
 
-  
+
   const stoppedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
@@ -282,8 +289,49 @@ const Dashboard = () => {
 
   const visibleColumns = useSelector((state) => state.columnVisibility)
 
+  const fetchAddress = async (vehicleId, longitude, latitude) => {
+    try {
+      const apiKey = 'DG2zGt0KduHmgSi2kifd'; // Replace with your actual MapTiler API key
+      const response = await axios.get(
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
+      );
+      // console.log(response)
+      const address = response.data.features.length <= 5
+        ? response.data.features[0].place_name_en
+        : response.data.features[1].place_name_en;
+
+      setAddress(prevAddresses => ({
+        ...prevAddresses,
+        [vehicleId]: address, // Update the specific vehicle's address
+      }));
+    } catch (error) {
+      console.error('Error fetching the address:', error);
+      setAddress(prevAddresses => ({
+        ...prevAddresses,
+        [vehicleId]: 'Error fetching address',
+      }));
+    }
+  };
+
+  const setNewAddressForRedux = (address) => {
+    if (address) {
+      dispatch(setNewAddress(address));
+    }
+  };
+
+  useEffect(() => {
+    setNewAddressForRedux(address);
+  }, [address])
+
   useEffect(() => {
     console.log("filtered vehicle", filteredVehicles);
+    filteredVehicles.forEach(vehicle => {
+      if (vehicle?.deviceId && vehicle.longitude && vehicle.latitude && !address[vehicle.id]) {
+        // Fetch address only if it's not already fetched for this vehicle
+        fetchAddress(vehicle.deviceId, vehicle.longitude, vehicle.latitude);
+      }
+    });
+    // console.log(address)
   }, [filteredVehicles])
 
   return (
@@ -291,10 +339,10 @@ const Dashboard = () => {
       {/* <WidgetsDropdown className="mb-4" /> */}
       <CRow className='gutter-0'>
         <CCol xs>
-          <CCard className="mb-4">
-            <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader>
-            <CCardBody className="content">
-              <hr className="mt-0 mb-0" />
+          <CCard style={{ borderRadius: '0px' }}>
+            {/* <CCardHeader>Vehicle's{' & '}Devices Info</CCardHeader> */}
+            <CCardBody className="content mt-4">
+              {/* <hr className="mt-0 mb-0" /> */}
 
               {/* <CRow>
             <CCol sm={7} className="d-none d-md-block"></CCol>
@@ -395,7 +443,7 @@ const Dashboard = () => {
               <hr />
               <br />
 
-              <div className="table-container" style={{ height: '53rem', overflowY: 'auto' }}>
+              <div className="table-container" style={{ overflowY: 'auto' }}>
                 <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
                   <CTableHead
                     className="text-nowrap"
@@ -604,11 +652,11 @@ const Dashboard = () => {
                           {visibleColumns.address && (
                             <CTableDataCell
                               className="text-center address table-cell"
-                              style={{ width: '20rem' }}
+                              style={{ minWidth: '500px' }}
                             >
-                              <div className="upperdata" style={{ fontSize: '1rem' }}>
-                                shiv kailasa, mihan, khapri, nagpur, maharshtra 111111
-                              </div>
+                              <span className="upperdata" style={{ fontSize: '1rem', textWrap: 'auto' }}>
+                                {newAddress[item.deviceId] || 'Loading...'}
+                              </span>
                             </CTableDataCell>
                           )}
                           {visibleColumns.lastUpdate && (
@@ -776,7 +824,8 @@ const Dashboard = () => {
                           )}
                           <CTableDataCell className="text-center status table-cell">
                             <button
-                              className="btn btn-primary"
+                              className="btn shadow-sm"
+                              style={{ backgroundColor: '#FF7A00', fontSize: '1rem', color: 'white' }}
                               onClick={() => handleClickOnTrack(item)}
                             >
                               Live Track

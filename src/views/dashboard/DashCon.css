@@ -3,21 +3,14 @@
   /* Hides scrollbar for Chrome, Safari, and Edge */
 }
 
-.gutter-0{
+.gutter-0 {
   --bs-gutter-x: 0 !important;
 }
 
 /* For Firefox */
 .table-container {
-  scrollbar-width: none !important;
-  /* Hides scrollbar in Firefox */
-  width: 100%;
-  /* Ensure container takes full width */
-}
-
-.vehiclesTable {
-  width: 100%;
-  /* Ensure table stretches to full width */
+  scrollbar-width: 10px !important;
+  /* scrollbar-color: transparent transparent !important; */
 }
 
 .content {

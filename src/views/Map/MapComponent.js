@@ -1,5 +1,5 @@
-import React, { useContext } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import React, { useContext, useEffect, useState } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import MarkerClusterGroup from 'react-leaflet-cluster'
@@ -48,6 +48,11 @@ import { RxLapTimer } from 'react-icons/rx'
 import dayjs from 'dayjs'
 import './map.css'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { useSelector } from 'react-redux'
+
+import { IoLocationSharp } from "react-icons/io5";
+import { GiSpeedometer } from "react-icons/gi";
 
 // Define map icons
 const mapIcons = {
@@ -138,23 +143,99 @@ const getVehicleIcon = (vehicle) => {
 }
 
 const MainMap = ({ filteredVehicles }) => {
+  const { newAddress } = useSelector((state) => state.address)
   const navigate = useNavigate();
+  const [address, setAddress] = useState('');
   const handleClickOnTrack = (vehicle) => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
-  }
+  }
+  // const fetchAddress = async (vehicleId, longitude, latitude) => {
+  //   try {
+  //     const apiKey = 'DG2zGt0KduHmgSi2kifd'; // Replace with your actual MapTiler API key
+  //     const response = await axios.get(
+  //       `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
+  //     );
+  //     // console.log(response)
+  //     const address = response.data.features.length <= 5
+  //       ? response.data.features[0].place_name_en
+  //       : response.data.features[1].place_name_en;
+
+  //     setAddress(prevAddresses => ({
+  //       ...prevAddresses,
+  //       [vehicleId]: address, // Update the specific vehicle's address
+  //     }));
+  //   } catch (error) {
+  //     console.error('Error fetching the address:', error);
+  //     setAddress(prevAddresses => ({
+  //       ...prevAddresses,
+  //       [vehicleId]: 'Error fetching address',
+  //     }));
+  //   }
+  // };
+
+  useEffect(() => {
+    console.log("filtered vehicle", filteredVehicles);
+    // filteredVehicles.forEach(vehicle => {
+    //   if (vehicle?.deviceId && vehicle.longitude && vehicle.latitude && !address[vehicle.id]) {
+    //     // Fetch address only if it's not already fetched for this vehicle
+    //     fetchAddress(vehicle.deviceId, vehicle.longitude, vehicle.latitude);
+    //   }
+    // });
+    // console.log(address)
+  }, [filteredVehicles])
+
+  function CtrlZoomHandler() {
+    const map = useMap();
+
+    useEffect(() => {
+      // Disable scroll zoom by default
+      map.scrollWheelZoom.disable();
+
+      // Function to handle scroll zoom with Ctrl key
+      const handleScrollZoom = (e) => {
+        if (e.originalEvent.ctrlKey) {
+          map.scrollWheelZoom.enable();  // Enable zoom on scroll
+        } else {
+          map.scrollWheelZoom.disable(); // Disable zoom on scroll
+        }
+      };
+
+      // Function to disable scroll zoom when mouse leaves the map
+      const handleMouseOut = () => {
+        map.scrollWheelZoom.disable();
+      };
+
+      // Attach event listeners
+      map.on('wheel', handleScrollZoom);
+      map.on('mouseout', handleMouseOut);
+
+      // Clean up event listeners on component unmount
+      return () => {
+        map.off('wheel', handleScrollZoom);
+        map.off('mouseout', handleMouseOut);
+      };
+    }, [map]);
+
+    return null;
+  }
+
   return (
     <MapContainer
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
       zoom={10}
-      style={{ height: '550px', width: '100%' }}
+      scrollWheelZoom={true}
+      style={{ height: '550px', width: '100%', borderRadius: '15px', border: '2px solid gray' }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; RocketSales, HB Gadget Solutions Nagpur"
+        attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
       />
+      {/* <CtrlZoomHandler /> */}
       <MarkerClusterGroup chunkedLoading>
         {filteredVehicles?.map((vehicle, index) => {
+          // console.log(vehicle)
+          // fetchAddress(vehicle)
           return (
             <Marker
               key={index}
@@ -162,27 +243,30 @@ const MainMap = ({ filteredVehicles }) => {
               icon={getVehicleIcon(vehicle)}
             >
               <Popup>
-                <div className="toolTip">
-                  <div>
+                <div className="toolTip" style={{ display: 'flex', fontSize: '.90rem', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3px' }}>
+                  <span style={{ textAlign: 'center', fontSize: '1.2rem' }}>
                     <strong> {vehicle.name}</strong>
-                  </div>
-
+                  </span>
+                  <hr style={{ width: '100%', height: '3px', marginBottom: '0px', marginTop: '5px', borderRadius: '5px', backgroundColor: '#000' }} />
                   <div className="toolTipContent">
-                    <div>
+                    <span>
                       <strong>
-                        <FaSearchLocation />
+                        <IoLocationSharp size={25} color='#FF7A00' />
                       </strong>{' '}
-                      shiv kailasa, mihan, khapri, nagpur, maharshtra 111111{' '}
+                      {newAddress[vehicle.deviceId] || 'Loading...'}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '10px' }}>
+                      <div>
+                        <strong>
+                          <IoMdSpeedometer size={25} color='#FF7A00' />
+                        </strong>{' '}
+                        {(vehicle.speed).toFixed(2)} km/h{' '}
+                      </div>
+
                     </div>
                     <div>
                       <strong>
-                        <IoMdSpeedometer />
-                      </strong>{' '}
-                      {vehicle.speed} km/h{' '}
-                    </div>
-                    <div>
-                      <strong>
-                        <HiOutlineStatusOnline />
+                        <HiOutlineStatusOnline size={25} color='#FF7A00' />
                       </strong>{' '}
                       {(() => {
                         const sp = vehicle.speed
@@ -205,18 +289,18 @@ const MainMap = ({ filteredVehicles }) => {
                     </div>
                     <div>
                       <strong>
-                        <RxLapTimer />
+                        <RxLapTimer size={25} color='#FF7A00' />
                       </strong>{' '}
                       {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
                     </div>
-                    <div>
-                    <button className="btn btn-primary" onClick={() => handleClickOnTrack(vehicle)}>
-                      Live Track
-                    </button>
-                  </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                      <button className="btn" style={{ width: '100%', color: 'white', fontSize: '1rem', backgroundColor: '#FF7A00' }} onClick={() => handleClickOnTrack(vehicle)}>
+                        Live Track
+                      </button>
+                    </div>
                   </div>
                   {/* <strong></strong> {device.lastUpdate} km/h */}
-                  
+
                 </div>
               </Popup>
             </Marker>
