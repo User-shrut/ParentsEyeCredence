@@ -75,7 +75,7 @@ const Login = () => {
               style={{
                 maxWidth: '500px',
                 borderRadius: '15px',
-                maxHeight: '630px',
+                maxHeight: '93vh',
                 backgroundColor: '#f7f6e7',
                 width: '100%',  // Ensures the card doesn't overflow on smaller screens
               }}

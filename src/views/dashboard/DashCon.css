@@ -194,3 +194,69 @@ td {
 .countallCol {
   max-width: 9rem !important;
 }
+
+
+
+.vehicle-card {
+  background-color: #fff;
+  border-radius: 12px;  /* Rounded corners */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 22vh;  /* Compact card size */
+  justify-content: space-between;
+  text-align: center;
+  border: 2px solid transparent;  /* Default border */
+  width: 100%;
+}
+
+.vehicle-card:hover {
+  transform: scale(1.05);  /* Slight zoom effect on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);  /* Deeper shadow */
+}
+
+.vehicle-info {
+  margin-bottom: 0.5rem;
+}
+
+.vehicle-type {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.vehicle-count {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.vehicle-icon {
+  margin-top: 0.5rem;
+}
+
+.vehicle-card.all-vehicles {
+  border-left: 6px solid burlywood;  /* Gray for All */
+}
+
+.vehicle-card.running-vehicles {
+  border-left: 6px solid #28a745;  /* Green for Running */
+}
+
+.vehicle-card.stopped-vehicles {
+  border-left: 6px solid #dc3545;  /* Red for Stopped */
+}
+
+.vehicle-card.idle-vehicles {
+  border-left: 6px solid #ffc107;  /* Yellow for Idle */
+}
+
+.vehicle-card.overspeed-vehicles {
+  border-left: 6px solid #fd7e14;  /* Orange for Overspeed */
+}
+
+.vehicle-card.inactive-vehicles {
+  border-left: 6px solid #6c757d;  /* Gray for Inactive */
+}
