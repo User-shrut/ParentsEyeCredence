@@ -351,102 +351,108 @@ const Dashboard = () => {
 
               {/* <div className="mb-5"></div> */}
 
-              <br />
-              <CRow className="justify-content-space-around">
-                <CCol xs={12} md={2} xl={2} className="count-col countallCol">
+              {/* <br /> */}
+
+              <CRow className="justify-content-around my-3">
+                {/* All Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="border-start border-start-4 border-start-error countAll py-1 px-3"
-                    onClick={() => {
-                      dispatch(filterAllVehicles())
-                    }}
+                    className="vehicle-card all-vehicles"
+                    onClick={() => dispatch(filterAllVehicles())}
                   >
-                    <div className="text-body-secondary text-truncate small ">All</div>
-                    <div className="fs-5 fw-semibold allData">{allVehiclesCount}</div>
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">All</div>
+                      <div className="vehicle-count fs-4 fw-bold">{allVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carGray} alt="All Vehicles" />
+                    </div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2} className="count-col">
-                  <div className="border-start border-start-4 border-start-success countRun py-1 px-3">
-                    <div className="text-body-secondary text-truncate small ">Running</div>
-                    <div className="fs-5 fw-semibold runningData">{runningVehiclesCount}</div>
-                  </div>
-
+                {/* Running Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="img"
-                    onClick={() => {
-                      dispatch(filterRunningVehicles())
-                    }}
+                    className="vehicle-card running-vehicles"
+                    onClick={() => dispatch(filterRunningVehicles())}
                   >
-                    <img style={{ width: '3.5rem' }} src={carGreen} alt="" />
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">Running</div>
+                      <div className="vehicle-count fs-4 fw-bold">{runningVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carGreen} alt="Running Vehicles" />
+                    </div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2} className="count-col">
-                  <div className="border-start border-start-4 border-start-danger countStop py-1 px-3">
-                    <div className="text-body-secondary text-truncate small ">Stopped</div>
-                    <div className="fs-5 fw-semibold stopData">{stoppedVehiclesCount}</div>
-                  </div>
-
+                {/* Stopped Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="img"
-                    onClick={() => {
-                      dispatch(filterStoppedVehicles())
-                    }}
+                    className="vehicle-card stopped-vehicles"
+                    onClick={() => dispatch(filterStoppedVehicles())}
                   >
-                    <img style={{ width: '3.5rem' }} src={carRed} alt="" />
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">Stopped</div>
+                      <div className="vehicle-count fs-4 fw-bold">{stoppedVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carRed} alt="Stopped Vehicles" />
+                    </div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2} className="count-col">
-                  <div className="border-start border-start-4 border-start py-1 px-3 countldel">
-                    <div className="text-body-secondary text-truncate small ">Idle</div>
-                    <div className="fs-5 fw-semibold idleData">{idleVehiclesCount}</div>
-                  </div>
-
+                {/* Idle Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="img"
-                    onClick={() => {
-                      dispatch(filterIdleVehicles())
-                    }}
+                    className="vehicle-card idle-vehicles"
+                    onClick={() => dispatch(filterIdleVehicles())}
                   >
-                    <img style={{ width: '3.5rem' }} src={carYellow} alt="" />
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">Idle</div>
+                      <div className="vehicle-count fs-4 fw-bold">{idleVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carYellow} alt="Idle Vehicles" />
+                    </div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2} className="count-col">
-                  <div className="border-start border-start-4 border-start countOverSpeed py-1 px-3">
-                    <div className="text-body-secondary text-truncate small ">Overspeed</div>
-                    <div className="fs-5 fw-semibold overspeedData">{overspeedVehiclesCount}</div>
-                  </div>
-
+                {/* Overspeed Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="img"
-                    onClick={() => {
-                      dispatch(filterOverspeedVehicles())
-                    }}
+                    className="vehicle-card overspeed-vehicles"
+                    onClick={() => dispatch(filterOverspeedVehicles())}
                   >
-                    <img style={{ width: '3.5rem' }} src={carOrange} alt="" />
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">Overspeed</div>
+                      <div className="vehicle-count fs-4 fw-bold">{overspeedVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carOrange} alt="Overspeed Vehicles" />
+                    </div>
                   </div>
                 </CCol>
 
-                <CCol xs={12} md={2} xl={2} className="count-col">
-                  <div className="border-start border-start-4 border-start-error countInactive py-1 px-3">
-                    <div className="text-body-secondary text-truncate small ">Inactive</div>
-                    <div className="fs-5 fw-semibold inactiveData">{inactiveVehiclesCount}</div>
-                  </div>
-
+                {/* Inactive Vehicles */}
+                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
-                    className="img"
-                    onClick={() => {
-                      dispatch(filterInactiveVehicles())
-                    }}
+                    className="vehicle-card inactive-vehicles"
+                    onClick={() => dispatch(filterInactiveVehicles())}
                   >
-                    <img style={{ width: '3.5rem' }} src={carGray} alt="" />
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">Inactive</div>
+                      <div className="vehicle-count fs-4 fw-bold">{inactiveVehiclesCount}</div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '5rem' }} src={carGray} alt="Inactive Vehicles" />
+                    </div>
                   </div>
                 </CCol>
               </CRow>
-              <hr />
-              <br />
+
+              {/* <hr />
+              <br /> */}
 
               <div className="table-container" style={{ overflowY: 'auto' }}>
                 <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
