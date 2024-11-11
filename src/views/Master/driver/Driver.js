@@ -54,6 +54,8 @@ import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react';
 import { cilSettings } from '@coreui/icons';
+import "../../../../src/app.css";
+
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -373,7 +375,7 @@ const Driver = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
               Add Driver
             </button>

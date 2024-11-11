@@ -50,6 +50,8 @@ import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import { auto } from '@popperjs/core'
+import "../../../../src/app.css";
+
 
 const Geofences = () => {
   const [deviceData , setDeviceData] = useState();
@@ -463,7 +465,7 @@ const Geofences = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
               Add Geofence
             </button>

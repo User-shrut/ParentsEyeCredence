@@ -63,6 +63,7 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons';
 import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
+import "../../../../src/app.css";
 
 const Users = () => {
   // somthing for testing
@@ -78,7 +79,7 @@ const Users = () => {
   const [isSuperAdmin, setSuperAdmin] = useState(false)
   const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
-  const [currentPage , setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Go to the next step
   const handleNext = () => {
@@ -91,6 +92,7 @@ const Users = () => {
   }
 
   const handleModalClose = () => {
+    setFormData({})
     setEditModalOpen(false)
     setAddModalOpen(false)
     setCurrentStep(0)
@@ -547,7 +549,7 @@ const Users = () => {
     // Create a new workbook and add a worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('User Data');
-  
+
     // Define the headers
     worksheet.columns = [
       { header: 'SN', key: 'sn', width: 5 },
@@ -557,10 +559,10 @@ const Users = () => {
       { header: 'Master Permissions', key: 'masterPermissions', width: 40 },
       { header: 'Reports Permissions', key: 'reportsPermissions', width: 40 }
     ];
-  
+
     // Add custom styles to headers
     worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true,size: 14, color: { argb: 'FFFFFFFF' } };  // White font
+      cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };  // White font
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
@@ -568,19 +570,19 @@ const Users = () => {
       };
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
     });
-  
+
     // Map filtered data into the format required for export
     filteredData?.forEach((item, rowIndex) => {
       const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
         .filter((permission) => item[permission])
         .join(', ') || 'N/A';
-  
+
       const reportsPermissions = [
         'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
       ]
         .filter((permission) => item[permission])
         .join(', ') || 'N/A';
-  
+
       // Add rows with mapped data
       worksheet.addRow({
         sn: rowIndex + 1,
@@ -591,7 +593,7 @@ const Users = () => {
         reportsPermissions
       });
     });
-  
+
     // Write the Excel file to a Blob and save it
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -668,7 +670,7 @@ const Users = () => {
               <button
                 onClick={() => setAddModalOpen(true)}
                 variant="contained"
-                className="btn btn-primary"
+                className="btn btn-secondary"
               >
                 Add User
               </button>
@@ -690,7 +692,7 @@ const Users = () => {
         <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap ">
             <CTableRow>
-            <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
                 SN
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
@@ -713,7 +715,7 @@ const Users = () => {
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-       
+
           <CTableBody>
             {loading ? (
               <CTableRow>
@@ -738,7 +740,7 @@ const Users = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index} className="p-0">
-                  <CTableDataCell className='text-center p-0'>{(currentPage - 1)  * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell className='text-center p-0'>{(currentPage - 1) * limit + index + 1}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
                   <CTableDataCell className="text-center p-0">
@@ -872,6 +874,7 @@ const Users = () => {
               nextClassName="page-item"
               nextLinkClassName="page-link"
               activeClassName="active"
+              activeLinkClassName="text-white"  // Active page text color (optional)
             />
           </div>
           {/* Form Control */}
