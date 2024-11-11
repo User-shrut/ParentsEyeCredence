@@ -69,27 +69,29 @@ const Login = () => {
           </div>
 
 
-          <div className="pt-4 col-12 col-md-6 d-flex justify-content-center position-relative">
+          <div className="col-12 col-md-6 d-flex justify-content-center position-relative" style={{paddingTop:'35px'}}>
             <div
               className="card border-2 shadow-lg"
               style={{
-                maxWidth: '500px',
+                maxWidth: '500px',  // Reduced width for smaller card
                 borderRadius: '15px',
-                maxHeight: '93vh',
+                maxHeight: '600px',  // Reduced height for smaller card
                 backgroundColor: '#f7f6e7',
-                width: '100%',  // Ensures the card doesn't overflow on smaller screens
+                width: '100%', // Ensures the card stays responsive
+                height: '100%',
+                padding: '1rem',  // Added padding for better spacing inside the card
               }}
             >
-              <div className="card-body d-flex flex-column h-100 p-4">
+              <div className="card-body d-flex flex-column h-100 p-3"> {/* Reduced padding for smaller form */}
                 <div className="text-center mt-3 mb-4">
                   <img
                     src="CR-LOGO.png"
                     alt="Logo"
-                    width="150px"
+                    width="120px" // Smaller logo size
                     className="loginLogo"
                   />
                   <h2 className="slogan mt-3 text-muted">
-                   <strong>Navigating Towards a Secured Future</strong> 
+                    <strong>Navigating Towards a Secured Future</strong>
                   </h2>
                 </div>
                 <h2 className="card-title text-center mb-3" style={{ fontWeight: 'bold', color: '#333' }}>
@@ -99,13 +101,12 @@ const Login = () => {
                   <strong>Please enter your details</strong>
                 </p>
                 <form onSubmit={handleLogin}>
-
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
                     <label htmlFor="username" className="form-label text-black username-label">
                       <strong><b>UserName</b></strong>
                     </label>
                     <div className="input-group" style={{ borderRadius: '10px', border: '1px solid orange' }}>
-                      <span className="input-group-text" id="basic-addon1"><FaUserAlt/></span>
+                      <span className="input-group-text" id="basic-addon1"><FaUserAlt /></span>
                       <input
                         type="text"
                         className="form-control form-control-lg username-input"
@@ -114,13 +115,11 @@ const Login = () => {
                         value={credentials.username}
                         onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                         required
-
                       />
                     </div>
                   </div>
 
-
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
                     <label htmlFor="password" className="form-label text-black password-label">
                       <strong><b>Password</b></strong>
                     </label>
@@ -138,7 +137,7 @@ const Login = () => {
                     </div>
                   </div>
 
-                  <div className="mb-4 form-check d-flex align-items-center">
+                  <div className="mb-3 form-check d-flex align-items-center">
                     <input
                       type="checkbox"
                       className="form-check-input remember-checkbox"
@@ -146,23 +145,23 @@ const Login = () => {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
-                    <label className="form-check-label ms-2 remember-label" htmlFor="remember" style={{ fontSize: '0.9rem' }}>
+                    <label className="form-check-label ms-2 remember-label" htmlFor="remember" style={{ fontSize: '0.8rem' }}>
                       Remember for 30 days
                     </label>
                   </div>
 
-
                   <button
                     type="submit"
                     className="btn btn-lg w-100 fw-bold hover-button"
+                    style={{ padding: '0.5rem' }} 
                   >
                     Log In
                   </button>
-
                 </form>
               </div>
             </div>
           </div>
+
 
 
         </div>
