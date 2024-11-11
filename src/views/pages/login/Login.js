@@ -146,7 +146,7 @@ const Login = () => {
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
                     <label className="form-check-label ms-2 remember-label" htmlFor="remember" style={{ fontSize: '0.8rem' }}>
-                      Remember for 30 days
+                     <strong>Remember for 30 days</strong> 
                     </label>
                   </div>
 
