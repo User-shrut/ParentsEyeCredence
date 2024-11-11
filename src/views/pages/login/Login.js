@@ -70,27 +70,36 @@ const Login = () => {
 
 
           <div className="col-12 col-md-6 d-flex justify-content-center position-relative" style={{paddingTop:'35px'}}>
+          <div className="col-12 col-md-6 d-flex justify-content-center position-relative" style={{paddingTop:'35px'}}>
             <div
               className="card border-2 shadow-lg"
               style={{
                 maxWidth: '500px',  // Reduced width for smaller card
+                maxWidth: '500px',  // Reduced width for smaller card
                 borderRadius: '15px',
                 maxHeight: '600px',  // Reduced height for smaller card
+                maxHeight: '600px',  // Reduced height for smaller card
                 backgroundColor: '#f7f6e7',
+                width: '100%', // Ensures the card stays responsive
+                height: '100%',
+                padding: '1rem',  // Added padding for better spacing inside the card
                 width: '100%', // Ensures the card stays responsive
                 height: '100%',
                 padding: '1rem',  // Added padding for better spacing inside the card
               }}
             >
               <div className="card-body d-flex flex-column h-100 p-3"> {/* Reduced padding for smaller form */}
+              <div className="card-body d-flex flex-column h-100 p-3"> {/* Reduced padding for smaller form */}
                 <div className="text-center mt-3 mb-4">
                   <img
                     src="CR-LOGO.png"
                     alt="Logo"
                     width="120px" // Smaller logo size
+                    width="120px" // Smaller logo size
                     className="loginLogo"
                   />
                   <h2 className="slogan mt-3 text-muted">
+                    <strong>Navigating Towards a Secured Future</strong>
                     <strong>Navigating Towards a Secured Future</strong>
                   </h2>
                 </div>
@@ -102,10 +111,12 @@ const Login = () => {
                 </p>
                 <form onSubmit={handleLogin}>
                   <div className="mb-3"> {/* Reduced bottom margin for inputs */}
+                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
                     <label htmlFor="username" className="form-label text-black username-label">
                       <strong><b>UserName</b></strong>
                     </label>
                     <div className="input-group" style={{ borderRadius: '10px', border: '1px solid orange' }}>
+                      <span className="input-group-text" id="basic-addon1"><FaUserAlt /></span>
                       <span className="input-group-text" id="basic-addon1"><FaUserAlt /></span>
                       <input
                         type="text"
@@ -119,6 +130,7 @@ const Login = () => {
                     </div>
                   </div>
 
+                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
                   <div className="mb-3"> {/* Reduced bottom margin for inputs */}
                     <label htmlFor="password" className="form-label text-black password-label">
                       <strong><b>Password</b></strong>
@@ -138,6 +150,7 @@ const Login = () => {
                   </div>
 
                   <div className="mb-3 form-check d-flex align-items-center">
+                  <div className="mb-3 form-check d-flex align-items-center">
                     <input
                       type="checkbox"
                       className="form-check-input remember-checkbox"
@@ -154,6 +167,7 @@ const Login = () => {
                     type="submit"
                     className="btn btn-lg w-100 fw-bold hover-button"
                     style={{ padding: '0.5rem' }} 
+                    style={{ padding: '0.5rem' }} 
                   >
                     Log In
                   </button>
@@ -161,6 +175,7 @@ const Login = () => {
               </div>
             </div>
           </div>
+
 
 
 
