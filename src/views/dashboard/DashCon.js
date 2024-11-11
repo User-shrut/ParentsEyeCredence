@@ -830,7 +830,7 @@ const Dashboard = () => {
                           <CTableDataCell className="text-center status table-cell">
                             <button
                               className="btn shadow-sm"
-                              style={{ backgroundColor: '#FF7A00', fontSize: '1rem', color: 'white' }}
+                              style={{ backgroundColor: '#000000', fontSize: '1rem', color: 'white' }}
                               onClick={() => handleClickOnTrack(item)}
                             >
                               Live Track

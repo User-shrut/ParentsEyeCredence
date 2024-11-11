@@ -294,7 +294,7 @@ const MainMap = ({ filteredVehicles }) => {
                       {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                      <button className="btn" style={{ width: '100%', color: 'white', fontSize: '1rem', backgroundColor: '#FF7A00' }} onClick={() => handleClickOnTrack(vehicle)}>
+                      <button className="btn" style={{ width: '100%', color: 'white', fontSize: '1rem', backgroundColor: '#000000' }} onClick={() => handleClickOnTrack(vehicle)}>
                         Live Track
                       </button>
                     </div>

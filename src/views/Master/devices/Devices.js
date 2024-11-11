@@ -416,12 +416,12 @@ const Devices = () => {
 
       if (formData.id && formData._id) {
         // Call both old PUT API and new PUT API
-        response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
-          headers: {
-            Authorization: `Basic ${token1}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        // response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
+        //   headers: {
+        //     Authorization: `Basic ${token1}`,
+        //     'Content-Type': 'application/json',
+        //   },
+        // })
 
         response2 = await axios.put(`${newPutApi}/${formData._id}`, newRow, {
           headers: {
@@ -431,12 +431,12 @@ const Devices = () => {
         })
       } else if (formData.id && !formData._id) {
         // Call old PUT API and new POST API
-        response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
-          headers: {
-            Authorization: `Basic ${token1}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        // response1 = await axios.put(`${oldPutApi}/${formData.id}`, oldRow, {
+        //   headers: {
+        //     Authorization: `Basic ${token1}`,
+        //     'Content-Type': 'application/json',
+        //   },
+        // })
 
         response2 = await axios.post(newPostApi, newRow, {
           headers: {
@@ -461,19 +461,14 @@ const Devices = () => {
         })
       }
 
-      // Check if the response status is in the 2xx range
-      if (response1.status == 200 && (response2.status == 200 || response2.status == 201)) {
+      
         toast.success('User is edited successfully')
         setEditModalOpen(false)
         fetchData()
         setLoading(false)
 
         setFormData({})
-      } else {
-        // Handle other response statuses
-        toast.error(`Error: ${response1.status} - ${response1.statusText}`)
-        setLoading(false)
-      }
+      
     } catch (error) {
       console.error('Error during submission:', error)
       let errorMessage = 'An error occurred'

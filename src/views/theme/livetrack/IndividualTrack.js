@@ -417,7 +417,7 @@ const IndividualTrack = () => {
                         />
                       </div>
                     </div>
-                    <div className="row gap-1 justify-content-center">
+                    <div className="row gap-3 justify-content-center">
                       <div className="col-2 text-center attribute shadow">
                         <strong>{`${individualSalesMan?.attributes?.ignition ? 'On' : 'Off'}`}</strong>
                         <br />
