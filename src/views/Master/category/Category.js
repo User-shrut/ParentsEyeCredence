@@ -42,6 +42,8 @@ import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF.
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
+import "../../../../src/app.css";
+
 
 const Category = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -54,8 +56,15 @@ const Category = () => {
   const [pageCount, setPageCount] = useState()
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage , setCurrentPage] = useState(1)
-  const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+
+  const handleEditModalClose = () => {
+    setFormData({})
+    setEditModalOpen(false)}
+
+
+  const handleAddModalClose = () => {
+    setFormData({})
+    setAddModalOpen(false)}
 
   const style = {
     position: 'absolute',
@@ -284,7 +293,7 @@ const Category = () => {
             <button
               onClick={() => setAddModalOpen(true)}
               variant="contained"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
               Add Category
             </button>

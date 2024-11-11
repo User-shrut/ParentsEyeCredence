@@ -51,6 +51,8 @@ import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react';
 import { cilSettings } from '@coreui/icons';
+import "../../../../src/app.css";
+
 
 const Model = () => {
   const [data, setData] = useState([]);
@@ -293,7 +295,7 @@ const Model = () => {
           <button
             onClick={handleAddModalOpen} // Open add modal on button click
             variant="contained"
-            className="btn btn-primary"
+            className="btn btn-secondary"
           >
             Add Model
           </button>

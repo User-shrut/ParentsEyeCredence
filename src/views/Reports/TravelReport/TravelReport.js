@@ -249,7 +249,7 @@ const SearchTrip = ({
         <div className="d-flex justify-content-end">
           <div className="btn-group">
             <button
-              className="btn btn-primary"
+              className="btn btn-secondary"
               type="submit"
               onClick={() => handleDropdownClick('SHOW NOW')}
             >

@@ -194,7 +194,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
       <CCol xs={12} >
         <div className="d-flex justify-content-end">
           <div className="btn-group">
-            <button className="btn btn-primary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
+            <button className="btn btn-secondary " type="button" onClick={() => handleDropdownClick('SHOW NOW')}>
               {buttonText}
             </button>
             {/* <button

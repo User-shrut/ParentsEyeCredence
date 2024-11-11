@@ -41,6 +41,8 @@ import carRed from '../../assets/vehicleList/Car/carRed.svg'
 import carYellow from '../../assets/vehicleList/Car/carYellow.svg'
 import carOrange from '../../assets/vehicleList/Car/carOrange.svg'
 import carGray from '../../assets/vehicleList/Car/carGray.svg'
+import white from '../../assets/vehicleList/Car/white.svg'
+
 
 //==============================BIKE========================================
 import bikeGreen from '../../assets/vehicleList/Bike/bikeGreen.svg'
@@ -91,6 +93,8 @@ dayjs.extend(duration)
 import Cookies from 'js-cookie'
 import ReactPaginate from 'react-paginate'
 import axios from 'axios'
+import '../../app.css'
+
 
 const Dashboard = () => {
   const dispatch = useDispatch()
@@ -365,7 +369,7 @@ const Dashboard = () => {
                       <div className="vehicle-count fs-4 fw-bold">{allVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carGray} alt="All Vehicles" />
+                      <img style={{ width: '5rem' }} src={white} alt="All Vehicles" />
                     </div>
                   </div>
                 </CCol>

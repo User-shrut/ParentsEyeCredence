@@ -50,6 +50,8 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import AddDeviceModal from './AddDeviceForm'
 import EditDeviceModal from './EditDeviceForm'
+import "../../../../src/app.css";
+
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -856,7 +858,7 @@ const Devices = () => {
               <button
                 onClick={() => setAddModalOpen(true)}
                 variant="contained"
-                className="btn btn-primary"
+                className="btn btn-secondary"
               >
                 Add Device
               </button>
