@@ -196,22 +196,22 @@ td {
 }
 
 
-
+/* vehicle cart */
 .vehicle-card {
   background-color: #fff;
   border-radius: 12px;  /* Rounded corners */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Align items in a row */
   align-items: center;
-  padding: 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 22vh;  /* Compact card size */
   justify-content: space-between;
   text-align: center;
   border: 2px solid transparent;  /* Default border */
   width: 100%;
+  height: 12vh; /* Reduced height for a smaller card */
 }
 
 .vehicle-card:hover {
@@ -220,21 +220,27 @@ td {
 }
 
 .vehicle-info {
-  margin-bottom: 0.5rem;
+  flex-grow: 1;
+  margin-left: 0.5rem;
+  text-align: left; /* Align text to the left */
 }
 
 .vehicle-type {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #6c757d;
 }
 
 .vehicle-count {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
 .vehicle-icon {
-  margin-top: 0.5rem;
+  margin-right: 0.5rem; /* Slight margin to the right */
+}
+
+.vehicle-icon img {
+  width: 3.5rem; /* Adjusted image size */
 }
 
 .vehicle-card.all-vehicles {

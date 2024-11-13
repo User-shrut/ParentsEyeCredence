@@ -52,7 +52,7 @@ const AppHeaderDropdown = () => {
         <VscAccount />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end" style={{ width: '200px' }}>
-        <CDropdownHeader className="bg-body-secondary fw-semibold mb-2 text-center">
+        <CDropdownHeader className="fw-semibold mb-2 text-center" style={{ backgroundColor: "#6c757d", color: "white" }} >
           Account
         </CDropdownHeader>
         <div className="px-2">

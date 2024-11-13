@@ -678,7 +678,7 @@ const Trips = () => {
 
       // console.log(response.data.deviceDataByTrips[0]);
 
-      if (response.status == 201) {
+      if (response.status == 200) {
         console.log(response.data.finalTrip)
         console.log('done in all')
         console.log(response.data)

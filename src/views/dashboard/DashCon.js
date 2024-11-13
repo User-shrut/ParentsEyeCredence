@@ -357,7 +357,7 @@ const Dashboard = () => {
 
               {/* <br /> */}
 
-              <CRow className="justify-content-around my-3">
+              <CRow className="justify-content-around my-3 mb-2">
                 {/* All Vehicles */}
                 <CCol xs={12} md={2} xl={2} className="count-col mb-3">
                   <div
@@ -365,11 +365,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterAllVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">All</div>
+                      <div className="vehicle-type text-muted"><strong>All</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{allVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={white} alt="All Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={white} alt="All Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -381,11 +381,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterRunningVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">Running</div>
+                      <div className="vehicle-type text-muted"><strong>Running</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{runningVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carGreen} alt="Running Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={carGreen} alt="Running Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -397,11 +397,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterStoppedVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">Stopped</div>
+                      <div className="vehicle-type text-muted"><strong>Stopped</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{stoppedVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carRed} alt="Stopped Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={carRed} alt="Stopped Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -413,11 +413,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterIdleVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">Idle</div>
+                      <div className="vehicle-type text-muted"><strong>Idle</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{idleVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carYellow} alt="Idle Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={carYellow} alt="Idle Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -429,11 +429,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterOverspeedVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">Overspeed</div>
+                      <div className="vehicle-type text-muted"><strong>OverSpeed</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{overspeedVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carOrange} alt="Overspeed Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={carOrange} alt="Overspeed Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -445,11 +445,11 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterInactiveVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted">Inactive</div>
+                      <div className="vehicle-type text-muted"><strong>Inactive</strong></div>
                       <div className="vehicle-count fs-4 fw-bold">{inactiveVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
-                      <img style={{ width: '5rem' }} src={carGray} alt="Inactive Vehicles" />
+                      <img style={{ width: '3.5rem' }} src={carGray} alt="Inactive Vehicles" />
                     </div>
                   </div>
                 </CCol>
@@ -458,13 +458,13 @@ const Dashboard = () => {
               {/* <hr />
               <br /> */}
 
-              <div className="table-container" style={{ overflowY: 'auto' }}>
-                <CTable className="my-3 border vehiclesTable mt-0" hover responsive>
+              <div className="table-container" style={{ overflowY: 'auto', }}>
+                <CTable  className="my-2 border vehiclesTable mt-0" hover responsive>
                   <CTableHead
                     className="text-nowrap"
                     style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
                   >
-                    <CTableRow>
+                    <CTableRow >
                       {visibleColumns.srNo && (
                         <CTableHeaderCell
                           className="bg-body-tertiary text-center sr-no table-cell"

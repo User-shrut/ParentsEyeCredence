@@ -278,7 +278,7 @@ const AppHeader = () => {
             <CDropdownMenu>
               <CDropdownItem
                 active={colorMode === 'light'}
-                className="d-flex align-items-center"
+                className="d-flex align-items-center custom-dropdown-item"
                 as="button"
                 type="button"
                 onClick={() => setColorMode('light')}
@@ -287,7 +287,7 @@ const AppHeader = () => {
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'dark'}
-                className="d-flex align-items-center"
+                className="d-flex align-items-center custom-dropdown-item"
                 as="button"
                 type="button"
                 onClick={() => setColorMode('dark')}
@@ -296,7 +296,7 @@ const AppHeader = () => {
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'auto'}
-                className="d-flex align-items-center"
+                className="d-flex align-items-center custom-dropdown-item"
                 as="button"
                 type="button"
                 onClick={() => setColorMode('auto')}
@@ -305,6 +305,7 @@ const AppHeader = () => {
               </CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
+
 
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
