@@ -688,9 +688,9 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="flex-grow-1 rounded-3 overflow-hidden">
-        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-          <CTableHead className="text-nowrap ">
+      <div className="flex-grow-1 rounded-3 overflow-hidden" style={{border: '1px solid black'}}>
+        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+          <CTableHead className="text-nowrap " >
             <CTableRow>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 SN
@@ -740,16 +740,16 @@ const Users = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index} className="p-0">
-                  <CTableDataCell className='text-center p-0'>{(currentPage - 1) * limit + index + 1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">{item.username}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">{item.email}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">
+                  <CTableDataCell className='text-center p-0'  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.username}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.email}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                     {item.mobile || 'N/A'}
                   </CTableDataCell>
 
                   {/* Master Column */}
-                  <CTableDataCell className="text-center p-0">
-                    <CFormSelect id="periods" className="w-75 text-center border-0">
+                  <CTableDataCell className="text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                    <CFormSelect id="periods" className=" text-center border-2"  style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",   }} >
                       <option value="">Master</option>
                       {[
                         'users',
@@ -771,8 +771,8 @@ const Users = () => {
                   </CTableDataCell>
 
                   {/* Reports Column */}
-                  <CTableDataCell className="align-items-center p-0">
-                    <CFormSelect id="periods" className="w-75 text-center border-0">
+                  <CTableDataCell className="align-items-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
+                    <CFormSelect id="periods" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",   }}>
                       <option value="">Reports</option>
                       {[
                         'history',
@@ -796,8 +796,8 @@ const Users = () => {
                     </CFormSelect>
                   </CTableDataCell>
                   <CTableDataCell
-                    className="text-center d-flex p-0"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                    className="text-center d-flex "
+                    style={{ justifyContent: 'center', alignItems: 'center',  backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                   >
                     <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                       <RiEdit2Fill
@@ -853,6 +853,7 @@ const Users = () => {
           <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
+      <br/>
       <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}
