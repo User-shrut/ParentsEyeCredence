@@ -866,6 +866,7 @@ const Devices = () => {
           )}
         </div>
       </div>
+      
       <TableContainer
         component={Paper}
         sx={{
@@ -874,21 +875,22 @@ const Devices = () => {
           overflowY: 'auto', // Enable vertical scrollbar if needed
           marginBottom: '10px',
           borderRadius: '10px',
+          border: '1px solid black'
         }}
       >
-        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-              <CTableHeaderCell className="text-center text-white bg-secondary">
+        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+          <CTableHead className="text-nowrap" >
+            <CTableRow style={{height:'6vh' ,  }} >
+              <CTableHeaderCell className="text-center text-white bg-secondary" >
                 SN
-              </CTableHeaderCell>
+              </CTableHeaderCell >
               {columns.slice(1).map((column, index) => (
-                <CTableHeaderCell key={index} className="text-center text-white bg-secondary">
+                <CTableHeaderCell key={index} className="text-center text-white bg-secondary" >
                   {column.Header}
                 </CTableHeaderCell>
               ))}
               {decodedToken.superadmin ? (
-                <CTableHeaderCell className="text-white text-center bg-secondary">
+                <CTableHeaderCell className="text-center text-white bg-secondary " >
                   Actions
                 </CTableHeaderCell>
               ) : null}
@@ -896,7 +898,7 @@ const Devices = () => {
           </CTableHead>
           <CTableBody>
             {loading ? (
-              <CTableRow key="loading">
+              <CTableRow key="loading"  style={{border:'1px soild black'}}>
                 <CTableDataCell colSpan="16" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
@@ -917,14 +919,14 @@ const Devices = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell>{currentPage * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", border: 'none'}}>{currentPage * limit + index + 1}</CTableDataCell>
                   {columns.slice(1).map((column) => (
-                    <CTableDataCell key={column.accessor} className="text-center">
+                    <CTableDataCell key={column.accessor} className="text-center"   style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                       {column.accessor === 'groups' ? (
                         <CFormSelect
                           id="groups"
-                          className=" text-center border-0"
-                          style={{ width: '100px' }}
+                          className=" text-center border-2"
+                          style={{ width: '100px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                         >
                           <option>{item.groups?.length || '0'}</option>
                           {Array.isArray(item.groups) &&
@@ -937,8 +939,8 @@ const Devices = () => {
                       ) : column.accessor === 'geofences' ? (
                         <CFormSelect
                           id="geofence"
-                          className=" text-center border-0"
-                          style={{ width: '120px' }}
+                          className=" text-center border-2"
+                          style={{ width: '120px' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                         >
                           <option value="">{item.geofences?.length || '0'}</option>
                           {Array.isArray(item.geofences) &&
@@ -951,8 +953,8 @@ const Devices = () => {
                       ) : column.accessor === 'users' ? (
                         <CFormSelect
                           id="users"
-                          className=" text-center border-0"
-                          style={{ width: '120px' }}
+                          className=" text-center border-2"
+                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",  }}
                         >
                           <option value="">{item.users?.length || '0'}</option>
                           {Array.isArray(item.users) &&
@@ -1004,7 +1006,9 @@ const Devices = () => {
             )}
           </CTableBody>
         </CTable>
+        
       </TableContainer>
+
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"

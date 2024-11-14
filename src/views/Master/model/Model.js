@@ -303,8 +303,16 @@ const Model = () => {
       </div>
 
       {/* Table */}
-      <TableContainer component={Paper} style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-        <CTable align="middle" className="mb-0 border" hover responsive>
+      <TableContainer component={Paper} sx={{
+          height: 'auto', // Set the desired height
+          overflowX: 'auto', // Enable horizontal scrollbar
+          overflowY: 'auto', // Enable vertical scrollbar if needed
+          marginBottom: '10px',
+          borderRadius: '10px',
+          border: '1px solid black'
+        }}>
+
+        <CTable bordered align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
             <CTableHeaderCell className=" text-center text-white bg-secondary">SN</CTableHeaderCell>
@@ -335,9 +343,9 @@ const Model = () => {
             ) : (filteredData.length > 0 ? (
               filteredData.map((item , index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell className="text-center">{ index+1}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.modelName}</CTableDataCell>
-                  <CTableDataCell className="text-center">
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{ index+1}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{item.modelName}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >
                     {/* Row layout for the icons */}
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
                       <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>

@@ -396,9 +396,16 @@ const Driver = () => {
 
       <TableContainer
         component={Paper}
-        style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
+        sx={{
+          height: 'auto', // Set the desired height
+          overflowX: 'auto', // Enable horizontal scrollbar
+          overflowY: 'auto', // Enable vertical scrollbar if needed
+          marginBottom: '10px',
+          borderRadius: '10px',
+          border: '1px solid black'
+        }}
       >
-        <CTable align="middle" className="mb-0 border" hover responsive>
+        <CTable bordered align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow className='bg-body-tertiary'>
             <CTableHeaderCell
@@ -463,17 +470,17 @@ const Driver = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="text-center">{(currentPage - 1) * limit + index+1 }</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.name}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.phone}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.email}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.device}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.licenseNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.aadharNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center">{item.address}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{(currentPage - 1) * limit + index+1 }</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.name}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.phone}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.email}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.device}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.licenseNumber}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.aadharNumber}</CTableDataCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.address}</CTableDataCell>
                   <CTableDataCell
                     className="text-center d-flex"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"  }}
                   >
                     <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
                       <RiEdit2Fill

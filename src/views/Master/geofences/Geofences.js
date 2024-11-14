@@ -484,8 +484,17 @@ const Geofences = () => {
 
       <div className="row">
         <div className="col-12 col-md-6 position-relative">
-          <TableContainer component={Paper} style={{ maxHeight: '800px', marginBottom: '10px' }}>
-            <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <TableContainer  component={Paper} 
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                marginBottom: '10px',
+                borderRadius: '10px',
+                border: '1px solid black'
+              }}>
+
+            <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
               <CTableHead className="text-nowrap">
                 <CTableRow>
                 <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
@@ -529,14 +538,14 @@ const Geofences = () => {
                 ) : filteredData.length > 0 ? (
                   filteredData?.map((item, index) => (
                     <CTableRow key={index}>
-                      <CTableDataCell className="ps-3 text-start p-0">{(currentPage - 1) * limit + index+1}</CTableDataCell>
-                      <CTableDataCell className="ps-3 text-start p-0">{item.name}</CTableDataCell>
-                      <CTableDataCell className="text-start p-0">{item.type}</CTableDataCell>
-                      <CTableDataCell className="text-center p-0">
+                      <CTableDataCell className="ps-3 text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index+1}</CTableDataCell>
+                      <CTableDataCell className="ps-3 text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.name}</CTableDataCell>
+                      <CTableDataCell className="text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.type}</CTableDataCell>
+                      <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}  >
                         <CFormSelect
                           id="geofence"
-                          className=" text-center border-0"
-                          style={{ width: '120px' }}
+                          className=" text-center border-2 "
+                          style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}}
                         >
                           <option value="">{item.deviceIds.length || '0'}</option>
                           {Array.isArray(item.deviceIds) &&
@@ -549,7 +558,8 @@ const Geofences = () => {
                       </CTableDataCell>
                       <CTableDataCell
                         className="text-center d-flex p-0"
-                        style={{ justifyContent: 'center', alignItems: 'center' }}
+                        style={{ justifyContent: 'center', alignItems: 'center' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+
                       >
                         <IconButton aria-label="edit" onClick={() => handleEditGeofence(item)}>
                           <RiEdit2Fill

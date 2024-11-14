@@ -318,9 +318,16 @@ const Group = () => {
 
       <TableContainer
         component={Paper}
-        style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
+        sx={{
+          height: 'auto', // Set the desired height
+          overflowX: 'auto', // Enable horizontal scrollbar
+          overflowY: 'auto', // Enable vertical scrollbar if needed
+          marginBottom: '10px',
+          borderRadius: '10px',
+          border: '1px solid black'
+        }}
       >
-        <CTable align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
             <CTableHeaderCell className=" text-center text-white bg-secondary">
@@ -361,11 +368,12 @@ const Group = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0">{(currentPage -1 ) * limit + index+1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0">{item.name}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage -1 ) * limit + index+1}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>{item.name}</CTableDataCell>
                   <CTableDataCell
                     className="text-center d-flex p-0"
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                    
                   >
                     <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
                       <RiEdit2Fill
