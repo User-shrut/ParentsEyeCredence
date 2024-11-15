@@ -97,7 +97,7 @@ const SearchIdeal = ({
       validated={validated}
       onSubmit={handleFormSubmit}
     >
-      <CCol md={2}>
+      <CCol md={3}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
         <CFormSelect
           id="user"
@@ -438,10 +438,10 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                 row.data
                   .map((nestedRow, nestedIndex) => (
                     <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                      <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                      <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
 
                       {selectedColumns.map((column, index) => (
-                        <CTableDataCell key={index}>
+                        <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                           {column === 'Vehicle Status'
                             ? (
                               nestedRow.vehicleStatus === 'Idle' ? (

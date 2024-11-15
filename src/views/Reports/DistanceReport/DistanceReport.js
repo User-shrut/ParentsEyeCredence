@@ -396,17 +396,17 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
               apiData?.data && apiData.data.length > 0 ? (
                 apiData.data.map((row, rowIndex) => (
                   <CTableRow key={row.deviceId} className="custom-row">
-                    <CTableDataCell>{rowIndex + 1}</CTableDataCell>
-                    <CTableDataCell>{findDeviceName(row.deviceId)}</CTableDataCell>
+                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
+                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{findDeviceName(row.deviceId)}</CTableDataCell>
 
                     {/* Dynamically render table cells based on the date range */}
                     {allDates.map((date, index) => (
-                      <CTableDataCell key={index} >
+                      <CTableDataCell key={index}  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >
                         {/* Check if the date exists in the row, otherwise print '0' */}
                         {row[date] !== undefined ? `${row[date]} km` : '0 km'}
                       </CTableDataCell>
                     ))}
-                    <CTableDataCell>
+                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                       {calculateTotalDistance(row).toFixed(2)}
                       <span> km</span>
                     </CTableDataCell>

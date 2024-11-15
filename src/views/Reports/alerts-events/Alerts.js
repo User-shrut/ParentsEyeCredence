@@ -100,24 +100,31 @@ const Alerts = () => {
 
       <TableContainer
         component={Paper}
-        style={{ maxHeight: '800px', overflowY: 'scroll', marginBottom: '10px' }}
+        sx={{
+          height: 'auto', // Set the desired height
+          overflowX: 'auto', // Enable horizontal scrollbar
+          overflowY: 'auto', // Enable vertical scrollbar if needed
+          marginBottom: '10px',
+          borderRadius: '10px',
+          border: '1px solid black'
+        }}
       >
-        <CTable align="middle" className="mb-0 border" hover responsive >
+        <CTable bordered align="middle" className="mb-0 border" hover responsive >
           <CTableHead className="text-nowrap">
             <CTableRow className="bg-body-tertiary">
-              <CTableHeaderCell className=" text-start ps-4 text-white bg-secondary">
+              <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
                 SN 
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-start text-white bg-secondary">
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Device Name
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-start text-white bg-secondary">
-                Notification Type
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
+                Notification
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Location
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-start text-white bg-secondary">
+              <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Message
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
@@ -147,13 +154,13 @@ const Alerts = () => {
               </CTableRow>
             ) : data.length > 0 ? (
               data?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-start ps-4">{index + 1}</CTableDataCell>
-                  <CTableDataCell className="text-start ps-4">{item.name}</CTableDataCell>
-                  <CTableDataCell className="text-start">{item.type}</CTableDataCell>
-                  <CTableDataCell className="text-center">show location</CTableDataCell>
-                  <CTableDataCell className="text-start">{item.message}</CTableDataCell>
-                  <CTableDataCell className="text-end pe-4">{`${item.createdAt.slice(0,10)} ${item.createdAt.slice(11,19)}`}</CTableDataCell>
+                <CTableRow key={index} >
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center ps-4">{index + 1}</CTableDataCell>
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center ps-4">{item.name}</CTableDataCell>
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">{item.type}</CTableDataCell>
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">show location</CTableDataCell>
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">{item.message}</CTableDataCell>
+                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center pe-4">{`${item.createdAt.slice(0,10)} ${item.createdAt.slice(11,19)}`}</CTableDataCell>
                 </CTableRow>
               ))
             ) : (

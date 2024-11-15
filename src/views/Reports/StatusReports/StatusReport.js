@@ -496,11 +496,11 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
             apiData?.data && apiData.data.length > 0 ? (
               apiData.data.map((row, rowIndex) => (
                 <CTableRow key={row.id} className="custom-row">
-                  <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                  <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
                   {/* Dynamically render table cells based on selected columns */}
                   {selectedColumns.map((column, index) => (
                     <>
-                      <CTableDataCell key={index}>
+                      <CTableDataCell key={index}  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                         {column === 'Vehicle Status' ? (
                           row.vehicleStatus === 'Idle' ? (
                             <>

@@ -402,11 +402,11 @@ const StopTable = ({ apiData, selectedColumns }) => {
           {apiData?.finalDeviceDataByStopage?.length > 0 ? (
             apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
               <CTableRow key={row.id || rowIndex} className="custom-row">
-                <CTableDataCell>{rowIndex + 1}</CTableDataCell>
+                <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
 
                 {/* Dynamically render table cells based on selected columns */}
                 {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index}>
+                  <CTableDataCell key={index}  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                     {column === 'Speed' ? (
                       // Convert speed from m/s to km/h and format to 2 decimal places
                       // (row.speed * 3.6).toFixed(2) + ' km/h'

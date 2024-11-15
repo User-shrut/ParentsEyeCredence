@@ -426,11 +426,11 @@ const TripTable = ({ apiData, selectedColumns }) => {
             apiData.finalTrip.map((row, rowIndex) => (
               <CTableRow key={row.id || rowIndex} className="custom-row">
                 {/* Device ID Cell */}
-                <CTableDataCell>{row.name}</CTableDataCell>
+                <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{row.name}</CTableDataCell>
 
                 {/* Dynamically render table cells based on selected columns */}
                 {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index}>
+                  <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                     {column === 'Start Time'
                       ? // Add 6 hours 30 minutes to startTime
                       new Date(
