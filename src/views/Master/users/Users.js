@@ -30,6 +30,8 @@ import {
   StepLabel,
   InputAdornment,
   Select,
+  DialogTitle,
+  DialogActions,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
@@ -645,6 +647,90 @@ const Users = () => {
   }
 
 
+  // add group
+
+  // State to manage dialog and new group name
+  const [openNewGroupDialog, setOpenNewGroupDialog] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+
+  // Function to handle opening the "Add New Group" dialog
+  const handleNewGroup = () => {
+    setOpenNewGroupDialog(true);
+  };
+  
+ // Function to fetch the list of groups (GET request)
+ const fetchGroupsData = async () => {
+  const accessToken = Cookies.get('authToken');  // Retrieve the stored access token
+  try {
+    // Making a GET request to fetch groups from the API
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log('Fetched groups: ', data.groups);
+    setGroups(data.groups);  // Update the groups state with fetched data
+  } catch (error) {
+    console.error('Error fetching groups:', error);
+    toast.error('Failed to fetch groups');
+  }
+};
+
+// Function to handle the API call for adding a new group (POST request)
+const createNewGroup = async () => {
+  console.log('Save button clicked');
+
+  // Check if the new group name is valid (not empty or just spaces)
+  if (newGroupName.trim()) {
+    try {
+      const accessToken = Cookies.get('authToken');  // Get the access token from cookies
+
+      // Sending a POST request to create the new group
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/group`,
+        { name: newGroupName },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        toast.success('Group created successfully');
+
+        // Fetch updated list of groups after creating a new one
+        await fetchGroupsData();  // Fetch groups to refresh the list
+
+        // Reset dialog and input field after success
+        setOpenNewGroupDialog(false);
+        setNewGroupName('');
+      }
+    } catch (error) {
+      console.error('Error creating group:', error);
+      toast.error('An error occurred while creating the group');
+    }
+  } else {
+    // Show a warning if the group name is empty
+    toast.warn('Group name cannot be empty');
+  }
+};
+
+// Using useEffect to fetch the groups list when the component mounts
+useEffect(() => {
+  fetchGroups();
+}, []);
+
+  
+
   //  ####################################################
 
   return (
@@ -688,30 +774,30 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="flex-grow-1 rounded-3 overflow-hidden" style={{border: '1px solid black'}}>
-        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+      <div className="flex-grow-1 rounded-3 overflow-hidden" style={{ border: '1px solid black' }}>
+        <CTable style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
           <CTableHead className="text-nowrap " >
             <CTableRow>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
-                SN
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>SN</strong> 
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Name
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Name</strong>
               </CTableHeaderCell>
-              <CTableHeaderCell className="text-center text-white bg-secondary">
-                Email
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Email</strong>
               </CTableHeaderCell>
-              <CTableHeaderCell className="text-center text-white bg-secondary">
-                Mobile No.
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Mobile No.</strong>
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Master Permissions
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Master Permissions</strong> 
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Reports Permissions
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Reports Permissions</strong> 
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Actions
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Actions</strong>
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -740,16 +826,16 @@ const Users = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={index} className="p-0">
-                  <CTableDataCell className='text-center p-0'  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index + 1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.username}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.email}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                  <CTableDataCell className='text-center p-0' style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.username}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.email}</CTableDataCell>
+                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                     {item.mobile || 'N/A'}
                   </CTableDataCell>
 
                   {/* Master Column */}
-                  <CTableDataCell className="text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
-                    <CFormSelect id="periods" className=" text-center border-2"  style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",   }} >
+                  <CTableDataCell className="text-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                    <CFormSelect id="periods" className=" text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                       <option value="">Master</option>
                       {[
                         'users',
@@ -771,8 +857,8 @@ const Users = () => {
                   </CTableDataCell>
 
                   {/* Reports Column */}
-                  <CTableDataCell className="align-items-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
-                    <CFormSelect id="periods" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",   }}>
+                  <CTableDataCell className="align-items-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
+                    <CFormSelect id="periods" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
                       <option value="">Reports</option>
                       {[
                         'history',
@@ -797,7 +883,7 @@ const Users = () => {
                   </CTableDataCell>
                   <CTableDataCell
                     className="text-center d-flex "
-                    style={{ justifyContent: 'center', alignItems: 'center',  backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                   >
                     <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                       <RiEdit2Fill
@@ -853,7 +939,7 @@ const Users = () => {
           <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      <br/>
+      <br />
       <div className='d-flex justify-content-center align-items-center'>
         <div className="d-flex">
           {/* Pagination */}
@@ -956,7 +1042,6 @@ const Users = () => {
                   onChange={handleInputChange}
                   sx={{ marginBottom: '10px' }}
                   fullWidth
-                  // required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -1002,22 +1087,75 @@ const Users = () => {
                     ),
                   }}
                 />
+
+                {/* // Form control with "Add New Group" option */}
                 <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
                   <InputLabel>Groups</InputLabel>
                   <Select
-                    name="groupsAssigned" // Should match the key in formData
-                    value={formData.groupsAssigned || []} // This is already an array in formData
-                    onChange={handleInputChange}
+                    name="groupsAssigned"
+                    value={formData.groupsAssigned || []}
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // Check if "Add New Group" option is selected
+                      if (value.includes("new")) {
+                        // Remove "new" from the selected values
+                        const newValue = value.filter((item) => item !== "new");
+                        handleInputChange({
+                          target: {
+                            name: e.target.name,
+                            value: newValue,
+                          },
+                        });
+
+                        // Open the "Add New Group" dialog
+                        handleNewGroup();
+                      } else {
+                        handleInputChange(e);
+                      }
+                    }}
                     label="Groups"
                     multiple
                   >
+                      <MenuItem value="new" sx={{ fontStyle: "italic" }}>
+                      + Add New Group
+                    </MenuItem>
+                    
                     {groups.map((group) => (
                       <MenuItem key={group._id} value={group._id}>
                         {group.name}
                       </MenuItem>
                     ))}
+                  
                   </Select>
                 </FormControl>
+
+                {/* // Dialog for creating a new group */}
+                <Dialog open={openNewGroupDialog} onClose={() => setOpenNewGroupDialog(false)}>
+                  <DialogTitle>Create New Group</DialogTitle>
+                  <DialogContent>
+                    <TextField
+                      label="Group Name"
+                      value={newGroupName}
+                      onChange={(e) => setNewGroupName(e.target.value)}
+                      fullWidth
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setOpenNewGroupDialog(false)}>Cancel</Button>
+                    <Button
+                      onClick={() => {
+                        createNewGroup();
+                        setOpenNewGroupDialog(false); // Close the dialog after saving
+                      }}
+                      disabled={!newGroupName.trim()}
+                    >
+                      Save
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+
               </div>
             )}
 
