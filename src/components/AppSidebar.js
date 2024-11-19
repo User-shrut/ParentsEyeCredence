@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import {
   CCloseButton,
+  CHeaderToggler,
   CSidebar,
   CSidebarBrand,
   CSidebarFooter,
@@ -22,6 +23,7 @@ import navigation from '../_nav'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useNavigate } from 'react-router-dom'
+import { cilDelete, cilMenu } from '@coreui/icons'
 
 // const getUserRole = () => {
 //   const navigate = useNavigate()
@@ -55,11 +57,15 @@ const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
+  
   const navigate = useNavigate()
 
   const [decodedToken, setDecodedToken] = useState(null)
   const [navigatingNav, setNavigatingNav] = useState(null)
   const token = Cookies.get('authToken')
+
+  const toggle = useSelector((state) => state.navbar)
+
 
   useEffect(() => {
     if (!token) {
@@ -88,10 +94,18 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      <CSidebarHeader className="border-bottom">
+      <CSidebarHeader className="borderless-bottom">
         <CSidebarBrand to="/dashboard">
-          <img src={logo} alt="Logo" className="sidebar-brand-full" height={55} width={200} />
+          {/* <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} /> */}
+
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
+          <CHeaderToggler
+            onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+            style={{ marginInlineStart: '200px' }}
+          >
+            <CIcon icon={cilDelete} size="xl"  />
+          </CHeaderToggler>
+
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

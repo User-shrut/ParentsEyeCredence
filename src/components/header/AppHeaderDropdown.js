@@ -59,7 +59,7 @@ const AppHeaderDropdown = () => {
           <h3 className="text-center my-0">{(decodedToken && decodedToken.user) ? decodedToken.user.username.slice(0, 12) : decodedToken?.username && decodedToken.username.slice(0, 12)}</h3>
           <p className="text-center small mb-3 mt-0">{(decodedToken && decodedToken.user) ? 'User' : 'SuperAdmin'}</p>
         </div>
-        <CDropdownItem href="#">
+        <CDropdownItem href="/help-support">
           <BiSupport className="me-3 fs-5" />
           Help & Support
         </CDropdownItem>

@@ -6,6 +6,7 @@ import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 
 import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
+import { useSelector } from 'react-redux'
 
 export const AppSidebarNav = ({ items }) => {
   const navLink = (name, icon, badge, indent = false) => {
@@ -55,12 +56,41 @@ export const AppSidebarNav = ({ items }) => {
       </Component>
     )
   }
+  const {home,master,reports,expense,support} = useSelector((state) => state.navbar)
 
-  return (
-    <CSidebarNav as={SimpleBar}>
+
+  return (<>
+    {home &&
+    (<CSidebarNav as={SimpleBar}>home
+      {items &&
+        items.map((item, index) => (item.items ? navGroup(item, index): navItem(item, index)))
+        }
+    </CSidebarNav>)}
+
+    {master &&
+    (<CSidebarNav as={SimpleBar}>master
       {items &&
         items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
-    </CSidebarNav>
+    </CSidebarNav>)}
+
+    {reports &&
+    (<CSidebarNav as={SimpleBar}>reports
+      {items &&
+        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+    </CSidebarNav>)}
+
+    {expense &&
+    (<CSidebarNav as={SimpleBar}>Expense
+      {items &&
+        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+    </CSidebarNav>)}
+
+    {support &&
+    (<CSidebarNav as={SimpleBar}>support
+      {items &&
+        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+    </CSidebarNav>)}
+    </>
   )
 }
 

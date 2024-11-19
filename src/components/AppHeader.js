@@ -51,6 +51,11 @@ import { io } from 'socket.io-client';
 import notificationSound from '../../src/Google_Event.mp3';
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
+import logo from 'src/assets/brand/logo.png'
+import { setToggleSidebar } from '../features/navSlice.js'
+import { FaAddressCard, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
+import { TbReportSearch } from 'react-icons/tb'
+import { MdOutlineSupportAgent } from 'react-icons/md'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -59,6 +64,8 @@ const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
   const { filteredVehicles } = useSelector((state) => state.liveFeatures)
+  const toggle = useSelector((state) => state.navbar)
+  console.log(toggle, "nave baajdasjdjasdkjashd");
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -159,6 +166,30 @@ const AppHeader = () => {
 
   }, [])
 
+  // Reducer of side bar nav open
+
+  const handleHome = () => {
+    dispatch({ type: 'set', sidebarShow: true })
+    dispatch(setToggleSidebar({ home: true, master: false, reports: false, expense: false, support: false }))
+  }
+  const handleMaster = () => {
+    dispatch({ type: 'set', sidebarShow: true })
+    dispatch(setToggleSidebar({ home: false, master: true, reports: false, expense: false, support: false }))
+  }
+  const handleReports = () => {
+    dispatch({ type: 'set', sidebarShow: true })
+    dispatch(setToggleSidebar({ home: false, master: false, reports: true, expense: false, support: false }))
+  }
+
+  const handleExpense = () => {
+    dispatch({ type: 'set', sidebarShow: true })
+    dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: true, support: false }))
+  }
+  const handleSupports = () => {
+    dispatch({ type: 'set', sidebarShow: true })
+    dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: false, support: true }))
+  }
+
   // #########################################################
 
   return (
@@ -166,98 +197,87 @@ const AppHeader = () => {
       <CContainer className="border-bottom px-4" fluid>
         <CHeaderToggler
           onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-          style={{ marginInlineStart: '-14px' }}
+          style={{ marginInlineStart: '-30px' }}
         >
-          <CIcon icon={cilMenu} size="lg" />
+          {/* <CIcon icon={cilMenu} size="lg" /> */}
         </CHeaderToggler>
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink id='header-dashboard' to="/dashboard" as={NavLink}>
-              Dashboard
+              <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} style={{ marginInlineStart: '-30px' }} />
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
 
-        {isDashboard && (
-          <CHeaderNav className="ms-auto">
-            <select
-              className="form-select header-inputs"
-              aria-label="Default select example"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option selected>Status</option>
-              <option value="all">All</option>
-              <option value="running">Running</option>
-              <option value="idle">Idle</option>
-              <option value="stopped">Stop</option>
-              <option value="overspeed">OverSpeed</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </CHeaderNav>
-        )}
-
-        {isDashboard && (
-          <CHeaderNav className="ms-auto">
-            <select
-              className="form-select header-inputs"
-              aria-label="Default select example"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option selected>Select By Category</option>
-
-              <option value="car">Car</option>
-              <option value="bus">Bus</option>
-              <option value="motorcycle">Bike</option>
-              <option value="truck">Truck</option>
-              <option value="tractor">Tracktor</option>
-              <option value="crean">Crean</option>
-              <option value="jcb">JCB</option>
-            </select>
-          </CHeaderNav>
-        )}
-
-        {/* <CHeaderNav className="d-none d-md-flex">
-          <select class="form-select" aria-label="Default select example">
-            <option selected>Select by Name</option>
-            {deviceNames.map((name) => (
-              <option key={name} value={name}>
-                {' '}
-                {name}{' '}
-              </option>
-            ))}
-          </select>
-        </CHeaderNav> */}
-
-        {isDashboard && (
-          <CHeaderNav className="ms-auto">
-            <form className="d-flex" role="search">
-              <input
-                className="form-control me-2"
-                type="text"
-                placeholder="Search vehicles by name"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                aria-label="Search"
-              />
-            </form>
-          </CHeaderNav>
-        )}
-
-        {isDashboard && (
-          <CHeaderNav className="ms-auto">
-            {/* table cols filter  */}
-            <TableColumnVisibility />
-          </CHeaderNav>
-        )}
 
         <CHeaderNav className="ms-auto">
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem> */}
+          <button className="nav-btn" onClick={() => handleHome()}>
+            <FaHome className="nav-icon" /> Home
+          </button>
+        </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          <button className="nav-btn" onClick={() => handleMaster()}>
+            <FaAddressCard className="nav-icon" /> Master
+          </button>
+        </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          <button className="nav-btn" onClick={() => handleReports()}>
+            <FaChartBar className="nav-icon" /> Reports
+          </button>
+        </CHeaderNav>
+
+        <CHeaderNav className="ms-auto">
+          <button className="nav-btn" onClick={() => handleExpense()}>
+            <TbReportSearch className="nav-icon" /> Expense Management
+          </button>
+        </CHeaderNav>
+
+        {/* <CHeaderNav className="ms-auto">
+          <button className="nav-btn" onClick={() => handleSupports()}>
+            <MdOutlineSupportAgent className="nav-icon" /> Supports
+          </button>
+        </CHeaderNav> */}
+
+        <style jsx>{`
+  .nav-btn {
+    padding: 10px 20px; /* Padding for the button */
+    margin: 0 10px; /* Margin between buttons */
+    background-color: white; /* Light white background color */
+    color: #343a40; /* Dark gray text color */
+    border: none; /* Light border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease; /* Smooth transition */
+    display: flex;
+    align-items: center; /* Align icon and text */
+    justify-content: center; /* Center the content */
+  }
+
+  .nav-btn .nav-icon {
+    margin-right: 20px; /* Space between icon and text */
+    font-size: 18px; /* Icon size */
+  }
+
+  .nav-btn:hover {
+    background-color: #e2e6ea; /* Light gray background on hover */
+    border-color: #ccc; /* Darker border color on hover */
+    transform: scale(1.05); /* Slight scaling effect on hover */
+  }
+
+  .nav-btn:focus {
+    outline: none; /* Remove focus outline */
+  }
+
+  .nav-btn:active {
+    transform: scale(0.98); /* Slight shrink effect when active */
+  }
+`}</style>    
+
+        <CHeaderNav className="ms-auto">
+          
 
           <NotificationDropdown notifications={notifications} />
         </CHeaderNav>
@@ -318,3 +338,45 @@ const AppHeader = () => {
 }
 
 export default AppHeader
+
+
+  {/* this is comment perment         
+        <CHeaderNav className="d-none d-md-flex">
+          <select class="form-select" aria-label="Default select example">
+            <option selected>Select by Name</option>
+            {deviceNames.map((name) => (
+              <option key={name} value={name}>
+                {' '}
+                {name}{' '}
+              </option>
+            ))}
+          </select>
+        </CHeaderNav> */}
+
+        {/* {isDashboard && (
+          <CHeaderNav className="ms-auto">
+            <form className="d-flex" role="search">
+              <input
+                className="form-control me-2"
+                type="text"
+                placeholder="Search vehicles by name"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search"
+              />
+            </form>
+          </CHeaderNav>
+        )} */}
+
+        {/* {isDashboard && (
+          <CHeaderNav className="ms-auto">
+        
+            <TableColumnVisibility />
+          </CHeaderNav>
+        )} */}
+
+        {/* <CNavItem>
+            <CNavLink href="#">
+              <CIcon icon={cilBell} size="lg" />
+            </CNavLink>
+          </CNavItem> */}

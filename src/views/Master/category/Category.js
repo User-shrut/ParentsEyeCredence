@@ -321,18 +321,18 @@ const Category = () => {
           border: '1px solid black'
         }}
       >
-        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-            <CTableHeaderCell className=" text-center text-white bg-secondary">
+            <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                SN
               </CTableHeaderCell>
 
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                 Category Name
               </CTableHeaderCell>
 
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                 Actions
               </CTableHeaderCell>
             </CTableRow>

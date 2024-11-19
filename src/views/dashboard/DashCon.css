@@ -266,3 +266,19 @@ td {
 .vehicle-card.inactive-vehicles {
   border-left: 6px solid #6c757d;  /* Gray for Inactive */
 }
+
+
+/* filter row */
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.filter-btn {
+  color: #ff7a00 !important;
+}
+
+
