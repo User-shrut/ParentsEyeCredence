@@ -312,12 +312,12 @@ const Model = () => {
           border: '1px solid black'
         }}>
 
-        <CTable bordered align="middle" className="mb-0 border" hover responsive>
+        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-            <CTableHeaderCell className=" text-center text-white bg-secondary">SN</CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">Model Name</CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">Actions</CTableHeaderCell>
+            <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell "><strong>SN</strong></CTableHeaderCell>
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell "><strong>Model Name</strong></CTableHeaderCell>
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell "><strong>Actions</strong></CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>

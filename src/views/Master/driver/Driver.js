@@ -405,44 +405,44 @@ const Driver = () => {
           border: '1px solid black'
         }}
       >
-        <CTable bordered align="middle" className="mb-0 border" hover responsive>
+        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow className='bg-body-tertiary'>
             <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                SN
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>SN</strong> 
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Driver Name
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Driver Name</strong>
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Mobile No.
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Mobile No.</strong>
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Email
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Email</strong>
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Vehicle no.
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Vehicle no.</strong>
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Lic. No.
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+                <strong>Lic. No.</strong>
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Aadhar No.
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Aadhar No.</strong> 
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Address
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Address</strong> 
               </CTableHeaderCell>
               <CTableHeaderCell
-                className=" text-center text-white bg-secondary">
-                Actions
+                className=" text-center bg-body-secondary text-center sr-no table-cell">
+               <strong>Actions</strong>
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>

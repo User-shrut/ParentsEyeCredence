@@ -494,24 +494,24 @@ const Geofences = () => {
                 border: '1px solid black'
               }}>
 
-            <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+            <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
               <CTableHead className="text-nowrap">
                 <CTableRow>
-                <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
-                    SN
+                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                  <strong>SN</strong>
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="ps-3 text-start text-white bg-secondary">
-                    Geofence Name
+                  <CTableHeaderCell className="ps-3 text-center bg-body-secondary text-center sr-no table-cell">
+                   <strong>Geofence Name</strong> 
                   </CTableHeaderCell>
-                  <CTableHeaderCell className=" text-start text-white bg-secondary">
-                    Type
+                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                    <strong>Type</strong>
                   </CTableHeaderCell>
-                  <CTableHeaderCell className=" text-center text-white bg-secondary">
-                    Vehicles
+                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                   <strong>Vehicles</strong> 
                   </CTableHeaderCell>
 
-                  <CTableHeaderCell className=" text-center text-white bg-secondary">
-                    Actions
+                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                    <strong>Actions</strong>
                   </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -538,9 +538,9 @@ const Geofences = () => {
                 ) : filteredData.length > 0 ? (
                   filteredData?.map((item, index) => (
                     <CTableRow key={index}>
-                      <CTableDataCell className="ps-3 text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index+1}</CTableDataCell>
-                      <CTableDataCell className="ps-3 text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.name}</CTableDataCell>
-                      <CTableDataCell className="text-start p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.type}</CTableDataCell>
+                      <CTableDataCell className=" text-center"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index+1}</CTableDataCell>
+                      <CTableDataCell className=" text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.name}</CTableDataCell>
+                      <CTableDataCell className="text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.type}</CTableDataCell>
                       <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}  >
                         <CFormSelect
                           id="geofence"
