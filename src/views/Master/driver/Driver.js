@@ -450,7 +450,7 @@ const Driver = () => {
 
             {loading ? (
               <CTableRow>
-                <CTableDataCell colSpan="8" className="text-center">
+                <CTableDataCell colSpan="10" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
                       <span className="placeholder col-12" />
@@ -484,11 +484,11 @@ const Driver = () => {
                   >
                     <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
                       <RiEdit2Fill
-                        style={{ fontSize: '25px', color: 'lightBlue', margin: '5.3px' }}
+                        style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
                       />
                     </IconButton>
                     <IconButton aria-label="delete" onClick={() => deleteDriverSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '25px', color: 'red', margin: '5.3px' }} />
+                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '5.3px' }} />
                     </IconButton>
                   </CTableDataCell>
                 </CTableRow>

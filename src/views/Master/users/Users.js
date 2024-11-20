@@ -59,7 +59,7 @@ import {
 
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
-import { IoMdAdd } from 'react-icons/io'
+import { IoMdAdd, IoMdAddCircle } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons';
@@ -525,27 +525,36 @@ const Users = () => {
   //  ######################### delete user #########################
 
   const deleteUserSubmit = async (item) => {
-    confirm('you want to delete this user')
-    console.log(item)
+    // Show a confirmation dialog
+    const confirmed = confirm('Do you want to delete this user?');
 
+    // If the user cancels, do nothing
+    if (!confirmed) return;
+
+    console.log(item);
     try {
-      const accessToken = Cookies.get('authToken')
-      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/user/${item._id}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      const accessToken = Cookies.get('authToken');
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/user/${item._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
-        toast.error('Successfully deleted User!')
-        fetchUserData()
+        toast.error('Successfully deleted User!');
+        fetchUserData();
       }
     } catch (error) {
-      throw error.response ? error.response.data : new Error('An error occurred')
+      // Handle the error
+      console.error(error.response ? error.response.data : 'An error occurred');
     }
-  }
+  };
 
 
+  // Excel and pdf download
 
   const exportToExcel = async () => {
     // Create a new workbook and add a worksheet
@@ -657,79 +666,79 @@ const Users = () => {
   const handleNewGroup = () => {
     setOpenNewGroupDialog(true);
   };
-  
- // Function to fetch the list of groups (GET request)
- const fetchGroupsData = async () => {
-  const accessToken = Cookies.get('authToken');  // Retrieve the stored access token
-  try {
-    // Making a GET request to fetch groups from the API
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-    console.log('Fetched groups: ', data.groups);
-    setGroups(data.groups);  // Update the groups state with fetched data
-  } catch (error) {
-    console.error('Error fetching groups:', error);
-    toast.error('Failed to fetch groups');
-  }
-};
-
-// Function to handle the API call for adding a new group (POST request)
-const createNewGroup = async () => {
-  console.log('Save button clicked');
-
-  // Check if the new group name is valid (not empty or just spaces)
-  if (newGroupName.trim()) {
+  // Function to fetch the list of groups (GET request)
+  const fetchGroupsData = async () => {
+    const accessToken = Cookies.get('authToken');  // Retrieve the stored access token
     try {
-      const accessToken = Cookies.get('authToken');  // Get the access token from cookies
+      // Making a GET request to fetch groups from the API
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      // Sending a POST request to create the new group
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/group`,
-        { name: newGroupName },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (response.status === 201) {
-        toast.success('Group created successfully');
-
-        // Fetch updated list of groups after creating a new one
-        await fetchGroupsData();  // Fetch groups to refresh the list
-
-        // Reset dialog and input field after success
-        setOpenNewGroupDialog(false);
-        setNewGroupName('');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+
+      const data = await response.json();
+      console.log('Fetched groups: ', data.groups);
+      setGroups(data.groups);  // Update the groups state with fetched data
     } catch (error) {
-      console.error('Error creating group:', error);
-      toast.error('An error occurred while creating the group');
+      console.error('Error fetching groups:', error);
+      toast.error('Failed to fetch groups');
     }
-  } else {
-    // Show a warning if the group name is empty
-    toast.warn('Group name cannot be empty');
-  }
-};
+  };
 
-// Using useEffect to fetch the groups list when the component mounts
-useEffect(() => {
-  fetchGroups();
-}, []);
+  // Function to handle the API call for adding a new group (POST request)
+  const createNewGroup = async () => {
+    console.log('Save button clicked');
 
-  
+    // Check if the new group name is valid (not empty or just spaces)
+    if (newGroupName.trim()) {
+      try {
+        const accessToken = Cookies.get('authToken');  // Get the access token from cookies
+
+        // Sending a POST request to create the new group
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/group`,
+          { name: newGroupName },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.status === 201) {
+          toast.success('Group created successfully');
+
+          // Fetch updated list of groups after creating a new one
+          await fetchGroupsData();  // Fetch groups to refresh the list
+
+          // Reset dialog and input field after success
+          setOpenNewGroupDialog(false);
+          setNewGroupName('');
+        }
+      } catch (error) {
+        console.error('Error creating group:', error);
+        toast.error('An error occurred while creating the group');
+      }
+    } else {
+      // Show a warning if the group name is empty
+      toast.warn('Group name cannot be empty');
+    }
+  };
+
+  // Using useEffect to fetch the groups list when the component mounts
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+
 
   //  ####################################################
 
@@ -779,22 +788,22 @@ useEffect(() => {
           <CTableHead className="text-nowrap " >
             <CTableRow>
               <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>SN</strong> 
+                <strong>SN</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                 <strong>Name</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>Email</strong>
+                <strong>Email</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 <strong>Mobile No.</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>Master Permissions</strong> 
+                <strong>Master Permissions</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>Reports Permissions</strong> 
+                <strong>Reports Permissions</strong>
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                 <strong>Actions</strong>
@@ -806,7 +815,7 @@ useEffect(() => {
             {loading ? (
               <CTableRow>
 
-                <CTableDataCell colSpan="6" className="text-center">
+                <CTableDataCell colSpan="8" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
                       <span className="placeholder col-12" />
@@ -890,9 +899,10 @@ useEffect(() => {
                         style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
                       />
                     </IconButton>
+                 
                     <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
                       <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
-                    </IconButton>
+                    </IconButton>;
                   </CTableDataCell>
                 </CTableRow>
               ))
@@ -1117,16 +1127,16 @@ useEffect(() => {
                     label="Groups"
                     multiple
                   >
-                      <MenuItem value="new" sx={{ fontStyle: "italic" }}>
-                      + Add New Group
+                    <MenuItem value="new" sx={{ fontStyle: "italic" }}>
+                      <IoMdAddCircle />Add New Group
                     </MenuItem>
-                    
+
                     {groups.map((group) => (
                       <MenuItem key={group._id} value={group._id}>
                         {group.name}
                       </MenuItem>
                     ))}
-                  
+
                   </Select>
                 </FormControl>
 
@@ -1386,6 +1396,7 @@ useEffect(() => {
                   label="User Name"
                   variant="outlined"
                   name="username"
+                  type='text'
                   value={formData.username !== undefined ? formData.username : ''}
                   onChange={handleInputChange}
                   sx={{ marginBottom: '10px' }}
@@ -1408,7 +1419,7 @@ useEffect(() => {
                   onChange={handleInputChange}
                   sx={{ marginBottom: '10px' }}
                   fullWidth
-                  required
+
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -1422,7 +1433,7 @@ useEffect(() => {
                   label="Mobile Number"
                   variant="outlined"
                   name="mobile"
-                  type="phone"
+                  type="number"
                   value={formData.mobile !== undefined ? formData.mobile : ''}
                   onChange={handleInputChange}
                   sx={{ marginBottom: '10px' }}

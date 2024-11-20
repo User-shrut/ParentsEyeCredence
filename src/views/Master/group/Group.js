@@ -347,7 +347,7 @@ const Group = () => {
             {loading ? (
               <>
                 <CTableRow>
-                  <CTableDataCell colSpan="2" className="text-center">
+                  <CTableDataCell colSpan="4" className="text-center">
                     <div className="text-nowrap mb-2 text-center w-">
                       <p className="card-text placeholder-glow">
                         <span className="placeholder col-12" />

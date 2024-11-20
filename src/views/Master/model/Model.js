@@ -303,7 +303,9 @@ const Model = () => {
       </div>
 
       {/* Table */}
-      <TableContainer component={Paper} sx={{
+      <TableContainer 
+      component={Paper} 
+      sx={{
           height: 'auto', // Set the desired height
           overflowX: 'auto', // Enable horizontal scrollbar
           overflowY: 'auto', // Enable vertical scrollbar if needed
@@ -312,7 +314,7 @@ const Model = () => {
           border: '1px solid black'
         }}>
 
-        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-0 border" hover responsive>
+        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
             <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell "><strong>SN</strong></CTableHeaderCell>
@@ -323,7 +325,7 @@ const Model = () => {
           <CTableBody>
             {loading ? (
               <CTableRow>
-                <CTableDataCell colSpan="15" className="text-center">
+                <CTableDataCell colSpan="4" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
                       <span className="placeholder col-12" />
@@ -343,20 +345,20 @@ const Model = () => {
             ) : (filteredData.length > 0 ? (
               filteredData.map((item , index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{ index+1}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{item.modelName}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >
+                  <CTableDataCell className="text-center  p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{ index+1}</CTableDataCell>
+                  <CTableDataCell className="text-center  p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{item.modelName}</CTableDataCell>
+                  <CTableDataCell className="text-center  p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >
                     {/* Row layout for the icons */}
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
                       <IconButton aria-label="edit" onClick={() => handleEditModalOpen(item)}>
-                        <RiEdit2Fill style={{ fontSize: '25px', color: 'lightBlue' }} />
+                        <RiEdit2Fill style={{ fontSize: '20px', color: 'lightBlue', margin: '3px'  }} />
                       </IconButton>
                       <IconButton
                         aria-label="delete"
                         onClick={() => handleDeleteSelected(item._id)}
                         sx={{ color: 'red' }}
                       >
-                        <AiFillDelete style={{ fontSize: '25px' }} />
+                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
                       </IconButton>
                     </div>
                   </CTableDataCell>
