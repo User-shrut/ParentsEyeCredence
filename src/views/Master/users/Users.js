@@ -82,6 +82,7 @@ const Users = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [token, setToken] = useState('')
 
   // Go to the next step
   const handleNext = () => {
@@ -94,7 +95,35 @@ const Users = () => {
   }
 
   const handleModalClose = () => {
-    setFormData({})
+    // setFormData({})
+    setFormData({
+      username: '',
+      email: '',
+      mobile: '',
+      password: '',
+      permissions: {
+        notification: false,
+        devices: false,
+        driver: false,
+        groups: false,
+        category: false,
+        model: false,
+        users: false,
+        report: false,
+        stop: false,
+        travel: false,
+        geofence: false,
+        maintenance: false,
+        status: false,
+        distance: false,
+        history: false,
+        sensor: false,
+        idle: false,
+        alerts: false,
+        vehicle: false,
+      },
+      isAdmin: false,
+    })
     setEditModalOpen(false)
     setAddModalOpen(false)
     setCurrentStep(0)
@@ -186,6 +215,8 @@ const Users = () => {
           user?.mobile?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
+      setCurrentPage(1)
+
     }
   };
 
@@ -242,7 +273,7 @@ const Users = () => {
     const token = Cookies.get('authToken')
     if (token) {
       const decodedToken = jwtDecode(token)
-
+      setToken(decodedToken) 
       if (decodedToken.superadmin == true) {
         setSuperAdmin(true)
       } else {
@@ -544,7 +575,7 @@ const Users = () => {
       );
 
       if (response.status === 200) {
-        toast.error('Successfully deleted User!');
+        toast.error('Successfully deleted User!'); 
         fetchUserData();
       }
     } catch (error) {
@@ -894,7 +925,7 @@ const Users = () => {
                     className="text-center d-flex "
                     style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                   >
-                    <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
+                    {/* <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                       <RiEdit2Fill
                         style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
                       />
@@ -902,13 +933,70 @@ const Users = () => {
                  
                     <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
                       <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
-                    </IconButton>;
+                    </IconButton> */}
+                     {/* //----Added logic to hide the edit and delete option for login user itself. */}
+                  {isSuperAdmin && (
+                    <CTableDataCell
+                      className="text-center d-flex p-0"
+                      style={{ justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
+                        <RiEdit2Fill
+                          style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                        />
+                      </IconButton>
+                      <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
+                        <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
+                      </IconButton>
+                    </CTableDataCell>
+                  )}
+                    {!isSuperAdmin && item.username == token.user.username && (
+                  <CTableDataCell
+                    className="text-center d-flex p-0"
+                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                  >
+                      
+                        <IconButton aria-label="edit">
+                          <RiEdit2Fill
+                            style={{ fontSize: '20px', color: 'transparent', margin: '2px' }}
+                          />
+                        </IconButton>
+                        <IconButton aria-label="delete">
+                          <AiFillDelete
+                            style={{
+                              fontSize: '20px',
+                              color: 'transparent',
+                              margin: '2px',
+                              pointerEvents: 'none',
+                            }}
+                          />
+                        </IconButton>
+                      
                   </CTableDataCell>
+                    )}
+                    {!isSuperAdmin && item.username != token.user.username && (
+                  <CTableDataCell
+                    className="text-center d-flex p-0"
+                    style={{ justifyContent: 'center', alignItems: 'center' }}
+                  >
+                      
+                        <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
+                          <RiEdit2Fill
+                            style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
+                          />
+                        </IconButton>
+                        <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
+                          <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
+                        </IconButton>
+                      
+                  </CTableDataCell>
+                    )}
+                  </CTableDataCell> 
                 </CTableRow>
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan="6" className="text-center">
+                <CTableDataCell colSpan="7" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
@@ -984,7 +1072,7 @@ const Users = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: '5000', value: '5000' }
+                { label: 'ALL', value: '' }
               ]}
             />
           </div>
@@ -1179,11 +1267,14 @@ const Users = () => {
                   Permissions
                 </Typography>
 
-                <FormControlLabel
+                {/* render the admin togle for only admin */}
+                {isSuperAdmin && (
+                  <FormControlLabel
                   sx={{ color: 'black' }}
                   control={<Checkbox checked={formData.isAdmin} onChange={handleAdminToggle} />}
                   label="Admin (Select all permissions)"
                 />
+                )}
 
                 {isSuperAdmin ? (
                   <div className="row w-100">
@@ -1223,7 +1314,7 @@ const Users = () => {
                     <div className="col">
                       <Accordion>
                         <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-                          Reports
+                          Reports-add-admin
                         </AccordionSummary>
                         <AccordionDetails>
                           <FormGroup sx={{ color: 'black' }}>
@@ -1297,7 +1388,7 @@ const Users = () => {
                       <div className="col">
                         <Accordion>
                           <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-                            Reports
+                            Reports-add-user
                           </AccordionSummary>
                           <AccordionDetails>
                             <FormGroup sx={{ color: 'black' }}>
@@ -1312,9 +1403,8 @@ const Users = () => {
                                 'vehicle',
                                 'sensor',
                                 'geofenceReport',
-                              ]
-                                .filter((permission) => availablePermissions[permission])
-                                .map((permission) => (
+                              ].filter((permission) => availablePermissions[permission])
+                              .map((permission) => (
                                   <FormControlLabel
                                     key={permission}
                                     control={
@@ -1495,11 +1585,13 @@ const Users = () => {
                   Permissions
                 </Typography>
 
-                <FormControlLabel
+                {isSuperAdmin && (
+                  <FormControlLabel
                   sx={{ color: 'black' }}
                   control={<Checkbox checked={formData.isAdmin} onChange={handleAdminToggle} />}
                   label="Admin (Select all permissions)"
                 />
+                )}
 
                 <div className="row w-100">
                   <div className="col">
@@ -1507,8 +1599,7 @@ const Users = () => {
                       <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
                         Master
                       </AccordionSummary>
-                      <AccordionDetails>
-                        <FormGroup sx={{ color: 'black' }}>
+                      <AccordionDetails>{isSuperAdmin ?(<FormGroup sx={{ color: 'black' }}>
                           {[
                             'users',
                             'groups',
@@ -1517,7 +1608,8 @@ const Users = () => {
                             'driver',
                             'maintenance',
                             'notification'
-                          ].map((permission) => (
+                          ]
+                          .map((permission) => (
                             <FormControlLabel
                               key={permission}
                               control={
@@ -1530,7 +1622,30 @@ const Users = () => {
                               label={permission.charAt(0).toUpperCase() + permission.slice(1)}
                             />
                           ))}
-                        </FormGroup>
+                        </FormGroup>):(<FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'users',
+                            'groups',
+                            'devices',
+                            'geofence',
+                            'driver',
+                            'maintenance',
+                            'notification'
+                          ].filter((permission) => availablePermissions[permission])
+                          .map((permission) => (
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                          ))}
+                        </FormGroup>)}
                       </AccordionDetails>
                     </Accordion>
                   </div>
@@ -1540,8 +1655,8 @@ const Users = () => {
                       <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
                         Reports
                       </AccordionSummary>
-                      <AccordionDetails>
-                        <FormGroup sx={{ color: 'black' }}>
+                         {/* //added logic of giving permissions of reports to only which are allowed */}
+                      <AccordionDetails>{isSuperAdmin?(<FormGroup sx={{ color: 'black' }}>
                           {[
                             'history',
                             'stop',
@@ -1566,7 +1681,33 @@ const Users = () => {
                               label={permission.charAt(0).toUpperCase() + permission.slice(1)}
                             />
                           ))}
-                        </FormGroup>
+                        </FormGroup>):(<FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'history',
+                            'stop',
+                            'travel',
+                            'idle',
+                            'status',
+                            'distance',
+                            'alerts',
+                            'vehicle',
+                            'sensor',
+                            'geofenceReport',
+                          ].filter((permission) => availablePermissions[permission]).map((permission) => (
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                          ))}
+                        </FormGroup>)}
+                        
                       </AccordionDetails>
                     </Accordion>
                   </div>

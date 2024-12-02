@@ -110,7 +110,7 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
 
       <CCol md={6}>
         <CFormLabel htmlFor="type">Type</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="type"
           required
           value={formData.Type}
@@ -126,14 +126,33 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           <option value="Ignition">Ignition Wire Not Connected Change</option>
           <option value="Ignition Postive">Ignition Wire postive Change</option>
           <option value="Vehicle">Vehicle No.</option>
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+  id="type"
+  options={[
+    { value: '', label: 'Choose a type...' },
+    { value: 'Summary', label: 'Imei' },
+    { value: 'Sim No', label: 'Sim No.' },
+    { value: 'Subscription', label: 'Subscription' },
+    { value: 'Inactive', label: 'Inactive' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Timezone', label: 'Timezone' },
+    { value: 'Ignition', label: 'Ignition Wire Not Connected Change' },
+    { value: 'Ignition Postive', label: 'Ignition Wire positive Change' },
+    { value: 'Vehicle', label: 'Vehicle No.' },
+  ]}
+  value={formData.Type ? { value: formData.Type, label: formData.Type } : null}
+  onChange={(selectedOption) => handleInputChange('Type', selectedOption?.value)}
+  placeholder="Choose a type..."
+/>
+
         <CFormFeedback invalid>Please select a valid type.</CFormFeedback>
       </CCol>
 
 
       <CCol md={6}>
         <CFormLabel htmlFor="periods">Periods</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="periods"
           required
           value={formData.Periods}
@@ -147,7 +166,24 @@ const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, grou
           <option value="This Month">This Month</option>
           <option value="Previous Month">Previous Month</option>
           <option value="Custom">Custom</option>
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+        id="periods"
+        options={[
+          { value: '', label: 'Choose a period...' },
+          { value: 'Today', label: 'Today' },
+          { value: 'Yesterday', label: 'Yesterday' },
+          { value: 'This Week', label: 'This Week' },
+          { value: 'Previous Week', label: 'Previous Week' },
+          { value: 'This Month', label: 'This Month' },
+          { value: 'Previous Month', label: 'Previous Month' },
+          { value: 'Custom', label: 'Custom' },
+        ]}
+        value={formData.Periods ? { value: formData.Periods, label: formData.Periods } : null}
+        onChange={(selectedOption) => handlePeriodChange(selectedOption?.value)}
+        placeholder="Choose a period..."
+      />
+
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
 
