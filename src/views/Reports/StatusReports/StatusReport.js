@@ -90,7 +90,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
     >
       <CCol md={3}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="user"
           required
           value={selectedU}
@@ -112,11 +112,31 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
             )
           )
           }
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+  id="user"
+  options={
+    loading
+      ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
+      : users?.length > 0
+      ? users.map((user) => ({ value: user._id, label: user.username }))
+      : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
+  }
+  value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+  onChange={(selectedOption) => {
+    const selectedUser = selectedOption?.value;
+    setSelectedU(selectedUser);
+    console.log('Selected user:', selectedUser);
+    getGroups(selectedUser);
+  }}
+  isLoading={loading} // Optionally show a loading spinner
+  placeholder="Choose a user..."
+/>
+
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="group"
           required
           value={selectedG}
@@ -139,7 +159,27 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
             )
           )
           }
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+  id="group"
+  options={
+    loading
+      ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
+      : groups?.length > 0
+      ? groups.map((group) => ({ value: group._id, label: group.name }))
+      : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
+  }
+  value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+  onChange={(selectedOption) => {
+    const selectedGroup = selectedOption?.value;
+    setSelectedG(selectedGroup);
+    console.log('Selected Group ID:', selectedGroup);
+    getDevices(selectedGroup);
+  }}
+  isLoading={loading} // Optionally show a loading spinner
+  placeholder="Choose a group..."
+/>
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
       <CCol md={2}>
@@ -163,11 +203,12 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           }
 
         </CFormSelect>
+        
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="periods">Period</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="periods"
           required
           value={formData.Periods}
@@ -181,7 +222,24 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           <option value="This Month">This Month</option>
           <option value="Previous Month">Previous Month</option>
           <option value="Custom">Custom</option>
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+          id="periods"
+          options={[
+            { value: '', label: 'Choose a period...', isDisabled: true },
+            { value: 'Today', label: 'Today' },
+            { value: 'Yesterday', label: 'Yesterday' },
+            { value: 'This Week', label: 'This Week' },
+            { value: 'Previous Week', label: 'Previous Week' },
+            { value: 'This Month', label: 'This Month' },
+            { value: 'Previous Month', label: 'Previous Month' },
+            { value: 'Custom', label: 'Custom' },
+          ]}
+          value={formData.Periods ? { value: formData.Periods, label: formData.Periods } : null}
+          onChange={(selectedOption) => handlePeriodChange(selectedOption.value)}
+          placeholder="Choose a period..." // Displayed when no value is selected
+        />
+
         <CFormFeedback invalid>Please select a valid period.</CFormFeedback>
       </CCol>
       <CCol md={3}>
@@ -208,6 +266,30 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
             }
           }}
         />
+        {/* <Select
+  id="columns"
+  options={[
+    { value: 'all', label: 'All Columns' }, // Add "All Columns" option
+    ...columns.map((column) => ({ value: column, label: column })),
+  ]}
+  value={
+    formData.Columns.length === 1 && formData.Columns[0] === 'all'
+      ? { value: 'all', label: 'All Columns' } // Show "All Columns" if selected
+      : formData.Columns.length === 1
+      ? { value: formData.Columns[0], label: formData.Columns[0] }
+      : null
+  }
+  onChange={(selectedOption) => {
+    if (selectedOption.value === 'all') {
+      // If "All Columns" is selected, set formData.Columns to 'all'
+      handleInputChange('Columns', ['all']);
+    } else {
+      // Otherwise, set formData.Columns to the selected column
+      handleInputChange('Columns', [selectedOption.value]);
+    }
+  }}
+/> */}
+
         <CFormFeedback invalid>Please select at least one column.</CFormFeedback>
       </CCol>
       {showDateInputs && (

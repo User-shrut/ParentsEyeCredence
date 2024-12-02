@@ -135,6 +135,7 @@ const Driver = () => {
           driver?.address?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
+      setCurrentPage(1);
     }
   };
 
@@ -229,9 +230,10 @@ const Driver = () => {
 
 
   const deleteDriverSubmit = async (item) => {
-    alert("you want to delete this Driver");
-    console.log(item)
-
+    
+    const confirmed = confirm('Do you want to delete this Driver?');
+    // If the user cancels, do nothing
+    if (!confirmed) return;
     try {
       const accessToken = Cookies.get('authToken')
       const response = await axios.delete(
@@ -494,7 +496,7 @@ const Driver = () => {
                 </CTableRow>
               ))) : (
               <CTableRow>
-                <CTableDataCell colSpan="8" className="text-center">
+                <CTableDataCell colSpan="9" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
@@ -567,7 +569,7 @@ const Driver = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: '5000', value: '5000' }
+                { label: 'ALL', value: '' }
               ]}
             />
           </div>
