@@ -6,7 +6,7 @@ import addressReducer from './features/addressSlice.js'
 import navReducer from './features/navSlice.js'
 // Initial state and reducer for sidebar and theme
 const initialState = {
-  sidebarShow: false,
+  sidebarShow: true,
   // theme: 'light',
 }
 

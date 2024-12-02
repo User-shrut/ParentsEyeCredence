@@ -63,9 +63,9 @@ const HelpSupp = () => {
       {/* Contact Details */}
       <div className="contact-details animate-fade-in">
         <h4>Contact Us</h4>
-        <p>Email: support@example.com</p>
-        <p>Phone: +1 234 567 890</p>
-        <p>Address: 1234 Help St, Support City, SC 56789</p>
+        <p>Email: credeancetracker@mail.com</p>
+        <p>Phone: +91-9087654321</p>
+        <p>Address: Krida chowk nagpur.</p>
       </div>
 
       {/* Inline CSS for styles */}

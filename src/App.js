@@ -5,6 +5,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import Loader from './components/Loader/Loader'
+import HelpSupp from './views/forms/help-support/HelpSupp'
 
 
 // Containers
@@ -56,6 +57,7 @@ const App = () => {
           <Route exact path="/404" name="Page 404" element={<Page404 />} />
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
           <Route path="*" name="Home" element={<DefaultLayout />} />
+          <Route path="/HelpSupp" element={<HelpSupp />} />
         </Routes>
       </Suspense>
     </HashRouter>

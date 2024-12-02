@@ -9,6 +9,7 @@ import {
   CSidebarFooter,
   CSidebarHeader,
   CSidebarToggler,
+  CTooltip,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 
@@ -19,6 +20,7 @@ import { sygnet } from 'src/assets/brand/sygnet'
 
 // sidebar nav config
 import navigation from '../_nav'
+
 // auth purpose
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
@@ -57,7 +59,7 @@ const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebar.sidebarShow)
-  
+
   const navigate = useNavigate()
 
   const [decodedToken, setDecodedToken] = useState(null)
@@ -83,12 +85,13 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end xl"
+      className="border-end"
+      // style={{marginTop:"5%"}}  
       // style={{backgroundColor: 'rgb(248,249,255)' }}
       fontcolor="rgb(0,0,0)"
       colorScheme="light"
       position="fixed"
-      unfoldable={unfoldable}
+      unfoldable={sidebarShow}
       visible={sidebarShow}
       onVisibleChange={(visible) => {
         dispatch({ type: 'set', sidebarShow: visible })
@@ -96,15 +99,11 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="borderless-bottom">
         <CSidebarBrand to="/dashboard">
-          {/* <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} /> */}
+          <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} />
 
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
-          <CHeaderToggler
-            onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-            style={{ marginInlineStart: '200px' }}
-          >
-            <CIcon icon={cilDelete} size="xl"  />
-          </CHeaderToggler>
+
+
 
         </CSidebarBrand>
         <CCloseButton
@@ -115,9 +114,22 @@ const AppSidebar = () => {
       </CSidebarHeader>
       {navigatingNav && <AppSidebarNav items={navigatingNav} />}
       <CSidebarFooter className="border-top d-none d-lg-flex">
+        
+        <CTooltip content = 'Close'>
         <CSidebarToggler
-          onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
+         onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+          // onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
         />
+        </CTooltip>
+
+        {/* <CHeaderToggler
+          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+          // style={{ marginInlineStart: '200px' }}
+        >
+          <CIcon icon={cilDelete} size="xl" />
+        </CHeaderToggler> */}
+
+
       </CSidebarFooter>
     </CSidebar>
   )

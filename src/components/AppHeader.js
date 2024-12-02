@@ -57,6 +57,7 @@ import { FaAddressCard, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
 import { TbReportSearch } from 'react-icons/tb'
 import { MdOutlineSupportAgent } from 'react-icons/md'
 
+
 const AppHeader = () => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -171,24 +172,41 @@ const AppHeader = () => {
   const handleHome = () => {
     dispatch({ type: 'set', sidebarShow: true })
     dispatch(setToggleSidebar({ home: true, master: false, reports: false, expense: false, support: false }))
+    if (toggle.home) {
+      dispatch({ type: 'set', sidebarShow: !sidebarShow })
+
+    }
   }
   const handleMaster = () => {
     dispatch({ type: 'set', sidebarShow: true })
     dispatch(setToggleSidebar({ home: false, master: true, reports: false, expense: false, support: false }))
+    if (toggle.master) {
+      dispatch({ type: 'set', sidebarShow: !sidebarShow })
+
+    }
   }
   const handleReports = () => {
     dispatch({ type: 'set', sidebarShow: true })
     dispatch(setToggleSidebar({ home: false, master: false, reports: true, expense: false, support: false }))
+    if (toggle.reports) {
+      dispatch({ type: 'set', sidebarShow: !sidebarShow })
+
+    }
   }
+  
 
   const handleExpense = () => {
     dispatch({ type: 'set', sidebarShow: true })
     dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: true, support: false }))
+    if (toggle.expense) {
+      dispatch({ type: 'set', sidebarShow: !sidebarShow })
+
+    }
   }
-  const handleSupports = () => {
-    dispatch({ type: 'set', sidebarShow: true })
-    dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: false, support: true }))
-  }
+  // const handleSupports = () => {
+  //   dispatch({ type: 'set', sidebarShow: true })
+  //   dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: false, support: true }))
+  // }
 
   // #########################################################
 
