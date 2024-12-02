@@ -177,12 +177,23 @@ const Notification = () => {
     if (!searchQuery) {
       setFilteredData(data); // No query, show all drivers
     } else {
-      const filtered = data.filter(
-        (notification) =>
-          notification.deviceId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          notification.type?.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      // const filtered = data.filter(
+      //   (notification) =>
+      //     notification.deviceId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      //     notification.type?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      // );
+
+      //changed the code as it was getting crashed while searching
+      const filtered = data.filter((notification) => {
+        const deviceName = notification.deviceId?.name || ''; // Default to empty string if undefined
+        const typeName = notification.type?.name || ''; // Default to empty string if undefined
+  
+        return deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               typeName.toLowerCase().includes(searchQuery.toLowerCase());
+      });
       setFilteredData(filtered);
+      setCurrentPage(1);
+
     }
   };
 
@@ -269,8 +280,9 @@ const Notification = () => {
 
   const handleDeleteNotification = async (item) => {
 
-    console.log(item)
-
+    const confirmed = confirm('Do you want to delete this notification');
+    // added the logic If the user cancels, do nothing
+    if (!confirmed) return;
     try {
       const response = await axios.delete(
         `${import.meta.env.VITE_API_URL}/notifications/${item._id}`,
@@ -282,7 +294,7 @@ const Notification = () => {
       )
 
       if (response.status === 200) {
-        alert('group is deleted successfully')
+      
         fetchNotificationData()
       }
     } catch (error) {
@@ -550,7 +562,7 @@ const Notification = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: '5000', value: '5000' }
+                { label: 'ALL', value: '' }
               ]}
             />
           </div>

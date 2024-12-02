@@ -261,9 +261,14 @@ const Geofences = () => {
     } else {
       const filtered = data.filter(
         (geofences) =>
-          geofences.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          geofences.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          geofences.deviceIds.toLowerCase().includes(searchQuery.toLowerCase())
+        //fixed app crash on geofence search
+
+        (String(geofences?.name)?.toLowerCase().includes(searchQuery?.toLowerCase()))  ||
+        (String(geofences?.type)?.toLowerCase().includes(searchQuery?.toLowerCase()) )||
+        (String(geofences?.deviceIds)?.toLowerCase().includes(searchQuery?.toLowerCase()))
+      //     geofences.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      //     geofences.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      //     geofences.deviceIds.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -376,8 +381,9 @@ const Geofences = () => {
   // ######################## Delete Geofence ################################
 
   const deleteGeofenceSubmit = async (item) => {
-    alert('you want to delete this Geofence')
-    console.log(item)
+    const confirmed = confirm('Do you want to delete this Geofence?');
+    // If the user cancels, do nothing
+    if (!confirmed) return;
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -520,17 +526,17 @@ const Geofences = () => {
                   <>
                     <div className="text-nowrap mb-2" style={{ width: '240px' }}>
                       <p className="card-text placeholder-glow">
-                        <span className="placeholder col-7" />
-                        <span className="placeholder col-4" />
-                        <span className="placeholder col-4" />
-                        <span className="placeholder col-6" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
                         <span className="placeholder col-8" />
                       </p>
                       <p className="card-text placeholder-glow">
-                        <span className="placeholder col-7" />
-                        <span className="placeholder col-4" />
-                        <span className="placeholder col-4" />
-                        <span className="placeholder col-6" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
+                        <span className="placeholder col-8" />
                         <span className="placeholder col-8" />
                       </p>
                     </div>
@@ -557,7 +563,7 @@ const Geofences = () => {
                         </CFormSelect>
                       </CTableDataCell>
                       <CTableDataCell
-                        className="text-center d-flex p-0"
+                        className="text-center d-flex "
                         style={{ justifyContent: 'center', alignItems: 'center' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
 
                       >

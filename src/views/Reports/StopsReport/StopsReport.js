@@ -107,7 +107,7 @@ const SearchStop = ({
     >
       <CCol md={2}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="user"
           required
           value={selectedU}
@@ -129,11 +129,31 @@ const SearchStop = ({
             )
           )
           }
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+  id="user"
+  options={
+    loading
+      ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
+      : users?.length > 0
+      ? users.map((user) => ({ value: user._id, label: user.username }))
+      : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
+  }
+  value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+  onChange={(selectedOption) => {
+    const selectedUser = selectedOption?.value;
+    setSelectedU(selectedUser);
+    console.log('Selected user:', selectedUser);
+    getGroups(selectedUser);
+  }}
+  placeholder="Choose a user..."
+  isLoading={loading} // Show a loading spinner while fetching users
+/>
+
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="group"
           required
           value={selectedG}
@@ -156,12 +176,32 @@ const SearchStop = ({
             )
           )
           }
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+        id="group"
+        options={
+          loading
+            ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
+            : groups?.length > 0
+            ? groups.map((group) => ({ value: group._id, label: group.name }))
+            : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
+        }
+        value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+        onChange={(selectedOption) => {
+          const selectedGroup = selectedOption?.value;
+          setSelectedG(selectedGroup);
+          console.log('Selected Group ID:', selectedGroup);
+          getDevices(selectedGroup);
+        }}
+        placeholder="Choose a group..."
+        isLoading={loading} // Show a loading spinner while fetching groups
+      />
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Devices</CFormLabel>
-        <CFormSelect
+        {/* <CFormSelect
           id="devices"
           required
           value={formData.Devices}
@@ -179,7 +219,22 @@ const SearchStop = ({
           ) : (
             <option disabled>No Device in this Group</option>
           )}
-        </CFormSelect>
+        </CFormSelect> */}
+        <Select
+        id="devices"
+        options={
+          loading
+            ? [{ value: '', label: 'Loading devices...', isDisabled: true }]
+            : devices?.length > 0
+            ? devices.map((device) => ({ value: device.deviceId, label: device.name }))
+            : [{ value: '', label: 'No Device in this Group', isDisabled: true }]
+        }
+        value={formData.Devices ? { value: formData.Devices, label: devices.find((device) => device.deviceId === formData.Devices)?.name } : null}
+        onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
+        placeholder="Choose a device..."
+        isLoading={loading} // Show a loading spinner while fetching devices
+      />
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
       <CCol md={2}>

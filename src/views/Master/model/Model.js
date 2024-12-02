@@ -366,7 +366,7 @@ const Model = () => {
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan="2" className="text-center">
+                <CTableDataCell colSpan="3" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}

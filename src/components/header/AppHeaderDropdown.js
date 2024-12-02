@@ -46,6 +46,13 @@ const AppHeaderDropdown = () => {
     navigate('/login')
     window.location.reload();
   }
+
+  const handleHelpSupportClick = () => {
+    navigate('/HelpSupp');  // Navigates to the HelpSupp page
+    window.location.reload();
+  }
+
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 fs-5 pe-0" caret={false}>
@@ -59,7 +66,7 @@ const AppHeaderDropdown = () => {
           <h3 className="text-center my-0">{(decodedToken && decodedToken.user) ? decodedToken.user.username.slice(0, 12) : decodedToken?.username && decodedToken.username.slice(0, 12)}</h3>
           <p className="text-center small mb-3 mt-0">{(decodedToken && decodedToken.user) ? 'User' : 'SuperAdmin'}</p>
         </div>
-        <CDropdownItem href="/help-support">
+        <CDropdownItem onClick={handleHelpSupportClick}>
           <BiSupport className="me-3 fs-5" />
           Help & Support
         </CDropdownItem>
