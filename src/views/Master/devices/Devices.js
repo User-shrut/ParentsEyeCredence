@@ -107,7 +107,7 @@ const Devices = () => {
     const currentI = data.slice(currentPage * limit, (currentPage + 1) * limit)
     setCurrentItems(currentI)
 
-    console.log(currentItems)
+    console.log("currentItems",currentItems)
   }, [currentPage, limit, data])
 
   const handlePageClick = (event) => {
@@ -272,16 +272,45 @@ const Devices = () => {
         ])
 
         // Process responses if needed
-        const oldApiData = oldApiResponse.data
-        const newApiData = newApiResponse.data.devices
+        const oldApiData = oldApiResponse.data  //.slice(900,901)
+        const newApiData = newApiResponse.data.devices  //.slice(2857,2858)
 
         console.log('oldApiData: ', oldApiData)
         console.log('newApiData: ', newApiData)
 
-        const result = compareAndMerge(oldApiData, newApiData)
+        // const result = compareAndMerge(oldApiData, newApiData)
+        // console.log(' merge data hai : ', result)
+        //setData(result)
 
-        console.log(' merge data hai : ', result)
-        setData(result)
+        const mergedResult = [];
+        function compareAndMerge(oldApiData, newApiData) {
+          // Normalize old and new data to keep the key names consistent
+              newApiData.forEach(newItem => {
+              const oldItem = oldApiData.find(item => item.id == newItem.deviceId);
+              if (oldItem) {
+                  if (newItem.driver) {
+                      oldItem.Driver = newItem.driver;
+                      delete oldItem.driver;
+                  }
+                  mergedResult.push({ ...oldItem, ...newItem });
+              } else {
+                  mergedResult.push(newItem);
+              }
+          });
+      
+          // Add remaining old data that wasn't in new data
+          oldApiData.forEach(oldItem => {
+              const newItem = newApiData.find(item => item.deviceId == oldItem.id);
+              if (!newItem) {
+                mergedResult.push(oldItem); 
+              }
+          });
+      
+          return mergedResult;
+      }
+        compareAndMerge(oldApiData, newApiData)
+        console.log(' merge data hai : ', mergedResult)
+        setData(mergedResult)
       } else {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
           headers: {
@@ -328,25 +357,47 @@ const Devices = () => {
   }, [])
 
   // ##################### Filter data by search query #######################
+
+  const [pageCount,setPageCount] = useState(0)
   const filterDevices = () => {
     if (!searchQuery) {
       setFilteredData(currentItems)
-    } else {
-      const filtered = currentItems?.filter(
-        (device) =>
+    } 
+    if(searchQuery) {
+      const filtered = data?.filter( //currentItems.filter
+        (device) => 
           device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.uniqueId?.includes(searchQuery) ||
           device.sim?.includes(searchQuery) ||
           device.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.category?.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-      setFilteredData(filtered)
+      // a = filtered.length
+      setPageCount(filtered.length)
+      const filteredByPage = filtered.slice(currentPage*limit,(currentPage+1)*limit)
+      setFilteredData(filteredByPage)
     }
   }
 
-  useEffect(() => {
+  const handleSearch = ()=>{
     filterDevices(searchQuery)
-  }, [currentItems, searchQuery])
+  }
+
+  // KEYBOARD EVENT HANDLER
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  useEffect(() => {
+    if (searchQuery=='') {
+      filterDevices(searchQuery)
+    }
+    if (searchQuery) {
+      filterDevices(searchQuery)
+    }
+  }, [currentItems, searchQuery,currentPage,limit])
 
   // #########################  Edit Device API function #######################
 
@@ -681,7 +732,7 @@ const Devices = () => {
       ...formData,
       [name]: value,
     })
-    console.log(formData)
+    console.log("Add device formData",formData)
   }
 
   // Handle year selection for expiration date
@@ -835,6 +886,10 @@ const Devices = () => {
     doc.save('table_data.pdf')
   }
 
+  // console.log("pageCountttttttttttt",pageCount)
+  console.log("data.lengthhhhhhhhhhhhhh",data)
+  console.log("filteredDataaaaaaaaaaaaaa",filteredData)
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -851,12 +906,28 @@ const Devices = () => {
               placeholder="search here...."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </div>
+          <div className="me-3 d-none d-md-block" >
+              <button
+                onClick={handleSearch}
+                variant="contained"
+                className="btn btn-secondary"
+              >
+                Search
+              </button>
+            </div>
           {decodedToken.superadmin && (
             <div>
               <button
-                onClick={() => setAddModalOpen(true)}
+                onClick={() => {
+                  setAddModalOpen(true);
+                  setFormData({
+                    ...formData,
+                    installationdate: new Date().toISOString().split('T')[0],
+                  })
+                }}
                 variant="contained"
                 className="btn btn-secondary"
               >
@@ -975,7 +1046,7 @@ const Devices = () => {
                   ))}
 
                   {decodedToken.superadmin ? (
-                    <CTableDataCell className="text-center d-flex">
+                    <CTableDataCell className="text-center d-flex" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>
                       <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                         <RiEdit2Fill
                           style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
@@ -1032,7 +1103,7 @@ const Devices = () => {
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={Math.ceil(data.length / limit)} // Set based on the total pages from the API
+              pageCount={(searchQuery)? Math.ceil(pageCount / limit): Math.ceil(data.length / limit) } // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}
@@ -1056,7 +1127,7 @@ const Devices = () => {
                 { label: '20', value: '20' },
                 { label: '50', value: '50' },
                 { label: '100', value: '100' },
-                { label: '200', value: '200' },
+                { label: '500', value: '500' },
               ]}
             />
           </div>

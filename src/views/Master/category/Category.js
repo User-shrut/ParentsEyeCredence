@@ -21,6 +21,7 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CFormSelect,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -98,6 +99,7 @@ const Category = () => {
 
       if (response.data) {
         setData(response.data)
+        setPageCount(response.data.totalPages)
         setLoading(false)
       }
     } catch (error) {
@@ -117,6 +119,7 @@ const Category = () => {
           category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
+      setCurrentPage(1);
     }
   };
 
@@ -206,8 +209,9 @@ const Category = () => {
   // ###################### Delete Group ##############################
 
   const deleteCategorySubmit = async (item) => {
-    alert('you want to delete this Category')
-    console.log(item)
+    const confirmed = confirm('Do you want to delete this Category?');
+    // If the user cancels, do nothing
+    if (!confirmed) return;
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -381,7 +385,7 @@ const Category = () => {
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan="2" className="text-center">
+                <CTableDataCell colSpan="3" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
@@ -421,7 +425,7 @@ const Category = () => {
           <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      {pageCount > 1 && (
+        {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
           nextLabel="next >"

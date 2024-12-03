@@ -58,10 +58,19 @@ const Group = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+  // const handleEditModalClose = () => setEditModalOpen(false)
+  // const handleAddModalClose = () => setAddModalOpen(false)
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const handleEditModalClose = () => {
+    setFormData({})
+    setEditModalOpen(false)}
+
+
+  const handleAddModalClose = () => {
+    setFormData({})
+    setAddModalOpen(false)}
 
   const style = {
     position: 'absolute',
@@ -117,6 +126,7 @@ const Group = () => {
           group.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filtered);
+      setCurrentPage(1)
     }
   };
 
@@ -139,7 +149,7 @@ const Group = () => {
   // #########################################################################
 
   //  ####################  Add Group ###########################
-
+  
   const handleAddGroup = async (e) => {
     e.preventDefault()
     console.log(formData)
@@ -174,7 +184,7 @@ const Group = () => {
       const accessToken = Cookies.get('authToken')
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/group/${formData._id}`,
-        { name: formData.name },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -206,8 +216,10 @@ const Group = () => {
   // ###################### Delete Group ##############################
 
   const deleteGroupSubmit = async (item) => {
-    alert('you want to delete this group')
-    console.log(item)
+    const confirmed = confirm('Do you want to delete this user?');
+
+    // If the user cancels, do nothing
+    if (!confirmed) return;
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -218,7 +230,7 @@ const Group = () => {
       })
 
       if (response.status === 200) {
-        toast.error('group is deleted successfully')
+        toast.error('group is deleted successfully')//success toast added in place of error
         fetchGroupData()
       }
     } catch (error) {
@@ -388,7 +400,7 @@ const Group = () => {
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan="2" className="text-center">
+                <CTableDataCell colSpan="3" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
@@ -462,7 +474,7 @@ const Group = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: '5000', value: '5000' }
+                { label: 'All', value: '' },
               ]}
             />
           </div>
