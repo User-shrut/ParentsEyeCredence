@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
   Button,
+  Autocomplete,
 } from '@mui/material'
 import { AiOutlinePlus } from 'react-icons/ai'
 import CloseIcon from '@mui/icons-material/Close'
@@ -99,7 +100,7 @@ const AddDeviceModal = ({
         console.log('Record created successfully:')
         toast.success('Record created successfully')
         handleClose()
-        fetchData();
+        fetchData()
       } else {
         const contentType = response.headers.get('content-type')
         let responseBody
@@ -186,113 +187,187 @@ const AddDeviceModal = ({
                 if (col.accessor === 'users') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
+                      <Autocomplete
                         multiple
-                      >
-                        {users.map((user) => (
-                          <MenuItem key={user._id} value={user._id}>
-                            {user.username}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                        disableCloseOnSelect
+                        id={`autocomplete-${col.accessor}`}
+                        options={users}
+                        getOptionLabel={(option) => option.username || ''}
+                        value={
+                          users.filter((user) => formData[col.accessor]?.includes(user._id)) || []
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue.map((user) => user._id),
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search users..."
+                            variant="outlined"
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) => option._id === value._id}
+                      />
                     </FormControl>
                   )
                 } else if (col.accessor === 'groups') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
+                      <Autocomplete
+                        disableCloseOnSelect
                         multiple
-                      >
-                        {groups.map((group) => (
-                          <MenuItem key={group._id} value={group._id}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                        id={`autocomplete-${col.accessor}`}
+                        options={groups}
+                        getOptionLabel={(option) => option.name || ''}
+                        value={
+                          groups.filter((group) => formData[col.accessor]?.includes(group._id)) ||
+                          []
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue.map((group) => group._id),
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search group..."
+                            variant="outlined"
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) => option._id === value._id}
+                      />
                     </FormControl>
                   )
                 } else if (col.accessor === 'Driver') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        <MenuItem value="">select driver...</MenuItem>
-                        {drivers.map((driver) => (
-                          <MenuItem key={driver._id} value={driver._id}>
-                            {driver.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        id={`autocomplete-${col.accessor}`}
+                        options={drivers}
+                        getOptionLabel={(option) => option.name || ''}
+                        value={
+                          drivers.find((driver) => driver._id === formData[col.accessor]) || null
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue ? newValue._id : '',
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search driver..."
+                            variant="outlined"
+                          />
+                        )}
+                      />
                     </FormControl>
                   )
                 } else if (col.accessor === 'geofences') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
+                      <Autocomplete
                         multiple
-                      >
-                        {areas.map((geofence) => (
-                          <MenuItem key={geofence._id} value={geofence._id}>
-                            {geofence.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                        disableCloseOnSelect
+                        id={`autocomplete-${col.accessor}`}
+                        options={areas}
+                        getOptionLabel={(option) => option.name || ''}
+                        value={
+                          areas.filter((area) => formData[col.accessor]?.includes(area._id)) || []
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue.map((area) => area._id),
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search area..."
+                            variant="outlined"
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) => option._id === value._id}
+                      />
                     </FormControl>
                   )
                 } else if (col.accessor === 'model') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {models.map((model) => (
-                          <MenuItem key={model.modelName} value={model.modelName}>
-                            {model.modelName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        id={`autocomplete-${col.accessor}`}
+                        options={models}
+                        getOptionLabel={(option) => option.modelName || ''}
+                        value={
+                          models.find((model) => model.modelName === formData[col.accessor]) || null
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue ? newValue.modelName : '',
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search models..."
+                            variant="outlined"
+                          />
+                        )}
+                      />
                     </FormControl>
                   )
                 } else if (col.accessor === 'category') {
                   return (
                     <FormControl fullWidth sx={{ marginBottom: 2 }} key={col.accessor}>
-                      <InputLabel>{col.Header}</InputLabel>
-                      <Select
-                        name={col.accessor}
-                        value={formData[col.accessor] || []}
-                        onChange={handleInputChange}
-                        label={col.Header}
-                      >
-                        {categories.map((category) => (
-                          <MenuItem key={category.categoryName} value={category.categoryName}>
-                            {category.categoryName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Autocomplete
+                        id={`autocomplete-${col.accessor}`}
+                        options={categories}
+                        getOptionLabel={(option) => option.categoryName || ''}
+                        value={
+                          categories.find(
+                            (category) => category.categoryName === formData[col.accessor],
+                          ) || null
+                        }
+                        onChange={(event, newValue) => {
+                          handleInputChange({
+                            target: {
+                              name: col.accessor,
+                              value: newValue ? newValue.categoryName : '',
+                            },
+                          })
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label={col.Header}
+                            placeholder="Search categories..."
+                            variant="outlined"
+                          />
+                        )}
+                      />
                     </FormControl>
                   )
                 }

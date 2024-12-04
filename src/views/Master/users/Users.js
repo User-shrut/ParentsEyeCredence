@@ -875,7 +875,7 @@ const Users = () => {
 
                   {/* Master Column */}
                   <CTableDataCell className="text-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
-                    <CFormSelect id="periods" className=" text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                    <CFormSelect id="periods" value="" className=" text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                       <option value="">Master</option>
                       {[
                         'users',
@@ -898,7 +898,7 @@ const Users = () => {
 
                   {/* Reports Column */}
                   <CTableDataCell className="align-items-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
-                    <CFormSelect id="periods" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
+                    <CFormSelect id="periods" value="" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
                       <option value="">Reports</option>
                       {[
                         'history',

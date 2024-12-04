@@ -550,6 +550,7 @@ const Geofences = () => {
                       <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}  >
                         <CFormSelect
                           id="geofence"
+                          value=""
                           className=" text-center border-2 "
                           style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}}
                         >

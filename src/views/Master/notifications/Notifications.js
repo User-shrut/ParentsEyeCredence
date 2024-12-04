@@ -460,6 +460,7 @@ const Notification = () => {
                   <CTableDataCell className="text-center p-0 " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >
                     <CFormSelect
                       id="type"
+                      value=""
                       className=" text-center border-2 "
                       style={{ width: '130px', margin: '0 auto' }}
                     >

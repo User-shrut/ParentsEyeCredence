@@ -998,6 +998,7 @@ const Devices = () => {
                           id="groups"
                           className=" text-center border-2"
                           style={{ width: '100px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          value=""
                         >
                           <option>{item.groups?.length || '0'}</option>
                           {Array.isArray(item.groups) &&
@@ -1012,6 +1013,7 @@ const Devices = () => {
                           id="geofence"
                           className=" text-center border-2"
                           style={{ width: '120px' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          value=""
                         >
                           <option value="">{item.geofences?.length || '0'}</option>
                           {Array.isArray(item.geofences) &&
@@ -1026,6 +1028,7 @@ const Devices = () => {
                           id="users"
                           className=" text-center border-2"
                           style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",  }}
+                          value=""
                         >
                           <option value="">{item.users?.length || '0'}</option>
                           {Array.isArray(item.users) &&
