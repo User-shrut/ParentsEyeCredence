@@ -544,8 +544,8 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                   ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
                                   new Date(
                                     new Date(nestedRow.arrivalTime).setHours(
-                                      new Date(nestedRow.arrivalTime).getHours() + 6,
-                                      new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                                      new Date(nestedRow.arrivalTime).getHours() - 5,
+                                      new Date(nestedRow.arrivalTime).getMinutes() - 30,
                                     ),
                                   ).toLocaleString([], {
                                     year: 'numeric',
@@ -553,21 +553,21 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                     day: '2-digit',
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                    hour12: true,
+                                    hour12: false,
                                   })
                                   : column === 'Departure Time'
                                     ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
                                     new Date(
                                       new Date(nestedRow.departureTime).setHours(
-                                        new Date(nestedRow.departureTime).getHours() + 6,
-                                        new Date(nestedRow.departureTime).getMinutes() + 30,
+                                        new Date(nestedRow.departureTime).getHours() - 5,
+                                        new Date(nestedRow.departureTime).getMinutes() - 30,
                                       ),
                                     ).toLocaleString([], {
                                       year: 'numeric',
                                       month: '2-digit',
                                       hour: '2-digit',
                                       minute: '2-digit',
-                                      hour12: true,
+                                      hour12: false,
                                     })
                                     : column === 'Total Duration'
                                       ? // Convert total duration from seconds to HH:mm:ss format

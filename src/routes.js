@@ -23,7 +23,7 @@ const Trips = React.lazy(() => import('./views/Reports/TravelReport/TravelReport
 const IdleReport = React.lazy(() => import('./views/Reports/IdleReport/IdleReport.js'))
 const Schedules = React.lazy(() => import('./views/Reports/SensorReport/SensorReport.js'))
 const Alerts = React.lazy(() => import('./views/Reports/alerts-events/Alerts.js'))
-const Summary = React.lazy(() => import('./views/Reports/VehicleReport/VehicleReport.js'))
+// const Summary = React.lazy(() => import('./views/Reports/VehicleReport/VehicleReport.js'))
 const Customchart = React.lazy(() => import('./views/Reports/GeofenceReport/GeofenceReport.js'))
 
 // expense management
@@ -63,7 +63,7 @@ const routes = [
   { path: '/idlereport', name: 'Idle', element: IdleReport },
   { path: '/sensorreports', name: 'Schedule', element: Schedules },
   { path: '/alerts-events', name: 'Alerts', element: Alerts },
-  { path: '/vehiclereport', name: 'Summary', element: Summary },
+  // { path: '/vehiclereport', name: 'Summary', element: Summary },
   { path: '/geofencereport', name: 'Geofence Report', element: Customchart},
   { path: '/invoice', name: 'Invoice', element: InvoiceForm },
   { path: '/po', name: 'PO', element: Po },

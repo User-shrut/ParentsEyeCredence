@@ -114,24 +114,24 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           }
         </CFormSelect> */}
         <Select
-  id="user"
-  options={
-    loading
-      ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
-      : users?.length > 0
-      ? users.map((user) => ({ value: user._id, label: user.username }))
-      : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
-  }
-  value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
-  onChange={(selectedOption) => {
-    const selectedUser = selectedOption?.value;
-    setSelectedU(selectedUser);
-    console.log('Selected user:', selectedUser);
-    getGroups(selectedUser);
-  }}
-  isLoading={loading} // Optionally show a loading spinner
-  placeholder="Choose a user..."
-/>
+          id="user"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
+              : users?.length > 0
+                ? users.map((user) => ({ value: user._id, label: user.username }))
+                : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
+          }
+          value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+          onChange={(selectedOption) => {
+            const selectedUser = selectedOption?.value;
+            setSelectedU(selectedUser);
+            console.log('Selected user:', selectedUser);
+            getGroups(selectedUser);
+          }}
+          isLoading={loading} // Optionally show a loading spinner
+          placeholder="Choose a user..."
+        />
 
       </CCol>
       <CCol md={2}>
@@ -161,24 +161,24 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           }
         </CFormSelect> */}
         <Select
-  id="group"
-  options={
-    loading
-      ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
-      : groups?.length > 0
-      ? groups.map((group) => ({ value: group._id, label: group.name }))
-      : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
-  }
-  value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
-  onChange={(selectedOption) => {
-    const selectedGroup = selectedOption?.value;
-    setSelectedG(selectedGroup);
-    console.log('Selected Group ID:', selectedGroup);
-    getDevices(selectedGroup);
-  }}
-  isLoading={loading} // Optionally show a loading spinner
-  placeholder="Choose a group..."
-/>
+          id="group"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
+              : groups?.length > 0
+                ? groups.map((group) => ({ value: group._id, label: group.name }))
+                : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
+          }
+          value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+          onChange={(selectedOption) => {
+            const selectedGroup = selectedOption?.value;
+            setSelectedG(selectedGroup);
+            console.log('Selected Group ID:', selectedGroup);
+            getDevices(selectedGroup);
+          }}
+          isLoading={loading} // Optionally show a loading spinner
+          placeholder="Choose a group..."
+        />
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -203,7 +203,7 @@ const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups
           }
 
         </CFormSelect>
-        
+
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
       <CCol md={2}>
@@ -578,11 +578,11 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
             apiData?.data && apiData.data.length > 0 ? (
               apiData.data.map((row, rowIndex) => (
                 <CTableRow key={row.id} className="custom-row">
-                  <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
+                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
                   {/* Dynamically render table cells based on selected columns */}
                   {selectedColumns.map((column, index) => (
                     <>
-                      <CTableDataCell key={index}  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
+                      <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                         {column === 'Vehicle Status' ? (
                           row.vehicleStatus === 'Idle' ? (
                             <>

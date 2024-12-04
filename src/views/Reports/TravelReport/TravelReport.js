@@ -58,7 +58,7 @@ const SearchTrip = ({
     const date = new Date(inputDate) // Create a Date object with the given input
 
     // Get the timezone offset in minutes and convert to milliseconds
-    const timezoneOffset = date.getTimezoneOffset() * 60000
+    const timezoneOffset = date.getTimezoneOffset() 
 
     // Adjust the date object to local time by subtracting the offset
     const localDate = new Date(date.getTime() - timezoneOffset)
@@ -372,21 +372,21 @@ const TripTable = ({ apiData, selectedColumns }) => {
           if (column === 'Start Time')
             return new Date(
               new Date(row.startTime).setHours(
-                new Date(row.startTime).getHours() + 6,
-                new Date(row.startTime).getMinutes() + 30,
+                new Date(row.startTime).getHours() -6,
+                new Date(row.startTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'End Time')
             return new Date(
               new Date(row.endTime).setHours(
-                new Date(row.endTime).getHours() + 6,
-                new Date(row.endTime).getMinutes() + 30,
+                new Date(row.endTime).getHours() - 6,
+                new Date(row.endTime).getMinutes() - 30 ,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Distance') return (row.distance / 1000).toFixed(2) + ' km'
-          if (column === 'Total Distance') return (row.totalDistance / 1000).toFixed(2) + ' km'
-          if (column === 'Maximum Speed') return (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
-          if (column === 'Average Speed') return (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+          if (column === 'Distance') return (row.distance).toFixed(2) + ' km'
+          if (column === 'Total Distance') return (row.totalDistance).toFixed(2) + ' km'
+          if (column === 'Maximum Speed') return (row.maxSpeed).toFixed(2) + ' km/h'
+          if (column === 'Average Speed') return (row.avgSpeed).toFixed(2) + ' km/h'
           if (column === 'Duration') return row.duration
           if (column === 'Start Address')
             return addressData[row.deviceId]?.startAddress || 'Fetching...'
@@ -415,8 +415,8 @@ const TripTable = ({ apiData, selectedColumns }) => {
           if (column === 'Start Time')
             rowData['Start Time'] = new Date(
               new Date(row.startTime).setHours(
-                new Date(row.startTime).getHours() + 6,
-                new Date(row.startTime).getMinutes() + 30,
+                new Date(row.startTime).getHours() ,
+                new Date(row.startTime).getMinutes() ,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'End Time')
@@ -426,13 +426,13 @@ const TripTable = ({ apiData, selectedColumns }) => {
                 new Date(row.endTime).getMinutes() + 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Distance') rowData.Distance = (row.distance / 1000).toFixed(2) + ' km'
+          if (column === 'Distance') rowData.Distance = (row.distance).toFixed(2) + ' km'
           if (column === 'Total Distance')
-            rowData['Total Distance'] = (row.totalDistance / 1000).toFixed(2) + ' km'
+            rowData['Total Distance'] = (row.totalDistance).toFixed(2) + ' km'
           if (column === 'Maximum Speed')
-            rowData['Maximum Speed'] = (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+            rowData['Maximum Speed'] = (row.maxSpeed ).toFixed(2) + ' km/h'
           if (column === 'Average Speed')
-            rowData['Average Speed'] = (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+            rowData['Average Speed'] = (row.avgSpeed ).toFixed(2) + ' km/h'
           if (column === 'Duration') rowData.Duration = row.duration
           if (column === 'Start Address')
             rowData['Start Address'] = addressData[row.deviceId]?.startAddress || 'Fetching...'
@@ -490,8 +490,8 @@ const TripTable = ({ apiData, selectedColumns }) => {
                       ? // Add 6 hours 30 minutes to startTime
                       new Date(
                         new Date(row.startTime).setHours(
-                          new Date(row.startTime).getHours() + 6,
-                          new Date(row.startTime).getMinutes() + 30,
+                          new Date(row.startTime).getHours() - 5,
+                          new Date(row.startTime).getMinutes() - 30 ,
                         ),
                       ).toLocaleString([], {
                         year: 'numeric',
@@ -505,8 +505,8 @@ const TripTable = ({ apiData, selectedColumns }) => {
                         ? // Add 6 hours 30 minutes to endTime
                         new Date(
                           new Date(row.endTime).setHours(
-                            new Date(row.endTime).getHours() + 6,
-                            new Date(row.endTime).getMinutes() + 30,
+                            new Date(row.endTime).getHours() - 5,
+                            new Date(row.endTime).getMinutes() - 30 ,
                           ),
                         ).toLocaleString([], {
                           year: 'numeric',
@@ -524,10 +524,10 @@ const TripTable = ({ apiData, selectedColumns }) => {
                             row.totalDistance
                             : column === 'Maximum Speed'
                               ? // Convert maxSpeed from m/s to km/h and round to 2 decimal places
-                              (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
+                              (row.maxSpeed).toFixed(2) + ' km/h'
                               : column === 'Average Speed'
                                 ? // Convert avgSpeed from m/s to km/h and round to 2 decimal places
-                                (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
+                                (row.avgSpeed).toFixed(2) + ' km/h'
                                 : column === 'Duration'
                                   ? row.duration
                                   : column === 'Start Address'

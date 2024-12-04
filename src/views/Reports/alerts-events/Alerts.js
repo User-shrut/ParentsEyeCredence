@@ -274,7 +274,7 @@ const Alerts = () => {
   // Function to get address from latitude and longitude
   const getAddressFromLatLng = async (latitude, longitude) => {
     // const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-    
+
     try {
       const response = await axios.get(url)
       const address = response.data?.display_name || 'Address not found'
@@ -329,7 +329,7 @@ const Alerts = () => {
           <CTableHead className="text-nowrap">
             <CTableRow className="bg-body-tertiary">
               <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
-                SN 
+                SN
               </CTableHeaderCell>
               <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Device Name
@@ -369,16 +369,35 @@ const Alerts = () => {
                 </CTableDataCell>
               </CTableRow>
             ) : data.length > 0 ? (
-              data?.map((item, index) => (
-                <CTableRow key={index} >
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center ps-4">{index + 1}</CTableDataCell>
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center ps-4">{item.name}</CTableDataCell>
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">{item.type}</CTableDataCell>
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">{item.address || 'Fetching...'}</CTableDataCell>
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center">{item.message}</CTableDataCell>
-                  <CTableDataCell style={{backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}} className="text-center pe-4">{`${item.createdAt.slice(0,10)} ${item.createdAt.slice(11,19)}`}</CTableDataCell>
-                </CTableRow>
-              ))
+              data.filter((item) => {
+                const query = searchQuery.toLowerCase();
+                return (
+                  item.name?.toLowerCase().includes(query) || // Filter by name
+                  item.type?.toLowerCase().includes(query) || // Filter by type
+                  item.address?.toLowerCase().includes(query) || // Filter by address
+                  item.message?.toLowerCase().includes(query) // Filter by message
+                );
+              })
+                ?.map((item, index) => (
+
+                  <CTableRow key={index} >
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{index + 1}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{item.name}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.type}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.address || 'Fetching...'}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.message}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center pe-4"> {new Date(item.createdAt).toLocaleString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
+                      hour12: false, // Use 24-hour format
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}</CTableDataCell>
+                  </CTableRow>
+                ))
             ) : (
               <CTableRow>
                 <CTableDataCell colSpan="8" className="text-center">

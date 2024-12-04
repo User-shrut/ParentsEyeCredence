@@ -949,20 +949,20 @@ const Devices = () => {
           border: '1px solid black'
         }}
       >
-        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
-          <CTableHead className="text-nowrap" >
-            <CTableRow style={{height:'6vh' ,  }} >
-              <CTableHeaderCell className="text-center text-white bg-secondary" >
-                SN
+        <CTable bordered align="middle" className="mb-2 borderless min-vh-25 rounded-top-3" hover responsive >
+          <CTableHead style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+            <CTableRow style={{height:'6vh' ,  }} className="text-nowrap "  >
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+              <strong>SN</strong>
               </CTableHeaderCell >
               {columns.slice(1).map((column, index) => (
-                <CTableHeaderCell key={index} className="text-center text-white bg-secondary" >
-                  {column.Header}
+                <CTableHeaderCell key={index} className="text-center bg-body-secondary text-center sr-no table-cell" >
+                 <strong>{column.Header}</strong> 
                 </CTableHeaderCell>
               ))}
               {decodedToken.superadmin ? (
-                <CTableHeaderCell className="text-center text-white bg-secondary " >
-                  Actions
+                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+                  <strong>Actions</strong>
                 </CTableHeaderCell>
               ) : null}
             </CTableRow>
