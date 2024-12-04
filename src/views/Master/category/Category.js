@@ -13,6 +13,7 @@ import {
   Box,
   TextField,
   FormControl,
+  InputAdornment
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -42,6 +43,7 @@ import * as XLSX from 'xlsx'; // For Excel export
 import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF.
 import CIcon from '@coreui/icons-react'
+import CategoryIcon from '@mui/icons-material/Category';
 import { cilSettings } from '@coreui/icons'
 import "../../../../src/app.css";
 
@@ -475,6 +477,15 @@ const Category = () => {
                   value={formData.categoryName !== undefined ? formData.categoryName : ''}
                   onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <CategoryIcon
+                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button
@@ -518,6 +529,15 @@ const Category = () => {
                   value={formData.categoryName !== undefined ? formData.categoryName : ''}
                   onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <CategoryIcon
+                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button

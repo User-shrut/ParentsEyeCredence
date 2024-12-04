@@ -29,7 +29,7 @@ import Cookies from 'js-cookie';  // Importing js-cookie for managing cookies
 //   FormControl,
 // } from '@mui/material';
 import {
-  TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
+  TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl, InputAdornment
 } from '@mui/material';
 import {
   CTable,
@@ -50,6 +50,7 @@ import * as XLSX from 'xlsx'; // For Excel export
 import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react';
+import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 import { cilSettings } from '@coreui/icons';
 import "../../../../src/app.css";
 
@@ -366,7 +367,7 @@ const Model = () => {
               ))
             ) : (
               <CTableRow>
-                <CTableDataCell colSpan="3" className="text-center">
+                <CTableDataCell colSpan="2" className="text-center">
                   <div
                     className="d-flex flex-column justify-content-center align-items-center"
                     style={{ height: '200px' }}
@@ -424,6 +425,15 @@ const Model = () => {
                 onChange={handleInputChange}
                 label="Model Name"
                 required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <ViewComfyIcon
+                        sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Button
                 variant="contained"
@@ -455,6 +465,15 @@ const Model = () => {
                 onChange={handleInputChange}
                 label="Model Name"
                 required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <ViewComfyIcon
+                        sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Button
                 variant="contained"

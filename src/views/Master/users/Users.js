@@ -76,8 +76,8 @@ const Users = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  const [currentStep, setCurrentStep] = useState(0)
-  const steps = ['Personal Info', 'Permissions']
+ // const [currentStep, setCurrentStep] = useState(0)
+ // const steps = ['Personal Info', 'Permissions']
   const [isSuperAdmin, setSuperAdmin] = useState(false)
   const [filteredData, setFilteredData] = useState([]);
   const [groups, setGroups] = useState([])
@@ -85,14 +85,14 @@ const Users = () => {
   const [token, setToken] = useState('')
 
   // Go to the next step
-  const handleNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
-  }
+  // const handleNext = () => {
+  //   setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  // }
 
-  // Go to the previous step
-  const handleBack = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 0))
-  }
+  // // Go to the previous step
+  // const handleBack = () => {
+  //   setCurrentStep((prev) => Math.max(prev - 1, 0))
+  // }
 
   const handleModalClose = () => {
     // setFormData({})
@@ -126,7 +126,7 @@ const Users = () => {
     })
     setEditModalOpen(false)
     setAddModalOpen(false)
-    setCurrentStep(0)
+    //setCurrentStep(0)
   }
 
   const style = {
@@ -134,7 +134,7 @@ const Users = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '35%',
+    width: '75%',
     maxHeight: '90vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -379,7 +379,7 @@ const Users = () => {
         toast.success('User is created successfully')
         fetchUserData()
         setAddModalOpen(false)
-        setCurrentStep(0)
+        //setCurrentStep(0)
         setFormData({
           username: '',
           email: '',
@@ -497,7 +497,7 @@ const Users = () => {
       if (response.status === 200) {
         toast.success('User is edited successfully')
         setEditModalOpen(false)
-        setCurrentStep(0)
+        //setCurrentStep(0)
         fetchUserData()
         setLoading(false)
 
@@ -1103,16 +1103,16 @@ const Users = () => {
 
           {/* Step-by-step form with progress indicator */}
           <div>
-            <Stepper activeStep={currentStep} alternativeLabel>
+            {/* <Stepper activeStep={currentStep} alternativeLabel>
               {steps.map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
                 </Step>
               ))}
-            </Stepper>
+            </Stepper> */}
 
-            {currentStep === 0 && (
-              <div className="mt-3">
+            {/* {currentStep === 0 && ( */}
+              <div className="mt-3" style={{display:'grid',gridTemplateColumns:'auto auto auto', gridGap:'0.7rem 1.5rem'}}>
                 {/* Personal Info Step */}
                 <TextField
                   label="User Name"
@@ -1255,9 +1255,9 @@ const Users = () => {
 
 
               </div>
-            )}
+            {/* )} */}
 
-            {currentStep === 1 && (
+            {/* {currentStep === 1 && ( */}
               <div className="mt-3">
                 {/* Permissions Step */}
                 <Typography sx={{ color: '#333', fontWeight: 'bold', marginTop: '15px' }}>
@@ -1425,11 +1425,11 @@ const Users = () => {
                   )
                 )}
               </div>
-            )}
+            {/* )} */}
 
             {/* Navigation buttons */}
             <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
-              {currentStep > 0 && (
+              {/* {currentStep > 0 && (
                 <Button onClick={handleBack} variant="outlined">
                   Back
                 </Button>
@@ -1442,7 +1442,10 @@ const Users = () => {
                 <Button onClick={handleSubmit} variant="contained" color="primary">
                   Submit
                 </Button>
-              )}
+              )} */}
+              <Button onClick={handleSubmit} variant="contained" color="primary" style={{marginLeft:'auto'}}>
+                  Submit
+                </Button>
             </div>
           </div>
         </Box>
@@ -1471,16 +1474,16 @@ const Users = () => {
 
           {/* Step-by-step form with progress indicator */}
           <div>
-            <Stepper activeStep={currentStep} alternativeLabel>
+            {/* <Stepper activeStep={currentStep} alternativeLabel>
               {steps.map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
                 </Step>
               ))}
-            </Stepper>
+            </Stepper> */}
 
-            {currentStep === 0 && (
-              <div className="mt-3">
+            {/* {currentStep === 0 && ( */}
+              <div className="mt-3" style={{display:'grid',gridTemplateColumns:'auto auto auto', gridGap:'0.7rem 1.5rem'}} >
                 {/* Personal Info Step */}
                 <TextField
                   label="User Name"
@@ -1573,9 +1576,9 @@ const Users = () => {
                   </Select>
                 </FormControl>
               </div>
-            )}
+            {/* )} */}
 
-            {currentStep === 1 && (
+            {/* {currentStep === 1 && ( */}
               <div className="mt-3">
                 {/* Permissions Step */}
                 <Typography sx={{ color: '#333', fontWeight: 'bold', marginTop: '15px' }}>
@@ -1713,11 +1716,11 @@ const Users = () => {
                   </div>
                 </div>
               </div>
-            )}
+            {/* )} */}
 
             {/* Navigation buttons */}
             <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
-              {currentStep > 0 && (
+              {/* {currentStep > 0 && (
                 <Button onClick={handleBack} variant="outlined">
                   Back
                 </Button>
@@ -1730,7 +1733,10 @@ const Users = () => {
                 <Button onClick={EditUserSubmit} variant="contained" color="primary">
                   Submit
                 </Button>
-              )}
+              )} */}
+              <Button onClick={EditUserSubmit} variant="contained" color="primary" style={{marginLeft:'auto'}}>
+                  Submit
+              </Button>
             </div>
           </div>
         </Box>

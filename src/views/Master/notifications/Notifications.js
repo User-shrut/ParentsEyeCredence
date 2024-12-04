@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { Autocomplete, InputAdornment, Chip, Checkbox } from "@mui/material";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material';
+import ListItemText from "@mui/material/ListItemText";
+import GroupIcon from '@mui/icons-material/Group';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+
 import {
   TableContainer,
   Paper,
@@ -16,6 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  OutlinedInput
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -83,10 +91,17 @@ const Notification = () => {
   const [selectedGroup, setSelectedGroup] = useState()
   const [devices, setDevices] = useState([])
   const [selectedDevices, setSelectedDevices] = useState([])
+  const [selectedNotificationTypes, setSelectedNotificationTypes] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [devicesAlreadyAdded, setDevicesAlreadyAdded] = useState([]);
+
 
   const handleEditModalClose = () => setEditModalOpen(false)
-  const handleAddModalClose = () => setAddModalOpen(false)
+  const handleAddModalClose = () => {
+    setAddModalOpen(false)
+    setSelectedDevices([])
+    setDevices([])
+  }
 
   const style = {
     position: 'absolute',
@@ -94,7 +109,7 @@ const Notification = () => {
     borderRadius: '10px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '35%',
+    width: '75%',
     maxHeight: '90vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -122,27 +137,7 @@ const Notification = () => {
     }
   }
 
-  const getDevices = async (selectedGroup) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
-        {
-          headers: {
-            Authorization: 'Bearer ' + accessToken,
-          },
-        },
-      )
-      if (response.data.success) {
-        setDevices(response.data.data)
-      } else {
-        setDevices([])
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      throw error // Re-throw the error for further handling if needed
-    }
-  }
-
+  
   useEffect(() => {
     getGroups()
   }, [limit])
@@ -164,6 +159,9 @@ const Notification = () => {
         console.log(response.data.notifications)
         console.log(response.data.totalPages)
         setLoading(false)
+        const filtereddevices = response.data.notifications.map((item) => item.deviceId.name)
+        setDevicesAlreadyAdded(filtereddevices)
+        console.log(("setdevicesalreadyadded", devicesAlreadyAdded));
       }
     } catch (error) {
       setLoading(false)
@@ -196,6 +194,32 @@ const Notification = () => {
 
     }
   };
+  const getDevices = async (selectedGroup) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${selectedGroup}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      )
+      if (response.data.success) {
+        console.log("alreadyaddeddevices in setdevices", devicesAlreadyAdded);
+
+        setDevices(response.data.data)
+        console.log("devices es form me aa rhi he", devices);
+
+      } else {
+        setDevices([])
+      }
+    } catch (error) {
+      setDevices([])
+      console.error('Error fetching data:', error)
+      throw error // Re-throw the error for further handling if needed
+
+    }
+  }
 
   useEffect(() => {
     fetchNotificationData()
@@ -220,8 +244,14 @@ const Notification = () => {
   const handleAddNotification = async (e) => {
     e.preventDefault()
     console.log(formData)
+    const selectedDevicesArray = selectedDevices.map((device) => device._id);
+
+    const FormDataObj = {
+      "deviceId": selectedDevicesArray,
+      "type": selectedNotificationTypes,
+    }
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/notifications`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/notifications`, FormDataObj, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -232,6 +262,8 @@ const Notification = () => {
         toast.success('Successfully Notification Created!')
         fetchNotificationData()
         setFormData({})
+        setSelectedDevices([])
+        setSelectedNotificationTypes([])
         setAddModalOpen(false)
       }
     } catch (error) {
@@ -244,7 +276,7 @@ const Notification = () => {
 
   const handleEditNotification = async (e) => {
     e.preventDefault()
-    console.log(formData)
+    console.log("formData in editnotification", formData)
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/notifications/${formData._id}`,
@@ -260,6 +292,8 @@ const Notification = () => {
         toast.success('Successfully Notification Updated!')
         fetchNotificationData()
         setFormData({})
+        setSelectedDevices([])
+        setSelectedNotificationTypes([])
         setEditModalOpen(false)
       }
     } catch (error) {
@@ -587,8 +621,8 @@ const Notification = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddNotification}>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <form onSubmit={handleAddNotification} style={{display: 'flex',flexDirection: 'column'}}>
+              {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel>Select Group</InputLabel>
                 <Select
                   name="groups"
@@ -601,8 +635,8 @@ const Notification = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              </FormControl> */}
+              {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel>Devices</InputLabel>
                 <Select
                   name="devices"
@@ -621,8 +655,8 @@ const Notification = () => {
                     <MenuItem>No device available</MenuItem>
                   )}
                 </Select>
-              </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              </FormControl> */}
+              {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel>Notification Type</InputLabel>
                 <Select
                   name="type"
@@ -637,13 +671,176 @@ const Notification = () => {
                     </MenuItem>
                   ))}
                 </Select>
+              </FormControl> */}
+               <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <Autocomplete
+                  options={groups} // List of devices
+                  getOptionLabel={(option) => option.name} // Defines the label for each option
+                  //onChange={(event, value) => setSelectedDevice(value)}
+                  onChange={(event, value) => {
+                    console.log("value in autocomplete group", value);
+
+                    getDevices(value._id)
+                  }} // Handle selection
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select group...."
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <InputAdornment position="start">
+                              <GroupIcon sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }} />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      }}
+                      fullWidth
+                    />
+                  )}
+                  filterOptions={(options, state) =>
+                    options.filter((option) =>
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                    )
+                  }
+                  isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
+                />
               </FormControl>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                <Autocomplete
+                  multiple
+                  options={devices} // List of devices
+                  disableCloseOnSelect
+                  getOptionLabel={(option) => option.name} // Defines the label for each option
+                  onChange={(event, newValue) => {
+                    console.log("value in auto devices", newValue);
+
+                    setSelectedDevices(newValue)
+                  }
+                  }
+
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select devices..."
+                      fullWidth
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <InputAdornment position="start">
+                              <DirectionsCarIcon sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }} />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                  // renderOption={(props, option, { selected }) => (
+                  //   <li {...props}>
+                  //     <Checkbox
+                  //       style={{ marginRight: 8 }}
+                  //       checked={selected}
+                  //     />
+                  //     <ListItemText primary={option.name} />
+                  //   </li>
+
+                  // )}
+                  renderOption={(props, option, { selected }) => {
+                    const isDisabled = devicesAlreadyAdded.includes(option.name);
+                    { (() => console.log("Logging inside JSX:", devicesAlreadyAdded, "isDisabled", isDisabled))() } // Check if option.name is in devicesAlreadyAdded
+                    return (
+                      <li {...props} aria-disabled={isDisabled} >
+                        <Checkbox
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                          disabled={isDisabled} // Disable the checkbox if condition is met
+                        />
+                        <ListItemText
+                          primary={option.name}
+                          style={{
+                            textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
+                            color: isDisabled ? "gray" : "inherit",
+                          }}
+                        />
+                      </li>
+                    );
+                  }}
+                  filterOptions={(options, state) =>
+                    options.filter((option) =>
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                    )
+                  }
+                  isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
+                />
+              </FormControl>
+              <Autocomplete
+                multiple
+                options={['All', ...notificationTypes]} // Include "All" dynamically
+                disableCloseOnSelect
+                getOptionLabel={(option) => option}
+                value={selectedNotificationTypes}
+                onChange={(event, newValue) => {
+                  if (newValue.includes('All')) {
+                    if (selectedNotificationTypes.length === notificationTypes.length) {
+                      // Deselect all
+                      setSelectedNotificationTypes([]);
+                    } else {
+                      // Select all options except "All"
+                      setSelectedNotificationTypes(notificationTypes);
+                    }
+                  } else {
+                    setSelectedNotificationTypes(newValue);
+                  }
+                }}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                    <Checkbox
+                      icon={<CheckBoxOutlineBlank />}
+                      checkedIcon={<CheckBox />}
+                      style={{ marginRight: 8 }}
+                      checked={option === 'All' ? selectedNotificationTypes.length === notificationTypes.length : selected}
+                    />
+                    {option}
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select Notifications"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <>
+                          <InputAdornment position="start">
+                            <NotificationsIcon
+                              sx={{
+                                borderRadius: "50%",
+                                backgroundColor: "rgba(0, 0, 0, 0.54)",
+                                color: "white",
+                                padding: "5px",
+                                fontSize: "28px",
+                              }}
+                            />
+                          </InputAdornment>
+                          {params.InputProps.startAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
              
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px' }}
+                style={{ marginTop: '20px', marginLeft:'auto' }}
               >
                 Submit
               </Button>
@@ -672,16 +869,25 @@ const Notification = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleEditNotification}>
+            <form onSubmit={handleEditNotification} style={{display: 'flex',flexDirection: 'column'}}>
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Device"
                   name="device"
                   value={formData.deviceId?.name !== undefined ? formData.deviceId?.name : ''}
                   disabled
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DirectionsCarIcon
+                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel>Notification Type</InputLabel>
                 <Select
                   name="type"
@@ -696,13 +902,66 @@ const Notification = () => {
                     </MenuItem>
                   ))}
                 </Select>
+              </FormControl> */}
+              <FormControl fullWidth sx={{ marginBottom: 2, marginTop: 5 }}>
+                <InputLabel>Notification Type</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.type || []}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected.includes('All')) {
+                      if (formData.type?.length === notificationTypes.length) {
+                        // Deselect all if "All" is selected
+                        setFormData({ ...formData, type: [] });
+                      } else {
+                        // Select all options
+                        setFormData({ ...formData, type: notificationTypes });
+                      }
+                    } else {
+                      // Regular update
+                      setFormData({ ...formData, type: selected });
+                    }
+                  }}
+                  input={
+                    <OutlinedInput
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <NotificationsIcon
+                            sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          />
+                        </InputAdornment>
+                      }
+                      label="Notification Type"
+                    />
+                  }
+                  label="Select Notification Type..."
+                  multiple
+                  renderValue={(selected) => selected.join(', ')}
+                >
+                  {/* "All" Option */}
+                  <MenuItem value="All">
+                    <Checkbox
+                      checked={formData.type?.length === notificationTypes.length} // Check "All" if all options are selected
+                    />
+                    <ListItemText primary="All" />
+                  </MenuItem>
+
+                  {/* Individual Notification Types */}
+                  {notificationTypes.map((Ntype) => (
+                    <MenuItem key={Ntype} value={Ntype}>
+                      <Checkbox checked={formData.type?.includes(Ntype)} />
+                      <ListItemText primary={Ntype} />
+                    </MenuItem>
+                  ))}
+                </Select>
               </FormControl>
               
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px' }}
+                style={{ marginTop: '20px', marginLeft:'auto'}}
               >
                 Edit
               </Button>
