@@ -16,6 +16,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  InputAdornment
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -45,6 +46,7 @@ import * as XLSX from 'xlsx'; // For Excel export
 import jsPDF from 'jspdf'; // For PDF export
 import 'jspdf-autotable'; // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
+import GroupIcon from '@mui/icons-material/Group';
 import { cilSettings } from '@coreui/icons'
 import "../../../../src/app.css";
 
@@ -508,6 +510,15 @@ const Group = () => {
                   value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <GroupIcon
+                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button
@@ -551,6 +562,15 @@ const Group = () => {
                   value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <GroupIcon
+                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </FormControl>
               <Button

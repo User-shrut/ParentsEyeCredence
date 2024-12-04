@@ -42,6 +42,18 @@ const AddDeviceModal = ({
   handleYearSelection,
   setShowExpirationDropdown,
 }) => {
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0'); // Day of the month
+    const hours = String(now.getHours()).padStart(2, '0'); // Hours
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Minutes
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Seconds
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Format: YYYY/MM/DD HH:MM:SS
+  };
   const handleAddSubmit = async () => {
     const oldapiUrl = `http://63.142.251.13:8082/api/devices`
     const apiUrl = `${import.meta.env.VITE_API_URL}/device`
@@ -383,9 +395,11 @@ const AddDeviceModal = ({
                       <label>Installation date: </label>
                       <TextField
                         key={col.accessor}
-                        type="date"
+                        type="datetime-local"
                         name={col.accessor}
-                        value={formData[col.accessor] || ''}
+                        //value={formData[col.accessor] || ''} //change kelya nantr display hote
+                        //value={getCurrentDateTime() || ''} ////change kelya nantr input mdhe show nhi hot but backened vr changed vali jate as expected
+                        value={formData[col.accessor] || getCurrentDateTime()}
                         onChange={handleInputChange}
                         fullWidth
                       />
