@@ -358,15 +358,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
           if (column === 'Arrival Time')
             return new Date(
               new Date(row.arrivalTime).setHours(
-                new Date(row.arrivalTime).getHours() ,
-                new Date(row.arrivalTime).getMinutes() ,
+                new Date(row.arrivalTime).getHours() - 5 ,
+                new Date(row.arrivalTime).getMinutes() - 30 ,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Departure Time')
             return new Date(
               new Date(row.departureTime).setHours(
-                new Date(row.departureTime).getHours() + 6,
-                new Date(row.departureTime).getMinutes() + 30,
+                new Date(row.departureTime).getHours() - 5,
+                new Date(row.departureTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Device Name') return row.device?.name || '--'
@@ -405,15 +405,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
           if (column === 'Arrival Time')
             rowData['Arrival Time'] = new Date(
               new Date(row.arrivalTime).setHours(
-                new Date(row.arrivalTime).getHours() + 6,
-                new Date(row.arrivalTime).getMinutes() + 30,
+                new Date(row.arrivalTime).getHours() - 5,
+                new Date(row.arrivalTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Departure Time')
             rowData['Departure Time'] = new Date(
               new Date(row.departureTime).setHours(
-                new Date(row.departureTime).getHours() + 6,
-                new Date(row.departureTime).getMinutes() + 30,
+                new Date(row.departureTime).getHours() - 5,
+                new Date(row.departureTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Device Name') rowData['Device Name'] = row.device?.name || '--'

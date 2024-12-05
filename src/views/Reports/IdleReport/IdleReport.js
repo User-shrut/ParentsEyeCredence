@@ -407,15 +407,15 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
             if (column === 'Arrival Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
-                  new Date(nestedRow.arrivalTime).getHours() + 6,
-                  new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                  new Date(nestedRow.arrivalTime).getHours() - 5,
+                  new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             if (column === 'Departure Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
-                  new Date(nestedRow.departureTime).getHours() + 6,
-                  new Date(nestedRow.departureTime).getMinutes() + 30,
+                  new Date(nestedRow.departureTime).getHours() - 5,
+                  new Date(nestedRow.departureTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             if (column === 'Total Duration')
@@ -449,15 +449,15 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
             if (column === 'Arrival Time')
               rowData['Arrival Time'] = new Date(
                 new Date(nestedRow.arrivalTime).setHours(
-                  new Date(nestedRow.arrivalTime).getHours() + 6,
-                  new Date(nestedRow.arrivalTime).getMinutes() + 30,
+                  new Date(nestedRow.arrivalTime).getHours() - 5,
+                  new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             if (column === 'Departure Time')
               rowData['Departure Time'] = new Date(
                 new Date(nestedRow.departureTime).setHours(
-                  new Date(nestedRow.departureTime).getHours() + 6,
-                  new Date(nestedRow.departureTime).getMinutes() + 30,
+                  new Date(nestedRow.departureTime).getHours() - 5,
+                  new Date(nestedRow.departureTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             if (column === 'Total Duration')

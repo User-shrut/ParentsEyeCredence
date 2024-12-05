@@ -431,6 +431,7 @@ const IndividualTrack = () => {
                       </div>
                       <div className="col-2 text-center attribute shadow">
                         <strong>{`${Math.round(individualSalesMan?.attributes?.distance)}`}</strong>
+                        <small> M</small>
                         <br />
                         <p className="p-0 m-0">Distance</p>
                       </div>

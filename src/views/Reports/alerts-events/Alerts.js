@@ -325,25 +325,25 @@ const Alerts = () => {
           border: '1px solid black'
         }}
       >
-        <CTable bordered align="middle" className="mb-0 border" hover responsive >
+        <CTable style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
           <CTableHead className="text-nowrap">
             <CTableRow className="bg-body-tertiary">
-              <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 SN
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                 Device Name
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 Notification
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 Location
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 Message
               </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center text-white bg-secondary">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 Time
               </CTableHeaderCell>
             </CTableRow>

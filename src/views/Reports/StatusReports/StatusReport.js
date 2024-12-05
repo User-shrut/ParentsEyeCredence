@@ -393,103 +393,52 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
     console.log(newAddressData);
   }
 
-  const exportToExcel = async () => {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Table Data');
+  // Function to export table data to Excel
 
-    // Optional: Add vehicle name as a title above the table
-    const vehicleName = "Your Vehicle Name Here"; // Replace with actual vehicle name if available
-    worksheet.addRow([`Vehicle Name: ${vehicleName}`]).font = { bold: true, size: 14 };
-
-    // Create header row
-    const header = ['SN', ...selectedColumns];
-    const headerRow = worksheet.addRow(header);
-
-    // Apply header styles
-    headerRow.font = { bold: true };
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFCC00' }, // Background color
-      };
-      cell.font = {
-        color: { argb: 'FFFFFF' }, // Font color
-        bold: true,
-      };
-    });
-
-    // Populate data rows
-    const dataToExport = apiData.data.map((row, rowIndex) => {
-      const rowData = selectedColumns.reduce((acc, column) => {
-        switch (column) {
-          case 'Vehicle Status':
-            acc[column] = row.vehicleStatus || '--';
-            break;
-          case 'Start Date Time':
-            acc[column] = row.startDateTime ? `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}` : '--';
-            break;
-          case 'End Date Time':
-            acc[column] = row.endDateTime ? `${row.endDateTime.slice(0, 10)} ${row.endDateTime.slice(11, 16)}` : '--';
-            break;
-          case 'Start Address':
-            acc[column] = newAddressData?.startAddress || 'Fetching...';
-            break;
-          case 'End Address':
-            acc[column] = newAddressData?.endAddress || 'Fetching...';
-            break;
-          case 'Distance':
-            acc[column] = row.distance || '--';
-            break;
-          case 'Total Distance':
-            acc[column] = row.distance ? (row.distance / 1000).toFixed(2) + ' km' : '--';
-            break;
-          case 'Driver Name':
-            acc[column] = row.driverInfos?.driverName || '--';
-            break;
-          case 'Driver Phone No.':
-            acc[column] = row.device?.name || '--';
-            break;
-          case 'Duration':
-            acc[column] = row.time || '--';
-            break;
-          case 'Start Coordinates':
-            acc[column] = row.startLocation
-              ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
-              : '--';
-            break;
-          case 'End Coordinates':
-            acc[column] = row.endLocation
-              ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-              : '--';
-            break;
-          default:
-            acc[column] = row[column] || '--'; // Fallback for other columns
+  const exportToExcel = () => {
+    const workbook = XLSX.utils.book_new(); // Create a new workbook
+  
+    const tableColumn = ['SN', ...selectedColumns];
+    const tableRows = apiData.data.map((row, rowIndex) => {
+      const rowData = selectedColumns.map((column) => {
+        if (column === 'Vehicle Status') {
+          if (row.vehicleStatus === 'Idle') return 'Idle';
+          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off';
+          if (row.vehicleStatus === 'Ignition On') return 'Ignition On';
+          return '--';
+        } else if (column === 'Start Date Time') {
+          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
+        } else if (column === 'End Date Time') {
+          return `${row.endDateTime.slice(0, 10)} ${row.endDateTime.slice(11, 16)}`;
+        } else if (column === 'Start Address') {
+          return newAddressData?.startAddress || 'Fetching...';
+        } else if (column === 'End Address') {
+          return newAddressData?.endAddress || 'Fetching...';
+        } else if (column === 'Distance') {
+          return row.distance;
+        } else if (column === 'Total Distance') {
+          return (row.totalKm / 1000).toFixed(2) + ' km';
+        } else if (column === 'Driver Name') {
+          return row.driverInfos?.driverName || '--';
+        } else if (column === 'Driver Phone No.') {
+          return row.device?.name || '--';
+        } else if (column === 'Duration') {
+          return row.time;
+        } else if (column === 'Start Coordinates') {
+          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
+        } else if (column === 'End Coordinates') {
+          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
+        } else {
+          return row[column] || '--'; // Fallback for other columns
         }
-        return acc;
-      }, {});
-
-      return { SN: rowIndex + 1, ...rowData };
+      });
+      return [rowIndex + 1, ...rowData];
     });
-
-    // Add data rows to the worksheet
-    dataToExport.forEach(data => worksheet.addRow(data));
-
-    // Adjust column widths
-    worksheet.columns.forEach(column => {
-      if (column.values && column.values.length) { // Check if column.values is defined and has length
-        const maxLength = Math.max(
-          column.header ? column.header.length : 0,
-          ...column.values.map(val => (val ? String(val).length : 0))
-        );
-        column.width = maxLength < 15 ? 15 : maxLength; // Set a minimum width
-      }
-    });
-
-    // Write the file
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'table_data.xlsx'); // Use file-saver to save the file
+  
+    const worksheetData = [tableColumn, ...tableRows];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    XLSX.writeFile(workbook, 'table_data.xlsx');
   };
 
   // Function to export table data to PDF
@@ -509,9 +458,9 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           if (row.vehicleStatus === 'Ignition On') return 'Ignition On';
           return '--';
         } else if (column === 'Start Date Time') {
-          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
         } else if (column === 'End Date Time') {
-          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(12, 16)}`;
+          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
         } else if (column === 'Start Address') {
           return newAddressData?.startAddress || 'Fetching...';
         } else if (column === 'End Address') {
