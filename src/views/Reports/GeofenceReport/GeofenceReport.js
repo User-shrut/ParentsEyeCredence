@@ -97,7 +97,7 @@ const GeofenceReports = () => {
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
-          <h2>Geofences Reports</h2>
+          <h2>Geofences Alerts Reports</h2>
         </div>
 
         <div className="d-flex">
