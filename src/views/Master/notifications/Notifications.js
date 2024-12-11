@@ -6,6 +6,7 @@ import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material';
 import ListItemText from "@mui/material/ListItemText";
 import GroupIcon from '@mui/icons-material/Group';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import Popper from '@mui/material/Popper';
 
 import {
   TableContainer,
@@ -103,13 +104,19 @@ const Notification = () => {
     setDevices([])
   }
 
+  const CustomListbox = (props) => {
+    return (
+      <ul {...props} style={{ maxHeight: '200px', overflowY: 'auto' }} />
+    );
+  };
+
   const style = {
     position: 'absolute',
     top: '50%',
     borderRadius: '10px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '75%',
+    width: '40%',
     maxHeight: '90vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
@@ -754,18 +761,20 @@ const Notification = () => {
                     const isDisabled = devicesAlreadyAdded.includes(option.name);
                     { (() => console.log("Logging inside JSX:", devicesAlreadyAdded, "isDisabled", isDisabled))() } // Check if option.name is in devicesAlreadyAdded
                     return (
-                      <li {...props} aria-disabled={isDisabled} >
+                      <li {...props} 
+                     // aria-disabled={isDisabled}
+                       >
                         <Checkbox
                           style={{ marginRight: 8 }}
                           checked={selected}
-                          disabled={isDisabled} // Disable the checkbox if condition is met
+                          //disabled={isDisabled} // Disable the checkbox if condition is met
                         />
                         <ListItemText
                           primary={option.name}
-                          style={{
-                            textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
-                            color: isDisabled ? "gray" : "inherit",
-                          }}
+                          // style={{
+                          //   textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
+                          //   color: isDisabled ? "gray" : "inherit",
+                          // }}
                         />
                       </li>
                     );
@@ -797,6 +806,7 @@ const Notification = () => {
                     setSelectedNotificationTypes(newValue);
                   }
                 }}
+                ListboxComponent={CustomListbox} 
                 renderOption={(props, option, { selected }) => (
                   <li {...props}>
                     <Checkbox
@@ -833,7 +843,9 @@ const Notification = () => {
                       ),
                     }}
                   />
+                  
                 )}
+                
               />
 
              

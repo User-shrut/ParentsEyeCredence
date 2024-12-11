@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import AllInOneForm from './AllInOneForm'
+
 import {
   TableContainer,
   Paper,
@@ -84,6 +86,13 @@ const Devices = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Device Info', 'Assign To', 'Subscription']
   const [filteredData, setFilteredData] = useState([])
+
+  const [open, setOpen] = useState(false);
+  const [customExtendDate, setCustomExtendDate] = useState('');
+
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
@@ -107,7 +116,7 @@ const Devices = () => {
     const currentI = data.slice(currentPage * limit, (currentPage + 1) * limit)
     setCurrentItems(currentI)
 
-    console.log("currentItems",currentItems)
+    console.log("currentItems", currentItems)
   }, [currentPage, limit, data])
 
   const handlePageClick = (event) => {
@@ -130,6 +139,7 @@ const Devices = () => {
     { Header: 'Installation Date', accessor: 'installationdate' }, // Maps to 'installationdate'
     { Header: 'Expiration', accessor: 'expirationdate' }, // Maps to 'expirationdate'
     { Header: 'Extend Date', accessor: 'extenddate' },
+   
   ]
 
   const style = {
@@ -137,8 +147,8 @@ const Devices = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '35%',
-    height: '100vh',
+    width: '66%',
+    height: '82vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
@@ -285,29 +295,29 @@ const Devices = () => {
         const mergedResult = [];
         function compareAndMerge(oldApiData, newApiData) {
           // Normalize old and new data to keep the key names consistent
-              newApiData.forEach(newItem => {
-              const oldItem = oldApiData.find(item => item.id == newItem.deviceId);
-              if (oldItem) {
-                  if (newItem.driver) {
-                      oldItem.Driver = newItem.driver;
-                      delete oldItem.driver;
-                  }
-                  mergedResult.push({ ...oldItem, ...newItem });
-              } else {
-                  mergedResult.push(newItem);
+          newApiData.forEach(newItem => {
+            const oldItem = oldApiData.find(item => item.id == newItem.deviceId);
+            if (oldItem) {
+              if (newItem.driver) {
+                oldItem.Driver = newItem.driver;
+                delete oldItem.driver;
               }
+              mergedResult.push({ ...oldItem, ...newItem });
+            } else {
+              mergedResult.push(newItem);
+            }
           });
-      
+
           // Add remaining old data that wasn't in new data
           oldApiData.forEach(oldItem => {
-              const newItem = newApiData.find(item => item.deviceId == oldItem.id);
-              if (!newItem) {
-                mergedResult.push(oldItem); 
-              }
+            const newItem = newApiData.find(item => item.deviceId == oldItem.id);
+            if (!newItem) {
+              mergedResult.push(oldItem);
+            }
           });
-      
+
           return mergedResult;
-      }
+        }
         compareAndMerge(oldApiData, newApiData)
         console.log(' merge data hai : ', mergedResult)
         setData(mergedResult)
@@ -358,14 +368,14 @@ const Devices = () => {
 
   // ##################### Filter data by search query #######################
 
-  const [pageCount,setPageCount] = useState(0)
+  const [pageCount, setPageCount] = useState(0)
   const filterDevices = () => {
     if (!searchQuery) {
       setFilteredData(currentItems)
-    } 
-    if(searchQuery) {
+    }
+    if (searchQuery) {
       const filtered = data?.filter( //currentItems.filter
-        (device) => 
+        (device) =>
           device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.uniqueId?.includes(searchQuery) ||
           device.sim?.includes(searchQuery) ||
@@ -374,7 +384,7 @@ const Devices = () => {
       )
       // a = filtered.length
       setPageCount(filtered.length)
-      const filteredByPage = filtered.slice(currentPage*limit,(currentPage+1)*limit)
+      const filteredByPage = filtered.slice(currentPage * limit, (currentPage + 1) * limit)
       setFilteredData(filteredByPage)
     }
   }
@@ -514,14 +524,14 @@ const Devices = () => {
         })
       }
 
-      
-        toast.success('User is edited successfully')
-        setEditModalOpen(false)
-        fetchData()
-        setLoading(false)
 
-        setFormData({})
-      
+      toast.success('User is edited successfully')
+      setEditModalOpen(false)
+      fetchData()
+      setLoading(false)
+
+      setFormData({})
+
     } catch (error) {
       console.error('Error during submission:', error)
       let errorMessage = 'An error occurred'
@@ -758,33 +768,72 @@ const Devices = () => {
     }
   }
 
-  const handleCheckPassword = () => {
-    if (extendedPassword == myPassword) {
-      setPasswordCheck(true)
-      setExtendedPasswordModel(false)
-      alert('Password is correct')
+  // const handleCheckPassword = () => {
+  //   if (extendedPassword == myPassword) {
+  //     setPasswordCheck(true)
+  //     setExtendedPasswordModel(false)
+  //     alert('Password is correct')
 
-      // Now update the expiration date based on the selected plan (years)
-      const ExpiryDate = formData.expirationdate
-      if (ExpiryDate && extendedYear) {
-        const expiry = new Date(ExpiryDate)
-        const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + extendedYear))
-          .toISOString()
-          .split('T')[0] // Format to yyyy-mm-dd
+  //     // Now update the expiration date based on the selected plan (years)
+  //     const ExpiryDate = formData.expirationdate
+  //     if (ExpiryDate && extendedYear) {
+  //       const expiry = new Date(ExpiryDate)
+  //       const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + extendedYear))
+  //         .toISOString()
+  //         .split('T')[0] // Format to yyyy-mm-dd
 
-        // Now set the extended date
-        setFormData({
-          ...formData,
-          extenddate: extendedDate,
-          expirationdate: extendedDate,
-        })
+  //       // Now set the extended date
+  //       setFormData({
+  //         ...formData,
+  //         extenddate: extendedDate,
+  //         expirationdate: extendedDate,
+  //       })
 
-        setSelectedYears(null) // Reset the selected years after updating
-      }
-    } else {
-      alert('Password is not correct')
+  //       setSelectedYears(null) // Reset the selected years after updating
+  //     }
+  //   } else {
+  //     alert('Password is not correct')
+  //   }
+  // }
+// below is when we deal with custom date
+const handleCheckPassword = () => {
+  if (extendedPassword === myPassword) {
+    setPasswordCheck(true);
+    setExtendedPasswordModel(false);
+    alert('Password is correct');
+
+    // Update the expiration date
+    if (customExtendDate) {
+      // Apply the custom date selected earlier
+      setFormData({
+        ...formData,
+        extenddate: customExtendDate,
+        expirationdate: customExtendDate,
+      });
+      setCustomExtendDate(null); // Clear the custom date state after applying
+    } else if (formData.expirationdate && extendedYear) {
+      // Apply year extension logic
+      const expiry = new Date(formData.expirationdate);
+      const extendedDate = new Date(
+        expiry.setFullYear(expiry.getFullYear() + extendedYear)
+      )
+        .toISOString()
+        .split('T')[0];
+
+      setFormData({
+        ...formData,
+        extenddate: extendedDate,
+        expirationdate: extendedDate,
+      });
     }
+
+    setSelectedYears(null); // Reset the selected years
+  } else {
+    alert('Password is not correct');
   }
+};
+
+  
 
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {
@@ -910,17 +959,17 @@ const Devices = () => {
             />
           </div>
           <div className="me-3 d-none d-md-block" >
-              <button
-                onClick={handleSearch}
-                variant="contained"
-                className="btn btn-secondary"
-              >
-                Search
-              </button>
-            </div>
+            <button
+              onClick={handleSearch}
+              variant="contained"
+              className="btn btn-secondary"
+            >
+              Search
+            </button>
+          </div>
           {decodedToken.superadmin && (
             <div>
-              <button
+              {/* <button
                 onClick={() => {
                   setAddModalOpen(true);
                   setFormData({
@@ -932,12 +981,17 @@ const Devices = () => {
                 className="btn btn-secondary"
               >
                 Add Device
+              </button> */}
+              <button onClick={handleOpen}
+                variant="contained"
+                className="btn btn-secondary" >
+                Add Device
               </button>
             </div>
           )}
         </div>
       </div>
-      
+
       <TableContainer
         component={Paper}
         sx={{
@@ -949,20 +1003,20 @@ const Devices = () => {
           border: '1px solid black'
         }}
       >
-        <CTable bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
-          <CTableHead className="text-nowrap" >
-            <CTableRow style={{height:'6vh' ,  }} >
-              <CTableHeaderCell className="text-center text-white bg-secondary" >
-                SN
+        <CTable bordered align="middle" className="mb-2 borderless min-vh-25 rounded-top-3" hover responsive >
+          <CTableHead style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+            <CTableRow style={{height:'6vh' ,  }} className="text-nowrap "  >
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+                <strong>SN</strong>
               </CTableHeaderCell >
               {columns.slice(1).map((column, index) => (
-                <CTableHeaderCell key={index} className="text-center text-white bg-secondary" >
-                  {column.Header}
+                <CTableHeaderCell key={index} className="text-center bg-body-secondary text-center sr-no table-cell" >
+                  <strong>{column.Header}</strong>
                 </CTableHeaderCell>
               ))}
               {decodedToken.superadmin ? (
-                <CTableHeaderCell className="text-center text-white bg-secondary " >
-                  Actions
+                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+                  <strong>Actions</strong>
                 </CTableHeaderCell>
               ) : null}
             </CTableRow>
@@ -990,9 +1044,9 @@ const Devices = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", border: 'none'}}>{currentPage * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", border: 'none' }}>{currentPage * limit + index + 1}</CTableDataCell>
                   {columns.slice(1).map((column) => (
-                    <CTableDataCell key={column.accessor} className="text-center"   style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                    <CTableDataCell key={column.accessor} className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
                       {column.accessor === 'groups' ? (
                         <CFormSelect
                           id="groups"
@@ -1012,7 +1066,7 @@ const Devices = () => {
                         <CFormSelect
                           id="geofence"
                           className=" text-center border-2"
-                          style={{ width: '120px' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                           value=""
                         >
                           <option value="">{item.geofences?.length || '0'}</option>
@@ -1027,7 +1081,7 @@ const Devices = () => {
                         <CFormSelect
                           id="users"
                           className=" text-center border-2"
-                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",  }}
+                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
                           value=""
                         >
                           <option value="">{item.users?.length || '0'}</option>
@@ -1049,7 +1103,7 @@ const Devices = () => {
                   ))}
 
                   {decodedToken.superadmin ? (
-                    <CTableDataCell className="text-center d-flex" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>
+                    <CTableDataCell className="text-center d-flex" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                       <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                         <RiEdit2Fill
                           style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
@@ -1080,7 +1134,7 @@ const Devices = () => {
             )}
           </CTableBody>
         </CTable>
-        
+
       </TableContainer>
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
@@ -1106,7 +1160,7 @@ const Devices = () => {
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={(searchQuery)? Math.ceil(pageCount / limit): Math.ceil(data.length / limit) } // Set based on the total pages from the API
+              pageCount={(searchQuery) ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)} // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}
@@ -1181,8 +1235,11 @@ const Devices = () => {
         steps={steps}
         handleExtendYearSelection={handleExtendYearSelection}
         setShowExpirationDropdown={setShowExpirationDropdown}
+        customExtendDate={customExtendDate}
+        setCustomExtendDate={setCustomExtendDate}
+        setExtendedPasswordModel={setExtendedPasswordModel}
       />
-      
+
       <Modal open={extendedPasswordModel} onClose={handleModalClose}>
         <Box sx={style} style={{ height: '30%' }}>
           <Box
@@ -1218,6 +1275,28 @@ const Devices = () => {
           </Button>
         </Box>
       </Modal>
+      <AllInOneForm open={open} setOpen={setOpen} handleClose={handleClose} handleOpen={handleOpen}
+
+        style={style}
+        token={token}
+        fetchData={fetchData}
+        currentStep={currentStep}
+        steps={steps}
+        columns={columns}
+        formData={formData}
+        setFormData={setFormData}
+        users={users}
+        groups={groups}
+        drivers={drivers}
+        areas={areas}
+        models={models}
+        categories={categories}
+        handleInputChange={handleInputChange}
+        handleNext={handleNext}
+        handleBack={handleBack}
+        handleYearSelection={handleYearSelection}
+        setShowExpirationDropdown={setShowExpirationDropdown}
+      />
     </div>
   )
 }

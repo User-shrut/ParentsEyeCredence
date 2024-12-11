@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -6,21 +6,24 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Stepper,
-  Step,
-  StepLabel,
+  // Stepper,
+  // Step,
+  // StepLabel,
   TextField,
   Typography,
   IconButton,
   Modal,
+  InputAdornment
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { AiOutlinePlus } from 'react-icons/ai'
+import { MdOutlineOnDeviceTraining } from "react-icons/md";
+
 
 const EditDeviceModal = ({
   editModalOpen,
   handleModalClose,
-  currentStep,
+  //currentStep,
   style,
   handleNext,
   handleBack,
@@ -38,7 +41,12 @@ const EditDeviceModal = ({
   steps,
   handleExtendYearSelection,
   setShowExpirationDropdown,
+  customExtendDate,
+  setCustomExtendDate,
+  setExtendedPasswordModel
 }) => {
+
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   return (
     <Modal open={editModalOpen} onClose={handleModalClose}>
       <Box
@@ -53,7 +61,7 @@ const EditDeviceModal = ({
         <div className="d-flex justify-content-between align-items-center mb-4">
           <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
             <span role="img" aria-label="device">
-              <AiOutlinePlus className="fs-2" />
+              <MdOutlineOnDeviceTraining style={{verticalAlign: 'text-top'}}/>
             </span>{' '}
             Update Device
           </Typography>
@@ -63,17 +71,18 @@ const EditDeviceModal = ({
         </div>
 
         {/* Step-by-step form with progress indicator */}
-        <div>
-          <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
+        <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridGap: '1rem 1.5rem' }}>
+          {/* <Stepper activeStep={currentStep} className="mb-4" alternativeLabel>
             {steps.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
               </Step>
             ))}
-          </Stepper>
+          </Stepper> */}
 
           {/* Step 1: General Information */}
-          {currentStep === 0 &&
+          {
+            // currentStep === 0 &&
             columns.map((col) => {
               if (
                 col.accessor === 'name' ||
@@ -99,7 +108,8 @@ const EditDeviceModal = ({
             })}
 
           {/* Step 2: Assign Device */}
-          {currentStep === 1 &&
+          {
+            // currentStep === 1 &&
             columns.map((col) => {
               if (col.accessor === 'users') {
                 return (
@@ -218,15 +228,17 @@ const EditDeviceModal = ({
             })}
 
           {/* Step 3: Installation and Expiration Dates */}
-          {currentStep === 2 &&
+          {
+            // currentStep === 2 &&
             columns.map((col) => {
               if (col.accessor === 'installationdate') {
                 return (
-                  <div className="mt-3">
-                    <label>Installation date: </label>
+                  <div >
+                    {/* <label>Installation date: </label> */}
                     <TextField
                       key={col.accessor}
                       name={col.accessor}
+                      label="Installation Date"
                       value={formData[col.accessor] || ''}
                       onChange={handleInputChange}
                       fullWidth
@@ -236,11 +248,11 @@ const EditDeviceModal = ({
                 )
               } else if (col.accessor === 'expirationdate') {
                 return (
-                  <div className="mt-3">
-                    <label>Expiration Date: </label>
+                  <div >
                     <TextField
                       key={col.accessor}
                       name={col.accessor}
+                      label="Expiration Date"
                       value={formData[col.accessor]}
                       onChange={handleInputChange}
                       fullWidth
@@ -250,28 +262,66 @@ const EditDeviceModal = ({
                 )
               } else if (col.accessor === 'extenddate') {
                 return (
-                  <div className="mt-3">
-                    <label>Extend Plan: </label>
-                    <br />
+
+
+                  <FormControl fullWidth >
+                    <InputLabel id="extend-plan-label">Extend Plan</InputLabel>
                     <Select
+                      labelId="extend-plan-label"
                       onChange={(e) => {
-                        handleExtendYearSelection(parseInt(e.target.value))
-                        setShowExpirationDropdown(false)
+                        const value = e.target.value;
+                        if (value === 'custom') {
+                          setShowCustomDatePicker(true); // Show the date picker for custom date
+                          setShowExpirationDropdown(false);
+                        } else {
+                          setShowCustomDatePicker(false);
+                          handleExtendYearSelection(parseInt(value));
+                          setShowExpirationDropdown(false);
+                        }
                       }}
                       fullWidth
                     >
                       <MenuItem value={1}>1 Year</MenuItem>
                       <MenuItem value={2}>2 Years</MenuItem>
                       <MenuItem value={3}>3 Years</MenuItem>
+                      <MenuItem value="custom">Custom Date</MenuItem>
                     </Select>
-                  </div>
+                  </FormControl>
                 )
               }
               return null
             })}
 
+          {showCustomDatePicker && (
+            <FormControl fullWidth >
+              {/* <input
+                          type="date"
+                          fullWidth
+                          value={customExtendDate}
+                          onChange={(e) => {setCustomExtendDate(e.target.value); setExtendedPasswordModel(true)} }// Store the selected date temporarily
+                        /> */}
+
+              <TextField
+                type="date"
+                label="Select Custom Extended Date:"
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true, // Ensures the label doesn't overlap with the date input
+                }}
+                value={customExtendDate}
+                onChange={(e) => { setCustomExtendDate(e.target.value); setExtendedPasswordModel(true) }}// Store the selected date temporarily
+
+
+                fullWidth
+
+              >
+
+              </TextField>
+            </FormControl>
+          )}
+
           {/* Navigation buttons */}
-          <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
+          {/* <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
             {currentStep > 0 && (
               <Button onClick={handleBack} variant="outlined">
                 Back
@@ -286,8 +336,13 @@ const EditDeviceModal = ({
                 Submit
               </Button>
             )}
-          </div>
+          </div> */}
+
         </div>
+        <button onClick={handleEditSubmit} variant="contained" className="btn btn-secondary" color="primary" style={{ marginTop: '2rem', width: '6rem', marginLeft: 'auto' }}>
+          Submit
+        </button>
+       
       </Box>
     </Modal>
   )
