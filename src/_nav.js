@@ -609,7 +609,7 @@ const _nav = (role, decodedToken) => {
     idle,
     sensor,
     alerts,
-    vehicle,
+    // vehicle, 
     geofenceReport
   console.log(decodedToken)
 
@@ -632,7 +632,7 @@ const _nav = (role, decodedToken) => {
       idle,
       sensor,
       alerts,
-      vehicle,
+      // vehicle,
       geofenceReport,
     } = decodedToken.user)
   }
@@ -868,17 +868,17 @@ const _nav = (role, decodedToken) => {
                   </div>
                 ),
               },
-              {
-                component: CNavItem,
-                name: 'Vehicle Reports',
-                to: '/vehiclereport',
+              // {
+              //   component: CNavItem,
+              //   name: 'Vehicle Reports',
+              //   to: '/vehiclereport',
                 
-                icon: (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FaCarOn style={{ marginRight: '15px', fontSize: '25px' }} />
-                  </div>
-                ),
-              },
+              //   icon: (
+              //     <div style={{ display: 'flex', alignItems: 'center' }}>
+              //       <FaCarOn style={{ marginRight: '15px', fontSize: '25px' }} />
+              //     </div>
+              //   ),
+              // },
               {
                 component: CNavItem,
                 name: 'Geofence Report',
@@ -1110,17 +1110,17 @@ const _nav = (role, decodedToken) => {
                   </div>
                 ),
               },
-              vehicle && {
-                component: CNavItem,
-                name: 'Vehicle Reports',
-                to: '/vehiclereport',
-                visible: true,  // This can be a boolean or controlled by a state.
-                icon: (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FaCarOn style={{ marginRight: '15px', fontSize: '25px' }} />
-                  </div>
-                ),
-              },
+              // vehicle && {
+              //   component: CNavItem,
+              //   name: 'Vehicle Reports',
+              //   to: '/vehiclereport',
+              //   visible: true,  // This can be a boolean or controlled by a state.
+              //   icon: (
+              //     <div style={{ display: 'flex', alignItems: 'center' }}>
+              //       <FaCarOn style={{ marginRight: '15px', fontSize: '25px' }} />
+              //     </div>
+              //   ),
+              // },
               geofenceReport && {
                 component: CNavItem,
                 name: 'Geofence Report',

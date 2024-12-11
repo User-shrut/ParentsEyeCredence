@@ -58,7 +58,7 @@ const SearchTrip = ({
     const date = new Date(inputDate) // Create a Date object with the given input
 
     // Get the timezone offset in minutes and convert to milliseconds
-    const timezoneOffset = date.getTimezoneOffset() * 60000
+    const timezoneOffset = date.getTimezoneOffset()
 
     // Adjust the date object to local time by subtracting the offset
     const localDate = new Date(date.getTime() - timezoneOffset)
@@ -138,24 +138,24 @@ const SearchTrip = ({
           }
         </CFormSelect> */}
         <Select
-        id="user"
-        options={
-          loading
-            ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
-            : users?.length > 0
-            ? users.map((user) => ({ value: user._id, label: user.username }))
-            : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
-        }
-        value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
-        onChange={(selectedOption) => {
-          const selectedUser = selectedOption?.value;
-          setSelectedU(selectedUser);
-          console.log('Selected user:', selectedUser);
-          getGroups(selectedUser);
-        }}
-        placeholder="Choose a user..."
-        isLoading={loading} // Show a loading spinner while fetching users
-      />
+          id="user"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
+              : users?.length > 0
+                ? users.map((user) => ({ value: user._id, label: user.username }))
+                : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
+          }
+          value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+          onChange={(selectedOption) => {
+            const selectedUser = selectedOption?.value;
+            setSelectedU(selectedUser);
+            console.log('Selected user:', selectedUser);
+            getGroups(selectedUser);
+          }}
+          placeholder="Choose a user..."
+          isLoading={loading} // Show a loading spinner while fetching users
+        />
 
       </CCol>
       <CCol md={2}>
@@ -185,24 +185,24 @@ const SearchTrip = ({
           }
         </CFormSelect> */}
         <Select
-        id="group"
-        options={
-          loading
-            ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
-            : groups?.length > 0
-            ? groups.map((group) => ({ value: group._id, label: group.name }))
-            : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
-        }
-        value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
-        onChange={(selectedOption) => {
-          const selectedGroup = selectedOption?.value;
-          setSelectedG(selectedGroup);
-          console.log('Selected Group ID:', selectedGroup);
-          getDevices(selectedGroup);
-        }}
-        placeholder="Choose a group..."
-        isLoading={loading} // Show a loading spinner while fetching groups
-      />
+          id="group"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
+              : groups?.length > 0
+                ? groups.map((group) => ({ value: group._id, label: group.name }))
+                : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
+          }
+          value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+          onChange={(selectedOption) => {
+            const selectedGroup = selectedOption?.value;
+            setSelectedG(selectedGroup);
+            console.log('Selected Group ID:', selectedGroup);
+            getDevices(selectedGroup);
+          }}
+          placeholder="Choose a group..."
+          isLoading={loading} // Show a loading spinner while fetching groups
+        />
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -228,19 +228,19 @@ const SearchTrip = ({
           )}
         </CFormSelect> */}
         <Select
-        id="devices"
-        options={
-          loading
-            ? [{ value: '', label: 'Loading devices...', isDisabled: true }]
-            : devices?.length > 0
-            ? devices.map((device) => ({ value: device.deviceId, label: device.name }))
-            : [{ value: '', label: 'No Device in this Group', isDisabled: true }]
-        }
-        value={formData.Devices ? { value: formData.Devices, label: devices.find((device) => device.deviceId === formData.Devices)?.name } : null}
-        onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
-        placeholder="Choose a device..."
-        isLoading={loading} // Show a loading spinner while fetching devices
-      />
+          id="devices"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading devices...', isDisabled: true }]
+              : devices?.length > 0
+                ? devices.map((device) => ({ value: device.deviceId, label: device.name }))
+                : [{ value: '', label: 'No Device in this Group', isDisabled: true }]
+          }
+          value={formData.Devices ? { value: formData.Devices, label: devices.find((device) => device.deviceId === formData.Devices)?.name } : null}
+          onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
+          placeholder="Choose a device..."
+          isLoading={loading} // Show a loading spinner while fetching devices
+        />
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -358,51 +358,72 @@ const TripTable = ({ apiData, selectedColumns }) => {
   }, [apiData])
 
   // PDF Download Function
-  const downloadPDF = () => {
+  const downloadPDF = () => { 
     const doc = new jsPDF({
       orientation: 'landscape',
     });
-    const tableColumn = ['Device', ...selectedColumns]
-    const tableRows = []
-
+    const tableColumn = ['Device', ...selectedColumns];
+    const tableRows = [];
+  
     apiData.finalTrip.forEach((row, rowIndex) => {
       const tableRow = [
         row.name,
         ...selectedColumns.map((column) => {
-          if (column === 'Start Time')
+          if (column === 'Start Time') {
             return new Date(
               new Date(row.startTime).setHours(
-                new Date(row.startTime).getHours() + 6,
-                new Date(row.startTime).getMinutes() + 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'End Time')
+                new Date(row.startTime).getHours() - 5,
+                new Date(row.startTime).getMinutes() - 30
+              )
+            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }
+          if (column === 'End Time') {
             return new Date(
               new Date(row.endTime).setHours(
-                new Date(row.endTime).getHours() + 6,
-                new Date(row.endTime).getMinutes() + 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Distance') return (row.distance / 1000).toFixed(2) + ' km'
-          if (column === 'Total Distance') return (row.totalDistance / 1000).toFixed(2) + ' km'
-          if (column === 'Maximum Speed') return (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
-          if (column === 'Average Speed') return (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
-          if (column === 'Duration') return row.duration
-          if (column === 'Start Address')
-            return addressData[row.deviceId]?.startAddress || 'Fetching...'
-          if (column === 'End Address')
-            return addressData[row.deviceId]?.endAddress || 'Fetching...'
-          if (column === 'Driver') return row.driverName
-          if (column === 'Device Name') return row.device?.name || '--'
-          return '--'
+                new Date(row.endTime).getHours() - 5,
+                new Date(row.endTime).getMinutes() - 30
+              )
+            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }
+          if (column === 'Distance') {
+            const distanceValue = parseFloat(row.distance); // Extract numeric part
+            return isNaN(distanceValue) ? '--' : distanceValue.toFixed(2) + ' km';
+          }
+          if (column === 'Total Distance') {
+            const totalDistanceValue = parseFloat(row.totalDistance); // Extract numeric part
+            return isNaN(totalDistanceValue) ? '--' : totalDistanceValue.toFixed(2) + ' km';
+          }
+          if (column === 'Maximum Speed') {
+            return (Number(row.maxSpeed) || 0).toFixed(2) + ' km/h';
+          }
+          if (column === 'Average Speed') {
+            return (Number(row.avgSpeed) || 0).toFixed(2) + ' km/h';
+          }
+          if (column === 'Duration') {
+            return row.duration || '--';
+          }
+          if (column === 'Start Address') {
+            return addressData[row.deviceId]?.startAddress || 'Fetching...';
+          }
+          if (column === 'End Address') {
+            return addressData[row.deviceId]?.endAddress || 'Fetching...';
+          }
+          if (column === 'Driver') {
+            return row.driverName || '--';
+          }
+          if (column === 'Device Name') {
+            return row.device?.name || '--';
+          }
+          return '--';
         }),
-      ]
-      tableRows.push(tableRow)
-    })
-
-    autoTable(doc, { head: [tableColumn], body: tableRows })
-    doc.save('trip-table.pdf')
-  }
+      ];
+      tableRows.push(tableRow);
+    });
+  
+    autoTable(doc, { head: [tableColumn], body: tableRows });
+    doc.save('trip-table.pdf');
+  };
+  
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -410,55 +431,87 @@ const TripTable = ({ apiData, selectedColumns }) => {
       apiData.finalTrip.map((row, rowIndex) => {
         const rowData = {
           Device: row.name,
-        }
+        };
+  
         selectedColumns.forEach((column) => {
-          if (column === 'Start Time')
+          if (column === 'Start Time') {
             rowData['Start Time'] = new Date(
               new Date(row.startTime).setHours(
-                new Date(row.startTime).getHours() + 6,
-                new Date(row.startTime).getMinutes() + 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'End Time')
+                new Date(row.startTime).getHours() - 5,
+                new Date(row.startTime).getMinutes() - 30
+              )
+            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }
+  
+          if (column === 'End Time') {
             rowData['End Time'] = new Date(
               new Date(row.endTime).setHours(
-                new Date(row.endTime).getHours() + 6,
-                new Date(row.endTime).getMinutes() + 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Distance') rowData.Distance = (row.distance / 1000).toFixed(2) + ' km'
-          if (column === 'Total Distance')
-            rowData['Total Distance'] = (row.totalDistance / 1000).toFixed(2) + ' km'
-          if (column === 'Maximum Speed')
-            rowData['Maximum Speed'] = (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
-          if (column === 'Average Speed')
-            rowData['Average Speed'] = (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
-          if (column === 'Duration') rowData.Duration = row.duration
-          if (column === 'Start Address')
-            rowData['Start Address'] = addressData[row.deviceId]?.startAddress || 'Fetching...'
-          if (column === 'End Address')
-            rowData['End Address'] = addressData[row.deviceId]?.endAddress || 'Fetching...'
-          if (column === 'Driver') rowData.Driver = row.driverName
-          if (column === 'Device Name') rowData['Device Name'] = row.device?.name || '--'
-        })
-        return rowData
-      }),
-    )
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Trips')
+                new Date(row.endTime).getHours() - 5,
+                new Date(row.endTime).getMinutes() - 30
+              )
+            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }
+  
+        
+        if (column === 'Distance') {
+          const distanceValue = parseFloat(row.distance.replace(' KM', '')) || 0;
+          rowData.Distance = distanceValue.toFixed(2) + ' km';
+        }
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
-
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'trip-table.xlsx')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+        if (column === 'Total Distance') {
+          const totalDistanceValue = parseFloat(row.totalDistance.replace(' KM', '')) || 0;
+          rowData['Total Distance'] = totalDistanceValue.toFixed(2) + ' km';
+        }
+  
+          if (column === 'Maximum Speed') {
+            rowData['Maximum Speed'] = (Number(row.maxSpeed) || 0).toFixed(2) + ' km/h';
+          }
+  
+          if (column === 'Average Speed') {
+            rowData['Average Speed'] = (Number(row.avgSpeed) || 0).toFixed(2) + ' km/h';
+          }
+  
+          if (column === 'Duration') {
+            rowData.Duration = row.duration || '--';
+          }
+  
+          if (column === 'Start Address') {
+            rowData['Start Address'] = addressData[row.deviceId]?.startAddress || 'Fetching...';
+          }
+  
+          if (column === 'End Address') {
+            rowData['End Address'] = addressData[row.deviceId]?.endAddress || 'Fetching...';
+          }
+  
+          if (column === 'Driver') {
+            rowData.Driver = row.driverName || '--';
+          }
+  
+          if (column === 'Device Name') {
+            rowData['Device Name'] = row.device?.name || '--';
+          }
+        });
+  
+        return rowData;
+      })
+    );
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Trips');
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'trip-table.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
 
   return (
     <>
@@ -481,89 +534,113 @@ const TripTable = ({ apiData, selectedColumns }) => {
             apiData.finalTrip.map((row, rowIndex) => (
               <CTableRow key={row.id || rowIndex} className="custom-row">
                 {/* Device ID Cell */}
-                <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{row.name}</CTableDataCell>
+                <CTableDataCell
+                  style={{
+                    backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2",
+                  }}
+                >
+                  {row.name}
+                </CTableDataCell>
 
                 {/* Dynamically render table cells based on selected columns */}
                 {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
-                    {column === 'Start Time'
-                      ? // Add 6 hours 30 minutes to startTime
-                      new Date(
-                        new Date(row.startTime).setHours(
-                          new Date(row.startTime).getHours() + 6,
-                          new Date(row.startTime).getMinutes() + 30,
-                        ),
-                      ).toLocaleString([], {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })
-                      : column === 'End Time'
-                        ? // Add 6 hours 30 minutes to endTime
-                        new Date(
-                          new Date(row.endTime).setHours(
-                            new Date(row.endTime).getHours() + 6,
-                            new Date(row.endTime).getMinutes() + 30,
-                          ),
-                        ).toLocaleString([], {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        })
-                        : column === 'Distance'
-                          ? // Convert distance from meters to kilometers and round to 2 decimal places
-                          row.distance
-                          : column === 'Total Distance'
-                            ? // Convert totalDistance from meters to kilometers and round to 2 decimal places
-                            row.totalDistance
-                            : column === 'Maximum Speed'
-                              ? // Convert maxSpeed from m/s to km/h and round to 2 decimal places
-                              (row.maxSpeed * 3.6).toFixed(2) + ' km/h'
-                              : column === 'Average Speed'
-                                ? // Convert avgSpeed from m/s to km/h and round to 2 decimal places
-                                (row.avgSpeed * 3.6).toFixed(2) + ' km/h'
-                                : column === 'Duration'
-                                  ? row.duration
-                                  : column === 'Start Address'
-                                    ? addressData[row.deviceId]?.startAddress || 'Fetching...'
-                                    : column === 'End Address'
-                                      ? addressData[row.deviceId]?.endAddress || 'Fetching...'
-                                      : column === 'Driver'
-                                        ? row.driverName
-                                        : column === 'Device Name'
-                                          ? row.device?.name || '--'
-                                          : '--'}
+                  <CTableDataCell
+                    key={index}
+                    style={{
+                      backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2",
+                    }}
+                  >
+                    {(() => {
+                      switch (column) {
+                        case "Start Time":
+                          return new Date(
+                            new Date(row.startTime).setHours(
+                              new Date(row.startTime).getHours() - 5,
+                              new Date(row.startTime).getMinutes() - 30
+                            )
+                          ).toLocaleString([], {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          });
+                        case "End Time":
+                          return new Date(
+                            new Date(row.endTime).setHours(
+                              new Date(row.endTime).getHours() - 5,
+                              new Date(row.endTime).getMinutes() - 30
+                            )
+                          ).toLocaleString([], {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          });
+                        case "Distance":
+                          return row.distance;
+                        case "Total Distance":
+                          return row.totalDistance;
+                        case "Maximum Speed":
+                          return `${row.maxSpeed.toFixed(2)} km/h`;
+                        case "Average Speed":
+                          return `${row.avgSpeed.toFixed(2)} km/h`;
+                        case "Duration":
+                          return row.duration;
+                        case "Start Address":
+                          return addressData[row.deviceId]?.startAddress || "Fetching...";
+                        case "End Address":
+                          return addressData[row.deviceId]?.endAddress || "Fetching...";
+                        case "Driver":
+                          return row.driverName;
+                        case "Device Name":
+                          return row.device?.name || "--";
+                        default:
+                          return "--";
+                      }
+                    })()}
                   </CTableDataCell>
                 ))}
               </CTableRow>
             ))
           ) : (
-            <CTableRow style={{ position: 'relative' }}>
+            <CTableRow>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
-                  backgroundColor: '#f8f9fa', // Light gray background
-                  color: '#6c757d', // Darker text color
-                  fontStyle: 'italic', // Italic font style
-                  padding: '16px', // Extra padding for emphasis
-                  textAlign: 'center', // Center the text
-                  border: '1px dashed #dee2e6', // Dashed border to highlight it
-                  height: '100px',
+                  backgroundColor: "#f8f9fa",
+                  color: "#6c757d",
+                  fontStyle: "italic",
+                  textAlign: "center",
+                  padding: "16px",
                 }}
               >
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                  <Loader />
-                </div>
+                {apiData?.finalTrip ? (
+                  "No Data Found"
+                ) : (
+
+                  <div style={{ position: "relative", height: "100px" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <Loader />
+                    </div>
+                  </div>
+                )}
               </CTableDataCell>
             </CTableRow>
           )}
         </CTableBody>
+
+
       </CTable>
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
@@ -782,12 +859,12 @@ const Trips = () => {
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                 <strong>Travel Data</strong>
-                <CFormInput
+                {/* <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ width: '250px' }}
-                />
+                /> */}
               </CCardHeader>
               <CCardBody>
                 <TripTable apiData={apiData} selectedColumns={selectedColumns} />

@@ -358,15 +358,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
           if (column === 'Arrival Time')
             return new Date(
               new Date(row.arrivalTime).setHours(
-                new Date(row.arrivalTime).getHours() + 6,
-                new Date(row.arrivalTime).getMinutes() + 30,
+                new Date(row.arrivalTime).getHours() - 5 ,
+                new Date(row.arrivalTime).getMinutes() - 30 ,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Departure Time')
             return new Date(
               new Date(row.departureTime).setHours(
-                new Date(row.departureTime).getHours() + 6,
-                new Date(row.departureTime).getMinutes() + 30,
+                new Date(row.departureTime).getHours() - 5,
+                new Date(row.departureTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Device Name') return row.device?.name || '--'
@@ -405,15 +405,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
           if (column === 'Arrival Time')
             rowData['Arrival Time'] = new Date(
               new Date(row.arrivalTime).setHours(
-                new Date(row.arrivalTime).getHours() + 6,
-                new Date(row.arrivalTime).getMinutes() + 30,
+                new Date(row.arrivalTime).getHours() - 5,
+                new Date(row.arrivalTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Departure Time')
             rowData['Departure Time'] = new Date(
               new Date(row.departureTime).setHours(
-                new Date(row.departureTime).getHours() + 6,
-                new Date(row.departureTime).getMinutes() + 30,
+                new Date(row.departureTime).getHours() - 5,
+                new Date(row.departureTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           if (column === 'Device Name') rowData['Device Name'] = row.device?.name || '--'
@@ -523,8 +523,8 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       // Add 6 hours 30 minutes to arrivalTime
                       new Date(
                         new Date(row.arrivalTime).setHours(
-                          new Date(row.arrivalTime).getHours() + 6,
-                          new Date(row.arrivalTime).getMinutes() + 30,
+                          new Date(row.arrivalTime).getHours() - 5 ,
+                          new Date(row.arrivalTime).getMinutes() - 30 ,
                         ),
                       ).toLocaleString([], {
                         year: 'numeric',
@@ -538,8 +538,8 @@ const StopTable = ({ apiData, selectedColumns }) => {
                       // Add 6 hours 30 minutes to departureTime
                       new Date(
                         new Date(row.departureTime).setHours(
-                          new Date(row.departureTime).getHours() + 6,
-                          new Date(row.departureTime).getMinutes() + 30,
+                          new Date(row.departureTime).getHours() - 5,
+                          new Date(row.departureTime).getMinutes() - 30,
                         ),
                       ).toLocaleString([], {
                         year: 'numeric',
@@ -560,27 +560,42 @@ const StopTable = ({ apiData, selectedColumns }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow style={{ position: 'relative' }}>
+            <CTableRow>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
-                  backgroundColor: '#f8f9fa',
-                  color: '#6c757d',
-                  fontStyle: 'italic',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: '1px dashed #dee2e6',
-                  height: '100px',
+                  backgroundColor: "#f8f9fa",
+                  color: "#6c757d",
+                  fontStyle: "italic",
+                  textAlign: "center",
+                  padding: "16px",
                 }}
               >
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                  <Loader />
-                </div>
+                {apiData?.finalDeviceDataByStopage? (
+                  "No Data Found"
+                ) : (
+
+                  <div style={{ position: "relative", height: "100px" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <Loader />
+                    </div>
+                  </div>
+                )}
               </CTableDataCell>
             </CTableRow>
           )}
         </CTableBody>
+
+
       </CTable>
+
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
@@ -779,12 +794,12 @@ const Stops = () => {
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                 <strong>All Stop List {selectedDeviceName && `for ${selectedDeviceName}`} </strong>
-                <CFormInput
+                {/* <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ width: '250px' }}
-                />
+                /> */}
               </CCardHeader>
               <CCardBody>
                 <StopTable apiData={apiData} selectedColumns={selectedColumns} />

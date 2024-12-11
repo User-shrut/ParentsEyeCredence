@@ -431,8 +431,14 @@ const IndividualTrack = () => {
                       </div>
                       <div className="col-2 text-center attribute shadow">
                         <strong>{`${Math.round(individualSalesMan?.attributes?.distance)}`}</strong>
+                        <small> M</small>
                         <br />
                         <p className="p-0 m-0">Distance</p>
+                      </div>
+                      <div className="col-2 text-center attribute shadow">
+                        <strong>{`${individualSalesMan?.attributes?.motion ? 'Yes' : 'No'}`}</strong>
+                        <br />
+                        <p className="p-0 m-0">Moving</p>
                       </div>
                       <div className="col-2 text-center attribute shadow">
                         <strong>{`${category}`}</strong>

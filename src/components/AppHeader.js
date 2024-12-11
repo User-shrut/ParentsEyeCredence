@@ -193,16 +193,30 @@ const AppHeader = () => {
 
     }
   }
-  
+
 
   const handleExpense = () => {
-    dispatch({ type: 'set', sidebarShow: true })
-    dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: true, support: false }))
-    if (toggle.expense) {
-      dispatch({ type: 'set', sidebarShow: !sidebarShow })
-
+    if (role === 'superadmin') { // Ensure this variable is determined earlier in your code
+      dispatch({ type: 'set', sidebarShow: true });
+      dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: true, support: false }));
+      if (toggle.expense) {
+        dispatch({ type: 'set', sidebarShow: !sidebarShow });
+      }
+    } else {
+      console.log('Access denied: Only superadmin can access this functionality.');
     }
+  };
+
+  // Determine role based on token
+  // const decodedToken1 = jwtDecode(token)
+  let role; 
+  if (decodedToken && decodedToken.superadmin === true) {
+    role = 'superadmin';
+  } else {
+    role = 'user';
   }
+  
+
   // const handleSupports = () => {
   //   dispatch({ type: 'set', sidebarShow: true })
   //   dispatch(setToggleSidebar({ home: false, master: false, reports: false, expense: false, support: true }))
@@ -222,7 +236,7 @@ const AppHeader = () => {
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink id='header-dashboard' to="/dashboard" as={NavLink}>
-              <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} style={{ marginInlineStart: '-30px' }} />
+              {/* <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} style={{ marginInlineStart: '-30px' }} /> */}
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
@@ -247,10 +261,13 @@ const AppHeader = () => {
         </CHeaderNav>
 
         <CHeaderNav className="ms-auto">
-          <button className="nav-btn" onClick={() => handleExpense()}>
-            <TbReportSearch className="nav-icon" /> Expense Management
-          </button>
+          {role === 'superadmin' && (
+            <button className="nav-btn" onClick={() => handleExpense()}>
+              <TbReportSearch className="nav-icon" /> Expense Management
+            </button>
+          )}
         </CHeaderNav>
+
 
         {/* <CHeaderNav className="ms-auto">
           <button className="nav-btn" onClick={() => handleSupports()}>
@@ -292,10 +309,10 @@ const AppHeader = () => {
   .nav-btn:active {
     transform: scale(0.98); /* Slight shrink effect when active */
   }
-`}</style>    
+`}</style>
 
         <CHeaderNav className="ms-auto">
-          
+
 
           <NotificationDropdown notifications={notifications} />
         </CHeaderNav>
@@ -358,7 +375,7 @@ const AppHeader = () => {
 export default AppHeader
 
 
-  {/* this is comment perment         
+{/* this is comment perment         
         <CHeaderNav className="d-none d-md-flex">
           <select class="form-select" aria-label="Default select example">
             <option selected>Select by Name</option>
@@ -371,7 +388,7 @@ export default AppHeader
           </select>
         </CHeaderNav> */}
 
-        {/* {isDashboard && (
+{/* {isDashboard && (
           <CHeaderNav className="ms-auto">
             <form className="d-flex" role="search">
               <input
@@ -386,14 +403,14 @@ export default AppHeader
           </CHeaderNav>
         )} */}
 
-        {/* {isDashboard && (
+{/* {isDashboard && (
           <CHeaderNav className="ms-auto">
         
             <TableColumnVisibility />
           </CHeaderNav>
         )} */}
 
-        {/* <CNavItem>
+{/* <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>

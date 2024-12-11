@@ -273,7 +273,7 @@ const SearchDistance = ({
   )
 }
 
-const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, devices }) => {
+const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, devices, searchQuery }) => {
   const [addressData, setAddressData] = useState({})
   const [newAddressData, setnewAddressData] = useState()
   // Function to get address based on latitude and longitude using Nominatim API
@@ -398,6 +398,16 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
   }
 
 
+  // Filter logic
+  const filteredData = apiData?.data?.filter((row) => {
+    const deviceName = findDeviceName(row.deviceId)?.toLowerCase() || '';
+    const searchTerm = searchQuery.toLowerCase();
+
+    // Check if the searchQuery matches the device name or any other relevant fields
+    return deviceName.includes(searchTerm);
+  }) || [];
+
+
   return (
     <>
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
@@ -433,8 +443,8 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
                 </div>
               </CTableDataCell>
             </CTableRow>) : (
-              apiData?.data && apiData.data.length > 0 ? (
-                apiData.data.map((row, rowIndex) => (
+             filteredData.length > 0 ? (
+              filteredData.map((row, rowIndex) => (
                   <CTableRow key={row.deviceId} className="custom-row">
                     <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
                     <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{findDeviceName(row.deviceId)}</CTableDataCell>
@@ -717,6 +727,7 @@ const Distance = () => {
                   allDates={allDates}
                   devices={devices}
                   selectedColumns={selectedColumns}
+                  searchQuery={searchQuery}  
                 />
               </CCardBody>
             </CCard>

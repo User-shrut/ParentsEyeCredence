@@ -19,6 +19,7 @@ import { AiOutlinePlus } from 'react-icons/ai'
 import CloseIcon from '@mui/icons-material/Close'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
+import { MdDevicesOther } from "react-icons/md";
 
 const AddDeviceModal = ({
   open,
@@ -42,18 +43,6 @@ const AddDeviceModal = ({
   handleYearSelection,
   setShowExpirationDropdown,
 }) => {
-
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, '0'); // Day of the month
-    const hours = String(now.getHours()).padStart(2, '0'); // Hours
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Minutes
-    const seconds = String(now.getSeconds()).padStart(2, '0'); // Seconds
-  
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Format: YYYY/MM/DD HH:MM:SS
-  };
   const handleAddSubmit = async () => {
     const oldapiUrl = `http://63.142.251.13:8082/api/devices`
     const apiUrl = `${import.meta.env.VITE_API_URL}/device`
@@ -148,7 +137,7 @@ const AddDeviceModal = ({
           <div className="d-flex justify-content-between align-items-center mb-4">
             <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
               <span role="img" aria-label="device">
-                <AiOutlinePlus className="fs-2" />
+                <MdDevicesOther className="fs-2" />
               </span>{' '}
               Add Device
             </Typography>
@@ -395,11 +384,9 @@ const AddDeviceModal = ({
                       <label>Installation date: </label>
                       <TextField
                         key={col.accessor}
-                        type="datetime-local"
+                        type="date"
                         name={col.accessor}
-                        //value={formData[col.accessor] || ''} //change kelya nantr display hote
-                        //value={getCurrentDateTime() || ''} ////change kelya nantr input mdhe show nhi hot but backened vr changed vali jate as expected
-                        value={formData[col.accessor] || getCurrentDateTime()}
+                        value={formData[col.accessor] || ''}
                         onChange={handleInputChange}
                         fullWidth
                       />

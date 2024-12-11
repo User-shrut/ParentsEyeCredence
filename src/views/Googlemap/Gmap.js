@@ -450,6 +450,8 @@
 
 // export default Gmap;
 
+// ###################################### Old Code ############################################################### //
+
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api';
 import IconButton from '@mui/material/IconButton';
@@ -552,4 +554,11 @@ const Gmap = ({ data }) => {
 };
 
 export default Gmap;
+
+
+
+
+
+
+
 

@@ -3,6 +3,7 @@ import axios from 'axios'
 import ReactPaginate from 'react-paginate'
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+
 import {
   TableContainer,
   Paper,
@@ -83,6 +84,7 @@ const Users = () => {
   const [groups, setGroups] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [token, setToken] = useState('')
+  const [searchQueryGroupField, setSearchQueryGroupField] = useState("");
 
   // Go to the next step
   // const handleNext = () => {
@@ -1187,17 +1189,17 @@ const Users = () => {
                 />
 
                 {/* // Form control with "Add New Group" option */}
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
+                {/* <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
                   <InputLabel>Groups</InputLabel>
                   <Select
                     name="groupsAssigned"
                     value={formData.groupsAssigned || []}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      const value = e.target.value; */}
 
-                      // Check if "Add New Group" option is selected
-                      if (value.includes("new")) {
-                        // Remove "new" from the selected values
+                      {/* // Check if "Add New Group" option is selected
+                      if (value.includes("new")) { */}
+                        {/* // Remove "new" from the selected values
                         const newValue = value.filter((item) => item !== "new");
                         handleInputChange({
                           target: {
@@ -1226,7 +1228,70 @@ const Users = () => {
                     ))}
 
                   </Select>
-                </FormControl>
+                </FormControl> */}
+
+                {/* trying to add serach */}
+                <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
+      <InputLabel>Groups</InputLabel>
+      <Select
+        name="groupsAssigned"
+        value={formData.groupsAssigned || []}
+        onChange={(e) => {
+          const value = e.target.value;
+
+          // Check if "Add New Group" option is selected
+          if (value.includes("new")) {
+            const newValue = value.filter((item) => item !== "new");
+            handleInputChange({
+              target: {
+                name: e.target.name,
+                value: newValue,
+              },
+            });
+
+            // Open the "Add New Group" dialog
+            handleNewGroup();
+          } else {
+            handleInputChange(e);
+          }
+        }}
+        label="Groups"
+        multiple
+        renderValue={(selected) =>
+          selected
+            .map((id) => groups.find((group) => group._id === id)?.name || id)
+            .join(", ")
+        }
+      >
+        {/* Search box */}
+        <Box sx={{ padding: "8px" }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search groups"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </Box>
+
+        {/* "Add New Group" option */}
+        <MenuItem value="new" sx={{ fontStyle: "italic" }}>
+          <IoMdAddCircle />
+          Add New Group
+        </MenuItem>
+
+        {/* Render filtered groups inline */}
+        {groups
+          .filter((group) =>
+            group.name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((group) => (
+            <MenuItem key={group._id} value={group._id}>
+              {group.name}
+            </MenuItem>
+          ))}
+      </Select>
+    </FormControl>
 
                 {/* // Dialog for creating a new group */}
                 <Dialog open={openNewGroupDialog} onClose={() => setOpenNewGroupDialog(false)}>
