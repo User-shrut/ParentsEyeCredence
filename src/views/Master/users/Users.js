@@ -33,6 +33,8 @@ import {
   Select,
   DialogTitle,
   DialogActions,
+  Autocomplete,
+  Chip
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
@@ -1230,68 +1232,74 @@ const Users = () => {
                   </Select>
                 </FormControl> */}
 
-                {/* trying to add serach */}
-                <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
-      <InputLabel>Groups</InputLabel>
-      <Select
-        name="groupsAssigned"
-        value={formData.groupsAssigned || []}
-        onChange={(e) => {
-          const value = e.target.value;
+ 
+    <Autocomplete
+      multiple
+      id="groups-assigned"
+      options={[ { _id: "new", name: "Add New Group" },...groups]} // Add "Add New Group" as an option
+      getOptionLabel={(option) => option.name}
+      value={
+        groups.filter((group) =>
+          formData.groupsAssigned?.includes(group._id)
+        ) || []
+      }
+      isOptionEqualToValue={(option, value) => option._id === value._id}
+      onChange={(event, value) => {
+        // Check if "Add New Group" is selected
+        const isNewGroupSelected = value.some((item) => item._id === "new");
 
-          // Check if "Add New Group" option is selected
-          if (value.includes("new")) {
-            const newValue = value.filter((item) => item !== "new");
-            handleInputChange({
-              target: {
-                name: e.target.name,
-                value: newValue,
-              },
-            });
+        if (isNewGroupSelected) {
+          const updatedValues = value.filter((item) => item._id !== "new");
+          handleInputChange({
+            target: {
+              name: "groupsAssigned",
+              value: updatedValues.map((item) => item._id),
+            },
+          });
 
-            // Open the "Add New Group" dialog
-            handleNewGroup();
-          } else {
-            handleInputChange(e);
-          }
-        }}
-        label="Groups"
-        multiple
-        renderValue={(selected) =>
-          selected
-            .map((id) => groups.find((group) => group._id === id)?.name || id)
-            .join(", ")
+          // Trigger "Add New Group" function
+          handleNewGroup();
+        } else {
+          handleInputChange({
+            target: {
+              name: "groupsAssigned",
+              value: value.map((item) => item._id),
+            },
+          });
         }
-      >
-        {/* Search box */}
-        <Box sx={{ padding: "8px" }}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Search groups"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Groups"
+          placeholder="Search or select groups"
+        />
+      )}
+      renderOption={(props, option) => (
+        <Box
+          component="li"
+          {...props}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            fontStyle: option._id === "new" ? "italic" : "normal",
+          }}
+        >
+          {option._id === "new" && <IoMdAddCircle style={{ marginRight: 8 }} />}
+          {option.name}
         </Box>
+      )}
+      renderTags={(selected, getTagProps) =>
+        selected.map((option, index) => (
+          <Chip
+            key={option._id}
+            label={option.name}
+            {...getTagProps({ index })}
+          />
+        ))
+      }
+    />
 
-        {/* "Add New Group" option */}
-        <MenuItem value="new" sx={{ fontStyle: "italic" }}>
-          <IoMdAddCircle />
-          Add New Group
-        </MenuItem>
-
-        {/* Render filtered groups inline */}
-        {groups
-          .filter((group) =>
-            group.name.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((group) => (
-            <MenuItem key={group._id} value={group._id}>
-              {group.name}
-            </MenuItem>
-          ))}
-      </Select>
-    </FormControl>
 
                 {/* // Dialog for creating a new group */}
                 <Dialog open={openNewGroupDialog} onClose={() => setOpenNewGroupDialog(false)}>
