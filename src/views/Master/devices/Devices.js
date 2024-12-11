@@ -1017,8 +1017,6 @@ const handleCheckPassword = () => {
               {decodedToken.superadmin ? (
                 <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
                   <strong>Actions</strong>
-                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
-                  <strong>Actions</strong>
                 </CTableHeaderCell>
               ) : null}
             </CTableRow>
