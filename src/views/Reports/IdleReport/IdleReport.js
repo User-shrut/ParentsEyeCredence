@@ -839,12 +839,12 @@ const Ideal = () => {
                 <strong>
                   All Idle Report List {selectedDeviceName && `for ${selectedDeviceName}`}{' '}
                 </strong>
-                <CFormInput
+                {/* <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ width: '250px' }}
-                />
+                /> */}
               </CCardHeader>
               <CCardBody>
                 <ShowIdeal apiData={apiData} selectedColumns={selectedColumns} />

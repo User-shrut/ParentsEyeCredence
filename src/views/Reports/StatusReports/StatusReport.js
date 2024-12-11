@@ -814,12 +814,12 @@ const Status = () => {
               <CCard className="p-0 mb-4 shadow-sm">
                 <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                   <strong>Status Report {selectedDeviceName && `for ${selectedDeviceName}`}</strong> {/* Show the device name here */}
-                  <CFormInput
+                  {/* <CFormInput
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{ width: '250px' }}
-                  />
+                  /> */}
                 </CCardHeader>
                 <CCardBody>
                   <ShowStatus apiData={apiData} statusLoading={statusLoading} selectedDeviceName={selectedDeviceName} selectedColumns={selectedColumns} />

@@ -859,12 +859,12 @@ const Trips = () => {
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                 <strong>Travel Data</strong>
-                <CFormInput
+                {/* <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ width: '250px' }}
-                />
+                /> */}
               </CCardHeader>
               <CCardBody>
                 <TripTable apiData={apiData} selectedColumns={selectedColumns} />

@@ -560,27 +560,42 @@ const StopTable = ({ apiData, selectedColumns }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow style={{ position: 'relative' }}>
+            <CTableRow>
               <CTableDataCell
                 colSpan={selectedColumns.length + 1}
                 style={{
-                  backgroundColor: '#f8f9fa',
-                  color: '#6c757d',
-                  fontStyle: 'italic',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: '1px dashed #dee2e6',
-                  height: '100px',
+                  backgroundColor: "#f8f9fa",
+                  color: "#6c757d",
+                  fontStyle: "italic",
+                  textAlign: "center",
+                  padding: "16px",
                 }}
               >
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                  <Loader />
-                </div>
+                {apiData?.finalDeviceDataByStopage? (
+                  "No Data Found"
+                ) : (
+
+                  <div style={{ position: "relative", height: "100px" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <Loader />
+                    </div>
+                  </div>
+                )}
               </CTableDataCell>
             </CTableRow>
           )}
         </CTableBody>
+
+
       </CTable>
+
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
@@ -779,12 +794,12 @@ const Stops = () => {
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
                 <strong>All Stop List {selectedDeviceName && `for ${selectedDeviceName}`} </strong>
-                <CFormInput
+                {/* <CFormInput
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ width: '250px' }}
-                />
+                /> */}
               </CCardHeader>
               <CCardBody>
                 <StopTable apiData={apiData} selectedColumns={selectedColumns} />
