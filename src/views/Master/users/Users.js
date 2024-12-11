@@ -3,6 +3,7 @@ import axios from 'axios'
 import ReactPaginate from 'react-paginate'
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { FaUserGroup } from "react-icons/fa6";
 
 import {
   TableContainer,
@@ -1273,6 +1274,24 @@ const Users = () => {
           {...params}
           label="Groups"
           placeholder="Search or select groups"
+          InputProps={{
+            ...params.InputProps,
+            startAdornment: (
+              <>
+                <InputAdornment position="start">
+                  <FaUserGroup
+                    style={{
+                      fontSize: '1.3rem',
+                      color: 'rgb(51 51 51 / 73%)',
+                      marginRight: '0.5rem',
+                      marginLeft: '0.5rem',
+                    }}
+                  />
+                </InputAdornment>
+                {params.InputProps.startAdornment}
+              </>
+            ),
+          }}
         />
       )}
       renderOption={(props, option) => (
