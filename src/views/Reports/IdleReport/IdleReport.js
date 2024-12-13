@@ -342,7 +342,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
 
   // Function to get address from latitude and longitude
   const getAddressFromLatLng = async (latitude, longitude) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+    // const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
 
     try {
       const response = await axios.get(url)
@@ -404,14 +404,14 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
             if (column === 'Duration')
               return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
             if (column === 'Location') return nestedRow.address || nestedRow.location
-            if (column === 'Arrival Time')
+            if (column === 'Start Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
                   new Date(nestedRow.arrivalTime).getHours() - 5,
                   new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            if (column === 'Departure Time')
+            if (column === 'End Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
                   new Date(nestedRow.departureTime).getHours() - 5,
@@ -446,15 +446,15 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                 .toISOString()
                 .substr(11, 8)
             if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location
-            if (column === 'Arrival Time')
-              rowData['Arrival Time'] = new Date(
+            if (column === 'Start Time')
+              rowData['Start Time'] = new Date(
                 new Date(nestedRow.arrivalTime).setHours(
                   new Date(nestedRow.arrivalTime).getHours() - 5,
                   new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
               ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            if (column === 'Departure Time')
-              rowData['Departure Time'] = new Date(
+            if (column === 'End Time')
+              rowData['End Time'] = new Date(
                 new Date(nestedRow.departureTime).setHours(
                   new Date(nestedRow.departureTime).getHours() - 5,
                   new Date(nestedRow.departureTime).getMinutes() - 30,
@@ -540,7 +540,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                               : column === 'Location'
                                 ? // Display address if available, otherwise fallback to location
                                 nestedRow.address || nestedRow.location
-                                : column === 'Arrival Time'
+                                : column === 'Start Time'
                                   ? // Add 6 hours 30 minutes to arrivalTime and format to YYYY-MM-DD HH:mm
                                   new Date(
                                     new Date(nestedRow.arrivalTime).setHours(
@@ -555,7 +555,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                     minute: '2-digit',
                                     hour12: false,
                                   })
-                                  : column === 'Departure Time'
+                                  : column === 'End Time'
                                     ? // Add 6 hours 30 minutes to departureTime and format to YYYY-MM-DD HH:mm
                                     new Date(
                                       new Date(nestedRow.departureTime).setHours(
@@ -565,6 +565,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                                     ).toLocaleString([], {
                                       year: 'numeric',
                                       month: '2-digit',
+                                      day: '2-digit',
                                       hour: '2-digit',
                                       minute: '2-digit',
                                       hour12: false,
@@ -656,10 +657,10 @@ const Ideal = () => {
   const [columns] = useState([
     // 'OUID',
     'Vehicle Status',
+    'Start Time',
     'Duration',
     'Location',
-    'Arrival Time',
-    'Departure Time',
+    'End Time',
     'Total Duration',
   ])
 

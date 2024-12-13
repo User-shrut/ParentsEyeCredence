@@ -355,14 +355,14 @@ const StopTable = ({ apiData, selectedColumns }) => {
             return 'South East'
           }
           if (column === 'Location') return locationData[rowIndex] || 'Fetching location...'
-          if (column === 'Arrival Time')
+          if (column === 'Start Time')
             return new Date(
               new Date(row.arrivalTime).setHours(
                 new Date(row.arrivalTime).getHours() - 5 ,
                 new Date(row.arrivalTime).getMinutes() - 30 ,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Departure Time')
+          if (column === 'End Time')
             return new Date(
               new Date(row.departureTime).setHours(
                 new Date(row.departureTime).getHours() - 5,
@@ -402,15 +402,15 @@ const StopTable = ({ apiData, selectedColumns }) => {
           }
           if (column === 'Location')
             rowData.Location = locationData[rowIndex] || 'Fetching location...'
-          if (column === 'Arrival Time')
-            rowData['Arrival Time'] = new Date(
+          if (column === 'Start Time')
+            rowData['Start Time'] = new Date(
               new Date(row.arrivalTime).setHours(
                 new Date(row.arrivalTime).getHours() - 5,
                 new Date(row.arrivalTime).getMinutes() - 30,
               ),
             ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          if (column === 'Departure Time')
-            rowData['Departure Time'] = new Date(
+          if (column === 'End Time')
+            rowData['End Time'] = new Date(
               new Date(row.departureTime).setHours(
                 new Date(row.departureTime).getHours() - 5,
                 new Date(row.departureTime).getMinutes() - 30,
@@ -519,7 +519,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                     ) : column === 'Location' ? (
                       // Show location
                       locationData[rowIndex] || 'Fetching location...'
-                    ) : column === 'Arrival Time' ? (
+                    ) : column === 'Start Time' ? (
                       // Add 6 hours 30 minutes to arrivalTime
                       new Date(
                         new Date(row.arrivalTime).setHours(
@@ -534,7 +534,7 @@ const StopTable = ({ apiData, selectedColumns }) => {
                         minute: '2-digit',
                         hour12: false,
                       })
-                    ) : column === 'Departure Time' ? (
+                    ) : column === 'End Time' ? (
                       // Add 6 hours 30 minutes to departureTime
                       new Date(
                         new Date(row.departureTime).setHours(
@@ -628,12 +628,12 @@ const Stops = () => {
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
   const [columns] = useState([
-    'Speed',
-    'Ignition',
+   'Start Time',
+   'Ignition',
+   'Speed',
     'Direction',
     'Location',
-    'Arrival Time',
-    'Departure Time',
+    'End Time',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
   const [showMap, setShowMap] = useState(false) //show mapping data
