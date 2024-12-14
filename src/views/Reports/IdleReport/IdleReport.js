@@ -337,7 +337,7 @@ const SearchIdeal = ({
   )
 }
 
-const ShowIdeal = ({ apiData, selectedColumns }) => {
+const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName }) => {
   const [dataWithAddresses, setDataWithAddresses] = useState([])
 
   // Function to get address from latitude and longitude
@@ -391,45 +391,75 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
 
   // PDF Download Function
   const downloadPDF = () => {
-    const doc = new jsPDF()
-    const tableColumn = ['SN', ...selectedColumns]
-    const tableRows = []
-
+    const doc = new jsPDF();
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
+    const tableRows = [];
+  
     dataWithAddresses.forEach((row, rowIndex) => {
       row.data.forEach((nestedRow, nestedIndex) => {
         const rowData = [
-          rowIndex + 1,
+          rowIndex + 1, // Serial Number
+          row.device?.name || selectedDeviceName || '--', // Fetch Vehicle Name
           ...selectedColumns.map((column) => {
-            if (column === 'Vehicle Status') return nestedRow.vehicleStatus
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus;
             if (column === 'Duration')
-              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
-            if (column === 'Location') return nestedRow.address || nestedRow.location
+              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
+            if (column === 'Location') return nestedRow.address || nestedRow.location;
             if (column === 'Start Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
                   new Date(nestedRow.arrivalTime).getHours() - 5,
                   new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
-              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              ).toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              });
             if (column === 'End Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
                   new Date(nestedRow.departureTime).getHours() - 5,
                   new Date(nestedRow.departureTime).getMinutes() - 30,
                 ),
-              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              ).toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              });
             if (column === 'Total Duration')
-              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
-            return '--'
+              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
+            return '--';
           }),
-        ]
-        tableRows.push(rowData)
-      })
-    })
-
-    autoTable(doc, { head: [tableColumn], body: tableRows })
-    doc.save('ideal-table.pdf')
-  }
+        ];
+        tableRows.push(rowData);
+      });
+    });
+  
+    // Generate the table with borders
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      styles: {
+        lineWidth: 0.5, // Set thickness of inner borders
+        lineColor: [0, 0, 0], // Set color for borders (black)
+        halign: 'center', // Horizontal alignment for text in cells
+        valign: 'middle', // Vertical alignment for text in cells
+      },
+      tableLineWidth: 0.5, // Set thickness for outer borders
+      tableLineColor: [0, 0, 0], // Set outer border color (black)
+      margin: { top: 10 }, // Adjust top margin if necessary
+    });
+  
+    doc.save(`${selectedDeviceName || 'Idle_Report'}.pdf`);
+  };
+  
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -438,60 +468,78 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
         return row.data.map((nestedRow, nestedIndex) => {
           const rowData = {
             SN: rowIndex + 1,
-          }
+            'Vehicle Name': row.device?.name || selectedDeviceName || '--', // Map Vehicle Name
+          };
+  
           selectedColumns.forEach((column) => {
-            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus
+            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus;
             if (column === 'Duration')
               rowData['Duration'] = new Date(nestedRow.durationSeconds * 1000)
                 .toISOString()
-                .substr(11, 8)
-            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location
+                .substr(11, 8);
+            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location;
             if (column === 'Start Time')
               rowData['Start Time'] = new Date(
                 new Date(nestedRow.arrivalTime).setHours(
                   new Date(nestedRow.arrivalTime).getHours() - 5,
                   new Date(nestedRow.arrivalTime).getMinutes() - 30,
                 ),
-              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              ).toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              });
             if (column === 'End Time')
               rowData['End Time'] = new Date(
                 new Date(nestedRow.departureTime).setHours(
                   new Date(nestedRow.departureTime).getHours() - 5,
                   new Date(nestedRow.departureTime).getMinutes() - 30,
                 ),
-              ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              ).toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              });
             if (column === 'Total Duration')
               rowData['Total Duration'] = new Date(row.totalDurationSeconds * 1000)
                 .toISOString()
-                .substr(11, 8)
-          })
-          return rowData
-        })
+                .substr(11, 8);
+          });
+  
+          return rowData;
+        });
       }),
-    )
-
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData')
-
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
-
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'ideal-table.xlsx')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
+    );
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData');
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${selectedDeviceName || 'Idle_Report'}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   return (
     <>
       <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>SN</CTableHeaderCell>
+            <CTableHeaderCell>Vehicle Name</CTableHeaderCell>
             {selectedColumns.map((column, index) => (
               <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
             ))}
@@ -507,6 +555,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                   .map((nestedRow, nestedIndex) => (
                     <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
                       <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
+                      <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{selectedDeviceName}</CTableDataCell>
 
                       {selectedColumns.map((column, index) => (
                         <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
@@ -529,7 +578,7 @@ const ShowIdeal = ({ apiData, selectedColumns }) => {
                               ) : nestedRow.vehicleStatus === 'Ignition On' ? (
                                 <>
                                   <CTooltip content="Ignition On">
-                                    <img src={ignitionOn} alt='on' width='40' height='40' style={{ marginRight: '10px' }} />
+                                   
                                     {/* <span>Ignition On</span> */}
                                   </CTooltip>
                                 </>
@@ -848,7 +897,7 @@ const Ideal = () => {
                 /> */}
               </CCardHeader>
               <CCardBody>
-                <ShowIdeal apiData={apiData} selectedColumns={selectedColumns} />
+                <ShowIdeal apiData={apiData} selectedDeviceName={selectedDeviceName} selectedColumns={selectedColumns} />
               </CCardBody>
             </CCard>
           </CCol>

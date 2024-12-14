@@ -398,9 +398,12 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
   const exportToExcel = () => {
     const workbook = XLSX.utils.book_new(); // Create a new workbook
   
-    const tableColumn = ['SN', ...selectedColumns];
+    const tableColumn = ['SN','Vehicle Name', ...selectedColumns];
     const tableRows = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.map((column) => {
+        if (column === 'Vehicle Name'){
+          return row.selectedDeviceName
+        }
         if (column === 'Vehicle Status') {
           if (row.vehicleStatus === 'Idle') return 'Idle';
           if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off';
@@ -416,6 +419,10 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           return newAddressData?.endAddress || 'Fetching...';
         } else if (column === 'Distance') {
           return row.distance;
+        } else if (column === 'Total KM') {
+          return row.totalKm;
+        } else if (column === 'Maximum Speed') {
+          return row.maxSpeed;
         } else if (column === 'Total Distance') {
           return (row.totalKm / 1000).toFixed(2) + ' km';
         } else if (column === 'Driver Name') {
@@ -432,13 +439,13 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           return row[column] || '--'; // Fallback for other columns
         }
       });
-      return [rowIndex + 1, ...rowData];
+      return [rowIndex + 1, selectedDeviceName, ...rowData];
     });
   
     const worksheetData = [tableColumn, ...tableRows];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    XLSX.writeFile(workbook, 'table_data.xlsx');
+    XLSX.writeFile(workbook,`${selectedDeviceName}.xlsx`);
   };
 
   // Function to export table data to PDF
@@ -446,10 +453,11 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
     const doc = new jsPDF({
       orientation: 'landscape',
     });
-
-    doc.setFontSize(16); // Set font size for the title
+  
+    doc.setFontSize(15); // Set font size for the title
     doc.text(selectedDeviceName, 14, 15);
-    const tableColumn = ['SN', ...selectedColumns];
+  
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
     const tableRows = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.map((column) => {
         if (column === 'Vehicle Status') {
@@ -459,37 +467,56 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           return '--';
         } else if (column === 'Start Date Time') {
           return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
-        } else if (column === 'End Date Time') {
-          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
         } else if (column === 'Start Address') {
           return newAddressData?.startAddress || 'Fetching...';
-        } else if (column === 'End Address') {
-          return newAddressData?.endAddress || 'Fetching...';
+        } else if (column === 'Start Coordinates') {
+          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
         } else if (column === 'Distance') {
           return row.distance;
+        } else if (column === 'Duration') {
+          return row.time;
         } else if (column === 'Total Distance') {
-          return (row.totalKm / 1000).toFixed(2) + ' km';
+          return (row.distance / 1000).toFixed(2) + ' km';
+        } else if (column === 'Maximum Speed') {
+          return row.maxSpeed;
+        } else if (column === 'Total KM') {
+          return row.totalKm;
+        } else if (column === 'End Date Time') {
+          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
+        } else if (column === 'End Address') {
+          return newAddressData?.endAddress || 'Fetching...';
+        } else if (column === 'End Coordinates') {
+          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
         } else if (column === 'Driver Name') {
           return row.driverInfos?.driverName || '--';
         } else if (column === 'Driver Phone No.') {
           return row.device?.name || '--';
-        } else if (column === 'Duration') {
-          return row.time;
-        } else if (column === 'Start Coordinates') {
-          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
-        } else if (column === 'End Coordinates') {
-          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
         } else {
           return row[column] || '--'; // Fallback for other columns
         }
       });
-      return [rowIndex + 1, ...rowData];
+      return [rowIndex + 1, selectedDeviceName, ...rowData];
     });
-
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
-    doc.save('table_data.pdf');
+  
+    // Add autoTable with border settings
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        lineWidth: 0.5, // Thickness of the borders
+        lineColor: [0, 0, 0], // Border color (black)
+        halign: 'center', // Horizontal alignment for text
+        valign: 'middle', // Vertical alignment for text
+      },
+      tableLineWidth: 0.5, // Outer border line width
+      tableLineColor: [0, 0, 0], // Outer border color (black)
+      margin: { top: 20 }, // Margin from the top
+    });
+  
+    doc.save(`${selectedDeviceName}.pdf`);
   };
-
+  
 
   return (
     <>
@@ -498,6 +525,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
         <CTableHead>
           <CTableRow>
             <CTableHeaderCell>SN</CTableHeaderCell>
+            <CTableHeaderCell>Vehicle Name</CTableHeaderCell>
             {/* Dynamically render table headers based on selected columns */}
             {selectedColumns.map((column, index) => (
               <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
@@ -528,6 +556,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
               apiData.data.map((row, rowIndex) => (
                 <CTableRow key={row.id} className="custom-row">
                   <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{rowIndex + 1}</CTableDataCell>
+                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >{selectedDeviceName}</CTableDataCell>
                   {/* Dynamically render table cells based on selected columns */}
                   {selectedColumns.map((column, index) => (
                     <>
@@ -565,8 +594,10 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                                   ? row.distance
                                   : column === 'Total Distance'
                                     ? (row.distance / 1000).toFixed(2) + ' km'
-                                    // : column === 'Maximum Speed'
-                                    //   ? row.maxSpeed
+                                    : column === 'Maximum Speed'
+                                      ? row.maxSpeed
+                                    : column === 'Total KM'
+                                      ? row.totalKm
                                     : column === 'End Address'
                                       ? newAddressData?.endAddress || 'Fetching...'
                                       : column === 'Driver Name'
@@ -643,14 +674,14 @@ const Status = () => {
     'Start Date Time',
     'Start Address',
     'Start Coordinates',
+    'Total Distance',
+    'Total KM',
+    'Maximum Speed',
     'End Date Time',
     'End Address',
     'End Coordinates',
-    // 'Distance',
-    'Total Distance',
-    // 'Maximum Speed',
     'Duration',
-
+    // 'Distance',
     'Driver Name',
     'Driver Phone No.'
   ]);

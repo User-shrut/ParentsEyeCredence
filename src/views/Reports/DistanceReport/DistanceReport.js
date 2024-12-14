@@ -356,24 +356,32 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
     const doc = new jsPDF({
       orientation: 'landscape',
     });
-
+  
     const tableData = apiData.data.map((row) => [
       findDeviceName(row.deviceId),
       ...allDates.map((date) => (row[date] !== undefined ? `${row[date]} km` : '0 km')),
       `${calculateTotalDistance(row).toFixed(2)} km`,
-    ])
-
-    const headers = ['Vehicle', ...allDates, 'Total Distance (km)']
-
+    ]);
+  
+    const headers = ['Vehicle', ...allDates, 'Total Distance (km)'];
+  
     autoTable(doc, {
       head: [headers],
       body: tableData,
-      styles: { fontSize: 5, fontWeight: 'bold' },
+      styles: { 
+        fontSize: 5, 
+        fontWeight: 'bold', 
+        lineWidth: 0.5, // Cell border thickness
+        lineColor: [0, 0, 0], // Black border color
+      },
       margin: { top: 10 },
-    })
-
-    doc.save('table_data.pdf')
-  }
+      tableLineWidth: 0.5, // Border around the table
+      tableLineColor: [0, 0, 0], // Black table border color
+    });
+  
+    doc.save('Distance Reports.pdf');
+  };
+  
 
   // Export to Excel function
   const exportToExcel = () => {
@@ -394,7 +402,7 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
 
     const ws = XLSX.utils.aoa_to_sheet(tableData)
     XLSX.utils.book_append_sheet(wb, ws, 'Table Data')
-    XLSX.writeFile(wb, 'table-data.xlsx')
+    XLSX.writeFile(wb, 'Distance Reports.xlsx')
   }
 
 

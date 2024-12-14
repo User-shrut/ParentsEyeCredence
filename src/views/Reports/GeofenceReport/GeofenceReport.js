@@ -913,20 +913,30 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
 
  
   // Export table data to PDF
-   const exportToPDF = () => {
+  const exportToPDF = () => {
     const doc = new jsPDF();
-    const tableColumns = selectedColumns.length > 0 ? selectedColumns : columns;
+    const tableColumns = ['SN', ...selectedColumns.length > 0 ? selectedColumns : columns]; // Add 'SN' column
     const tableRows = apiData.map((data, index) => {
-      return tableColumns.map((col) => renderColumnData(data, col));
+      const serialNumber = index + 1; // Serial number starting from 1
+      const rowData = tableColumns.slice(1).map((col) => renderColumnData(data, col)); // Get the data for other columns
+      return [serialNumber, ...rowData]; // Add SN as the first column in each row
     });
-
+  
     doc.autoTable({
       head: [tableColumns],
       body: tableRows,
+      styles: {
+        lineWidth: 0.5, // Thickness of cell borders
+        lineColor: [0, 0, 0], // Border color (black)
+      },
+      tableLineWidth: 0.5, // Thickness of table outer border
+      tableLineColor: [0, 0, 0], // Outer border color (black)
+      margin: { top: 10 }, // Adjust the margin if needed
     });
-
-    doc.save('table_data.pdf');
+  
+    doc.save('Geofences.pdf');
   };
+  
   
    // Export table data to Excel
    const exportToExcel = () => {
@@ -943,7 +953,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
     // Export to Excel file
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'table_data.xlsx');
+    saveAs(blob, 'Geofences.xlsx');
   };
 
   // ###################

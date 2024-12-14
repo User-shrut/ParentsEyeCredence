@@ -358,15 +358,17 @@ const TripTable = ({ apiData, selectedColumns }) => {
   }, [apiData])
 
   // PDF Download Function
-  const downloadPDF = () => { 
+  const downloadPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
     });
-    const tableColumn = ['Device', ...selectedColumns];
+  
+    const tableColumn = ['SN', 'Device', ...selectedColumns];  // Add 'SN' (serial number) column at the start
     const tableRows = [];
   
     apiData.finalTrip.forEach((row, rowIndex) => {
       const tableRow = [
+        rowIndex + 1, // Add Serial Number (row index + 1 for human-readable format)
         row.name,
         ...selectedColumns.map((column) => {
           if (column === 'Start Time') {
@@ -420,9 +422,25 @@ const TripTable = ({ apiData, selectedColumns }) => {
       tableRows.push(tableRow);
     });
   
-    autoTable(doc, { head: [tableColumn], body: tableRows });
+    // Add autoTable with border styling options
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        lineWidth: 0.5, // Border line thickness
+        lineColor: [0, 0, 0], // Border color (black)
+        halign: 'center', // Horizontal alignment for text
+        valign: 'middle', // Vertical alignment for text
+      },
+      tableLineWidth: 0.5, // Outer border line width
+      tableLineColor: [0, 0, 0], // Outer border color (black)
+      margin: { top: 20 }, // Margin from the top
+    });
+  
     doc.save('trip-table.pdf');
   };
+  
   
 
   // Excel Download Function
@@ -677,12 +695,12 @@ const Trips = () => {
   const [columns] = useState([
     'Start Time',
     'Start Address',
+    'Distance',
     'Average Speed',
+    'Maximum Speed', 
+    'Total Distance',
     'End Time',
     'End Address',
-    'Maximum Speed',
-    'Distance',
-    'Total Distance',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
   const [showMap, setShowMap] = useState(false) //show mapping data
