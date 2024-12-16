@@ -578,7 +578,6 @@ import { BsChatDots } from 'react-icons/bs'
 import { FaCar, FaHistory, FaRegEdit, FaStopwatch, FaUserAlt } from 'react-icons/fa'
 import { LiaFileInvoiceDollarSolid } from 'react-icons/lia'
 import { TbReport } from 'react-icons/tb'
-import { LuHelpCircle } from 'react-icons/lu'
 import { BiLogOutCircle } from 'react-icons/bi'
 import { FaCarOn, FaUserGroup } from 'react-icons/fa6'
 import { GrHostMaintenance, GrUserWorker } from 'react-icons/gr'
@@ -590,6 +589,7 @@ import { TbReportAnalytics } from 'react-icons/tb'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import { RiPinDistanceFill } from 'react-icons/ri'
 import { PiMapPinAreaFill } from 'react-icons/pi'
+import { BiSupport } from "react-icons/bi";
 
 const _nav = (role, decodedToken) => {
   let devices,
@@ -1166,7 +1166,7 @@ const _nav = (role, decodedToken) => {
       to: '/h&s',
       icon: (
         <div style={{ display: 'flex', alignItems: 'center', color : "#FF7A00" }}>
-          <LuHelpCircle color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
+          <BiSupport color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
         </div>
       ),
     },
