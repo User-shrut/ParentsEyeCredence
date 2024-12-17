@@ -1174,7 +1174,7 @@ const GeofenceReports = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log('API response data:', response.data); // Debug log
-      setApiData(response.data.data.reverse()); // Ensure response.data is an array or contains reports
+      setApiData(response.data.data); // Ensure response.data is an array or contains reports
       setStatusLoading(false);
     } catch (error) {
       setStatusLoading(false);

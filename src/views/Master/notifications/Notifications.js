@@ -335,7 +335,7 @@ const Notification = () => {
       )
 
       if (response.status === 200) {
-      
+        toast.error('Successfully Notification Deleted!')
         fetchNotificationData()
       }
     } catch (error) {
@@ -372,7 +372,7 @@ const Notification = () => {
     doc.autoTable(tableColumn, tableRows, { startY: 20 });
 
     // Save the generated PDF
-    doc.save('table_data.pdf');
+    doc.save('Notification_data.pdf');
   };
 
   const exportToExcel = () => {
@@ -396,7 +396,7 @@ const Notification = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'table_data.xlsx');
+    XLSX.writeFile(workbook, 'Notification_data.xlsx');
   };
 
   return (

@@ -308,7 +308,7 @@ const SearchStop = ({
   )
 }
 
-const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
+const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading }) => {
   const [locationData, setLocationData] = useState({})
 
   // Function to convert latitude and longitude into a location name
@@ -343,7 +343,7 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
     const doc = new jsPDF();
     const tableColumn = ['SN', 'Device Name', ...selectedColumns]; // Add 'SN' for Serial Number
     const tableRows = [];
-  
+
     apiData.finalDeviceDataByStopage.forEach((row, rowIndex) => {
       const tableRow = [
         rowIndex + 1, // Serial number (rowIndex + 1)
@@ -391,7 +391,7 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
       ];
       tableRows.push(tableRow);
     });
-  
+
     // Add autoTable with border settings
     autoTable(doc, {
       head: [tableColumn],
@@ -407,12 +407,12 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
       tableLineColor: [0, 0, 0], // Outer border color (black)
       margin: { top: 20 }, // Margin from the top
     });
-  
+
     doc.save(`${selectedDeviceName || 'Stops_Report'}.pdf`);
   };
-  
-  
-  
+
+
+
 
   // Function to generate and download Excel without using file-saver
   const downloadExcel = () => {
@@ -422,7 +422,7 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
           SN: rowIndex + 1, // Serial Number
           'Device Name': row.device?.name || selectedDeviceName || '--', // Add Device Name
         };
-        
+
         selectedColumns.forEach((column) => {
           if (column === 'Speed') rowData.Speed = `${(row.speed * 3.6).toFixed(2)} km/h`;
           if (column === 'Ignition') rowData.Ignition = row.ignition ? 'ON' : 'OFF';
@@ -431,10 +431,10 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
               row.course < 90 && row.course > 0
                 ? 'North East'
                 : row.course > 90 && row.course < 180
-                ? 'North West'
-                : row.course > 180 && row.course < 270
-                ? 'South West'
-                : 'South East';
+                  ? 'North West'
+                  : row.course > 180 && row.course < 270
+                    ? 'South West'
+                    : 'South East';
           }
           if (column === 'Location')
             rowData.Location = locationData[rowIndex] || 'Fetching location...';
@@ -470,16 +470,16 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
         return rowData;
       }),
     );
-  
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Stops');
-  
+
     // Generate Excel file
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  
+
     // Create a Blob from the Excel data
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-  
+
     // Create a link element, trigger download, and remove the element
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -489,7 +489,7 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
     link.click();
     link.remove();
   };
-  
+
 
   return (
     <>
@@ -506,146 +506,150 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns }) => {
         </CTableHead>
 
         <CTableBody>
-          {apiData?.finalDeviceDataByStopage?.length > 0 ? (
-            apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
-              <CTableRow key={row.id} className="custom-row">
-                <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
-                <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{selectedDeviceName}</CTableDataCell>
-                {/* Dynamically render table cells based on selected columns */}
-                {selectedColumns.map((column, index) => (
-                  <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
-                    {column === 'Speed' ? (
-                      // Convert speed from m/s to km/h and format to 2 decimal places
-                      // (row.speed * 3.6).toFixed(2) + ' km/h'
-                      row.speed.toFixed(2) + ' km/h'
-                    ) : column === 'Ignition' ? (
-                      // Show 'ON' or 'OFF' based on ignition status
-                      row.ignition === true ? (
-                        <img src={ignitionOn} alt="on" width="40" height="40" style={{ marginRight: '10px' }} />
-                      ) : (
-                        <img src={ignitionOff} alt="off" width="40" height="40" style={{ marginRight: '10px' }} />
-                      )
-                    ) : column === 'Direction' ? (
-                      // Show direction (course)
-                      row.course < 90 && row.course > 0 ? (
-                        <>
-                          <img
-                            src={upRight}
-                            alt="North East"
-                            width="30"
-                            height="25"
-                          />
-                          <span>North East</span>
-                        </>
-                      ) : row.course > 90 && row.course < 180 ? (
-                        <>
-                          <img
-                            src={upLeft}
-                            alt="North West"
-                            width="30"
-                            height="25"
-                          />
-                          <span>North West</span>
-                        </>
-                      ) : row.course > 180 && row.course < 270 ? (
-                        <>
-                          <img
-                            src={downLeft}
-                            alt="South West"
-                            width="30"
-                            height="25"
-                          />
-                          <span>South West</span>
-                        </>
-                      ) : (
-                        <>
-                          <img
-                            src={downRight}
-                            alt="South East"
-                            width="30"
-                            height="25"
-                          />
-                          <span>South East</span>
-                        </>
-                      )
-                    ) : column === 'Location' ? (
-                      // Show location
-                      locationData[rowIndex] || 'Fetching location...'
-                    ) : column === 'Start Time' ? (
-                      // Add 6 hours 30 minutes to arrivalTime
-                      new Date(
-                        new Date(row.arrivalTime).setHours(
-                          new Date(row.arrivalTime).getHours() - 5,
-                          new Date(row.arrivalTime).getMinutes() - 30,
-                        ),
-                      ).toLocaleString([], {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })
-                    ) : column === 'End Time' ? (
-                      // Add 6 hours 30 minutes to departureTime
-                      new Date(
-                        new Date(row.departureTime).setHours(
-                          new Date(row.departureTime).getHours() - 5,
-                          new Date(row.departureTime).getMinutes() - 30,
-                        ),
-                      ).toLocaleString([], {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })
-                    ) : column === 'Device Name' ? (
-                      // Show device name, or '--' if not available
-                      row.device?.name || '--'
-                    ) : (
-                      '--'
-                    )}
-                  </CTableDataCell>
-                ))}
-              </CTableRow>
-            ))
-          ) : (
-            <CTableRow>
+          {statusLoading ? (
+            <CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
-                colSpan={selectedColumns.length + 1}
+                colSpan={selectedColumns.length + 2}
                 style={{
-                  backgroundColor: "#f8f9fa",
-                  color: "#6c757d",
-                  fontStyle: "italic",
-                  textAlign: "center",
-                  padding: "16px",
+                  backgroundColor: '#f8f9fa',
+                  color: '#6c757d',
+                  fontStyle: 'italic',
+                  padding: '16px',
+                  textAlign: 'center',
+                  border: '1px dashed #dee2e6',
+                  height: '100px',
                 }}
               >
-                {apiData?.finalDeviceDataByStopage ? (
-                  "No Data Found"
-                ) : (
-
-                  <div style={{ position: "relative", height: "100px" }}>
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      <Loader />
-                    </div>
-                  </div>
-                )}
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Loader />
+                </div>
               </CTableDataCell>
             </CTableRow>
-          )}
+
+          ) :
+            apiData?.finalDeviceDataByStopage?.length > 0 ? (
+              apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
+                <CTableRow key={row.id} className="custom-row">
+                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
+                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{selectedDeviceName}</CTableDataCell>
+                  {/* Dynamically render table cells based on selected columns */}
+                  {selectedColumns.map((column, index) => (
+                    <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
+                      {column === 'Speed' ? (
+                        // Convert speed from m/s to km/h and format to 2 decimal places
+                        // (row.speed * 3.6).toFixed(2) + ' km/h'
+                        row.speed.toFixed(2) + ' km/h'
+                      ) : column === 'Ignition' ? (
+                        // Show 'ON' or 'OFF' based on ignition status
+                        row.ignition === true ? (
+                          <img src={ignitionOn} alt="on" width="40" height="40" style={{ marginRight: '10px' }} />
+                        ) : (
+                          <img src={ignitionOff} alt="off" width="40" height="40" style={{ marginRight: '10px' }} />
+                        )
+                      ) : column === 'Direction' ? (
+                        // Show direction (course)
+                        row.course < 90 && row.course > 0 ? (
+                          <>
+                            <img
+                              src={upRight}
+                              alt="North East"
+                              width="30"
+                              height="25"
+                            />
+                            <span>North East</span>
+                          </>
+                        ) : row.course > 90 && row.course < 180 ? (
+                          <>
+                            <img
+                              src={upLeft}
+                              alt="North West"
+                              width="30"
+                              height="25"
+                            />
+                            <span>North West</span>
+                          </>
+                        ) : row.course > 180 && row.course < 270 ? (
+                          <>
+                            <img
+                              src={downLeft}
+                              alt="South West"
+                              width="30"
+                              height="25"
+                            />
+                            <span>South West</span>
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              src={downRight}
+                              alt="South East"
+                              width="30"
+                              height="25"
+                            />
+                            <span>South East</span>
+                          </>
+                        )
+                      ) : column === 'Location' ? (
+                        // Show location
+                        locationData[rowIndex] || 'Fetching location...'
+                      ) : column === 'Start Time' ? (
+                        // Add 6 hours 30 minutes to arrivalTime
+                        new Date(
+                          new Date(row.arrivalTime).setHours(
+                            new Date(row.arrivalTime).getHours() - 5,
+                            new Date(row.arrivalTime).getMinutes() - 30,
+                          ),
+                        ).toLocaleString([], {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })
+                      ) : column === 'End Time' ? (
+                        // Add 6 hours 30 minutes to departureTime
+                        new Date(
+                          new Date(row.departureTime).setHours(
+                            new Date(row.departureTime).getHours() - 5,
+                            new Date(row.departureTime).getMinutes() - 30,
+                          ),
+                        ).toLocaleString([], {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })
+                      ) : column === 'Device Name' ? (
+                        // Show device name, or '--' if not available
+                        row.device?.name || '--'
+                      ) : (
+                        '--'
+                      )}
+                    </CTableDataCell>
+                  ))}
+                </CTableRow>
+              ))
+            ) : (
+              <CTableRow key={selectedDeviceName} >
+                <CTableDataCell
+                  colSpan={selectedColumns.length + 3}
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    color: "#6c757d",
+                    fontStyle: "italic",
+                    textAlign: "center",
+                    padding: "16px",
+                  }}
+                >
+                  No data available {selectedDeviceName}
+                </CTableDataCell>
+              </CTableRow>
+
+            )}
         </CTableBody>
-
-
       </CTable>
 
 
@@ -679,6 +683,7 @@ const Stops = () => {
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
+  const [statusLoading, setStatusLoading] = useState(false)
   const [columns] = useState([
     'Start Time',
     'Ignition',
@@ -781,6 +786,7 @@ const Stops = () => {
     }
   }
   const handleSubmit = async () => {
+    setStatusLoading(true);
     console.log(formData)
     // Convert the dates to ISO format if they're provided
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : ''
@@ -806,10 +812,12 @@ const Stops = () => {
       // console.log(response.data.deviceDataByTrips[0]);
       if (response.status == 200) {
         setApiData(response.data)
+        setStatusLoading(false)
       }
       // Assuming the data returned is what you want to display in the table
       console.log('Form submitted with data:', body)
     } catch (error) {
+      setStatusLoading(false)
       console.error('Error submitting form:', error)
     }
   }
@@ -854,7 +862,12 @@ const Stops = () => {
                 /> */}
               </CCardHeader>
               <CCardBody>
-                <StopTable apiData={apiData} selectedDeviceName={selectedDeviceName} selectedColumns={selectedColumns} />
+                <StopTable
+                  apiData={apiData}
+                  selectedDeviceName={selectedDeviceName}
+                  selectedColumns={selectedColumns}
+                  statusLoading={statusLoading}
+                />
               </CCardBody>
             </CCard>
           </CCol>

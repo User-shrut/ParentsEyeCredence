@@ -397,11 +397,11 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
 
   const exportToExcel = () => {
     const workbook = XLSX.utils.book_new(); // Create a new workbook
-  
-    const tableColumn = ['SN','Vehicle Name', ...selectedColumns];
+
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
     const tableRows = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.map((column) => {
-        if (column === 'Vehicle Name'){
+        if (column === 'Vehicle Name') {
           return row.selectedDeviceName
         }
         if (column === 'Vehicle Status') {
@@ -441,11 +441,11 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
       });
       return [rowIndex + 1, selectedDeviceName, ...rowData];
     });
-  
+
     const worksheetData = [tableColumn, ...tableRows];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    XLSX.writeFile(workbook,`${selectedDeviceName}.xlsx`);
+    XLSX.writeFile(workbook, `${selectedDeviceName}.xlsx`);
   };
 
   // Function to export table data to PDF
@@ -453,10 +453,10 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
     const doc = new jsPDF({
       orientation: 'landscape',
     });
-  
+
     doc.setFontSize(15); // Set font size for the title
     doc.text(selectedDeviceName, 14, 15);
-  
+
     const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
     const tableRows = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.map((column) => {
@@ -497,7 +497,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
       });
       return [rowIndex + 1, selectedDeviceName, ...rowData];
     });
-  
+
     // Add autoTable with border settings
     doc.autoTable({
       head: [tableColumn],
@@ -513,10 +513,10 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
       tableLineColor: [0, 0, 0], // Outer border color (black)
       margin: { top: 20 }, // Margin from the top
     });
-  
+
     doc.save(`${selectedDeviceName}.pdf`);
   };
-  
+
 
   return (
     <>
@@ -596,26 +596,26 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                                     ? (row.distance / 1000).toFixed(2) + ' km'
                                     : column === 'Maximum Speed'
                                       ? row.maxSpeed
-                                    : column === 'Total KM'
-                                      ? row.totalKm
-                                    : column === 'End Address'
-                                      ? newAddressData?.endAddress || 'Fetching...'
-                                      : column === 'Driver Name'
-                                        ? row.driverInfos?.driverName || '--'
-                                        : column === 'Driver Phone No.'
-                                          ? row.device?.name || '--'
-                                          : column === 'Vehicle Status'
-                                            ? row.vehicleStatus
-                                            : column === 'Duration'
-                                              ? row.time
-                                              // : column === 'Average Speed'
-                                              //   ? row.averageSpeed
-                                              : column === 'Start Coordinates'
-                                                ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+                                      : column === 'Total KM'
+                                        ? row.totalKm
+                                        : column === 'End Address'
+                                          ? newAddressData?.endAddress || 'Fetching...'
+                                          : column === 'Driver Name'
+                                            ? row.driverInfos?.driverName || '--'
+                                            : column === 'Driver Phone No.'
+                                              ? row.device?.name || '--'
+                                              : column === 'Vehicle Status'
+                                                ? row.vehicleStatus
+                                                : column === 'Duration'
+                                                  ? row.time
+                                                  // : column === 'Average Speed'
+                                                  //   ? row.averageSpeed
+                                                  : column === 'Start Coordinates'
+                                                    ? `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
 
-                                                : column === 'End Coordinates'
-                                                  ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-                                                  : '--'}
+                                                    : column === 'End Coordinates'
+                                                      ? `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
+                                                      : '--'}
                       </CTableDataCell>
                     </>
                   ))}
@@ -633,7 +633,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                     border: '1px dashed #dee2e6' // Dashed border to highlight it
                   }}
                 >
-                  No data available
+                  No data available {selectedDeviceName}
                 </CTableDataCell>
               </CTableRow>
             ))}
