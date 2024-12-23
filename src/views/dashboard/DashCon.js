@@ -308,6 +308,10 @@ const Dashboard = () => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
   }
+  const handleClickOnHistory = (vehicle) => {
+    console.log('trcak clicked')
+    navigate(`/history/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
+  }
 
   const visibleColumns = useSelector((state) => state.columnVisibility)
 
@@ -346,7 +350,7 @@ const Dashboard = () => {
   }, [address])
 
   useEffect(() => {
-    console.log("filtered vehicle", filteredVehicles);
+    // console.log("filtered vehicle", filteredVehicles);
     filteredVehicles.forEach(vehicle => {
       if (vehicle?.deviceId && vehicle.longitude && vehicle.latitude && !address[vehicle.id]) {
         // Fetch address only if it's not already fetched for this vehicle
@@ -355,87 +359,6 @@ const Dashboard = () => {
     });
     // console.log(address)
   }, [filteredVehicles])
-
-
-  // devices show
-  // const headerRef1 = useRef()
-  
-
-  // // const dispatch = useDispatch()
-  // // const { filteredVehicles1 } = useSelector((state) => state.liveFeatures)
-  // const [filter1, setFilter1] = useState('all')
-  // const [searchTerm, setSearchTerm] = useState('')
-
-  // useEffect(() => {
-  //   document.addEventListener('scroll', () => {
-  //     headerRef1.current &&
-  //       headerRef1.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
-  //   })
-  // }, [])
-
-  // useEffect(() => {
-  //   switch (filter1) {
-  //     case 'stopped':
-  //       dispatch(filterStoppedVehicles())
-  //       break
-  //     case 'idle':
-  //       dispatch(filterIdleVehicles())
-  //       break
-  //     case 'running':
-  //       dispatch(filterRunningVehicles())
-  //       break
-  //     case 'overspeed':
-  //       dispatch(filterOverspeedVehicles())
-  //       break
-  //     case 'inactive':
-  //       dispatch(filterInactiveVehicles())
-  //       break
-  //     case 'car':
-  //       dispatch(filterByCategory('car'))
-  //       break
-  //     case 'bus':
-  //       dispatch(filterByCategory('bus'))
-  //       break
-  //     case 'truck':
-  //       dispatch(filterByCategory('truck'))
-  //       break
-  //     case 'tracktor':
-  //       dispatch(filterByCategory('tracktor'))
-  //     case 'jcb':
-  //       dispatch(filterByCategory('jcb'))
-  //       break
-  //     case 'crean':
-  //       dispatch(filterByCategory('crean'))
-  //       break
-  //     case 'motorcycle':
-  //       dispatch(filterByCategory('motorcycle'))
-  //       break
-  //     case 'geofence_1':
-  //       dispatch(filterByGeofence(1))
-  //       break
-  //     case 'group_1':
-  //       dispatch(filterByGroup(1))
-  //       break
-  //     case 'vehicle_MH31FC7099':
-  //       dispatch(filterBySingleVehicle('MH31FC7099'))
-  //       break
-  //     default:
-  //       dispatch(filterAllVehicles())
-  //       break
-  //   }
-  // }, [filter, dispatch])
-
-  // useEffect(() => {
-  //   dispatch(searchVehiclesByName(searchTerm)) // Dispatch the search action
-  // }, [searchTerm, dispatch])
-
-  // const deviceNames = useSelector(selectDeviceNames)
-  // const location = useLocation()
-
-  // // Check if the current page is the dashboard
-  // const isDashboard = location.pathname === '/dashboard'
-
-  // neew redux option
 
   const headerRef = useRef()
   // const { filteredVehicles1 } = useSelector((state) => state.liveFeatures)
@@ -843,6 +766,12 @@ const Dashboard = () => {
                         >
                           Track
                         </CTableHeaderCell>
+                        <CTableHeaderCell
+                          className="bg-body-secondary text-center status table-cell"
+                          style={{ position: 'sticky', top: 0, width: '15%' }}
+                        >
+                          History
+                        </CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
 
@@ -1098,6 +1027,15 @@ const Dashboard = () => {
                                 onClick={() => handleClickOnTrack(item)}
                               >
                                 Live Track
+                              </button>
+                            </CTableDataCell>
+                            <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center status table-cell">
+                              <button
+                                className="btn shadow-sm"
+                                style={{ backgroundColor: '#000000', fontSize: '1rem', color: 'white' }}
+                                onClick={() => handleClickOnHistory(item)}
+                              >
+                                View History
                               </button>
                             </CTableDataCell>
                           </CTableRow>

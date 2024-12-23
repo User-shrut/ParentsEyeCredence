@@ -58,6 +58,11 @@ const routes = [
   { path: '/statusreports', name: 'Combine', element:Combine },
   { path: '/distancereports', name: 'Custom', element: Custom},
   { path: '/history', name: 'History', element: History },
+  {
+    path: '/history/:deviceId/:category/:name',
+    name: 'History',
+    element: History,
+  },
   { path: '/stops', name: 'Stops', element: Stops },
   { path: '/travelsreport', name: 'Trips', element: Trips },
   { path: '/idlereport', name: 'Idle', element: IdleReport },

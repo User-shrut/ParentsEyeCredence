@@ -677,12 +677,12 @@ const Trips = () => {
   const [columns] = useState([
     'Start Time',
     'Start Address',
+    'Distance',
     'Average Speed',
+    'Maximum Speed', 
+    'Total Distance',
     'End Time',
     'End Address',
-    'Maximum Speed',
-    'Distance',
-    'Total Distance',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
   const [showMap, setShowMap] = useState(false) //show mapping data

@@ -4,6 +4,7 @@ import vehicleReducer from './features/vehicleSlice.js'
 import columnVisibilityReducer from './features/columnVisibilitySlice.js'
 import addressReducer from './features/addressSlice.js'
 import navReducer from './features/navSlice.js'
+import historyReducer from './features/historySlice'
 // Initial state and reducer for sidebar and theme
 const initialState = {
   sidebarShow: true,
@@ -27,7 +28,7 @@ const rootReducer = combineReducers({
   columnVisibility: columnVisibilityReducer,
   address: addressReducer,
   navbar: navReducer,
-
+  history: historyReducer,
 })
 
 // Create the Redux store

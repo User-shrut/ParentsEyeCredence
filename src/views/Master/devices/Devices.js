@@ -139,7 +139,7 @@ const Devices = () => {
     { Header: 'Installation Date', accessor: 'installationdate' }, // Maps to 'installationdate'
     { Header: 'Expiration', accessor: 'expirationdate' }, // Maps to 'expirationdate'
     { Header: 'Extend Date', accessor: 'extenddate' },
-   
+
   ]
 
   const style = {
@@ -443,7 +443,7 @@ const Devices = () => {
       // API call
       const accessToken = Cookies.get('authToken')
       const username = 'hbtrack'
-      const password = '123456@'
+      const password = '123456@
       const token1 = btoa(`${username}:${password}`)
       const oldPutApi = `http://63.142.251.13:8082/api/devices`
       const newPutApi = `${import.meta.env.VITE_API_URL}/device`
@@ -454,7 +454,7 @@ const Devices = () => {
 
       const oldRow = {
         id: formData.id,
-        name: formData.name || '',
+        name: formData.name || '','
         uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
         phone: formData.sim || '',
         model: formData.model || '',
@@ -833,7 +833,7 @@ const handleCheckPassword = () => {
   }
 };
 
-  
+
 
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {

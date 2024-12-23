@@ -192,6 +192,10 @@
 
 
 import {
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -203,13 +207,36 @@ import { Paper, TableContainer } from '@mui/material'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [notificationIDs, setNotificationIDs] = useState()
+  const [filteredData, setFilteredData] = useState([]);
+  const [filterType, setFilterType] = useState(''); // State for selected filter
   const accessToken = Cookies.get('authToken')
+
+  const notificationTypes = [
+    'deviceMoving',
+    'ignitionOn',
+    'ignitionOff',
+    'deviceStopped',
+    'geofenceExited',
+    'geofenceEntered',
+    'speedLimitExceeded',
+    'statusOnline',
+    'statusOffline',
+    'statusUnknown',
+    'deviceActive',
+    'deviceInactive',
+    'fuelDrop',
+    'fuelIncrease',
+    'alarm',
+    'maintenanceRequired',
+  ];
 
   const fetchNotificationData = async (page = 1) => {
     setLoading(true)
@@ -285,23 +312,44 @@ const Alerts = () => {
     }
   }
 
+  // Filter data whenever filterType or searchQuery changes
+  useEffect(() => {
+    const filtered = data.filter((item) =>
+      (!filterType || item.type === filterType) &&
+      (item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.message?.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+    setFilteredData(filtered);
+  }, [filterType, searchQuery, data]);
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Alerts/Events</h2>
         </div>
-
         <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          <select
+            className="form-select me-3"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+          >
+            <option value="">All Types</option>
+            {notificationTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+          <input
+            type="search"
+            className="form-control"
+            placeholder="Search here..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
       <div className="mb-2 d-md-none">
@@ -368,8 +416,8 @@ const Alerts = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : data.length > 0 ? (
-              data.filter((item) => {
+            ) : filteredData.length > 0 ? (
+              filteredData.filter((item) => {
                 const query = searchQuery.toLowerCase();
                 return (
                   item.name?.toLowerCase().includes(query) || // Filter by name
@@ -412,8 +460,21 @@ const Alerts = () => {
             )}
           </CTableBody>
         </CTable>
+
+        <CDropdown className="position-fixed bottom-0 end-0 m-3">
+                <CDropdownToggle
+                  color="secondary"
+                  style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+                >
+                  <CIcon icon={cilSettings} />
+                </CDropdownToggle>
+                <CDropdownMenu>
+                  <CDropdownItem >PDF</CDropdownItem>
+                  <CDropdownItem >Excel</CDropdownItem>
+                </CDropdownMenu>
+              </CDropdown>
       </TableContainer>
-    </div>
+    </div >
   )
 }
 

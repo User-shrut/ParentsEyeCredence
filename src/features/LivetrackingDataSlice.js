@@ -166,5 +166,6 @@ export const {
 } = liveFeaturesSlice.actions
 
 export const selectDeviceNames = (state) => state.liveFeatures.deviceNames
+
 // Export the reducer
 export default liveFeaturesSlice.reducer

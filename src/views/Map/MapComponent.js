@@ -4,43 +4,6 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import MarkerClusterGroup from 'react-leaflet-cluster'
 
-// Importing all vehicle icons
-import busredSvg from '../../assets/AllTopViewVehicle/Top R.svg'
-import busyellowSvg from '../../assets/AllTopViewVehicle/Top Y.svg'
-import busgreenSvg from '../../assets/AllTopViewVehicle/Top G.svg'
-import busorangeSvg from '../../assets/AllTopViewVehicle/Top O.svg'
-import busgraySvg from '../../assets/AllTopViewVehicle/Top Grey.svg'
-
-import carredSvg from '../../assets/AllTopViewVehicle/Car-R.svg'
-import caryellowSvg from '../../assets/AllTopViewVehicle/Car-Y.svg'
-import cargreenSvg from '../../assets/AllTopViewVehicle/Car-G.svg'
-import carorangeSvg from '../../assets/AllTopViewVehicle/Car-O.svg'
-import cargraySvg from '../../assets/AllTopViewVehicle/Car-Grey.svg'
-
-import tractorredSvg from '../../assets/AllTopViewVehicle/Tractor-R.svg'
-import tractoryellowSvg from '../../assets/AllTopViewVehicle/Tractor-Y.svg'
-import tractorgreenSvg from '../../assets/AllTopViewVehicle/Tractor-G.svg'
-import tractororangeSvg from '../../assets/AllTopViewVehicle/Tractor-O.svg'
-import tractorgraySvg from '../../assets/AllTopViewVehicle/Tractor-Grey.svg'
-
-import autoredSvg from '../../assets/AllTopViewVehicle/Auto-R.svg'
-import autoyellowSvg from '../../assets/AllTopViewVehicle/Auto-Y.svg'
-import autogreenSvg from '../../assets/AllTopViewVehicle/Auto-G.svg'
-import autoorangeSvg from '../../assets/AllTopViewVehicle/Auto-O.svg'
-import autograySvg from '../../assets/AllTopViewVehicle/Auto-Grey.svg'
-
-import jcbredSvg from '../../assets/AllTopViewVehicle/JCB-R.svg'
-import jcbyellowSvg from '../../assets/AllTopViewVehicle/JCB-Y.svg'
-import jcbgreenSvg from '../../assets/AllTopViewVehicle/JCB-G.svg'
-import jcborangeSvg from '../../assets/AllTopViewVehicle/JCB-O.svg'
-import jcbgraySvg from '../../assets/AllTopViewVehicle/JCB-GREY.svg'
-
-import truckredSvg from '../../assets/AllTopViewVehicle/Truck-R.svg'
-import truckyellowSvg from '../../assets/AllTopViewVehicle/Truck-Y.svg'
-import truckgreenSvg from '../../assets/AllTopViewVehicle/Truck-G.svg'
-import truckorangeSvg from '../../assets/AllTopViewVehicle/Truck-O.svg'
-import truckgraySvg from '../../assets/AllTopViewVehicle/Truck-Grey.svg'
-
 import { FaSearchLocation } from 'react-icons/fa'
 import { IoMdSpeedometer } from 'react-icons/io'
 import { HiOutlineStatusOnline } from 'react-icons/hi'
@@ -53,94 +16,9 @@ import { useSelector } from 'react-redux'
 
 import { IoLocationSharp } from "react-icons/io5";
 import { GiSpeedometer } from "react-icons/gi";
+import useGetVehicleIcon from '../Reports/HistoryReport/useGetVehicleIcon'
 
-// Define map icons
-const mapIcons = {
-  bus: {
-    red: busredSvg,
-    yellow: busyellowSvg,
-    green: busgreenSvg,
-    orange: busorangeSvg,
-    gray: busgraySvg,
-  },
-  car: {
-    red: carredSvg,
-    yellow: caryellowSvg,
-    green: cargreenSvg,
-    orange: carorangeSvg,
-    gray: cargraySvg,
-  },
-  tractor: {
-    red: tractorredSvg,
-    yellow: tractoryellowSvg,
-    green: tractorgreenSvg,
-    orange: tractororangeSvg,
-    gray: tractorgraySvg,
-  },
-  auto: {
-    red: autoredSvg,
-    yellow: autoyellowSvg,
-    green: autogreenSvg,
-    orange: autoorangeSvg,
-    gray: autograySvg,
-  },
-  jcb: {
-    red: jcbredSvg,
-    yellow: jcbyellowSvg,
-    green: jcbgreenSvg,
-    orange: jcborangeSvg,
-    gray: jcbgraySvg,
-  },
-  truck: {
-    red: truckredSvg,
-    yellow: truckyellowSvg,
-    green: truckgreenSvg,
-    orange: truckorangeSvg,
-    gray: truckgraySvg,
-  },
-  default: {
-    red: carredSvg,
-    yellow: caryellowSvg,
-    green: cargreenSvg,
-    orange: carorangeSvg,
-    gray: cargraySvg,
-  },
-}
 
-// Function to get the correct icon based on vehicle state
-const getVehicleIcon = (vehicle) => {
-  let speed = vehicle.speed
-  let ignition = vehicle.attributes.ignition
-  const category = mapIcons[vehicle?.category] || mapIcons['default']
-  let course = vehicle.course || 0
-
-  let iconUrl
-  switch (true) {
-    case speed <= 2.0 && ignition:
-      iconUrl = category['yellow']
-      break
-    case speed > 2.0 && speed < 60 && ignition:
-      iconUrl = category['green']
-      break
-    case speed > 60.0 && ignition:
-      iconUrl = category['orange']
-      break
-    case speed <= 1.0 && !ignition:
-      iconUrl = category['red']
-      break
-    default:
-      iconUrl = category['gray']
-      break
-  }
-
-  return L.divIcon({
-    html: `<img src="${iconUrl}" style="transform: rotate(${course}deg); width: 48px; height: 48px;" />`,
-    iconSize: [48, 48],
-    iconAnchor: [24, 24], // Adjust anchor point based on size and rotation
-    popupAnchor: [0, -24],
-    className: '', // Ensure no default styles are applied
-  })
-}
 
 const MainMap = ({ filteredVehicles }) => {
   const { newAddress } = useSelector((state) => state.address)
@@ -150,39 +28,11 @@ const MainMap = ({ filteredVehicles }) => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
   }
-  // const fetchAddress = async (vehicleId, longitude, latitude) => {
-  //   try {
-  //     const apiKey = 'DG2zGt0KduHmgSi2kifd'; // Replace with your actual MapTiler API key
-  //     const response = await axios.get(
-  //       `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
-  //     );
-  //     // console.log(response)
-  //     const address = response.data.features.length <= 5
-  //       ? response.data.features[0].place_name_en
-  //       : response.data.features[1].place_name_en;
 
-  //     setAddress(prevAddresses => ({
-  //       ...prevAddresses,
-  //       [vehicleId]: address, // Update the specific vehicle's address
-  //     }));
-  //   } catch (error) {
-  //     console.error('Error fetching the address:', error);
-  //     setAddress(prevAddresses => ({
-  //       ...prevAddresses,
-  //       [vehicleId]: 'Error fetching address',
-  //     }));
-  //   }
-  // };
 
   useEffect(() => {
     console.log("filtered vehicle", filteredVehicles);
-    // filteredVehicles.forEach(vehicle => {
-    //   if (vehicle?.deviceId && vehicle.longitude && vehicle.latitude && !address[vehicle.id]) {
-    //     // Fetch address only if it's not already fetched for this vehicle
-    //     fetchAddress(vehicle.deviceId, vehicle.longitude, vehicle.latitude);
-    //   }
-    // });
-    // console.log(address)
+
   }, [filteredVehicles])
 
   function CtrlZoomHandler() {
@@ -220,6 +70,7 @@ const MainMap = ({ filteredVehicles }) => {
     return null;
   }
 
+  const iconImage = (category, item) => useGetVehicleIcon(item, category)
   return (
     <MapContainer
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
@@ -234,13 +85,11 @@ const MainMap = ({ filteredVehicles }) => {
       {/* <CtrlZoomHandler /> */}
       <MarkerClusterGroup chunkedLoading>
         {filteredVehicles?.map((vehicle, index) => {
-          // console.log(vehicle)
-          // fetchAddress(vehicle)
           return (
             <Marker
               key={index}
               position={[vehicle.latitude, vehicle.longitude]}
-              icon={getVehicleIcon(vehicle)}
+              icon={iconImage(vehicle.category, vehicle)}
             >
               <Popup>
                 <div className="toolTip" style={{ display: 'flex', fontSize: '.90rem', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3px' }}>
