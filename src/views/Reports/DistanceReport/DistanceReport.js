@@ -139,24 +139,24 @@ const SearchDistance = ({
           }
         </CFormSelect> */}
         <Select
-  id="user"
-  options={
-    loading
-      ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
-      : users?.length > 0
-      ? users.map((user) => ({ value: user._id, label: user.username }))
-      : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
-  }
-  value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
-  onChange={(selectedOption) => {
-    const selectedUser = selectedOption?.value;
-    setSelectedU(selectedUser);
-    console.log('Selected user:', selectedUser);
-    getGroups(selectedUser);
-  }}
-  placeholder="Choose a user..." // Displayed when no value is selected
-  isLoading={loading} // Optional loading spinner
-/>
+          id="user"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Users...', isDisabled: true }]
+              : users?.length > 0
+                ? users.map((user) => ({ value: user._id, label: user.username }))
+                : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
+          }
+          value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+          onChange={(selectedOption) => {
+            const selectedUser = selectedOption?.value;
+            setSelectedU(selectedUser);
+            console.log('Selected user:', selectedUser);
+            getGroups(selectedUser);
+          }}
+          placeholder="Choose a user..." // Displayed when no value is selected
+          isLoading={loading} // Optional loading spinner
+        />
 
       </CCol>
       <CCol md={2}>
@@ -186,24 +186,24 @@ const SearchDistance = ({
           }
         </CFormSelect> */}
         <Select
-  id="group"
-  options={
-    loading
-      ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
-      : groups?.length > 0
-      ? groups.map((group) => ({ value: group._id, label: group.name }))
-      : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
-  }
-  value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
-  onChange={(selectedOption) => {
-    const selectedGroup = selectedOption?.value;
-    setSelectedG(selectedGroup);
-    console.log('Selected Group ID:', selectedGroup);
-    getDevices(selectedGroup);
-  }}
-  placeholder="Choose a group..." // Displayed when no value is selected
-  isLoading={loading} // Shows a loading spinner during fetching
-/>
+          id="group"
+          options={
+            loading
+              ? [{ value: '', label: 'Loading Groups...', isDisabled: true }]
+              : groups?.length > 0
+                ? groups.map((group) => ({ value: group._id, label: group.name }))
+                : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
+          }
+          value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+          onChange={(selectedOption) => {
+            const selectedGroup = selectedOption?.value;
+            setSelectedG(selectedGroup);
+            console.log('Selected Group ID:', selectedGroup);
+            getDevices(selectedGroup);
+          }}
+          placeholder="Choose a group..." // Displayed when no value is selected
+          isLoading={loading} // Shows a loading spinner during fetching
+        />
 
         <CFormFeedback invalid>Please provide a valid device.</CFormFeedback>
       </CCol>
@@ -361,19 +361,27 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
       findDeviceName(row.deviceId),
       ...allDates.map((date) => (row[date] !== undefined ? `${row[date]} km` : '0 km')),
       `${calculateTotalDistance(row).toFixed(2)} km`,
-    ])
+    ]);
 
-    const headers = ['Vehicle', ...allDates, 'Total Distance (km)']
+    const headers = ['Vehicle', ...allDates, 'Total Distance (km)'];
 
     autoTable(doc, {
       head: [headers],
       body: tableData,
-      styles: { fontSize: 5, fontWeight: 'bold' },
+      styles: {
+        fontSize: 5,
+        fontWeight: 'bold',
+        lineWidth: 0.5, // Cell border thickness
+        lineColor: [0, 0, 0], // Black border color
+      },
       margin: { top: 10 },
-    })
+      tableLineWidth: 0.5, // Border around the table
+      tableLineColor: [0, 0, 0], // Black table border color
+    });
 
-    doc.save('table_data.pdf')
-  }
+    doc.save('Distance Reports.pdf');
+  };
+
 
   // Export to Excel function
   const exportToExcel = () => {
@@ -394,7 +402,7 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
 
     const ws = XLSX.utils.aoa_to_sheet(tableData)
     XLSX.utils.book_append_sheet(wb, ws, 'Table Data')
-    XLSX.writeFile(wb, 'table-data.xlsx')
+    XLSX.writeFile(wb, 'Distance Reports.xlsx')
   }
 
 
@@ -443,20 +451,20 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
                 </div>
               </CTableDataCell>
             </CTableRow>) : (
-             filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
+              filteredData.length > 0 ? (
+                filteredData.map((row, rowIndex) => (
                   <CTableRow key={row.deviceId} className="custom-row">
-                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
-                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{findDeviceName(row.deviceId)}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{findDeviceName(row.deviceId)}</CTableDataCell>
 
                     {/* Dynamically render table cells based on the date range */}
                     {allDates.map((date, index) => (
-                      <CTableDataCell key={index}  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >
+                      <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }} >
                         {/* Check if the date exists in the row, otherwise print '0' */}
                         {row[date] !== undefined ? `${row[date]} km` : '0 km'}
                       </CTableDataCell>
                     ))}
-                    <CTableDataCell  style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
+                    <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
                       {calculateTotalDistance(row).toFixed(2)}
                       <span> km</span>
                     </CTableDataCell>
@@ -465,7 +473,7 @@ const ShowDistance = ({ apiData, distanceLoading, selectedColumns, allDates, dev
               ) : (
                 <CTableRow>
                   <CTableDataCell
-                    colSpan={allDates.length + 1}
+                    colSpan={allDates.length + 3}
                     style={{
                       backgroundColor: '#f8f9fa', // Light gray background
                       color: '#6c757d', // Darker text color
@@ -727,7 +735,7 @@ const Distance = () => {
                   allDates={allDates}
                   devices={devices}
                   selectedColumns={selectedColumns}
-                  searchQuery={searchQuery}  
+                  searchQuery={searchQuery}
                 />
               </CCardBody>
             </CCard>

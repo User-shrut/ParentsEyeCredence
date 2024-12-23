@@ -106,12 +106,12 @@ const Driver = () => {
   };
   
   const validateLicenseNumber = (licenseNumber) => {
-    const licenseRegex = /^[A-Za-z0-9]{1,15}$/; // Adjust the length as needed
+    const licenseRegex = /^[A-Za-z0-9]/; // Adjust the length as needed
     return licenseNumber ? licenseRegex.test(licenseNumber) : true; // Allow empty license number
   };
   
   const validateAadharNumber = (aadharNumber) => {
-    const aadharRegex = /^[0-9]{12}$/;
+    const aadharRegex = /^[0-9]/;
     return aadharNumber ? aadharRegex.test(aadharNumber) : true; // Allow empty Aadhar
   };
 

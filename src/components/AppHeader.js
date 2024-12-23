@@ -209,13 +209,13 @@ const AppHeader = () => {
 
   // Determine role based on token
   // const decodedToken1 = jwtDecode(token)
-  let role; 
+  let role;
   if (decodedToken && decodedToken.superadmin === true) {
     role = 'superadmin';
   } else {
     role = 'user';
   }
-  
+
 
   // const handleSupports = () => {
   //   dispatch({ type: 'set', sidebarShow: true })
@@ -234,11 +234,11 @@ const AppHeader = () => {
           {/* <CIcon icon={cilMenu} size="lg" /> */}
         </CHeaderToggler>
         <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
+          {/* <CNavItem>
             <CNavLink id='header-dashboard' to="/dashboard" as={NavLink}>
-              {/* <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} style={{ marginInlineStart: '-30px' }} /> */}
+              <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} width={200} style={{ marginInlineStart: '-30px' }} />
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
         </CHeaderNav>
 
 

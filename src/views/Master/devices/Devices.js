@@ -885,7 +885,7 @@ const handleCheckPassword = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data')
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'table_data.xlsx')
+    XLSX.writeFile(workbook, 'Devices_data.xlsx')
   }
 
   const exportToPDF = () => {
@@ -932,7 +932,7 @@ const handleCheckPassword = () => {
       startY: 20,
       autoSize: true, // Automatically adjust column width based on content
     })
-    doc.save('table_data.pdf')
+    doc.save('Devices_data.pdf')
   }
 
   // console.log("pageCountttttttttttt",pageCount)

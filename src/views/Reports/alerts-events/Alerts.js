@@ -113,7 +113,7 @@
 //           <CTableHead className="text-nowrap">
 //             <CTableRow className="bg-body-tertiary">
 //               <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
-//                 SN 
+//                 SN
 //               </CTableHeaderCell>
 //               <CTableHeaderCell className=" text-center text-white bg-secondary">
 //                 Device Name
@@ -352,15 +352,6 @@ const Alerts = () => {
           />
         </div>
       </div>
-      <div className="mb-2 d-md-none">
-        <input
-          type="search"
-          className="form-control"
-          placeholder="search here..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
 
       <TableContainer
         component={Paper}
@@ -392,7 +383,7 @@ const Alerts = () => {
                 Message
               </CTableHeaderCell>
               <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                Time
+                Date/Time
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -429,7 +420,7 @@ const Alerts = () => {
                 ?.map((item, index) => (
 
                   <CTableRow key={index} >
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{index + 1}</CTableDataCell>
+                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{(currentPage - 1) * rowsPerPage + index + 1}</CTableDataCell>
                     <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{item.name}</CTableDataCell>
                     <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.type}</CTableDataCell>
                     <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.address || 'Fetching...'}</CTableDataCell>
