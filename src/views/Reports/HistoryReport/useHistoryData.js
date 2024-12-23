@@ -4,12 +4,13 @@ import Cookies from 'js-cookie'
 
 const useHistoryData = (url, { from, to, deviceId }, fetch) => {
   const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetching start at his data")
       if (fetch) {
         setLoading(true)
         setError(null)
@@ -33,7 +34,7 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
             to: convertToUTCWithOffset(to), // Convert `to` to UTC with offset
             deviceId,
           }
-          
+
           // Make the GET request with query parameters
           const response = await axios.get(url, {
             headers: {
@@ -42,6 +43,8 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
             },
             params,
           })
+
+      console.log("fetching stop at his data")
 
           if (response.status === 200) {
             setData(response.data)
@@ -58,6 +61,7 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
     }
 
     fetchData()
+
   }, [url, from, to, deviceId, fetch])
 
   return { data, loading, error }

@@ -52,8 +52,7 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import AddDeviceModal from './AddDeviceForm'
 import EditDeviceModal from './EditDeviceForm'
-import "../../../../src/app.css";
-
+import '../../../../src/app.css'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -87,12 +86,11 @@ const Devices = () => {
   const steps = ['Device Info', 'Assign To', 'Subscription']
   const [filteredData, setFilteredData] = useState([])
 
-  const [open, setOpen] = useState(false);
-  const [customExtendDate, setCustomExtendDate] = useState('');
+  const [open, setOpen] = useState(false)
+  const [customExtendDate, setCustomExtendDate] = useState('')
 
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
   const handleModalClose = () => {
     setEditModalOpen(false)
     setAddModalOpen(false)
@@ -116,7 +114,7 @@ const Devices = () => {
     const currentI = data.slice(currentPage * limit, (currentPage + 1) * limit)
     setCurrentItems(currentI)
 
-    console.log("currentItems", currentItems)
+    console.log('currentItems', currentItems)
   }, [currentPage, limit, data])
 
   const handlePageClick = (event) => {
@@ -139,7 +137,6 @@ const Devices = () => {
     { Header: 'Installation Date', accessor: 'installationdate' }, // Maps to 'installationdate'
     { Header: 'Expiration', accessor: 'expirationdate' }, // Maps to 'expirationdate'
     { Header: 'Extend Date', accessor: 'extenddate' },
-
   ]
 
   const style = {
@@ -282,8 +279,8 @@ const Devices = () => {
         ])
 
         // Process responses if needed
-        const oldApiData = oldApiResponse.data  //.slice(900,901)
-        const newApiData = newApiResponse.data.devices  //.slice(2857,2858)
+        const oldApiData = oldApiResponse.data //.slice(900,901)
+        const newApiData = newApiResponse.data.devices //.slice(2857,2858)
 
         console.log('oldApiData: ', oldApiData)
         console.log('newApiData: ', newApiData)
@@ -292,31 +289,31 @@ const Devices = () => {
         // console.log(' merge data hai : ', result)
         //setData(result)
 
-        const mergedResult = [];
+        const mergedResult = []
         function compareAndMerge(oldApiData, newApiData) {
           // Normalize old and new data to keep the key names consistent
-          newApiData.forEach(newItem => {
-            const oldItem = oldApiData.find(item => item.id == newItem.deviceId);
+          newApiData.forEach((newItem) => {
+            const oldItem = oldApiData.find((item) => item.id == newItem.deviceId)
             if (oldItem) {
               if (newItem.driver) {
-                oldItem.Driver = newItem.driver;
-                delete oldItem.driver;
+                oldItem.Driver = newItem.driver
+                delete oldItem.driver
               }
-              mergedResult.push({ ...oldItem, ...newItem });
+              mergedResult.push({ ...oldItem, ...newItem })
             } else {
-              mergedResult.push(newItem);
+              mergedResult.push(newItem)
             }
-          });
+          })
 
           // Add remaining old data that wasn't in new data
-          oldApiData.forEach(oldItem => {
-            const newItem = newApiData.find(item => item.deviceId == oldItem.id);
+          oldApiData.forEach((oldItem) => {
+            const newItem = newApiData.find((item) => item.deviceId == oldItem.id)
             if (!newItem) {
-              mergedResult.push(oldItem);
+              mergedResult.push(oldItem)
             }
-          });
+          })
 
-          return mergedResult;
+          return mergedResult
         }
         compareAndMerge(oldApiData, newApiData)
         console.log(' merge data hai : ', mergedResult)
@@ -374,7 +371,8 @@ const Devices = () => {
       setFilteredData(currentItems)
     }
     if (searchQuery) {
-      const filtered = data?.filter( //currentItems.filter
+      const filtered = data?.filter(
+        //currentItems.filter
         (device) =>
           device.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           device.uniqueId?.includes(searchQuery) ||
@@ -389,25 +387,25 @@ const Devices = () => {
     }
   }
 
-  const handleSearch = ()=>{
+  const handleSearch = () => {
     filterDevices(searchQuery)
   }
 
   // KEYBOARD EVENT HANDLER
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      handleSearch();
+    if (event.key === 'Enter') {
+      handleSearch()
     }
-  };
+  }
 
   useEffect(() => {
-    if (searchQuery=='') {
+    if (searchQuery == '') {
       filterDevices(searchQuery)
     }
     if (searchQuery) {
       filterDevices(searchQuery)
     }
-  }, [currentItems, searchQuery,currentPage,limit])
+  }, [currentItems, searchQuery, currentPage, limit])
 
   // #########################  Edit Device API function #######################
 
@@ -454,7 +452,7 @@ const Devices = () => {
 
       const oldRow = {
         id: formData.id,
-        name: formData.name || '','
+        name: formData.name || '',
         uniqueId: formData.uniqueId ? formData.uniqueId.trim() : '',
         phone: formData.sim || '',
         model: formData.model || '',
@@ -524,14 +522,12 @@ const Devices = () => {
         })
       }
 
-
       toast.success('User is edited successfully')
       setEditModalOpen(false)
       fetchData()
       setLoading(false)
 
       setFormData({})
-
     } catch (error) {
       console.error('Error during submission:', error)
       let errorMessage = 'An error occurred'
@@ -742,7 +738,7 @@ const Devices = () => {
       ...formData,
       [name]: value,
     })
-    console.log("Add device formData",formData)
+    console.log('Add device formData', formData)
   }
 
   // Handle year selection for expiration date
@@ -795,45 +791,41 @@ const Devices = () => {
   //     alert('Password is not correct')
   //   }
   // }
-// below is when we deal with custom date
-const handleCheckPassword = () => {
-  if (extendedPassword === myPassword) {
-    setPasswordCheck(true);
-    setExtendedPasswordModel(false);
-    alert('Password is correct');
+  // below is when we deal with custom date
+  const handleCheckPassword = () => {
+    if (extendedPassword === myPassword) {
+      setPasswordCheck(true)
+      setExtendedPasswordModel(false)
+      alert('Password is correct')
 
-    // Update the expiration date
-    if (customExtendDate) {
-      // Apply the custom date selected earlier
-      setFormData({
-        ...formData,
-        extenddate: customExtendDate,
-        expirationdate: customExtendDate,
-      });
-      setCustomExtendDate(null); // Clear the custom date state after applying
-    } else if (formData.expirationdate && extendedYear) {
-      // Apply year extension logic
-      const expiry = new Date(formData.expirationdate);
-      const extendedDate = new Date(
-        expiry.setFullYear(expiry.getFullYear() + extendedYear)
-      )
-        .toISOString()
-        .split('T')[0];
+      // Update the expiration date
+      if (customExtendDate) {
+        // Apply the custom date selected earlier
+        setFormData({
+          ...formData,
+          extenddate: customExtendDate,
+          expirationdate: customExtendDate,
+        })
+        setCustomExtendDate(null) // Clear the custom date state after applying
+      } else if (formData.expirationdate && extendedYear) {
+        // Apply year extension logic
+        const expiry = new Date(formData.expirationdate)
+        const extendedDate = new Date(expiry.setFullYear(expiry.getFullYear() + extendedYear))
+          .toISOString()
+          .split('T')[0]
 
-      setFormData({
-        ...formData,
-        extenddate: extendedDate,
-        expirationdate: extendedDate,
-      });
+        setFormData({
+          ...formData,
+          extenddate: extendedDate,
+          expirationdate: extendedDate,
+        })
+      }
+
+      setSelectedYears(null) // Reset the selected years
+    } else {
+      alert('Password is not correct')
     }
-
-    setSelectedYears(null); // Reset the selected years
-  } else {
-    alert('Password is not correct');
   }
-};
-
-
 
   // this is run when date is extended i edit mmodel
   const handleExtendYearSelection = (years) => {
@@ -936,8 +928,8 @@ const handleCheckPassword = () => {
   }
 
   // console.log("pageCountttttttttttt",pageCount)
-  console.log("data.lengthhhhhhhhhhhhhh",data)
-  console.log("filteredDataaaaaaaaaaaaaa",filteredData)
+  console.log('data.lengthhhhhhhhhhhhhh', data)
+  console.log('filteredDataaaaaaaaaaaaaa', filteredData)
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -958,12 +950,8 @@ const handleCheckPassword = () => {
               onKeyDown={handleKeyDown}
             />
           </div>
-          <div className="me-3 d-none d-md-block" >
-            <button
-              onClick={handleSearch}
-              variant="contained"
-              className="btn btn-secondary"
-            >
+          <div className="me-3 d-none d-md-block">
+            <button onClick={handleSearch} variant="contained" className="btn btn-secondary">
               Search
             </button>
           </div>
@@ -982,9 +970,7 @@ const handleCheckPassword = () => {
               >
                 Add Device
               </button> */}
-              <button onClick={handleOpen}
-                variant="contained"
-                className="btn btn-secondary" >
+              <button onClick={handleOpen} variant="contained" className="btn btn-secondary">
                 Add Device
               </button>
             </div>
@@ -1000,22 +986,38 @@ const handleCheckPassword = () => {
           overflowY: 'auto', // Enable vertical scrollbar if needed
           marginBottom: '10px',
           borderRadius: '10px',
-          border: '1px solid black'
+          border: '1px solid black',
         }}
       >
-        <CTable bordered align="middle" className="mb-2 borderless min-vh-25 rounded-top-3" hover responsive >
-          <CTableHead style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
-            <CTableRow style={{height:'6vh' ,  }} className="text-nowrap "  >
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+        <CTable
+          bordered
+          align="middle"
+          className="mb-2 borderless min-vh-25 rounded-top-3"
+          hover
+          responsive
+        >
+          <CTableHead
+            style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+            bordered
+            align="middle"
+            className="mb-2 border min-vh-25 rounded-top-3"
+            hover
+            responsive
+          >
+            <CTableRow style={{ height: '6vh' }} className="text-nowrap ">
+              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                 <strong>SN</strong>
-              </CTableHeaderCell >
+              </CTableHeaderCell>
               {columns.slice(1).map((column, index) => (
-                <CTableHeaderCell key={index} className="text-center bg-body-secondary text-center sr-no table-cell" >
+                <CTableHeaderCell
+                  key={index}
+                  className="text-center bg-body-secondary text-center sr-no table-cell"
+                >
                   <strong>{column.Header}</strong>
                 </CTableHeaderCell>
               ))}
               {decodedToken.superadmin ? (
-                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell" >
+                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
                   <strong>Actions</strong>
                 </CTableHeaderCell>
               ) : null}
@@ -1023,7 +1025,7 @@ const handleCheckPassword = () => {
           </CTableHead>
           <CTableBody>
             {loading ? (
-              <CTableRow key="loading"  style={{border:'1px soild black'}}>
+              <CTableRow key="loading" style={{ border: '1px soild black' }}>
                 <CTableDataCell colSpan="16" className="text-center">
                   <div className="text-nowrap mb-2 text-center w-">
                     <p className="card-text placeholder-glow">
@@ -1044,14 +1046,28 @@ const handleCheckPassword = () => {
             ) : filteredData.length > 0 ? (
               filteredData?.map((item, index) => (
                 <CTableRow key={item._id}>
-                  <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", border: 'none' }}>{currentPage * limit + index + 1}</CTableDataCell>
+                  <CTableDataCell
+                    style={{
+                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                      border: 'none',
+                    }}
+                  >
+                    {currentPage * limit + index + 1}
+                  </CTableDataCell>
                   {columns.slice(1).map((column) => (
-                    <CTableDataCell key={column.accessor} className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                    <CTableDataCell
+                      key={column.accessor}
+                      className="text-center"
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                    >
                       {column.accessor === 'groups' ? (
                         <CFormSelect
                           id="groups"
                           className=" text-center border-2"
-                          style={{ width: '100px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          style={{
+                            width: '100px',
+                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                          }}
                           value=""
                         >
                           <option>{item.groups?.length || '0'}</option>
@@ -1066,7 +1082,10 @@ const handleCheckPassword = () => {
                         <CFormSelect
                           id="geofence"
                           className=" text-center border-2"
-                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          style={{
+                            width: '120px',
+                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                          }}
                           value=""
                         >
                           <option value="">{item.geofences?.length || '0'}</option>
@@ -1081,7 +1100,10 @@ const handleCheckPassword = () => {
                         <CFormSelect
                           id="users"
                           className=" text-center border-2"
-                          style={{ width: '120px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                          style={{
+                            width: '120px',
+                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                          }}
                           value=""
                         >
                           <option value="">{item.users?.length || '0'}</option>
@@ -1103,7 +1125,10 @@ const handleCheckPassword = () => {
                   ))}
 
                   {decodedToken.superadmin ? (
-                    <CTableDataCell className="text-center d-flex" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
+                    <CTableDataCell
+                      className="text-center d-flex"
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                    >
                       <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
                         <RiEdit2Fill
                           style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
@@ -1134,7 +1159,6 @@ const handleCheckPassword = () => {
             )}
           </CTableBody>
         </CTable>
-
       </TableContainer>
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
@@ -1160,7 +1184,9 @@ const handleCheckPassword = () => {
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={(searchQuery) ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)} // Set based on the total pages from the API
+              pageCount={
+                searchQuery ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)
+              } // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}
@@ -1275,8 +1301,11 @@ const handleCheckPassword = () => {
           </Button>
         </Box>
       </Modal>
-      <AllInOneForm open={open} setOpen={setOpen} handleClose={handleClose} handleOpen={handleOpen}
-
+      <AllInOneForm
+        open={open}
+        setOpen={setOpen}
+        handleClose={handleClose}
+        handleOpen={handleOpen}
         style={style}
         token={token}
         fetchData={fetchData}

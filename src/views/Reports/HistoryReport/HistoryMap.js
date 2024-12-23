@@ -10,6 +10,7 @@ import useStoppageTimes from './useStoppageTimes.js'
 import useVehicleImage from './useVehicleImage.js'
 import useGetVehicleIcon from './useGetVehicleIcon.js'
 import location from '../../../assets/location.svg'
+import HistoryLoader from './HistoryLoader.js'
 
 const HistoryMap = ({
   fromDateTime,
@@ -22,12 +23,12 @@ const HistoryMap = ({
   category,
   name,
 }) => {
-  const { data } = useHistoryData(
+  const { data, loading } = useHistoryData(
     'http://63.142.251.13:9000/history/device-history-playback',
     { deviceId, from: fromDateTime, to: toDateTime },
     fetch,
   )
-  const { data: stopData, loading } = useHistoryData(
+  const { data: stopData } = useHistoryData(
     'http://63.142.251.13:9000/history/device-stopage',
     { deviceId, from: fromDateTime, to: toDateTime },
     fetch,
@@ -292,6 +293,7 @@ const HistoryMap = ({
 
   return (
     <div className="individualMap position-relative border border-5">
+      {loading && <HistoryLoader />}
       <MapContainer
         center={
           filteredData && positions && currentPositionIndex

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   CButton,
   CCard,
@@ -10,7 +11,11 @@ import {
   CFormInput,
   CRow,
   CFormLabel,
+  CFormSelect,
+  CSpinner,
 } from '@coreui/react'
+
+import { fetchDevices } from '../../../features/deviceSlice.js'
 
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
@@ -18,9 +23,7 @@ import HistoryMap from './HistoryMap'
 import './HistoryReport.css'
 
 const HistoryReport = () => {
-  const { deviceId: urlDeviceId } = useParams() // Retrieve deviceId from URL
-  const { category: category } = useParams() // Retrieve deviceId from URL
-  const { name: name } = useParams() // Retrieve deviceId from URL
+  const { deviceId: urlDeviceId, category, name } = useParams() // Retrieve params from URL
   const [fromDateTime, setFromDateTime] = useState('')
   const [toDateTime, setToDateTime] = useState('')
   const [deviceId, setDeviceId] = useState(urlDeviceId || '')
@@ -52,13 +55,23 @@ const HistoryReport = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('submit')
     if (fromDateTime === '' || toDateTime === '' || deviceId === '') {
       alert('Please fill all fields')
     } else if (validateDateRange(fromDateTime, toDateTime)) {
       setHistoryOn(true)
       setFetch(true)
     }
+  }
+
+  const dispatch = useDispatch()
+  const { devices, loading } = useSelector((state) => state.devices)
+
+  useEffect(() => {
+    dispatch(fetchDevices())
+  }, [dispatch])
+
+  const handleDeviceChange = (event) => {
+    setDeviceId(event.target.value)
   }
 
   return (
@@ -71,7 +84,7 @@ const HistoryReport = () => {
                 <strong>History Report</strong>
               </CCardHeader>
               <CCardBody>
-                <CForm style={{ display: 'flex', gap: '4rem' }} onSubmit={(e) => handleSubmit(e)}>
+                <CForm style={{ display: 'flex', gap: '4rem' }} onSubmit={handleSubmit}>
                   <div>
                     <CFormLabel htmlFor="fromDateTime">From Date-Time</CFormLabel>
                     <CFormInput
@@ -92,15 +105,21 @@ const HistoryReport = () => {
                     />
                   </div>
 
-                  {/* <div>
-                    <CFormLabel htmlFor="deviceId">Device ID</CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="deviceId"
-                      value={deviceId}
-                      onChange={(e) => setDeviceId(e.target.value)}
-                    />
-                  </div> */}
+                  <CFormSelect
+                    id="device-select"
+                    value={deviceId}
+                    onChange={handleDeviceChange}
+                    style={{ height: '3rem', width: '12rem', marginTop: '1rem' }}
+                  >
+                    <option value="" disabled>
+                      Select a Device
+                    </option>
+                    {devices.map((device, index) => (
+                      <option key={index} value={device.deviceId}>
+                        {device.name}
+                      </option>
+                    ))}
+                  </CFormSelect>
 
                   <CButton
                     color="primary"

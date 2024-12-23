@@ -139,3 +139,11 @@
 .light{
   font-weight: 500;
 }
+
+.custom-select .form-select {
+  height: 35px !important; /* Adjust the height to your desired value */
+}
+
+.custom-select .form-select option {
+  padding: 5px 10px !important; /* Adjust padding to reduce the size of each option */
+}
