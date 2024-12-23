@@ -35,7 +35,7 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
             deviceId,
           }
 
-          // Make the GET request with query parameters
+          // Make the GET request with query parameter
           const response = await axios.get(url, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
