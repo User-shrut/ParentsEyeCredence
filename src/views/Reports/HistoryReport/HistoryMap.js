@@ -12,6 +12,13 @@ import useGetVehicleIcon from './useGetVehicleIcon.js'
 import location from '../../../assets/location.svg'
 import HistoryLoader from './HistoryLoader.js'
 
+
+const redIcon = L.icon({
+  iconUrl: location, // Path to your custom icon (e.g., PNG or SVG)
+  iconSize: [32, 32], // Size of the icon
+  iconAnchor: [16, 32], // Anchor point of the icon (where the marker is placed)
+  popupAnchor: [0, -32], // Popup position relative to the icon
+});
 const HistoryMap = ({
   fromDateTime,
   toDateTime,
@@ -320,8 +327,8 @@ const HistoryMap = ({
             <Polyline
               positions={poly}
               color="blue"
-              weight={5}
-              opacity={0.7}
+              weight={7}
+              opacity={0.6}
               arrowheads={{
                 size: '15px',
                 frequency: 'endonly',
