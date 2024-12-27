@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import useHistoryData from './useHistoryData'
@@ -11,14 +11,71 @@ import useVehicleImage from './useVehicleImage.js'
 import useGetVehicleIcon from './useGetVehicleIcon.js'
 import location from '../../../assets/location.svg'
 import HistoryLoader from './HistoryLoader.js'
+import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md'
+import ReactDOMServer from 'react-dom/server'
+import { Line } from 'react-chartjs-2'
+import redFlag from '../../../assets/red-flag-svgrepo-com.svg'
+import greenFlag from '../../../assets/green.svg'
+import {
+  Chart as ChartJS,
+  LineElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+} from 'chart.js'
+import { Scrollbars } from 'react-custom-scrollbars-2'
+import SlidingSideMenu from './SlidingSideMenu'
 
+// Register Chart.js components
+ChartJS.register(LineElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement)
 
-const redIcon = L.icon({
-  iconUrl: location, // Path to your custom icon (e.g., PNG or SVG)
+const createNumberedIcon = (number) => {
+  return L.divIcon({
+    className: 'custom-marker', // Optional custom class for styling
+    html: `
+      <div style="position: relative; width: 42px; height: 42px;">
+        <img src="${location}" alt="location" style="width: 100%; height: 100%;" />
+        <div style="
+          position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
+    text-shadow: 0 0 2px black;
+    background-color: white !important;
+    border-radius: 50%;
+    border: 1px solid black;
+    width: 48%;
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
+        ">
+          ${number}
+        </div>
+      </div>
+    `,
+    iconSize: [32, 32], // Size of the icon
+    iconAnchor: [16, 32], // Anchor point
+    popupAnchor: [0, -32], // Popup position
+  })
+}
+const redFlagIcon = L.icon({
+  iconUrl: redFlag, // Path to your custom icon (e.g., PNG or SVG)
   iconSize: [32, 32], // Size of the icon
   iconAnchor: [16, 32], // Anchor point of the icon (where the marker is placed)
   popupAnchor: [0, -32], // Popup position relative to the icon
-});
+})
+const greenFlagIcon = L.icon({
+  iconUrl: greenFlag, // Path to your custom icon (e.g., PNG or SVG)
+  iconSize: [32, 32], // Size of the icon
+  iconAnchor: [16, 32], // Anchor point of the icon (where the marker is placed)
+  popupAnchor: [0, -32], // Popup position relative to the icon
+})
 const HistoryMap = ({
   fromDateTime,
   toDateTime,
@@ -49,11 +106,11 @@ const HistoryMap = ({
 
   const [positions, setPositions] = useState([])
   const [stopages, setStopages] = useState(stopData?.finalDeviceDataByStopage || [])
-  const [showStopages, setShowStopages] = useState(false)
+  const [showStopages, setShowStopages] = useState(true)
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
-  const [speed, setSpeed] = useState(1)
-  const [zoomLevel, setZoomLevel] = useState(10)
+  const [speed, setSpeed] = useState(2.5)
+  const [zoomLevel, setZoomLevel] = useState(14)
   const [progress, setProgress] = useState(0)
   const [isExpanded, setIsExpanded] = useState(false)
   const [trips, setTrips] = useState([])
@@ -61,6 +118,10 @@ const HistoryMap = ({
   const [longestTrip, setLongestTrip] = useState(null)
   const [startAddress, setStartAddress] = useState('')
   const [endAddress, setEndAddress] = useState('')
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [prevhoveredIndex, setPrevHoveredIndex] = useState(null)
+  const [originalPositions, setOriginalPositions] = useState([])
+  const mapRef = useRef()
   useEffect(() => {
     if (tripData?.finalTrip) {
       setTrips(tripData.finalTrip)
@@ -180,6 +241,7 @@ const HistoryMap = ({
   useEffect(() => {
     if (filteredData.length > 0) {
       setPositions(filteredData)
+      setOriginalPositions(filteredData)
       setIsPlaying(true) // Start animation as soon as data is fetched
     }
   }, [filteredData])
@@ -192,6 +254,86 @@ const HistoryMap = ({
 
   // Create polyline data
   const poly = useMemo(() => positions.map((item) => [item.latitude, item.longitude]), [positions])
+
+  const handleGraphHover = (index) => {
+    if (!isPlaying) setIsPlaying(false)
+
+    setHoveredIndex(index)
+    setCurrentPositionIndex(index)
+    if (isPlaying) setIsPlaying(true)
+  }
+
+  const handleGraphLeave = () => {
+    setHoveredIndex(null)
+    setIsPlaying(true)
+    setCurrentPositionIndex(prevHoveredIndex)
+  }
+
+  const speedData = positions?.map((pos) => pos.speed) || []
+  const labels = positions?.map((_, index) => index) || []
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Speed',
+        data: speedData,
+        borderColor: 'rgba(31, 116, 38, 0.5)',
+        backgroundColor: 'rgba(95, 237, 51, 0.5)',
+        cubicInterpolationMode: 'monotone',
+        tension: 0.4, // Smooth curve
+        pointRadius: 0, // Hide points
+        pointHoverRadius: 8, // Show points on hover
+        borderWidth: 2,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    maintainAspectRatio: false,
+    responsive: true,
+    scales: {
+      x: {
+        title: { display: true, text: 'Position Index' },
+        grid: { display: false },
+      },
+      y: {
+        title: { display: true, text: 'Speed (km/h)' },
+        grid: { drawBorder: false },
+      },
+    },
+    plugins: {
+      tooltip: {
+        enabled: true,
+        intersect: false,
+        mode: 'index',
+        callbacks: {
+          label: (tooltipItem) => `Speed: ${tooltipItem.raw} km/h`,
+        },
+      },
+      crosshair: {
+        line: {
+          color: 'rgba(0, 0, 0, 0.5)', // Vertical line color
+          width: 1, // Vertical line width
+        },
+      },
+    },
+    hover: {
+      mode: 'index',
+      intersect: false,
+    },
+    onHover: (event, chartElement) => {
+      // event.preventDefault();
+      if (chartElement.length) {
+        const index = chartElement[0].index
+        setPrevHoveredIndex(currentPositionIndex)
+        handleGraphHover(index)
+      } else {
+        handleGraphLeave()
+      }
+    },
+  }
+
   // console.log(poly)
 
   // Playback animation logic
@@ -228,12 +370,14 @@ const HistoryMap = ({
         const currentPosition = positions[currentPositionIndex]
         if (
           !lastPosition ||
-          Math.abs(currentPosition.latitude - lastPosition.latitude) > 0.001 ||
-          Math.abs(currentPosition.longitude - lastPosition.longitude) > 0.001
+          Math.abs(currentPosition?.latitude - lastPosition?.latitude) > 0.001 ||
+          Math.abs(currentPosition?.longitude - lastPosition?.longitude) > 0.001
         ) {
           // Only update the view if the position has changed significantly
-          map.setView([currentPosition.latitude, currentPosition.longitude], 15)
-          setLastPosition(currentPosition)
+          if ((currentPosition?.latitude, currentPosition?.longitude)) {
+            map.setView([currentPosition?.latitude, currentPosition?.longitude], zoomLevel)
+            setLastPosition(currentPosition)
+          }
         }
       }
     }, [currentPositionIndex, zoomLevel, map, positions, lastPosition])
@@ -298,240 +442,331 @@ const HistoryMap = ({
   const iconImage = useGetVehicleIcon(positions[currentPositionIndex], category)
   const vehicleImage = useVehicleImage(category, positions[currentPositionIndex])
 
+  const renderMarkers = () => {
+    return positions
+      .filter((_, index) => index % 4 === 0) // Skip every 5th point
+      .map((point, index) => {
+        // Create a custom icon with the course rotation
+        const rotation = point.course // Assuming course is an angle in degrees
+        const iconHtml = ReactDOMServer.renderToString(<MdOutlineKeyboardDoubleArrowUp />) // Convert React icon to string
+
+        const icon = L.divIcon({
+          html: `<div style="transform: rotate(${rotation}deg); font-size: 18px; font-weight: 900; color:#fff;">${iconHtml}</div>`, // Use the string icon
+          className: 'custom-icon', // Optional: style the icon if needed
+        })
+
+        return (
+          <Marker key={index} position={[point.latitude, point.longitude]} icon={icon}>
+            <Popup>
+              {`Lat: ${point.latitude}, Long: ${point.longitude}, Course: ${point.course}`}
+            </Popup>
+          </Marker>
+        )
+      })
+  }
+
+  const [totalDistance, setTotalDistance] = useState(0)
+
+  useEffect(() => {
+    if (positions.length > 0) {
+      let accumulatedDistance = 0
+
+      // Loop through all the positions up to the current position index
+      for (let i = 0; i <= currentPositionIndex; i++) {
+        const currentPosition = positions[i]?.attributes?.distance
+        if (currentPosition && currentPosition > 0) {
+          accumulatedDistance += currentPosition
+        }
+      }
+
+      // Set the total distance
+      setTotalDistance(accumulatedDistance)
+    }
+  }, [currentPositionIndex, positions])
   return (
     <div className="individualMap position-relative border border-5">
-      {loading && <HistoryLoader />}
-      <MapContainer
-        center={
-          filteredData && positions && currentPositionIndex
-            ? [positions[currentPositionIndex].latitude, positions[currentPositionIndex].longitude]
-            : [21.1458, 79.0882]
-        }
-        zoom={zoomLevel}
-        scrollWheelZoom={true}
-        style={{
-          position: 'relative',
-          height: '600px',
-          width: '100%',
-          borderRadius: '15px',
-          border: '2px solid gray',
-        }}
-      >
-        <MapZoomController />
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
-        />
-        {positions.length > 0 && (
-          <>
-            <Polyline
-              positions={poly}
-              color="blue"
-              weight={7}
-              opacity={0.6}
-              arrowheads={{
-                size: '15px',
-                frequency: 'endonly',
-                fill: true,
-                color: 'white', // Arrow color set to white
-              }}
-            />
+      <div className="graphAndMap" style={{ width: '100%' }}>
+        <MapContainer
+          ref={mapRef}
+          center={
+            filteredData && positions && currentPositionIndex
+              ? [
+                  positions[currentPositionIndex]?.latitude,
+                  positions[currentPositionIndex]?.longitude,
+                ]
+              : [21.1458, 79.0882]
+          }
+          zoom={zoomLevel}
+          scrollWheelZoom={true}
+          style={{
+            position: 'relative',
+            height: '400px',
+            width: '100%',
+            borderRadius: '15px',
+            border: '2px solid gray',
+          }}
+        >
+          <MapZoomController />
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
+          />
+          {positions.length > 0 && (
+            <>
+              <Polyline
+                positions={poly}
+                color="blue"
+                weight={7}
+                opacity={0.6}
+                arrowheads={{
+                  size: '15px',
+                  frequency: 'endonly',
+                  fill: true,
+                  color: 'white', // Arrow color set to white
+                }}
+              />
+              {renderMarkers()}
+              <Marker
+                position={[
+                  positions[currentPositionIndex]?.latitude,
+                  positions[currentPositionIndex]?.longitude,
+                ]}
+                duration={1000}
+                icon={iconImage}
+              >
+                <Popup>
+                  {`Vehicle at ${positions[currentPositionIndex]?.latitude}, ${positions[currentPositionIndex]?.longitude}`}
+                </Popup>
+              </Marker>
+            </>
+          )}
 
-            <ReactLeafletDriftMarker
-              position={[
-                positions[currentPositionIndex].latitude,
-                positions[currentPositionIndex].longitude,
-              ]}
-              duration={1000}
-              icon={iconImage}
-            >
-              <Popup>
-                {`Vehicle at ${positions[currentPositionIndex].latitude}, ${positions[currentPositionIndex].longitude}`}
-              </Popup>
-            </ReactLeafletDriftMarker>
+          {positions.length > 0 && positions[0]?.latitude && positions[0].longitude && (
+            <>
+              {/* Marker for the starting position */}
+              {positions[0]?.latitude && positions[0]?.longitude && (
+                <Marker
+                  position={[positions[0].latitude, positions[0].longitude]}
+                  icon={greenFlagIcon}
+                >
+                  <Popup>
+                    <div>
+                      <p>
+                        <strong>Speed:</strong> {stop?.speed || 'N/A'}
+                      </p>
+                      <p>
+                        <strong>Arrival Time:</strong>{' '}
+                        {stop?.arrivalTime ? new Date(stop.arrivalTime).toLocaleString() : 'N/A'}
+                      </p>
+                      <p>
+                        <strong>Departure Time:</strong>{' '}
+                        {stop?.departureTime
+                          ? new Date(stop.departureTime).toLocaleString()
+                          : 'N/A'}
+                      </p>
+                    </div>
+                  </Popup>
+                </Marker>
+              )}
+
+              {/* Marker for the ending position */}
+              {positions[positions.length - 1]?.latitude &&
+                positions[positions.length - 1]?.longitude && (
+                  <Marker
+                    position={[
+                      positions[positions.length - 1]?.latitude,
+                      positions[positions.length - 1]?.longitude,
+                    ]}
+                    icon={redFlagIcon}
+                  >
+                    <Popup>
+                      <div>
+                        <p>
+                          <strong>Speed:</strong> {stop?.speed || 'N/A'}
+                        </p>
+                        <p>
+                          <strong>Arrival Time:</strong>{' '}
+                          {stop?.arrivalTime ? new Date(stop?.arrivalTime).toLocaleString() : 'N/A'}
+                        </p>
+                        <p>
+                          <strong>Departure Time:</strong>{' '}
+                          {stop?.departureTime
+                            ? new Date(stop?.departureTime).toLocaleString()
+                            : 'N/A'}
+                        </p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                )}
+            </>
+          )}
+
+          {showStopages &&
+            stopages &&
+            stopages.map((stop, index) => (
+              <Marker
+                key={index}
+                position={[stop?.latitude, stop?.longitude]}
+                icon={createNumberedIcon(index)}
+                iconAnchor={[12, 41]}
+                popupAnchor={[1, -34]}
+                shadowAnchor={[10, 41]}
+              >
+                <Popup>
+                  <div>
+                    <p>
+                      <strong>Speed:</strong> {stop?.speed}
+                    </p>
+                    <p>
+                      <strong>Arrival Time:</strong> {new Date(stop?.arrivalTime).toLocaleString()}
+                    </p>
+                    <p>
+                      <strong>Departure Time:</strong>{' '}
+                      {stop.departureTime ? new Date(stop?.departureTime).toLocaleString() : 'N/A'}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+        </MapContainer>
+        {historyOn && chartData && chartOptions && (
+          <>
+            <div className="infoNav" style={{ height: '60px', width: '100%' }}>
+              <div className="info-img">
+                <img src={vehicleImage} alt="Car icon" className="vehicle" />
+                <p className="name">{name}</p>
+              </div>
+
+              <div className="divide fixedWidth">
+                <div className="bolder">Speed : </div>
+                <div className="lighter">
+                  {fetch && positions
+                    ? Math.round(positions[currentPositionIndex]?.speed * 1.6)
+                    : '0'}{' '}
+                  km/hr
+                </div>
+              </div>
+
+              <div className="divide">
+                <div className="bolder">Ignition: </div>
+                <div className="lighter">
+                  {fetch && positions
+                    ? positions[currentPositionIndex]?.attributes?.ignition
+                      ? 'On'
+                      : 'Off'
+                    : 'Off'}
+                </div>
+              </div>
+              <div className="divide fixedWidth">
+                <div className="bolder">Distance: </div>
+                <div className="lighter">
+                  {fetch && positions ? `${(totalDistance / 1000).toFixed(2)} Km` : '0 Km'}
+                </div>
+              </div>
+
+              <div className="controls">
+                <div className="center">
+                  <div className="pro">
+                    <div onClick={handleBackward}>
+                      <FaBackward />
+                    </div>
+                    <div onClick={handlePlayPause}>{isPlaying ? <IoMdPause /> : <IoMdPlay />}</div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={progress}
+                      onChange={(e) => {
+                        const newIndex = Math.floor((positions.length * e.target.value) / 100)
+                        setCurrentPositionIndex(newIndex)
+                        setProgress(e.target.value)
+                      }}
+                    />
+                    <div onClick={handleForward}>
+                      <FaForward />
+                    </div>
+                    <div className={`zoom-control ${isExpanded ? 'expanded' : ''}`}>
+                      <select
+                        value={speed}
+                        className="speed-toggle"
+                        onChange={(e) => setSpeed(Number(e.target.value))}
+                      >
+                        <option value={2.4}>1x</option>
+                        <option value={3.2}>2x</option>
+                        <option value={4.2}>3x</option>
+                      </select>
+                      <button className="zoom-toggle" onClick={() => setIsExpanded(!isExpanded)}>
+                        Zoom
+                      </button>
+                      {isExpanded && (
+                        <div className="zoom-slider">
+                          <input
+                            type="range"
+                            min="10"
+                            max="15"
+                            value={zoomLevel}
+                            onChange={(e) => handleZoomChange(Number(e.target.value))}
+                            className="slider"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <CButton
+                color={showStopages ? 'primary' : 'success'}
+                onClick={(e) => toggleStopages(e)}
+                style={{
+                  height: '2.1rem',
+                  width: '10rem',
+                  fontSize: '1rem',
+                  color: 'white',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center', // Ensures text contrast
+                }}
+              >
+                {showStopages ? 'Hide Stopages' : 'Show Stopages'}
+              </CButton>
+              <CButton
+                color="danger"
+                onClick={handleBack}
+                style={{
+                  height: '2.1rem',
+                  width: '4rem',
+                  fontSize: '1rem',
+                  color: 'white',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center', // Ensures text contrast
+                }}
+              >
+                Back
+              </CButton>
+            </div>
+
+            <div style={{ height: '140px', width: '100%' }}>
+              <Line data={chartData} options={chartOptions} />
+            </div>
           </>
         )}
-        {showStopages &&
-          stopages &&
-          stopages.map((stop, index) => (
-            <Marker
-              key={index}
-              position={[stop?.latitude, stop?.longitude]}
-              icon={redIcon}
-              iconAnchor={[12, 41]}
-              popupAnchor={[1, -34]}
-              shadowAnchor={[10, 41]}
-            >
-              <Popup>
-                <div>
-                  <p>
-                    <strong>Speed:</strong> {stop?.speed}
-                  </p>
-                  <p>
-                    <strong>Arrival Time:</strong> {new Date(stop?.arrivalTime).toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Departure Time:</strong>{' '}
-                    {stop.departureTime ? new Date(stop?.departureTime).toLocaleString() : 'N/A'}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-      </MapContainer>
+      </div>
+
+      {loading && <HistoryLoader />}
+
       {historyOn && (
         <div>
-          <div className="controllers upperBox">
-            <div className="info">
-              <div className="head-img-info">
-                <div className="info-img">
-                  <img src={vehicleImage} alt="Car icon" className="vehicle" />
-                </div>
-                <div className="info-info">
-                  <strong>{name}</strong>
-                  <br />
-                  <strong>
-                    Ignition:{' '}
-                    {fetch && positions
-                      ? positions[currentPositionIndex]?.attributes?.ignition
-                        ? 'On'
-                        : 'Off'
-                      : 'Off'}
-                  </strong>
-                  <br />
-                  <strong>
-                    Speed:{' '}
-                    {fetch && positions
-                      ? Math.round(positions[currentPositionIndex]?.speed * 1.6)
-                      : '0'}{' '}
-                    km/hr
-                  </strong>
-                </div>
-              </div>
-              <div className="trip-divi">
-                <div className="divide">
-                  <div className="bold">Total Trips :</div>
-                  <div className="light">{totalTrips}</div>
-                </div>
-
-                <div className="divide">
-                  <div className="bold">Longest Trip Duration :</div>
-                  <div className="light">{longestTrip?.duration}</div>
-                </div>
-                <div className="divide">
-                  <div className="bold">Started From :</div>
-                  <div className="light">{startAddress}</div>
-                </div>
-                <div className="divide">
-                  <div className="bold">Ended to :</div>
-                  <div className="light">{endAddress}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="controls">
-              <div className="center">
-                <div className="pro">
-                  <div onClick={handleBackward}>
-                    <FaBackward />
-                  </div>
-                  <div onClick={handlePlayPause}>{isPlaying ? <IoMdPause /> : <IoMdPlay />}</div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={progress}
-                    onChange={(e) => {
-                      const newIndex = Math.floor((positions.length * e.target.value) / 100)
-                      setCurrentPositionIndex(newIndex)
-                      setProgress(e.target.value)
-                    }}
-                  />
-                  <div onClick={handleForward}>
-                    <FaForward />
-                  </div>
-                  <div className={`zoom-control ${isExpanded ? 'expanded' : ''}`}>
-                    <select
-                      value={speed}
-                      className="speed-toggle"
-                      onChange={(e) => setSpeed(Number(e.target.value))}
-                    >
-                      <option value={1}>1x</option>
-                      <option value={2}>2x</option>
-                      <option value={3}>3x</option>
-                    </select>
-                    <button className="zoom-toggle" onClick={() => setIsExpanded(!isExpanded)}>
-                      Zoom
-                    </button>
-                    {isExpanded && (
-                      <div className="zoom-slider">
-                        <input
-                          type="range"
-                          min="5"
-                          max="20"
-                          value={zoomLevel}
-                          onChange={(e) => handleZoomChange(Number(e.target.value))}
-                          className="slider"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="controllers" style={{ marginTop: '10px' }}>
-            <div className="info-stops">
-              <strong>Stop Details</strong>
-              <div className="divide">
-                <div className="bold">Total Stops : </div>
-                <div className="light">{isDataAvailable ? stopages.length : 0}</div>
-              </div>
-              <div className="divide">
-                <div className="bold">Longest stop :</div>
-                <div className="light">{isDataAvailable ? longestStopAddress : '--'}</div>
-              </div>
-
-              <div className="divide">
-                <div className="bold">Duration :</div>
-                <div className="light">{isDataAvailable ? longestDuration : '--'}</div>
-              </div>
-
-              <div className="divide">
-                <div className="bold">Shortest stop :</div>
-                <div className="light">{isDataAvailable ? shortestStopAddress : '--'}</div>
-              </div>
-
-              <div className="divide">
-                <div className="bold">Duration :</div>
-                <div className="light">{isDataAvailable ? shortestDuration : '--'}</div>
-              </div>
-            </div>
-
-            <CButton
-              color={showStopages ? 'primary' : 'success'}
-              onClick={(e) => toggleStopages(e)}
-              style={{
-                height: 'auto',
-                width: '8rem',
-                marginTop: '1rem',
-                color: 'white', // Ensures text contrast
-              }}
-            >
-              {showStopages ? 'Remove Stopages' : 'Show Stopages'}
-            </CButton>
-          </div>
-          <CButton
-            color="danger"
-            onClick={handleBack}
-            style={{
-              height: '3rem',
-              width: '8rem',
-              marginTop: '1rem',
-            }}
-          >
-            Back
-          </CButton>
+          <SlidingSideMenu
+            stopData={stopData}
+            mapRef={mapRef}
+            setIsPlaying={setIsPlaying}
+            originalPositions={originalPositions}
+            setPositions={setPositions}
+            trips={trips}
+            setCurrentPositionIndex={setCurrentPositionIndex}
+          />
         </div>
       )}
     </div>

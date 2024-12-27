@@ -11,7 +11,7 @@
         "url": "https://github.com/makinacorpus/Leaflet.Snap/issues"
     },
     "scripts": {
-      "test": "mocha-phantomjs ./test/index.html --reporter list || true"
+        "test": "mocha-phantomjs ./test/index.html --reporter list || true"
     },
     "repository": {
         "type": "git",
@@ -19,7 +19,8 @@
     },
     "license": "MIT",
     "dependencies": {
-        "leaflet-geometryutil": "*"
+        "leaflet-geometryutil": "*",
+        "leaflet-snap": "file:"
     },
     "peerDependencies": {
         "leaflet": ">=0.7.0 <2.0.0"
@@ -29,8 +30,8 @@
     },
     "devDependencies": {
         "chai": "^3.5.0",
-        "mocha": "^3.0.2",
         "happen": "^0.3.1",
+        "mocha": "^3.0.2",
         "mocha-phantomjs": "^4.1.0",
         "sinon": "^1.17.5"
     }

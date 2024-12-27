@@ -1,0 +1,44 @@
+.divide{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.bold{
+  font-weight: 750;
+  width: auto;
+  font-size: 0.8rem;
+}
+.light {
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.custom-button {
+  padding: 9px !important;
+  height: 3rem;
+  width: 5rem;
+}
+
+.control-trips{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.custom-div {
+
+  border: 1px solid black;
+  border-radius: 5px;
+  transition: border 0.3s ease; /* Smooth transition for the border change */
+}
+
+.custom-div:hover {
+  border: 2px solid gray !important;
+}
+.custom-div:active {
+  border: 2px solid black !important;
+}
+
+

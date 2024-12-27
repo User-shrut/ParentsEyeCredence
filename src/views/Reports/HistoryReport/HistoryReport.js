@@ -76,6 +76,25 @@ const HistoryReport = () => {
 
   return (
     <>
+      <CRow className="justify-content-center gutter-0" style={{ overflow: 'hidden' }}>
+        <CCol xs={12} className="px-4">
+          <CCard className="p-0 mb-4 shadow-sm">
+            <CCardBody>
+              <HistoryMap
+                fromDateTime={fromDateTime}
+                toDateTime={toDateTime}
+                deviceId={deviceId}
+                fetch={fetch}
+                setFetch={setFetch}
+                historyOn={historyOn}
+                setHistoryOn={setHistoryOn}
+                category={category}
+                name={name}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
       {!historyOn && (
         <CRow className="pt-3 gutter-0">
           <CCol xs={12} md={12} className="px-4">
@@ -134,26 +153,6 @@ const HistoryReport = () => {
           </CCol>
         </CRow>
       )}
-
-      <CRow className="justify-content-center gutter-0">
-        <CCol xs={12} className="px-4">
-          <CCard className="p-0 mb-4 shadow-sm">
-            <CCardBody>
-              <HistoryMap
-                fromDateTime={fromDateTime}
-                toDateTime={toDateTime}
-                deviceId={deviceId}
-                fetch={fetch}
-                setFetch={setFetch}
-                historyOn={historyOn}
-                setHistoryOn={setHistoryOn}
-                category={category}
-                name={name}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
     </>
   )
 }

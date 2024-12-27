@@ -21,7 +21,8 @@
     "generate-docs": "rm -rf docs; node_modules/.bin/jsdoc -c jsdoc.config -d ./docs/"
   },
   "dependencies": {
-    "leaflet": "^1.6.0"
+    "leaflet": "^1.6.0",
+    "leaflet-geometryutil": "file:"
   },
   "devDependencies": {
     "@types/leaflet": "^1.5.21",
