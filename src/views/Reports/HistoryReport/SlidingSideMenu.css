@@ -6,12 +6,13 @@
 
 .bold{
   font-weight: 750;
+  min-width: 6rem;
   width: auto;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 .light {
-  font-weight: 400;
-  font-size: 0.8rem;
+  font-weight: 500;
+  font-size: 0.7rem;
 }
 
 .custom-button {
@@ -42,3 +43,17 @@
 }
 
 
+.lighting{
+  font-weight: 500;
+  font-size: 0.7rem;
+}
+
+.bolding{
+  font-weight: 750;
+  width: auto;
+  font-size: 0.75rem;
+}
+
+hr{
+  margin: 0 0 0 0;
+}

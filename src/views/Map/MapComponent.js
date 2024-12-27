@@ -14,61 +14,41 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
-import { IoLocationSharp } from "react-icons/io5";
-import { GiSpeedometer } from "react-icons/gi";
+import { IoLocationSharp } from 'react-icons/io5'
+import { GiSpeedometer } from 'react-icons/gi'
 import useGetVehicleIcon from '../Reports/HistoryReport/useGetVehicleIcon'
 
+const FlyToMapCenter = ({ mapCenter }) => {
+  const map = useMap();
 
+  useEffect(() => {
+    if (mapCenter) {
+      map.setView([mapCenter?.lat, mapCenter?.lng], mapCenter.zoom); // Fly to new coordinates
+    }
+  }, [mapCenter, map]);
 
-const MainMap = ({ filteredVehicles }) => {
+  return null;
+};
+
+const MainMap = ({ filteredVehicles, mapCenter }) => {
   const { newAddress } = useSelector((state) => state.address)
-  const navigate = useNavigate();
-  const [address, setAddress] = useState('');
+  const navigate = useNavigate()
+  const [address, setAddress] = useState('')
   const handleClickOnTrack = (vehicle) => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
-  }
 
+  }
 
   useEffect(() => {
-    console.log("filtered vehicle", filteredVehicles);
-
+    console.log('filtered vehicle', filteredVehicles)
   }, [filteredVehicles])
 
-  function CtrlZoomHandler() {
-    const map = useMap();
 
-    useEffect(() => {
-      // Disable scroll zoom by default
-      map.scrollWheelZoom.disable();
-
-      // Function to handle scroll zoom with Ctrl key
-      const handleScrollZoom = (e) => {
-        if (e.originalEvent.ctrlKey) {
-          map.scrollWheelZoom.enable();  // Enable zoom on scroll
-        } else {
-          map.scrollWheelZoom.disable(); // Disable zoom on scroll
-        }
-      };
-
-      // Function to disable scroll zoom when mouse leaves the map
-      const handleMouseOut = () => {
-        map.scrollWheelZoom.disable();
-      };
-
-      // Attach event listeners
-      map.on('wheel', handleScrollZoom);
-      map.on('mouseout', handleMouseOut);
-
-      // Clean up event listeners on component unmount
-      return () => {
-        map.off('wheel', handleScrollZoom);
-        map.off('mouseout', handleMouseOut);
-      };
-    }, [map]);
-
-    return null;
-  }
+  
+  useEffect(() => {
+    console.log('filtered vehicle', filteredVehicles)
+  }, [filteredVehicles])
 
   const iconImage = (category, item) => useGetVehicleIcon(item, category)
   return (
@@ -82,7 +62,7 @@ const MainMap = ({ filteredVehicles }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
       />
-      {/* <CtrlZoomHandler /> */}
+      <FlyToMapCenter mapCenter={mapCenter} />
       <MarkerClusterGroup chunkedLoading>
         {filteredVehicles?.map((vehicle, index) => {
           return (
@@ -92,30 +72,55 @@ const MainMap = ({ filteredVehicles }) => {
               icon={iconImage(vehicle.category, vehicle)}
             >
               <Popup>
-                <div className="toolTip" style={{ display: 'flex', fontSize: '.90rem', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3px' }}>
+                <div
+                  className="toolTip"
+                  style={{
+                    display: 'flex',
+                    fontSize: '.90rem',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '3px',
+                  }}
+                >
                   <span style={{ textAlign: 'center', fontSize: '1.2rem' }}>
                     <strong> {vehicle.name}</strong>
                   </span>
-                  <hr style={{ width: '100%', height: '3px', marginBottom: '0px', marginTop: '5px', borderRadius: '5px', backgroundColor: '#000' }} />
+                  <hr
+                    style={{
+                      width: '100%',
+                      height: '3px',
+                      marginBottom: '0px',
+                      marginTop: '5px',
+                      borderRadius: '5px',
+                      backgroundColor: '#000',
+                    }}
+                  />
                   <div className="toolTipContent">
                     <span>
                       <strong>
-                        <IoLocationSharp size={25} color='#FF7A00' />
+                        <IoLocationSharp size={25} color="#FF7A00" />
                       </strong>{' '}
                       {newAddress[vehicle.deviceId] || 'Loading...'}
                     </span>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '10px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'start',
+                        gap: '10px',
+                      }}
+                    >
                       <div>
                         <strong>
-                          <IoMdSpeedometer size={25} color='#FF7A00' />
+                          <IoMdSpeedometer size={25} color="#FF7A00" />
                         </strong>{' '}
-                        {(vehicle.speed).toFixed(2)} km/h{' '}
+                        {vehicle.speed.toFixed(2)} km/h{' '}
                       </div>
-
                     </div>
                     <div>
                       <strong>
-                        <HiOutlineStatusOnline size={25} color='#FF7A00' />
+                        <HiOutlineStatusOnline size={25} color="#FF7A00" />
                       </strong>{' '}
                       {(() => {
                         const sp = vehicle.speed
@@ -138,18 +143,33 @@ const MainMap = ({ filteredVehicles }) => {
                     </div>
                     <div>
                       <strong>
-                        <RxLapTimer size={25} color='#FF7A00' />
+                        <RxLapTimer size={25} color="#FF7A00" />
                       </strong>{' '}
                       {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                      <button className="btn" style={{ width: '100%', color: 'white', fontSize: '1rem', backgroundColor: '#000000' }} onClick={() => handleClickOnTrack(vehicle)}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                      }}
+                    >
+                      <button
+                        className="btn"
+                        style={{
+                          width: '100%',
+                          color: 'white',
+                          fontSize: '1rem',
+                          backgroundColor: '#000000',
+                        }}
+                        onClick={() => handleClickOnTrack(vehicle)}
+                      >
                         Live Track
                       </button>
                     </div>
                   </div>
                   {/* <strong></strong> {device.lastUpdate} km/h */}
-
                 </div>
               </Popup>
             </Marker>

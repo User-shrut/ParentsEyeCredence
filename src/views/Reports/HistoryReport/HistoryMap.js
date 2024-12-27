@@ -766,6 +766,8 @@ const HistoryMap = ({
             setPositions={setPositions}
             trips={trips}
             setCurrentPositionIndex={setCurrentPositionIndex}
+            toggleStopages={toggleStopages}
+            showStopages={showStopages}
           />
         </div>
       )}

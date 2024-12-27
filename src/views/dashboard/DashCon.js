@@ -34,7 +34,6 @@ import {
   searchVehiclesByName,
   filterBySingleVehicle,
   filterByCategory,
-
 } from '../../features/LivetrackingDataSlice.js'
 import { setNewAddress } from '../../features/addressSlice.js'
 
@@ -50,7 +49,6 @@ import carYellow from '../../assets/vehicleList/Car/carYellow.svg'
 import carOrange from '../../assets/vehicleList/Car/carOrange.svg'
 import carGray from '../../assets/vehicleList/Car/carGray.svg'
 import white from '../../assets/vehicleList/Car/white.svg'
-
 
 //==============================BIKE========================================
 import bikeGreen from '../../assets/vehicleList/Bike/bikeGreen.svg'
@@ -108,23 +106,15 @@ import CIcon from '@coreui/icons-react'
 import { cilMenu } from '@coreui/icons'
 import Sidenew from '../../components/Sidenew.js'
 
-
-
-
-
-
 const Dashboard = () => {
-
   const dispatch = useDispatch()
   const credentials = Cookies.get('crdntl')
   const { filteredVehicles } = useSelector((state) => state.liveFeatures)
   const { newAddress } = useSelector((state) => state.address)
   const [filter, setFilter] = useState('all')
-  const [address, setAddress] = useState({});
-
-
-
-
+  const [address, setAddress] = useState({})
+  const mapRef = useRef(null)
+  const [mapCenter, setMapCenter] = useState({ lat: 21.1458, lng: 79.0882, zoom: 10 })
 
   // pagination code
   const [currentPage, setCurrentPage] = useState(0)
@@ -153,7 +143,6 @@ const Dashboard = () => {
     }
   }, [])
 
-
   const stoppedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
@@ -173,9 +162,7 @@ const Dashboard = () => {
         const lastUpdate = dayjs(vehicle.lastUpdate)
         const now = dayjs()
         const duration = dayjs.duration(now.diff(lastUpdate))
-        return (
-          duration.asHours() > 24 || !(vehicle.status == "online")
-        )
+        return duration.asHours() > 24 || !(vehicle.status == 'online')
       }).length,
   )
 
@@ -317,46 +304,47 @@ const Dashboard = () => {
 
   const fetchAddress = async (vehicleId, longitude, latitude) => {
     try {
-      const apiKey = 'DG2zGt0KduHmgSi2kifd'; // Replace with your actual MapTiler API key
+      const apiKey = 'DG2zGt0KduHmgSi2kifd' // Replace with your actual MapTiler API key
       const response = await axios.get(
-        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
-      );
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`,
+      )
       // console.log(response)
-      const address = response.data.features.length <= 5
-        ? response.data.features[0].place_name_en
-        : response.data.features[1].place_name_en;
+      const address =
+        response.data.features.length <= 5
+          ? response.data.features[0].place_name_en
+          : response.data.features[1].place_name_en
 
-      setAddress(prevAddresses => ({
+      setAddress((prevAddresses) => ({
         ...prevAddresses,
         [vehicleId]: address, // Update the specific vehicle's address
-      }));
+      }))
     } catch (error) {
-      console.error('Error fetching the address:', error);
-      setAddress(prevAddresses => ({
+      console.error('Error fetching the address:', error)
+      setAddress((prevAddresses) => ({
         ...prevAddresses,
         [vehicleId]: 'Error fetching address',
-      }));
+      }))
     }
-  };
+  }
 
   const setNewAddressForRedux = (address) => {
     if (address) {
-      dispatch(setNewAddress(address));
+      dispatch(setNewAddress(address))
     }
-  };
+  }
 
   useEffect(() => {
-    setNewAddressForRedux(address);
+    setNewAddressForRedux(address)
   }, [address])
 
   useEffect(() => {
     // console.log("filtered vehicle", filteredVehicles);
-    filteredVehicles.forEach(vehicle => {
+    filteredVehicles.forEach((vehicle) => {
       if (vehicle?.deviceId && vehicle.longitude && vehicle.latitude && !address[vehicle.id]) {
         // Fetch address only if it's not already fetched for this vehicle
-        fetchAddress(vehicle.deviceId, vehicle.longitude, vehicle.latitude);
+        fetchAddress(vehicle.deviceId, vehicle.longitude, vehicle.latitude)
       }
-    });
+    })
     // console.log(address)
   }, [filteredVehicles])
 
@@ -433,9 +421,13 @@ const Dashboard = () => {
 
   // Check if the current page is the dashboard
   const isDashboard = location.pathname === '/dashboard'
-
-
-
+  const handleRowClick = (lat, lng) => {
+    console.log('Row Clicked')
+    setMapCenter({ lat, lng, zoom: 18 })
+    if (mapRef.current) {
+      mapRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
     <>
@@ -443,12 +435,9 @@ const Dashboard = () => {
       <CRow className="gutter-0">
         <CCol xs>
           <CCard style={{ borderRadius: '0px' }}>
-
             <CCardHeader>
-
               {isDashboard && (
-                <div className="d-flex flex-row flex-wrap justify-content-between">
-
+                <div className="d-flex flex-row flex-wrap justify-content-between" ref={mapRef}>
                   {/* <CHeaderToggler
                     onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
                     style={{ marginInlineStart: '-10px' }}
@@ -495,7 +484,12 @@ const Dashboard = () => {
 
                   {/* Search Field */}
                   <CHeaderNav className="ms-2 p-0 me-5">
-                    <form className="d-flex" role="search">
+                    <form
+                      className="d-flex"
+                      role="search"
+                      style={{ right: '0px' }}
+                      onSubmit={(e) => e.preventDefault()} // Prevent page refresh
+                    >
                       <input
                         className="form-control me-2"
                         type="text"
@@ -513,24 +507,17 @@ const Dashboard = () => {
                   </CHeaderNav>
                 </div>
               )}
-
             </CCardHeader>
-
 
             <CCardBody className="content mt-4">
               {/* <hr className="mt-0 mb-0" /> */}
-
               {/* <CRow>
             <CCol sm={7} className="d-none d-md-block"></CCol>
           </CRow> */}
-              <MainMap filteredVehicles={filteredVehicles} />
-      {/* <Sidenew/> */}
-
-
+              <MainMap filteredVehicles={filteredVehicles} mapCenter={mapCenter} />
+              {/* <Sidenew/> */}
               {/* <div className="mb-5"></div> */}
-
               {/* <br /> */}
-
               <CRow className="justify-content-around my-3 mb-2">
                 {/* All Vehicles */}
                 <CCol xs={12} md={2} xl={2} className="count-col mb-3">
@@ -539,7 +526,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterAllVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>All</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>All</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{allVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -555,7 +544,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterRunningVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>Running</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>Running</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{runningVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -571,7 +562,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterStoppedVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>Stopped</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>Stopped</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{stoppedVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -587,7 +580,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterIdleVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>Idle</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>Idle</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{idleVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -603,7 +598,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterOverspeedVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>OverSpeed</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>OverSpeed</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{overspeedVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -619,7 +616,9 @@ const Dashboard = () => {
                     onClick={() => dispatch(filterInactiveVehicles())}
                   >
                     <div className="vehicle-info">
-                      <div className="vehicle-type text-muted"><strong>Inactive</strong></div>
+                      <div className="vehicle-type text-muted">
+                        <strong>Inactive</strong>
+                      </div>
                       <div className="vehicle-count fs-4 fw-bold">{inactiveVehiclesCount}</div>
                     </div>
                     <div className="vehicle-icon">
@@ -628,20 +627,45 @@ const Dashboard = () => {
                   </div>
                 </CCol>
               </CRow>
-
               {/* <hr />
               <br /> */}
+              <div className="tableNav">
+                <CHeaderNav className="ms-2 p-0 me-2">
+                  <form
+                    className="d-flex"
+                    role="search"
+                    style={{ right: '0px' }}
+                    onSubmit={(e) => e.preventDefault()} // Prevent page refresh
+                  >
+                    <input
+                      className="form-control me-2"
+                      type="text"
+                      placeholder="Search vehicles by name"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      aria-label="Search"
+                    />
+                  </form>
+                </CHeaderNav>
+              </div>
 
-              <div className="table-container" style={{ overflowY: 'auto', }}>
-
-                <div style={{ height: 'auto', overflowX: 'auto', overflowY: 'auto', marginBottom: '10px', borderRadius: '10px', border: '1px solid black' }}>
-
+              <div className="table-container" style={{ overflowY: 'auto' }}>
+                <div
+                  style={{
+                    height: 'auto',
+                    overflowX: 'auto',
+                    overflowY: 'auto',
+                    marginBottom: '10px',
+                    borderRadius: '10px',
+                    border: '1px solid black',
+                  }}
+                >
                   <CTable bordered className="my-2 border vehiclesTable mt-0" hover responsive>
                     <CTableHead
                       className="text-nowrap"
                       style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
                     >
-                      <CTableRow >
+                      <CTableRow>
                         {visibleColumns.srNo && (
                           <CTableHeaderCell
                             className="bg-body-secondary text-center sr-no table-cell"
@@ -778,15 +802,29 @@ const Dashboard = () => {
                     <CTableBody>
                       {filteredVehicles.length > 0 ? (
                         currentVehicles.map((item, index) => (
-                          <CTableRow key={index} className={`table-row collapsed trans`}>
+                          <CTableRow
+                            key={index}
+                            className={`table-row collapsed trans`}
+                            onClick={() => handleRowClick(item.latitude, item.longitude)}
+                          >
                             {/* Sr No. */}
                             {visibleColumns.srNo && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center sr-no table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center sr-no table-cell"
+                              >
                                 {currentPage * itemsPerPage + index + 1}
                               </CTableDataCell>
                             )}
                             {visibleColumns.vehicle && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center vehicle table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center vehicle table-cell"
+                              >
                                 <div>
                                   {(() => {
                                     // const device = salesman.find((device) => device.id === item.deviceId)
@@ -817,7 +855,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.deviceName && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="device-name table-cell n text-center">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="device-name table-cell n text-center"
+                              >
                                 {(() => {
                                   // const device = salesman.find((device) => device.id === item.deviceId)
                                   if (item && item.name) {
@@ -828,7 +871,8 @@ const Dashboard = () => {
                                     return (
                                       <>
                                         <div className="upperdata">
-                                          <div>{firstWord}</div> {/* First word on the first line */}
+                                          <div>{firstWord}</div>{' '}
+                                          {/* First word on the first line */}
                                           {remainingWords && <div>{remainingWords}</div>}{' '}
                                           {/* Remaining words on the second line if present */}
                                         </div>
@@ -850,15 +894,26 @@ const Dashboard = () => {
                             {visibleColumns.address && (
                               <CTableDataCell
                                 className="text-center address table-cell"
-                                style={{ minWidth: '500px', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                                style={{
+                                  minWidth: '500px',
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
                               >
-                                <span className="upperdata" style={{ fontSize: '1rem', textWrap: 'auto' }}>
+                                <span
+                                  className="upperdata"
+                                  style={{ fontSize: '1rem', textWrap: 'auto' }}
+                                >
                                   {newAddress[item.deviceId] || 'Loading...'}
                                 </span>
                               </CTableDataCell>
                             )}
                             {visibleColumns.lastUpdate && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center last-update table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center last-update table-cell"
+                              >
                                 {(() => {
                                   // const device = salesman.find((device) => device.id === item.deviceId)
                                   if (item && item.lastUpdate) {
@@ -876,7 +931,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.cd && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center cd current-delay table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center cd current-delay table-cell"
+                              >
                                 {(() => {
                                   // const device = salesman.find((device) => device.id === item.deviceId)
                                   if (item && item.lastUpdate) {
@@ -905,7 +965,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.sp && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center sp speed table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center sp speed table-cell"
+                              >
                                 <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
                                 {expandedRow === index && (
                                   <>
@@ -918,17 +983,32 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.distance && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center d distance table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center d distance table-cell"
+                              >
                                 {`${Math.round(item.attributes.distance)} km`}
                               </CTableDataCell>
                             )}
                             {visibleColumns.td && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center td total-distance table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center td total-distance table-cell"
+                              >
                                 {`${Math.round(item.attributes.totalDistance)} km`}
                               </CTableDataCell>
                             )}
                             {visibleColumns.sat && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center satelite table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center satelite table-cell"
+                              >
                                 <div style={{ position: 'relative', display: 'inline-block' }}>
                                   <MdGpsNotFixed style={{ fontSize: '1.6rem' }} />{' '}
                                   {/* Adjust icon size as needed */}
@@ -949,7 +1029,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.ig && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ignition table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center ignition table-cell"
+                              >
                                 {(() => {
                                   const { ignition } = item.attributes
 
@@ -973,7 +1058,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.gps && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center gps table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center gps table-cell"
+                              >
                                 {(() => {
                                   const { valid } = item
 
@@ -997,7 +1087,12 @@ const Dashboard = () => {
                               </CTableDataCell>
                             )}
                             {visibleColumns.power && (
-                              <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center power table-cell">
+                              <CTableDataCell
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                                className="text-center power table-cell"
+                              >
                                 {(() => {
                                   const power = item.attributes.battery
 
@@ -1020,19 +1115,33 @@ const Dashboard = () => {
                                 })()}
                               </CTableDataCell>
                             )}
-                            <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center status table-cell">
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center status table-cell"
+                            >
                               <button
                                 className="btn shadow-sm"
-                                style={{ backgroundColor: '#000000', fontSize: '1rem', color: 'white' }}
+                                style={{
+                                  backgroundColor: '#000000',
+                                  fontSize: '1rem',
+                                  color: 'white',
+                                }}
                                 onClick={() => handleClickOnTrack(item)}
                               >
                                 Live Track
                               </button>
                             </CTableDataCell>
-                            <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center status table-cell">
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center status table-cell"
+                            >
                               <button
                                 className="btn shadow-sm"
-                                style={{ backgroundColor: '#000000', fontSize: '1rem', color: 'white' }}
+                                style={{
+                                  backgroundColor: '#000000',
+                                  fontSize: '1rem',
+                                  color: 'white',
+                                }}
                                 onClick={() => handleClickOnHistory(item)}
                               >
                                 View History
@@ -1063,7 +1172,6 @@ const Dashboard = () => {
                     </CTableBody>
                   </CTable>
                 </div>
-
 
                 <div className="mt-3">
                   {' '}
