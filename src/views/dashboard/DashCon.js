@@ -112,7 +112,7 @@ import Sidenew from '../../components/Sidenew.js'
 import Select from 'react-select'
 import { getUsers, getGroups, getDevices } from './dashApi.js'
 import zIndex from '@mui/material/styles/zIndex.js'
-import StatusButtons from './statusButtons.js'
+import StatusButtons from './StatusButtons.js'
 
 const Dashboard = () => {
   const dispatch = useDispatch()
