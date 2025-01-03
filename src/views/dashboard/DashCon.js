@@ -34,6 +34,8 @@ import {
   searchVehiclesByName,
   filterBySingleVehicle,
   filterByCategory,
+  filterByDevices,
+  setVehicles,
 } from '../../features/LivetrackingDataSlice.js'
 import { setNewAddress } from '../../features/addressSlice.js'
 
@@ -41,6 +43,8 @@ import MainMap from '../Map/MapComponent'
 import { PiEngineFill } from 'react-icons/pi'
 import { MdGpsFixed, MdGpsNotFixed } from 'react-icons/md'
 import { IoIosArrowDown, IoMdBatteryCharging } from 'react-icons/io'
+import { LuRefreshCw } from 'react-icons/lu'
+import { IoMdSearch } from 'react-icons/io'
 
 // ================================CAR==================================
 import carGreen from '../../assets/vehicleList/Car/carGreen.svg'
@@ -105,6 +109,10 @@ import TableColumnVisibility from '../../components/TableColumnVisibility.js'
 import CIcon from '@coreui/icons-react'
 import { cilMenu } from '@coreui/icons'
 import Sidenew from '../../components/Sidenew.js'
+import Select from 'react-select'
+import { getUsers, getGroups, getDevices } from './dashApi.js'
+import zIndex from '@mui/material/styles/zIndex.js'
+import StatusButtons from './statusButtons.js'
 
 const Dashboard = () => {
   const dispatch = useDispatch()
@@ -292,7 +300,7 @@ const Dashboard = () => {
   }
   const navigate = useNavigate()
   const handleClickOnTrack = (vehicle) => {
-    console.log('trcak clicked')
+    console.log('track clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
   }
   const handleClickOnHistory = (vehicle) => {
@@ -305,9 +313,10 @@ const Dashboard = () => {
   const fetchAddress = async (vehicleId, longitude, latitude) => {
     try {
       const apiKey = 'DG2zGt0KduHmgSi2kifd' // Replace with your actual MapTiler API key
-      const response = await axios.get(
-        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`,
-      )
+      const response = await axios
+        .get
+        // `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`,
+        ()
       // console.log(response)
       const address =
         response.data.features.length <= 5
@@ -319,7 +328,7 @@ const Dashboard = () => {
         [vehicleId]: address, // Update the specific vehicle's address
       }))
     } catch (error) {
-      console.error('Error fetching the address:', error)
+      // console.error('Error fetching the address:', error)
       setAddress((prevAddresses) => ({
         ...prevAddresses,
         [vehicleId]: 'Error fetching address',
@@ -429,6 +438,68 @@ const Dashboard = () => {
     }
   }
 
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [users, setUsers] = useState([])
+  const [groups, setGroups] = useState([])
+  const [devices, setDevices] = useState([])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true)
+      try {
+        const usersData = await getUsers()
+        setUsers(usersData)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUsers()
+  }, [])
+
+  // Fetch Groups when User is Selected
+  useEffect(() => {
+    if (selectedUser) {
+      const fetchGroups = async () => {
+        setLoading(true)
+        try {
+          const groupsData = await getGroups(selectedUser)
+          setGroups(groupsData)
+        } catch (error) {
+          console.error('Error fetching groups:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchGroups()
+    }
+  }, [selectedUser])
+
+  // Fetch Devices when Group is Selected
+  useEffect(() => {
+    if (selectedGroup) {
+      const fetchDevices = async () => {
+        setLoading(true)
+        try {
+          const devicesData = await getDevices(selectedGroup)
+          setDevices(devicesData)
+          // Filter vehicles based on deviceId in filteredVehicles
+          console.log('device Dataaaaa', devicesData)
+
+          dispatch(filterByDevices(devicesData))
+        } catch (error) {
+          console.error('Error fetching devices:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchDevices()
+    }
+  }, [selectedGroup])
+
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
@@ -446,7 +517,63 @@ const Dashboard = () => {
                   </CHeaderToggler> */}
 
                   {/* First Filter - Status */}
-                  <CHeaderNav className="ms-5 p-0 me-5">
+                  {/* <div> */}
+                  {/* User Select */}
+
+                  {/* <div className="filterOfGroupUser"> */}
+
+                  <CHeaderNav className="ms-1 p-0 me-3">
+                    <Select
+                      id="user-select"
+                      options={users.map((user) => ({
+                        value: user._id,
+                        label: user.username,
+                      }))}
+                      placeholder="Select User"
+                      value={
+                        selectedUser
+                          ? {
+                              value: selectedUser,
+                              label: users.find((user) => user._id === selectedUser)?.username,
+                            }
+                          : null
+                      }
+                      onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
+                      isLoading={loading}
+                      placeholder="Select a User"
+                    />
+                  </CHeaderNav>
+
+                  {/* Group Select */}
+                  <CHeaderNav className="ms-1 p-0 me-3">
+                    <Select
+                      style={{
+                        zIndex: '99999999999999',
+                      }}
+                      id="group-select"
+                      options={groups?.map((group) => ({
+                        value: group._id,
+                        label: group.name,
+                      }))}
+                      value={
+                        selectedGroup
+                          ? {
+                              value: selectedGroup,
+                              label: groups.find((group) => group._id === selectedGroup)?.name,
+                            }
+                          : null
+                      }
+                      onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
+                      isLoading={loading}
+                      placeholder="Select a Group"
+                    />
+                  </CHeaderNav>
+                  {/* </div> */}
+
+                  {/* Filtered Vehicles */}
+                  {/* </div> */}
+
+                  <CHeaderNav className="ms-1 p-0 me-3">
                     <select
                       className="form-select header-inputs"
                       aria-label="Default select example"
@@ -464,7 +591,7 @@ const Dashboard = () => {
                   </CHeaderNav>
 
                   {/* Second Filter - Category */}
-                  <CHeaderNav className="ms-2 p-0 me-5">
+                  <CHeaderNav className="ms-2 p-0 me-3">
                     <select
                       className="form-select header-inputs"
                       aria-label="Default select example"
@@ -483,27 +610,39 @@ const Dashboard = () => {
                   </CHeaderNav>
 
                   {/* Search Field */}
-                  <CHeaderNav className="ms-2 p-0 me-5">
+                  <CHeaderNav className="ms-2 p-0 me-3">
                     <form
-                      className="d-flex"
+                      className="d-flex searchBar"
                       role="search"
                       style={{ right: '0px' }}
                       onSubmit={(e) => e.preventDefault()} // Prevent page refresh
                     >
                       <input
-                        className="form-control me-2"
+                        className="form-control input"
                         type="text"
                         placeholder="Search vehicles by name"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         aria-label="Search"
                       />
+                      <button className="btn btn-outline searchBtn" type="submit">
+                        <IoMdSearch className="searchIcon" style={{ color: '#fff' }} />
+                      </button>
                     </form>
                   </CHeaderNav>
 
                   {/* Table Column Visibility */}
-                  <CHeaderNav className="ms-2 p-0 me-5">
+                  <CHeaderNav className="ms-2 p-0 me-3">
                     <TableColumnVisibility />
+                  </CHeaderNav>
+
+                  <CHeaderNav
+                    className="ms-2 p-0 me-3 refresh"
+                    onClick={() => {
+                      window.location.reload()
+                    }}
+                  >
+                    <LuRefreshCw />
                   </CHeaderNav>
                 </div>
               )}
@@ -630,21 +769,25 @@ const Dashboard = () => {
               {/* <hr />
               <br /> */}
               <div className="tableNav">
+                <StatusButtons />
                 <CHeaderNav className="ms-2 p-0 me-2">
                   <form
-                    className="d-flex"
+                    className="d-flex searchBar"
                     role="search"
                     style={{ right: '0px' }}
                     onSubmit={(e) => e.preventDefault()} // Prevent page refresh
                   >
                     <input
-                      className="form-control me-2"
+                      className="form-control input"
                       type="text"
                       placeholder="Search vehicles by name"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       aria-label="Search"
                     />
+                    <button className="btn btn-outline searchBtn" type="submit">
+                      <IoMdSearch className="searchIcon" style={{ color: '#fff' }} />
+                    </button>
                   </form>
                 </CHeaderNav>
               </div>
@@ -1064,26 +1207,13 @@ const Dashboard = () => {
                                 }}
                                 className="text-center gps table-cell"
                               >
-                                {(() => {
-                                  const { valid } = item
-
-                                  let iconColor = 'gray' // Default color
-                                  let iconText = 'N/A' // Default text
-
-                                  if (valid) {
-                                    iconColor = 'green'
-                                    iconText = 'On'
-                                  } else if (valid === false) {
-                                    iconColor = 'red'
-                                    iconText = 'Off'
-                                  }
-
-                                  return (
-                                    <div style={{ color: iconColor, fontSize: '1.1rem' }}>
-                                      <MdGpsFixed />
-                                    </div>
-                                  )
-                                })()}
+                                <div style={{ fontSize: '1.1rem' }}>
+                                  {item.valid ? (
+                                    <MdGpsFixed style={{ color: 'green' }} />
+                                  ) : (
+                                    <MdGpsFixed style={{ color: 'red' }} />
+                                  )}
+                                </div>
                               </CTableDataCell>
                             )}
                             {visibleColumns.power && (

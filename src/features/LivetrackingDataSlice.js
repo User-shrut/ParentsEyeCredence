@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { io } from 'socket.io-client';
-
+import { io } from 'socket.io-client'
 
 // Define initial state
 const initialState = {
@@ -73,7 +72,8 @@ const liveFeaturesSlice = createSlice({
     filterRunningVehicles(state) {
       state.activeFilter = (vehicles) =>
         vehicles.filter(
-          (vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
+          (vehicle) =>
+            vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
         ) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
@@ -83,25 +83,29 @@ const liveFeaturesSlice = createSlice({
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterInactiveVehicles(state) {
-      state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => !(vehicle.status == "online"));
+      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => !(vehicle.status == 'online'))
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterByCategory(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.category === action.payload) // Store filter function
+      state.activeFilter = (vehicles) =>
+        vehicles.filter((vehicle) => vehicle.category === action.payload) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterByGroup(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.groupId === action.payload) // Store filter function
+      state.activeFilter = (vehicles) =>
+        vehicles.filter((vehicle) => vehicle.groupId === action.payload) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterByGeofence(state, action) {
       state.activeFilter = (vehicles) =>
-        vehicles.filter((vehicle) => vehicle.geofenceIds && vehicle.geofenceIds.includes(action.payload)) // Store filter function
+        vehicles.filter(
+          (vehicle) => vehicle.geofenceIds && vehicle.geofenceIds.includes(action.payload),
+        ) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     filterBySingleVehicle(state, action) {
-      state.activeFilter = (vehicles) => vehicles.filter((vehicle) => vehicle.name === action.payload) // Store filter function
+      state.activeFilter = (vehicles) =>
+        vehicles.filter((vehicle) => vehicle.name === action.payload) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
     searchVehiclesByName(state, action) {
@@ -110,14 +114,21 @@ const liveFeaturesSlice = createSlice({
         vehicles.filter((vehicle) => vehicle.name.includes(searchTerm)) // Store filter function
       state.filteredVehicles = state.activeFilter(state.vehicles)
     },
+    filterByDevices(state, action) {
+      const devicesData = action.payload
+      state.activeFilter = (vehicles) =>
+        vehicles.filter((vehicle) =>
+          devicesData.some((device) => device.deviceId == vehicle.deviceId),
+        ) // Store filter function
+      state.filteredVehicles = state.activeFilter(state.vehicles)
+    },
   },
 })
 
-
 // WebSocket event listeners
 export const initializeSocket = (credentials) => (dispatch) => {
-
-  const convertedCredentialsIntoObject = JSON.parse(credentials);
+  const convertedCredentialsIntoObject = JSON.parse(credentials)
+  console.log("convertedCredentialsIntoObjectttttttttttttttttttt", convertedCredentialsIntoObject);
 
   // Handle connection event
   socket.on('connect', () => {
@@ -130,9 +141,9 @@ export const initializeSocket = (credentials) => (dispatch) => {
   })
 
   // Listen for live vehicle data
-  socket.emit("credentials", convertedCredentialsIntoObject);
+  socket.emit('credentials', convertedCredentialsIntoObject)
   socket.on('all device data', (data) => {
-    console.log(data);
+    console.log(data)
     dispatch(liveFeaturesSlice.actions.setVehicles(data))
   })
 
@@ -163,6 +174,7 @@ export const {
   searchVehiclesByName,
   setSingleVehicle,
   updateSingleVehicle,
+  filterByDevices,
 } = liveFeaturesSlice.actions
 
 export const selectDeviceNames = (state) => state.liveFeatures.deviceNames

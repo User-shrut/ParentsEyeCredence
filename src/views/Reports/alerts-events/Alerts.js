@@ -113,7 +113,7 @@
 //           <CTableHead className="text-nowrap">
 //             <CTableRow className="bg-body-tertiary">
 //               <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
-//                 SN
+//                 SN 
 //               </CTableHeaderCell>
 //               <CTableHeaderCell className=" text-center text-white bg-secondary">
 //                 Device Name
@@ -209,6 +209,10 @@ import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
+import { jsPDF } from 'jspdf';
+import "jspdf-autotable";
+import * as XLSX from 'xlsx';
+
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -217,7 +221,11 @@ const Alerts = () => {
   const [notificationIDs, setNotificationIDs] = useState()
   const [filteredData, setFilteredData] = useState([]);
   const [filterType, setFilterType] = useState(''); // State for selected filter
+  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const [rowsPerPage, setRowsPerPage] = useState(20) // Rows per page
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const accessToken = Cookies.get('authToken')
+
 
   const notificationTypes = [
     'deviceMoving',
@@ -324,6 +332,91 @@ const Alerts = () => {
     setFilteredData(filtered);
   }, [filterType, searchQuery, data]);
 
+  //  Download pdf file 
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Alerts/Events', 10, 10);
+  
+    const tableData = filteredData.map((item, index) => [
+      index + 1,
+      item.name,
+      item.type,
+      item.address || 'Fetching...',
+      item.message,
+      new Date(item.createdAt).toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }),
+    ]);
+  
+    doc.autoTable({
+      head: [['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time']],
+      body: tableData,
+      styles: {
+        lineWidth: 0.5, // Border thickness
+        lineColor: [0, 0, 0], // Black border color
+      },
+      tableLineWidth: 0.5, // Border around the table
+      tableLineColor: [0, 0, 0], // Table border color
+    });
+  
+    doc.save('alerts.pdf');
+  };
+  
+
+  // Download Excel file
+
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredData.map((item, index) => ({
+        SN: index + 1,
+        'Device Name': item.name,
+        Notification: item.type,
+        Location: item.address || 'Fetching...',
+        Message: item.message,
+        Time: new Date(item.createdAt).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          hour12: false,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+      }))
+    );
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Alerts');
+    XLSX.writeFile(workbook, 'alerts.xlsx');
+  };
+
+  // pagination
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  // Handle change of rows per page
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value))
+    setCurrentPage(1) // Reset to first page when changing rows per page
+  }
+  // Calculate paginated data
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+
+
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
@@ -331,6 +424,7 @@ const Alerts = () => {
           <h2>Alerts/Events</h2>
         </div>
         <div className="d-flex">
+          {/* Filteration */}
           <select
             className="form-select me-3"
             value={filterType}
@@ -343,9 +437,21 @@ const Alerts = () => {
               </option>
             ))}
           </select>
+          {/* Pagination */}
+          <select
+            className="form-select me-3"
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+          >
+            <option value={20}>20 rows</option>
+            <option value={50}>50 rows</option>
+            <option value={200}>200 rows</option>
+            <option value={500}>500 rows</option>
+          </select>
+          {/* Search */}
           <input
             type="search"
-            className="form-control"
+            className="form-control me-3"
             placeholder="Search here..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -407,8 +513,8 @@ const Alerts = () => {
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : filteredData.length > 0 ? (
-              filteredData.filter((item) => {
+            ) : paginatedData.length > 0 ? (
+              paginatedData.filter((item) => {
                 const query = searchQuery.toLowerCase();
                 return (
                   item.name?.toLowerCase().includes(query) || // Filter by name
@@ -453,18 +559,67 @@ const Alerts = () => {
         </CTable>
 
         <CDropdown className="position-fixed bottom-0 end-0 m-3">
-                <CDropdownToggle
-                  color="secondary"
-                  style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
-                >
-                  <CIcon icon={cilSettings} />
-                </CDropdownToggle>
-                <CDropdownMenu>
-                  <CDropdownItem >PDF</CDropdownItem>
-                  <CDropdownItem >Excel</CDropdownItem>
-                </CDropdownMenu>
-              </CDropdown>
+          <CDropdownToggle
+            color="secondary"
+            style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+          >
+            <CIcon icon={cilSettings} />
+          </CDropdownToggle>
+          <CDropdownMenu>
+            <CDropdownItem onClick={downloadPDF} >PDF</CDropdownItem>
+            <CDropdownItem onClick={downloadExcel} >Excel</CDropdownItem>
+          </CDropdownMenu>
+        </CDropdown>
       </TableContainer>
+
+      {/* Pagination */}
+
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <p className="mb-0">
+            Showing {(currentPage - 1) * rowsPerPage + 1} to{' '}
+            {Math.min(currentPage * rowsPerPage, filteredData.length)} of{' '}
+            {filteredData.length} entries
+          </p>
+        </div>
+        <div className="d-flex align-items-center">
+          {/* First Button */}
+          <button
+            onClick={() => handlePageChange(1)}  // Go to the first page
+            disabled={currentPage === 1}
+            className="btn btn-sm btn-outline-secondary mx-1"
+          >
+            First
+          </button>
+          {/* Previous Button */}
+          <button
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+            className="btn btn-sm btn-outline-secondary mx-1"
+          >
+            Prev
+          </button>
+          {/* Current Page */}
+          <p className="mb-0 mx-2">{currentPage}</p>
+          {/* Next Button */}
+          <button
+            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="btn btn-sm btn-outline-secondary mx-1"
+          >
+            Next
+          </button>
+          {/* Last Button */}
+          <button
+            onClick={() => handlePageChange(totalPages)}  // Go to the last page
+            disabled={currentPage === totalPages}
+            className="btn btn-sm btn-outline-secondary mx-1"
+          >
+            Last
+          </button>
+        </div>
+      </div>
+
     </div >
   )
 }

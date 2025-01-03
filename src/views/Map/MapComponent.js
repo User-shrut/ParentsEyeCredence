@@ -45,7 +45,7 @@ const MainMap = ({ filteredVehicles, mapCenter }) => {
   }, [filteredVehicles])
 
 
-  
+
   useEffect(() => {
     console.log('filtered vehicle', filteredVehicles)
   }, [filteredVehicles])
@@ -56,7 +56,7 @@ const MainMap = ({ filteredVehicles, mapCenter }) => {
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
       zoom={10}
       scrollWheelZoom={true}
-      style={{ height: '550px', width: '100%', borderRadius: '15px', border: '2px solid gray' }}
+      style={{ height: '550px', width: '100%', borderRadius: '15px', border: '2px solid gray', zIndex:'0'}}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -1,0 +1,60 @@
+/* Outline button base styles */
+.btn-outline-orange {
+  border: 2px solid orange;
+  color: orange;
+  background: transparent;
+  font-weight:600;
+}
+
+.btn-outline-orange:hover {
+  background: orange;
+  color: white;
+}
+
+.btn-outline-green {
+  border: 2px solid green;
+  color: green;
+  background: transparent;
+  font-weight:600;
+}
+
+.btn-outline-green:hover {
+  background: green;
+  color: white;
+}
+
+.btn-outline-gray {
+  border: 2px solid gray;
+  color: gray;
+  background: transparent;
+  font-weight:600;
+}
+
+.btn-outline-gray:hover {
+  background: gray;
+  color: white;
+}
+
+.btn-outline-yellow {
+  border: 2px solid rgb(255, 208, 0);
+  color: rgb(255, 208, 0);
+  background: transparent;
+  font-weight:600;
+}
+
+.btn-outline-yellow:hover {
+  background: rgb(255, 225, 0);
+  color: white;
+}
+
+.btn-outline-red {
+  border: 2px solid red;
+  color: red;
+  background: transparent;
+  font-weight:600;
+}
+
+.btn-outline-red:hover {
+  background: red;
+  color: white;
+}

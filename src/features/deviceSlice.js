@@ -16,6 +16,7 @@ export const fetchDevices = createAsyncThunk(
           Authorization: `Bearer ${authToken}`,
         },
       })
+      console.log("devicessssssss", response.data.devices)
       return response.data.devices
     } catch (error) {
       return rejectWithValue(error.message)

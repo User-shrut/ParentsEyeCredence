@@ -53,6 +53,9 @@ import { cilSettings } from '@coreui/icons'
 import AddDeviceModal from './AddDeviceForm'
 import EditDeviceModal from './EditDeviceForm'
 import '../../../../src/app.css'
+import { getDevices, getGroups, getUsers } from '../../dashboard/dashApi'
+import { default as Sselect } from 'react-select'
+import './Devices.css'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -929,7 +932,55 @@ const Devices = () => {
 
   // console.log("pageCountttttttttttt",pageCount)
   console.log('data.lengthhhhhhhhhhhhhh', data)
-  console.log('filteredDataaaaaaaaaaaaaa', filteredData)
+  console.log('filteredDataaaaaaaaaaaaaa offf devicessssssssssssssssssss', filteredData)
+
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [fillLoading, setFillLoading] = useState(false)
+  const [fillUsers, setFillUsers] = useState([])
+  const [fillGroups, setFillGroups] = useState([])
+  const [fillDevices, setFillDevices] = useState([])
+
+  // Generic Fetch Handler
+  const fetchFillData = async (fetchFunction, setData, params = null) => {
+    setFillLoading(true)
+    try {
+      const data = await fetchFunction(params)
+      setData(data)
+    } catch (error) {
+      console.error(`Error fetching data:`, error)
+    } finally {
+      setFillLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchFillData(getUsers, setFillUsers)
+  }, [])
+
+  useEffect(() => {
+    if (selectedUser) {
+      fetchFillData(getGroups, setFillGroups, selectedUser)
+    }
+  }, [selectedUser])
+
+  useEffect(() => {
+    if (selectedGroup) {
+      const fetchDevicesAndFilter = async () => {
+        try {
+          const devicesData = await getDevices(selectedGroup)
+          setFillDevices(devicesData)
+          const finalData = filteredData.filter((vehicle) =>
+            devicesData.some((device) => device.deviceId === vehicle.deviceId),
+          )
+          setFilteredData(finalData)
+        } catch (error) {
+          console.error('Error fetching devices:', error)
+        }
+      }
+      fetchDevicesAndFilter()
+    }
+  }, [selectedGroup, filteredData])
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -937,6 +988,50 @@ const Devices = () => {
       <div className="d-flex justify-content-between mb-2">
         <div>
           <h2>Devices</h2>
+        </div>
+        {/* HERE WE WILL ADD FILTER */}
+        <div className="fiterDevices">
+          <Sselect
+            id="user-select"
+            options={users.map((user) => ({
+              value: user._id,
+              label: user.username,
+            }))}
+            placeholder="Select User"
+            value={
+              selectedUser
+                ? {
+                    value: selectedUser,
+                    label: users.find((user) => user._id === selectedUser)?.username,
+                  }
+                : null
+            }
+            onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
+            isLoading={fillLoading}
+            placeholder="Select a User"
+          />
+          <Sselect
+            style={{
+              zIndex: '99999999999999',
+              minWidth: '10rem',
+            }}
+            id="group-select"
+            options={groups?.map((group) => ({
+              value: group._id,
+              label: group.name,
+            }))}
+            value={
+              selectedGroup
+                ? {
+                    value: selectedGroup,
+                    label: groups.find((group) => group._id === selectedGroup)?.name,
+                  }
+                : null
+            }
+            onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
+            isLoading={fillLoading}
+            placeholder="Select a Group"
+          />
         </div>
 
         <div className="d-flex">
