@@ -19,6 +19,7 @@ import {
   CFormFeedback,
 } from '@coreui/react';
 import '../style/remove-gutter.css';
+import '../../../utils.css'
 
 const SimpleTable = ({ data }) => {
   return (
@@ -58,7 +59,7 @@ const Validation = () => {
 
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+            <CCardHeader className="d-flex justify-content-between align-items-center text-white">
               <strong>All Schedule Reports List</strong>
             </CCardHeader>
             <SimpleTable data={sampleData} />

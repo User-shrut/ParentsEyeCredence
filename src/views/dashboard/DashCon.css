@@ -343,4 +343,7 @@ td {
   color: rgba(245, 136, 2, 0.867) !important;
 }
 
+#group-select, #user-select{
+  min-width: 14rem !important;
+}
 

@@ -113,7 +113,7 @@
 //           <CTableHead className="text-nowrap">
 //             <CTableRow className="bg-body-tertiary">
 //               <CTableHeaderCell className=" text-center ps-4 text-white bg-secondary">
-//                 SN 
+//                 SN
 //               </CTableHeaderCell>
 //               <CTableHeaderCell className=" text-center text-white bg-secondary">
 //                 Device Name
@@ -184,12 +184,7 @@
 
 // export default Alerts
 
-
-
-
-
 // ##################################### New Alerts With address ################################################### //
-
 
 import {
   CDropdown,
@@ -209,23 +204,22 @@ import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
-import { jsPDF } from 'jspdf';
-import "jspdf-autotable";
-import * as XLSX from 'xlsx';
-
+import { jsPDF } from 'jspdf'
+import 'jspdf-autotable'
+import * as XLSX from 'xlsx'
+import '../../../utils.css'
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [notificationIDs, setNotificationIDs] = useState()
-  const [filteredData, setFilteredData] = useState([]);
-  const [filterType, setFilterType] = useState(''); // State for selected filter
-  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const [filteredData, setFilteredData] = useState([])
+  const [filterType, setFilterType] = useState('') // State for selected filter
+  const [currentPage, setCurrentPage] = useState(1) // Current page number
   const [rowsPerPage, setRowsPerPage] = useState(20) // Rows per page
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage)
   const accessToken = Cookies.get('authToken')
-
 
   const notificationTypes = [
     'deviceMoving',
@@ -244,7 +238,7 @@ const Alerts = () => {
     'fuelIncrease',
     'alarm',
     'maintenanceRequired',
-  ];
+  ]
 
   const fetchNotificationData = async (page = 1) => {
     setLoading(true)
@@ -289,12 +283,9 @@ const Alerts = () => {
         // Fetch addresses for each alert
         const updatedData = await Promise.all(
           response.data.alerts.map(async (alert) => {
-            const address = await getAddressFromLatLng(
-              alert.location[1],
-              alert.location[0]
-            )
+            const address = await getAddressFromLatLng(alert.location[1], alert.location[0])
             return { ...alert, address } // Append address to the alert
-          })
+          }),
         )
         setData(updatedData)
         setLoading(false)
@@ -322,22 +313,23 @@ const Alerts = () => {
 
   // Filter data whenever filterType or searchQuery changes
   useEffect(() => {
-    const filtered = data.filter((item) =>
-      (!filterType || item.type === filterType) &&
-      (item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.message?.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-    setFilteredData(filtered);
-  }, [filterType, searchQuery, data]);
+    const filtered = data.filter(
+      (item) =>
+        (!filterType || item.type === filterType) &&
+        (item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.message?.toLowerCase().includes(searchQuery.toLowerCase())),
+    )
+    setFilteredData(filtered)
+  }, [filterType, searchQuery, data])
 
-  //  Download pdf file 
+  //  Download pdf file
 
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    doc.text('Alerts/Events', 10, 10);
-  
+    const doc = new jsPDF()
+    doc.text('Alerts/Events', 10, 10)
+
     const tableData = filteredData.map((item, index) => [
       index + 1,
       item.name,
@@ -354,8 +346,8 @@ const Alerts = () => {
         minute: '2-digit',
         second: '2-digit',
       }),
-    ]);
-  
+    ])
+
     doc.autoTable({
       head: [['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time']],
       body: tableData,
@@ -365,11 +357,10 @@ const Alerts = () => {
       },
       tableLineWidth: 0.5, // Border around the table
       tableLineColor: [0, 0, 0], // Table border color
-    });
-  
-    doc.save('alerts.pdf');
-  };
-  
+    })
+
+    doc.save('alerts.pdf')
+  }
 
   // Download Excel file
 
@@ -391,19 +382,19 @@ const Alerts = () => {
           minute: '2-digit',
           second: '2-digit',
         }),
-      }))
-    );
+      })),
+    )
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Alerts');
-    XLSX.writeFile(workbook, 'alerts.xlsx');
-  };
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Alerts')
+    XLSX.writeFile(workbook, 'alerts.xlsx')
+  }
 
   // pagination
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+    setCurrentPage(newPage)
+  }
   // Handle change of rows per page
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value))
@@ -412,10 +403,8 @@ const Alerts = () => {
   // Calculate paginated data
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-
+    currentPage * rowsPerPage,
+  )
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -467,10 +456,17 @@ const Alerts = () => {
           overflowY: 'auto',
           marginBottom: '10px',
           borderRadius: '10px',
-          border: '1px solid black'
+          border: '1px solid black',
         }}
       >
-        <CTable style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
+        <CTable
+          style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+          bordered
+          align="middle"
+          className="mb-2 border min-vh-25 rounded-top-3"
+          hover
+          responsive
+        >
           <CTableHead className="text-nowrap">
             <CTableRow className="bg-body-tertiary">
               <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
@@ -514,33 +510,64 @@ const Alerts = () => {
                 </CTableDataCell>
               </CTableRow>
             ) : paginatedData.length > 0 ? (
-              paginatedData.filter((item) => {
-                const query = searchQuery.toLowerCase();
-                return (
-                  item.name?.toLowerCase().includes(query) || // Filter by name
-                  item.type?.toLowerCase().includes(query) || // Filter by type
-                  item.address?.toLowerCase().includes(query) || // Filter by address
-                  item.message?.toLowerCase().includes(query) // Filter by message
-                );
-              })
+              paginatedData
+                .filter((item) => {
+                  const query = searchQuery.toLowerCase()
+                  return (
+                    item.name?.toLowerCase().includes(query) || // Filter by name
+                    item.type?.toLowerCase().includes(query) || // Filter by type
+                    item.address?.toLowerCase().includes(query) || // Filter by address
+                    item.message?.toLowerCase().includes(query) // Filter by message
+                  )
+                })
                 ?.map((item, index) => (
-
-                  <CTableRow key={index} >
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{(currentPage - 1) * rowsPerPage + index + 1}</CTableDataCell>
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center ps-4">{item.name}</CTableDataCell>
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.type}</CTableDataCell>
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.address || 'Fetching...'}</CTableDataCell>
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center">{item.message}</CTableDataCell>
-                    <CTableDataCell style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} className="text-center pe-4"> {new Date(item.createdAt).toLocaleString('en-IN', {
-                      timeZone: 'Asia/Kolkata',
-                      hour12: false, // Use 24-hour format
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    })}</CTableDataCell>
+                  <CTableRow key={index}>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center ps-4"
+                    >
+                      {(currentPage - 1) * rowsPerPage + index + 1}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center ps-4"
+                    >
+                      {item.name}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center"
+                    >
+                      {item.type}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center"
+                    >
+                      {item.address || 'Fetching...'}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center"
+                    >
+                      {item.message}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center pe-4"
+                    >
+                      {' '}
+                      {new Date(item.createdAt).toLocaleString('en-IN', {
+                        timeZone: 'Asia/Kolkata',
+                        hour12: false, // Use 24-hour format
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      })}
+                    </CTableDataCell>
                   </CTableRow>
                 ))
             ) : (
@@ -566,8 +593,8 @@ const Alerts = () => {
             <CIcon icon={cilSettings} />
           </CDropdownToggle>
           <CDropdownMenu>
-            <CDropdownItem onClick={downloadPDF} >PDF</CDropdownItem>
-            <CDropdownItem onClick={downloadExcel} >Excel</CDropdownItem>
+            <CDropdownItem onClick={downloadPDF}>PDF</CDropdownItem>
+            <CDropdownItem onClick={downloadExcel}>Excel</CDropdownItem>
           </CDropdownMenu>
         </CDropdown>
       </TableContainer>
@@ -578,14 +605,14 @@ const Alerts = () => {
         <div>
           <p className="mb-0">
             Showing {(currentPage - 1) * rowsPerPage + 1} to{' '}
-            {Math.min(currentPage * rowsPerPage, filteredData.length)} of{' '}
-            {filteredData.length} entries
+            {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length}{' '}
+            entries
           </p>
         </div>
         <div className="d-flex align-items-center">
           {/* First Button */}
           <button
-            onClick={() => handlePageChange(1)}  // Go to the first page
+            onClick={() => handlePageChange(1)} // Go to the first page
             disabled={currentPage === 1}
             className="btn btn-sm btn-outline-secondary mx-1"
           >
@@ -611,7 +638,7 @@ const Alerts = () => {
           </button>
           {/* Last Button */}
           <button
-            onClick={() => handlePageChange(totalPages)}  // Go to the last page
+            onClick={() => handlePageChange(totalPages)} // Go to the last page
             disabled={currentPage === totalPages}
             className="btn btn-sm btn-outline-secondary mx-1"
           >
@@ -619,8 +646,7 @@ const Alerts = () => {
           </button>
         </div>
       </div>
-
-    </div >
+    </div>
   )
 }
 

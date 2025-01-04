@@ -39,6 +39,7 @@ import ignitionOff from "src/status/power-off.png";
 import ignitionOn from "src/status/power-on.png";
 import Loader from '../../../components/Loader/Loader';
 import '../style/remove-gutter.css';
+import '../../../utils.css'
 
 const SearchStatus = ({ formData, handleInputChange, handleSubmit, users, groups, getGroups, devices, loading, getDevices, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -816,7 +817,7 @@ const Status = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white" style={{ backgroundColor: '#494a43 !important', color: 'white' }}>
+            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white" style={{ background: "linear-gradient(to right, #43c6ac 5%, #f8ffae 95%) !important", color: 'white' }}>
               <strong>Status Report</strong>
             </CCardHeader>
             <CCardBody>
@@ -843,7 +844,7 @@ const Status = () => {
           <CRow className="justify-content-center mt-4 gutter-0">
             <CCol xs={12} className="px-4">
               <CCard className="p-0 mb-4 shadow-sm">
-                <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+                <CCardHeader className="d-flex justify-content-between align-items-center text-white">
                   <strong>Status Report {selectedDeviceName && `for ${selectedDeviceName}`}</strong> {/* Show the device name here */}
                   {/* <CFormInput
                     placeholder="Search..."

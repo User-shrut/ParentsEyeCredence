@@ -21,6 +21,7 @@ import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
 import HistoryMap from './HistoryMap'
 import './HistoryReport.css'
+import '../../../utils.css'
 
 const HistoryReport = () => {
   const { deviceId: urlDeviceId, category, name } = useParams() // Retrieve params from URL
@@ -99,7 +100,7 @@ const HistoryReport = () => {
         <CRow className="pt-3 gutter-0">
           <CCol xs={12} md={12} className="px-4">
             <CCard className="mb-4 p-0 shadow-lg rounded">
-              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center  text-white">
                 <strong>History Report</strong>
               </CCardHeader>
               <CCardBody>

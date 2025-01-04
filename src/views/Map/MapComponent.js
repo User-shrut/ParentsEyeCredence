@@ -19,32 +19,29 @@ import { GiSpeedometer } from 'react-icons/gi'
 import useGetVehicleIcon from '../Reports/HistoryReport/useGetVehicleIcon'
 
 const FlyToMapCenter = ({ mapCenter }) => {
-  const map = useMap();
+  const map = useMap()
 
   useEffect(() => {
     if (mapCenter) {
-      map.setView([mapCenter?.lat, mapCenter?.lng], mapCenter.zoom); // Fly to new coordinates
+      map.setView([mapCenter?.lat, mapCenter?.lng], mapCenter.zoom) // Fly to new coordinates
     }
-  }, [mapCenter, map]);
+  }, [mapCenter, map])
 
-  return null;
-};
+  return null
+}
 
-const MainMap = ({ filteredVehicles, mapCenter }) => {
+const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
   const { newAddress } = useSelector((state) => state.address)
   const navigate = useNavigate()
   const [address, setAddress] = useState('')
   const handleClickOnTrack = (vehicle) => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
-
   }
 
   useEffect(() => {
     console.log('filtered vehicle', filteredVehicles)
   }, [filteredVehicles])
-
-
 
   useEffect(() => {
     console.log('filtered vehicle', filteredVehicles)
@@ -56,7 +53,13 @@ const MainMap = ({ filteredVehicles, mapCenter }) => {
       center={[21.1458, 79.0882]} // Center map on a default location (e.g., Nagpur)
       zoom={10}
       scrollWheelZoom={true}
-      style={{ height: '550px', width: '100%', borderRadius: '15px', border: '2px solid gray', zIndex:'0'}}
+      style={{
+        height: '550px',
+        width: '100%',
+        borderRadius: '15px',
+        border: '2px solid gray',
+        zIndex: '0',
+      }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -69,6 +72,12 @@ const MainMap = ({ filteredVehicles, mapCenter }) => {
             <Marker
               key={index}
               position={[vehicle.latitude, vehicle.longitude]}
+              ref={(ref) => {
+                if (ref) {
+                  markerRefs.current[index] = ref // Save reference by vehicle.id
+                  // console.log('maker id', index)
+                }
+              }}
               icon={iconImage(vehicle.category, vehicle)}
             >
               <Popup>

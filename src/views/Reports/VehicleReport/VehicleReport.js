@@ -20,6 +20,7 @@ import {
 } from '@coreui/react';
 import Select from 'react-select';
 import '../style/remove-gutter.css';
+import '../../../utils.css'
 
 const CustomStyles = ({ formData, handleInputChange, handleSubmit, devices, groups, columns, showMap, setShowMap }) => {
   const [validated, setValidated] = useState(false);
@@ -412,7 +413,7 @@ const Validation = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className='p-0 mb-4 shadow-sm'>
-              <CCardHeader className="bg-secondary text-white d-flex justify-content-between align-items-center">
+              <CCardHeader className="text-white d-flex justify-content-between align-items-center">
                 <strong>All Summary Report List</strong>
                 <CFormInput
                   placeholder="Search..."

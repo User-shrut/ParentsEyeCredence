@@ -29,11 +29,13 @@ import axios from 'axios'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import * as XLSX from 'xlsx' // For Excel export
-import jsPDF from 'jspdf' // For PDF export 
+import jsPDF from 'jspdf' // For PDF export
 import autoTable from 'jspdf-autotable'
 import { auto } from '@popperjs/core'
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css';
+
+import '../../../utils.css'
 
 const SearchDistance = ({
   formData,
@@ -690,7 +692,7 @@ const Distance = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+            <CCardHeader className="d-flex justify-content-between align-items-center text-white">
               <strong>Distance Report</strong>
             </CCardHeader>
             <CCardBody>

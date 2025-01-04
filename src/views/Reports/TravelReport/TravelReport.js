@@ -32,6 +32,7 @@ import autoTable from 'jspdf-autotable' // For table in PDF
 import * as XLSX from 'xlsx'
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
+import '../../../utils.css'
 
 const SearchTrip = ({
   formData,
@@ -884,7 +885,7 @@ const Trips = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center text-white">
                 <strong>Travel Data {selectedDeviceName && `for ${selectedDeviceName}`}</strong>
                 {/* <CFormInput
                   placeholder="Search..."

@@ -5,7 +5,7 @@ import axios from 'axios'
 const accessToken = Cookies.get('authToken') // Replace with your token
 
 export const getUsers = async () => {
-  const response = await axios.get(`http://63.142.251.13:9000/user`, {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -15,7 +15,7 @@ export const getUsers = async () => {
 }
 
 export const getGroups = async (userId) => {
-  const response = await axios.get(`http://63.142.251.13:9000/group/${userId}`, {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${userId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -24,7 +24,7 @@ export const getGroups = async (userId) => {
 }
 
 export const getDevices = async (groupId) => {
-  const response = await axios.get(`http://63.142.251.13:9000/device/getDeviceByGroup/${groupId}`, {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/device/getDeviceByGroup/${groupId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

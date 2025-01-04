@@ -430,12 +430,17 @@ const Dashboard = () => {
 
   // Check if the current page is the dashboard
   const isDashboard = location.pathname === '/dashboard'
-  const handleRowClick = (lat, lng) => {
-    console.log('Row Clicked')
-    setMapCenter({ lat, lng, zoom: 18 })
+  const markerRefs = useRef({})
+  const handleRowClick = (lat, lng, index) => {
+    // console.log('Row Clicked', index)
+    setMapCenter({ lat, lng, zoom: 20 }) // Update map center
     if (mapRef.current) {
-      mapRef.current.scrollIntoView({ behavior: 'smooth' })
+      mapRef.current.scrollIntoView({ behavior: 'smooth' }) // Scroll to map
     }
+
+    const markerRef = markerRefs.current[index]
+
+    markerRef?.openPopup() // Open popup if marker reference exists
   }
 
   const [selectedUser, setSelectedUser] = useState(null)
@@ -540,16 +545,12 @@ const Dashboard = () => {
                       }
                       onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
                       isLoading={loading}
-                      placeholder="Select a User"
                     />
                   </CHeaderNav>
 
                   {/* Group Select */}
                   <CHeaderNav className="ms-1 p-0 me-3">
                     <Select
-                      style={{
-                        zIndex: '99999999999999',
-                      }}
                       id="group-select"
                       options={groups?.map((group) => ({
                         value: group._id,
@@ -653,7 +654,11 @@ const Dashboard = () => {
               {/* <CRow>
             <CCol sm={7} className="d-none d-md-block"></CCol>
           </CRow> */}
-              <MainMap filteredVehicles={filteredVehicles} mapCenter={mapCenter} />
+              <MainMap
+                filteredVehicles={filteredVehicles}
+                mapCenter={mapCenter}
+                markerRefs={markerRefs}
+              />
               {/* <Sidenew/> */}
               {/* <div className="mb-5"></div> */}
               {/* <br /> */}
@@ -948,7 +953,7 @@ const Dashboard = () => {
                           <CTableRow
                             key={index}
                             className={`table-row collapsed trans`}
-                            onClick={() => handleRowClick(item.latitude, item.longitude)}
+                            onClick={() => handleRowClick(item.latitude, item.longitude, index)}
                           >
                             {/* Sr No. */}
                             {visibleColumns.srNo && (

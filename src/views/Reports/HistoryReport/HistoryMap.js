@@ -88,17 +88,17 @@ const HistoryMap = ({
   name,
 }) => {
   const { data, loading } = useHistoryData(
-    'http://63.142.251.13:9000/history/device-history-playback',
+    `${import.meta.env.VITE_API_URL}/history/device-history-playback`,
     { deviceId, from: fromDateTime, to: toDateTime },
     fetch,
   )
   const { data: stopData } = useHistoryData(
-    'http://63.142.251.13:9000/history/device-stopage',
+    `${import.meta.env.VITE_API_URL}/history/device-stopage`,
     { deviceId, from: fromDateTime, to: toDateTime },
     fetch,
   )
   const { data: tripData } = useHistoryData(
-    'http://63.142.251.13:9000/history/show-only-device-trips-startingpoint-endingpoint',
+    `${import.meta.env.VITE_API_URL}/history/show-only-device-trips-startingpoint-endingpoint`,
     { deviceId, from: fromDateTime, to: toDateTime },
     fetch,
   )

@@ -29,7 +29,7 @@
 // import CIcon from '@coreui/icons-react'
 // import { cilSettings } from '@coreui/icons'
 // import * as XLSX from 'xlsx' // For Excel export
-// import jsPDF from 'jspdf' // For PDF export 
+// import jsPDF from 'jspdf' // For PDF export
 // import { saveAs } from 'file-saver';
 // import autoTable from 'jspdf-autotable'
 // import { auto } from '@popperjs/core'
@@ -286,7 +286,7 @@
 
 //   const getAddressFromLatLng = async (latitude, longitude) => {
 //     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
-  
+
 //     try {
 //       const response = await axios.get(url);
 //       const address = response.data?.display_name || 'Address not found';
@@ -297,7 +297,7 @@
 //     }
 //   };
 
- 
+
 //   // Export table data to PDF
 //    const exportToPDF = () => {
 //     const doc = new jsPDF();
@@ -313,7 +313,7 @@
 
 //     doc.save('table_data.pdf');
 //   };
-  
+
 //    // Export table data to Excel
 //    const exportToExcel = () => {
 //     const tableColumns = selectedColumns.length > 0 ? selectedColumns : columns;
@@ -599,7 +599,7 @@
 //           </CCol>
 //         </CRow>
 //       )}
-      
+
 //     </div>
 //   );
 // };
@@ -643,12 +643,13 @@ import axios from 'axios'
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import * as XLSX from 'xlsx' // For Excel export
-import jsPDF from 'jspdf' // For PDF export 
+import jsPDF from 'jspdf' // For PDF export
 import { saveAs } from 'file-saver';
 import autoTable from 'jspdf-autotable'
 import { auto } from '@popperjs/core'
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css';
+import '../../../utils.css'
 
 const SearchGeofence = ({
   formData,
@@ -900,7 +901,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
 
   const getAddressFromLatLng = async (latitude, longitude) => {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
-  
+
     try {
       const response = await axios.get(url);
       const address = response.data?.display_name || 'Address not found';
@@ -911,7 +912,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
     }
   };
 
- 
+
   // Export table data to PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
@@ -921,7 +922,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
       const rowData = tableColumns.slice(1).map((col) => renderColumnData(data, col)); // Get the data for other columns
       return [serialNumber, ...rowData]; // Add SN as the first column in each row
     });
-  
+
     doc.autoTable({
       head: [tableColumns],
       body: tableRows,
@@ -933,11 +934,11 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
       tableLineColor: [0, 0, 0], // Outer border color (black)
       margin: { top: 10 }, // Adjust the margin if needed
     });
-  
+
     doc.save('Geofences.pdf');
   };
-  
-  
+
+
    // Export table data to Excel
    const exportToExcel = () => {
     const tableColumns = selectedColumns.length > 0 ? selectedColumns : columns;
@@ -970,12 +971,12 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
     return (selectedColumns.length > 0 ? selectedColumns : columns).some((col) => {
       // Get the value of the current column for this row
       const cellValue = renderColumnData(data, col).toString().toLowerCase();
-      
+
       // Check if the cell value contains the search query (case-insensitive)
       return cellValue.includes(searchQuery.toLowerCase());
     });
   });
-  
+
 
   return (
     <>
@@ -1214,7 +1215,7 @@ const GeofenceReports = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center  text-white">
                 <strong>Geofence Report Results</strong>
                 <CFormInput
                   placeholder="Search..."
@@ -1237,7 +1238,7 @@ const GeofenceReports = () => {
           </CCol>
         </CRow>
       )}
-      
+
     </div>
   );
 };
