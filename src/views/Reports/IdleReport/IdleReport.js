@@ -30,12 +30,12 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
-import * as XLSX from 'xlsx';
-import idel from "src/status/idel.png";
-import ignitionOff from "src/status/power-off.png";
-import ignitionOn from "src/status/power-on.png";
+import * as XLSX from 'xlsx'
+import idel from 'src/status/idel.png'
+import ignitionOff from 'src/status/power-off.png'
+import ignitionOn from 'src/status/power-on.png'
 import Loader from '../../../components/Loader/Loader'
-import '../style/remove-gutter.css';
+import '../style/remove-gutter.css'
 import '../../../utils.css'
 
 const SearchIdeal = ({
@@ -54,8 +54,8 @@ const SearchIdeal = ({
 }) => {
   const [validated, setValidated] = useState(false)
   const [showDateInputs, setShowDateInputs] = useState(false)
-  const [selectedU, setSelectedU] = useState();
-  const [selectedG, setSelectedG] = useState();
+  const [selectedU, setSelectedU] = useState()
+  const [selectedG, setSelectedG] = useState()
   // State to manage button text
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
@@ -132,17 +132,20 @@ const SearchIdeal = ({
                 ? users.map((user) => ({ value: user._id, label: user.username }))
                 : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
           }
-          value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+          value={
+            selectedU
+              ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username }
+              : null
+          }
           onChange={(selectedOption) => {
-            const selectedUser = selectedOption?.value;
-            setSelectedU(selectedUser);
-            console.log('Selected user:', selectedUser);
-            getGroups(selectedUser);
+            const selectedUser = selectedOption?.value
+            setSelectedU(selectedUser)
+            console.log('Selected user:', selectedUser)
+            getGroups(selectedUser)
           }}
           placeholder="Choose a user..."
           isLoading={loading} // Show a loading spinner while fetching users
         />
-
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
@@ -179,12 +182,16 @@ const SearchIdeal = ({
                 ? groups.map((group) => ({ value: group._id, label: group.name }))
                 : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
           }
-          value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+          value={
+            selectedG
+              ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name }
+              : null
+          }
           onChange={(selectedOption) => {
-            const selectedGroup = selectedOption?.value;
-            setSelectedG(selectedGroup);
-            console.log('Selected Group ID:', selectedGroup);
-            getDevices(selectedGroup);
+            const selectedGroup = selectedOption?.value
+            setSelectedG(selectedGroup)
+            console.log('Selected Group ID:', selectedGroup)
+            getDevices(selectedGroup)
           }}
           placeholder="Choose a group..."
           isLoading={loading} // Show a loading spinner while fetching groups
@@ -219,7 +226,14 @@ const SearchIdeal = ({
               ? devices.map((device) => ({ value: device.deviceId, label: device.name }))
               : [{ value: '', label: 'Loading devices...', isDisabled: true }]
           }
-          value={formData.Devices ? { value: formData.Devices, label: devices.find((device) => device.deviceId === formData.Devices)?.name } : null}
+          value={
+            formData.Devices
+              ? {
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
+              : null
+          }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
           placeholder="Choose a device..."
         />
@@ -392,9 +406,9 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
 
   // PDF Download Function
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
-    const tableRows = [];
+    const doc = new jsPDF()
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
+    const tableRows = []
 
     dataWithAddresses.forEach((row, rowIndex) => {
       row.data.forEach((nestedRow, nestedIndex) => {
@@ -402,10 +416,10 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
           rowIndex + 1, // Serial Number
           row.device?.name || selectedDeviceName || '--', // Fetch Vehicle Name
           ...selectedColumns.map((column) => {
-            if (column === 'Vehicle Status') return nestedRow.vehicleStatus;
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus
             if (column === 'Duration')
-              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
-            if (column === 'Location') return nestedRow.address || nestedRow.location;
+              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+            if (column === 'Location') return nestedRow.address || nestedRow.location
             if (column === 'Start Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
@@ -419,7 +433,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'End Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
@@ -433,15 +447,15 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'Total Duration')
-              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
-            return '--';
+              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
+            return '--'
           }),
-        ];
-        tableRows.push(rowData);
-      });
-    });
+        ]
+        tableRows.push(rowData)
+      })
+    })
 
     // Generate the table with borders
     autoTable(doc, {
@@ -456,11 +470,10 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
       tableLineWidth: 0.5, // Set thickness for outer borders
       tableLineColor: [0, 0, 0], // Set outer border color (black)
       margin: { top: 10 }, // Adjust top margin if necessary
-    });
+    })
 
-    doc.save(`${selectedDeviceName || 'Idle_Report'}.pdf`);
-  };
-
+    doc.save(`${selectedDeviceName || 'Idle_Report'}.pdf`)
+  }
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -470,15 +483,15 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
           const rowData = {
             SN: rowIndex + 1,
             'Vehicle Name': row.device?.name || selectedDeviceName || '--', // Map Vehicle Name
-          };
+          }
 
           selectedColumns.forEach((column) => {
-            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus;
+            if (column === 'Vehicle Status') rowData['Vehicle Status'] = nestedRow.vehicleStatus
             if (column === 'Duration')
               rowData['Duration'] = new Date(nestedRow.durationSeconds * 1000)
                 .toISOString()
-                .substr(11, 8);
-            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location;
+                .substr(11, 8)
+            if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location
             if (column === 'Start Time')
               rowData['Start Time'] = new Date(
                 new Date(nestedRow.arrivalTime).setHours(
@@ -492,7 +505,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'End Time')
               rowData['End Time'] = new Date(
                 new Date(nestedRow.departureTime).setHours(
@@ -506,33 +519,33 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'Total Duration')
               rowData['Total Duration'] = new Date(row.totalDurationSeconds * 1000)
                 .toISOString()
-                .substr(11, 8);
-          });
+                .substr(11, 8)
+          })
 
-          return rowData;
-        });
+          return rowData
+        })
       }),
-    );
+    )
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData');
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'IdealData')
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
 
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
 
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${selectedDeviceName || 'Idle_Report'}.xlsx`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${selectedDeviceName || 'Idle_Report'}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <>
@@ -637,22 +650,24 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                                     style={{ marginRight: '10px' }}
                                   />
                                 </CTooltip>
-                              ) : null;
+                              ) : null
 
                             case 'Duration':
                               return new Date(nestedRow.durationSeconds * 1000)
                                 .toISOString()
-                                .substr(11, 8);
+                                .substr(11, 8)
 
                             case 'Location':
-                              return nestedRow.address || nestedRow.location;
+                              return nestedRow.address || nestedRow.location
+                            case 'Co-ordinates':
+                              return nestedRow.location
 
                             case 'Start Time':
                               return new Date(
                                 new Date(nestedRow.arrivalTime).setHours(
                                   new Date(nestedRow.arrivalTime).getHours() - 5,
-                                  new Date(nestedRow.arrivalTime).getMinutes() - 30
-                                )
+                                  new Date(nestedRow.arrivalTime).getMinutes() - 30,
+                                ),
                               ).toLocaleString([], {
                                 year: 'numeric',
                                 month: '2-digit',
@@ -660,14 +675,14 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                                 hour: '2-digit',
                                 minute: '2-digit',
                                 hour12: false,
-                              });
+                              })
 
                             case 'End Time':
                               return new Date(
                                 new Date(nestedRow.departureTime).setHours(
                                   new Date(nestedRow.departureTime).getHours() - 5,
-                                  new Date(nestedRow.departureTime).getMinutes() - 30
-                                )
+                                  new Date(nestedRow.departureTime).getMinutes() - 30,
+                                ),
                               ).toLocaleString([], {
                                 year: 'numeric',
                                 month: '2-digit',
@@ -675,15 +690,15 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                                 hour: '2-digit',
                                 minute: '2-digit',
                                 hour12: false,
-                              });
+                              })
 
                             case 'Total Duration':
                               return new Date(row.totalDurationSeconds * 1000)
                                 .toISOString()
-                                .substr(11, 8);
+                                .substr(11, 8)
 
                             default:
-                              return '--';
+                              return '--'
                           }
                         })()}
                       </CTableDataCell>
@@ -706,7 +721,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                     No data available for {selectedDeviceName}
                   </CTableDataCell>
                 </CTableRow>
-              )
+              ),
             )
           ) : (
             // Condition when no data is available
@@ -754,7 +769,7 @@ const Ideal = () => {
     Columns: [],
   })
   const [searchQuery, setSearchQuery] = useState('')
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState()
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
@@ -767,6 +782,7 @@ const Ideal = () => {
     'Start Time',
     'Duration',
     'Location',
+    'Co-ordinates',
     'End Time',
     'Total Duration',
   ])
@@ -804,8 +820,8 @@ const Ideal = () => {
     }
   }
 
-  const getGroups = async (selectedUser = "") => {
-    setLoading(true);
+  const getGroups = async (selectedUser = '') => {
+    setLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
         headers: {
@@ -814,23 +830,23 @@ const Ideal = () => {
       })
       if (response.data.groupsAssigned) {
         setGroups(response.data.groupsAssigned)
-        setLoading(false);
-        console.log("perticular user ke groups")
+        setLoading(false)
+        console.log('perticular user ke groups')
       } else if (response.data.groups) {
         setGroups(response.data.groups)
-        setLoading(false);
-        console.log("all groups")
+        setLoading(false)
+        console.log('all groups')
       }
     } catch (error) {
-      setLoading(false);
+      setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
     }
   }
   const getUser = async () => {
-    setLoading(true);
-    setGroups([]);
-    setDevices([]);
+    setLoading(true)
+    setGroups([])
+    setDevices([])
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
@@ -839,19 +855,19 @@ const Ideal = () => {
       })
       if (response.data) {
         setUsers(response.data.users)
-        setLoading(false);
-        console.log("yaha tak thik hai")
+        setLoading(false)
+        console.log('yaha tak thik hai')
       }
     } catch (error) {
       console.error('Error fetching data:', error)
       throw error
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    getUser();
-    getGroups();
+    getUser()
+    getGroups()
   }, [])
 
   const handleInputChange = (name, value) => {
@@ -866,7 +882,7 @@ const Ideal = () => {
   }
 
   const handleSubmit = async () => {
-    setStatusLoading(true);
+    setStatusLoading(true)
     console.log('DataAll', formData)
 
     // Convert the dates to ISO format if they're provided
@@ -919,7 +935,7 @@ const Ideal = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+            <CCardHeader className="d-flex justify-content-between align-items-center text-white">
               <strong>Idle Report</strong>
             </CCardHeader>
             <CCardBody>

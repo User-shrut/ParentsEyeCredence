@@ -67,7 +67,7 @@ const Geofences = () => {
   const steps = ['Select Geofence', 'Geofence Info']
   const [filteredData, setFilteredData] = useState([]);
 
- 
+
   const handleEditModalClose = () => {
     setCurrentStep(0)
     setFormData({})
@@ -490,7 +490,7 @@ const Geofences = () => {
 
       <div className="row">
         <div className="col-12 col-md-6 position-relative">
-          <TableContainer  component={Paper} 
+          <TableContainer  component={Paper}
               sx={{
                 height: 'auto', // Set the desired height
                 overflowX: 'auto', // Enable horizontal scrollbar
@@ -507,13 +507,13 @@ const Geofences = () => {
                   <strong>SN</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="ps-3 text-center bg-body-secondary text-center sr-no table-cell">
-                   <strong>Geofence Name</strong> 
+                   <strong>Geofence Name</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                     <strong>Type</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                   <strong>Vehicles</strong> 
+                   <strong>Vehicles</strong>
                   </CTableHeaderCell>
 
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
@@ -843,7 +843,7 @@ const Geofences = () => {
                     marginTop: '20px',
                     marginBottom: '20px',
                   }),
-                }} 
+                }}
               />
 
               <Select

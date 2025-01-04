@@ -28,16 +28,16 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For table in PDF
-import * as XLSX from 'xlsx';
-import upLeft from "src/direction/up-left-arrow.gif";
-import upRight from "src/direction/up-right-arrow.gif";
-import downLeft from "src/direction/down-left-arrow.gif";
-import downRight from "src/direction/down-right-arrow.gif";
+import * as XLSX from 'xlsx'
+import upLeft from 'src/direction/up-left-arrow.gif'
+import upRight from 'src/direction/up-right-arrow.gif'
+import downLeft from 'src/direction/down-left-arrow.gif'
+import downRight from 'src/direction/down-right-arrow.gif'
 import Loader from '../../../components/Loader/Loader'
-import '../style/remove-gutter.css';
+import '../style/remove-gutter.css'
 // import { saveAs } from 'file-saver';
-import ignitionOff from "src/status/power-off.png";
-import ignitionOn from "src/status/power-on.png";
+import ignitionOff from 'src/status/power-off.png'
+import ignitionOn from 'src/status/power-on.png'
 import '../../../utils.css'
 
 const SearchStop = ({
@@ -57,8 +57,8 @@ const SearchStop = ({
   const [validated, setValidated] = useState(false)
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedU, setSelectedU] = useState();
-  const [selectedG, setSelectedG] = useState();
+  const [selectedU, setSelectedU] = useState()
+  const [selectedG, setSelectedG] = useState()
   // Date conversion function to convert the given date to the desired format
   const convertToDesiredFormat = (inputDate) => {
     const date = new Date(inputDate) // Create a Date object with the given input
@@ -142,17 +142,20 @@ const SearchStop = ({
                 ? users.map((user) => ({ value: user._id, label: user.username }))
                 : [{ value: '', label: 'No Users in this Account', isDisabled: true }]
           }
-          value={selectedU ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username } : null}
+          value={
+            selectedU
+              ? { value: selectedU, label: users.find((user) => user._id === selectedU)?.username }
+              : null
+          }
           onChange={(selectedOption) => {
-            const selectedUser = selectedOption?.value;
-            setSelectedU(selectedUser);
-            console.log('Selected user:', selectedUser);
-            getGroups(selectedUser);
+            const selectedUser = selectedOption?.value
+            setSelectedU(selectedUser)
+            console.log('Selected user:', selectedUser)
+            getGroups(selectedUser)
           }}
           placeholder="Choose a user..."
           isLoading={loading} // Show a loading spinner while fetching users
         />
-
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
@@ -189,12 +192,16 @@ const SearchStop = ({
                 ? groups.map((group) => ({ value: group._id, label: group.name }))
                 : [{ value: '', label: 'No Groups in this User', isDisabled: true }]
           }
-          value={selectedG ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name } : null}
+          value={
+            selectedG
+              ? { value: selectedG, label: groups.find((group) => group._id === selectedG)?.name }
+              : null
+          }
           onChange={(selectedOption) => {
-            const selectedGroup = selectedOption?.value;
-            setSelectedG(selectedGroup);
-            console.log('Selected Group ID:', selectedGroup);
-            getDevices(selectedGroup);
+            const selectedGroup = selectedOption?.value
+            setSelectedG(selectedGroup)
+            console.log('Selected Group ID:', selectedGroup)
+            getDevices(selectedGroup)
           }}
           placeholder="Choose a group..."
           isLoading={loading} // Show a loading spinner while fetching groups
@@ -232,7 +239,14 @@ const SearchStop = ({
                 ? devices.map((device) => ({ value: device.deviceId, label: device.name }))
                 : [{ value: '', label: 'No Device in this Group', isDisabled: true }]
           }
-          value={formData.Devices ? { value: formData.Devices, label: devices.find((device) => device.deviceId === formData.Devices)?.name } : null}
+          value={
+            formData.Devices
+              ? {
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
+              : null
+          }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
           placeholder="Choose a device..."
           isLoading={loading} // Show a loading spinner while fetching devices
@@ -341,30 +355,30 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
 
   // Function to generate PDF
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = ['SN', 'Device Name', ...selectedColumns]; // Add 'SN' for Serial Number
-    const tableRows = [];
+    const doc = new jsPDF()
+    const tableColumn = ['SN', 'Device Name', ...selectedColumns] // Add 'SN' for Serial Number
+    const tableRows = []
 
     apiData.finalDeviceDataByStopage.forEach((row, rowIndex) => {
       const tableRow = [
         rowIndex + 1, // Serial number (rowIndex + 1)
         row.device?.name || selectedDeviceName || '--', // Device Name
         ...selectedColumns.map((column) => {
-          if (column === 'Speed') return `${(row.speed * 3.6).toFixed(2)} km/h`;
-          if (column === 'Ignition') return row.ignition ? 'ON' : 'OFF';
+          if (column === 'Speed') return `${(row.speed * 3.6).toFixed(2)} km/h`
+          if (column === 'Ignition') return row.ignition ? 'ON' : 'OFF'
           if (column === 'Direction') {
-            if (row.course < 90 && row.course > 0) return 'North East';
-            if (row.course > 90 && row.course < 180) return 'North West';
-            if (row.course > 180 && row.course < 270) return 'South West';
-            return 'South East';
+            if (row.course < 90 && row.course > 0) return 'North East'
+            if (row.course > 90 && row.course < 180) return 'North West'
+            if (row.course > 180 && row.course < 270) return 'South West'
+            return 'South East'
           }
-          if (column === 'Location') return locationData[rowIndex] || 'Fetching location...';
+          if (column === 'Location') return locationData[rowIndex] || 'Fetching location...'
           if (column === 'Start Time')
             return new Date(
               new Date(row.arrivalTime).setHours(
                 new Date(row.arrivalTime).getHours() - 5,
-                new Date(row.arrivalTime).getMinutes() - 30
-              )
+                new Date(row.arrivalTime).getMinutes() - 30,
+              ),
             ).toLocaleString([], {
               year: 'numeric',
               month: '2-digit',
@@ -372,13 +386,13 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
-            });
+            })
           if (column === 'End Time')
             return new Date(
               new Date(row.departureTime).setHours(
                 new Date(row.departureTime).getHours() - 5,
-                new Date(row.departureTime).getMinutes() - 30
-              )
+                new Date(row.departureTime).getMinutes() - 30,
+              ),
             ).toLocaleString([], {
               year: 'numeric',
               month: '2-digit',
@@ -386,12 +400,12 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
-            });
-          return '--';
+            })
+          return '--'
         }),
-      ];
-      tableRows.push(tableRow);
-    });
+      ]
+      tableRows.push(tableRow)
+    })
 
     // Add autoTable with border settings
     autoTable(doc, {
@@ -407,13 +421,10 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
       tableLineWidth: 0.5, // Outer border line width
       tableLineColor: [0, 0, 0], // Outer border color (black)
       margin: { top: 20 }, // Margin from the top
-    });
+    })
 
-    doc.save(`${selectedDeviceName || 'Stops_Report'}.pdf`);
-  };
-
-
-
+    doc.save(`${selectedDeviceName || 'Stops_Report'}.pdf`)
+  }
 
   // Function to generate and download Excel without using file-saver
   const downloadExcel = () => {
@@ -422,11 +433,11 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
         const rowData = {
           SN: rowIndex + 1, // Serial Number
           'Device Name': row.device?.name || selectedDeviceName || '--', // Add Device Name
-        };
+        }
 
         selectedColumns.forEach((column) => {
-          if (column === 'Speed') rowData.Speed = `${(row.speed * 3.6).toFixed(2)} km/h`;
-          if (column === 'Ignition') rowData.Ignition = row.ignition ? 'ON' : 'OFF';
+          if (column === 'Speed') rowData.Speed = `${(row.speed * 3.6).toFixed(2)} km/h`
+          if (column === 'Ignition') rowData.Ignition = row.ignition ? 'ON' : 'OFF'
           if (column === 'Direction') {
             rowData.Direction =
               row.course < 90 && row.course > 0
@@ -435,10 +446,10 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
                   ? 'North West'
                   : row.course > 180 && row.course < 270
                     ? 'South West'
-                    : 'South East';
+                    : 'South East'
           }
           if (column === 'Location')
-            rowData.Location = locationData[rowIndex] || 'Fetching location...';
+            rowData.Location = locationData[rowIndex] || 'Fetching location...'
           if (column === 'Start Time')
             rowData['Start Time'] = new Date(
               new Date(row.arrivalTime).setHours(
@@ -452,7 +463,7 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
-            });
+            })
           if (column === 'End Time')
             rowData['End Time'] = new Date(
               new Date(row.departureTime).setHours(
@@ -466,31 +477,30 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
-            });
-        });
-        return rowData;
+            })
+        })
+        return rowData
       }),
-    );
+    )
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Stops');
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Stops')
 
     // Generate Excel file
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
 
     // Create a Blob from the Excel data
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
 
     // Create a link element, trigger download, and remove the element
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${selectedDeviceName || 'Stops_Report'}.xlsx`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  };
-
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${selectedDeviceName || 'Stops_Report'}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  }
 
   return (
     <>
@@ -521,138 +531,151 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
                   height: '100px',
                 }}
               >
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
                   <Loader />
                 </div>
               </CTableDataCell>
             </CTableRow>
-
-          ) :
-            apiData?.finalDeviceDataByStopage?.length > 0 ? (
-              apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
-                <CTableRow key={row.id} className="custom-row">
-                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{rowIndex + 1}</CTableDataCell>
-                  <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{selectedDeviceName}</CTableDataCell>
-                  {/* Dynamically render table cells based on selected columns */}
-                  {selectedColumns.map((column, index) => (
-                    <CTableDataCell key={index} style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
-                      {column === 'Speed' ? (
-                        // Convert speed from m/s to km/h and format to 2 decimal places
-                        // (row.speed * 3.6).toFixed(2) + ' km/h'
-                        row.speed.toFixed(2) + ' km/h'
-                      ) : column === 'Ignition' ? (
-                        // Show 'ON' or 'OFF' based on ignition status
-                        row.ignition === true ? (
-                          <img src={ignitionOn} alt="on" width="40" height="40" style={{ marginRight: '10px' }} />
-                        ) : (
-                          <img src={ignitionOff} alt="off" width="40" height="40" style={{ marginRight: '10px' }} />
-                        )
-                      ) : column === 'Direction' ? (
-                        // Show direction (course)
-                        row.course < 90 && row.course > 0 ? (
-                          <>
-                            <img
-                              src={upRight}
-                              alt="North East"
-                              width="30"
-                              height="25"
-                            />
-                            <span>North East</span>
-                          </>
-                        ) : row.course > 90 && row.course < 180 ? (
-                          <>
-                            <img
-                              src={upLeft}
-                              alt="North West"
-                              width="30"
-                              height="25"
-                            />
-                            <span>North West</span>
-                          </>
-                        ) : row.course > 180 && row.course < 270 ? (
-                          <>
-                            <img
-                              src={downLeft}
-                              alt="South West"
-                              width="30"
-                              height="25"
-                            />
-                            <span>South West</span>
-                          </>
-                        ) : (
-                          <>
-                            <img
-                              src={downRight}
-                              alt="South East"
-                              width="30"
-                              height="25"
-                            />
-                            <span>South East</span>
-                          </>
-                        )
-                      ) : column === 'Location' ? (
-                        // Show location
-                        locationData[rowIndex] || 'Fetching location...'
-                      ) : column === 'Start Time' ? (
-                        // Add 6 hours 30 minutes to arrivalTime
-                        new Date(
-                          new Date(row.arrivalTime).setHours(
-                            new Date(row.arrivalTime).getHours() - 5,
-                            new Date(row.arrivalTime).getMinutes() - 30,
-                          ),
-                        ).toLocaleString([], {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        })
-                      ) : column === 'End Time' ? (
-                        // Add 6 hours 30 minutes to departureTime
-                        new Date(
-                          new Date(row.departureTime).setHours(
-                            new Date(row.departureTime).getHours() - 5,
-                            new Date(row.departureTime).getMinutes() - 30,
-                          ),
-                        ).toLocaleString([], {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        })
-                      ) : column === 'Device Name' ? (
-                        // Show device name, or '--' if not available
-                        row.device?.name || '--'
-                      ) : (
-                        '--'
-                      )}
-                    </CTableDataCell>
-                  ))}
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow key={selectedDeviceName} >
+          ) : apiData?.finalDeviceDataByStopage?.length > 0 ? (
+            apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
+              <CTableRow key={row.id} className="custom-row">
                 <CTableDataCell
-                  colSpan={selectedColumns.length + 3}
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    color: "#6c757d",
-                    fontStyle: "italic",
-                    textAlign: "center",
-                    padding: "16px",
-                  }}
+                  style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
                 >
-                  No data available {selectedDeviceName}
+                  {rowIndex + 1}
                 </CTableDataCell>
+                <CTableDataCell
+                  style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                >
+                  {selectedDeviceName}
+                </CTableDataCell>
+                {/* Dynamically render table cells based on selected columns */}
+                {selectedColumns.map((column, index) => (
+                  <CTableDataCell
+                    key={index}
+                    style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                  >
+                    {column === 'Speed' ? (
+                      // Convert speed from m/s to km/h and format to 2 decimal places
+                      // (row.speed * 3.6).toFixed(2) + ' km/h'
+                      row.speed.toFixed(2) + ' km/h'
+                    ) : column === 'Ignition' ? (
+                      // Show 'ON' or 'OFF' based on ignition status
+                      row.ignition === true ? (
+                        <img
+                          src={ignitionOn}
+                          alt="on"
+                          width="40"
+                          height="40"
+                          style={{ marginRight: '10px' }}
+                        />
+                      ) : (
+                        <img
+                          src={ignitionOff}
+                          alt="off"
+                          width="40"
+                          height="40"
+                          style={{ marginRight: '10px' }}
+                        />
+                      )
+                    ) : column === 'Direction' ? (
+                      // Show direction (course)
+                      row.course < 90 && row.course > 0 ? (
+                        <>
+                          <img src={upRight} alt="North East" width="30" height="25" />
+                          <span>North East</span>
+                        </>
+                      ) : row.course > 90 && row.course < 180 ? (
+                        <>
+                          <img src={upLeft} alt="North West" width="30" height="25" />
+                          <span>North West</span>
+                        </>
+                      ) : row.course > 180 && row.course < 270 ? (
+                        <>
+                          <img src={downLeft} alt="South West" width="30" height="25" />
+                          <span>South West</span>
+                        </>
+                      ) : (
+                        <>
+                          <img src={downRight} alt="South East" width="30" height="25" />
+                          <span>South East</span>
+                        </>
+                      )
+                    ) : column === 'Location' ? (
+                      // Show location
+                      locationData[rowIndex] || 'Fetching location...'
+                    ) : column === 'Co-ordinates' ? (
+                      // Show location
+                      row.latitude && row.longitude ? (
+                        `${row.latitude}, ${row.longitude}`
+                      ) : (
+                        'Fetching location...'
+                      )
+                    ) : column === 'Start Time' ? (
+                      // Add 6 hours 30 minutes to arrivalTime
+                      new Date(
+                        new Date(row.arrivalTime).setHours(
+                          new Date(row.arrivalTime).getHours() - 5,
+                          new Date(row.arrivalTime).getMinutes() - 30,
+                        ),
+                      ).toLocaleString([], {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                      })
+                    ) : column === 'End Time' ? (
+                      // Add 6 hours 30 minutes to departureTime
+                      new Date(
+                        new Date(row.departureTime).setHours(
+                          new Date(row.departureTime).getHours() - 5,
+                          new Date(row.departureTime).getMinutes() - 30,
+                        ),
+                      ).toLocaleString([], {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                      })
+                    ) : column === 'Device Name' ? (
+                      // Show device name, or '--' if not available
+                      row.device?.name || '--'
+                    ) : (
+                      '--'
+                    )}
+                  </CTableDataCell>
+                ))}
               </CTableRow>
-
-            )}
+            ))
+          ) : (
+            <CTableRow key={selectedDeviceName}>
+              <CTableDataCell
+                colSpan={selectedColumns.length + 3}
+                style={{
+                  backgroundColor: '#f8f9fa',
+                  color: '#6c757d',
+                  fontStyle: 'italic',
+                  textAlign: 'center',
+                  padding: '16px',
+                }}
+              >
+                No data available {selectedDeviceName}
+              </CTableDataCell>
+            </CTableRow>
+          )}
         </CTableBody>
       </CTable>
-
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
@@ -680,7 +703,7 @@ const Stops = () => {
     Columns: [],
   })
   const [searchQuery, setSearchQuery] = useState('')
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState()
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
@@ -691,6 +714,7 @@ const Stops = () => {
     'Speed',
     'Direction',
     'Location',
+    'Co-ordinates',
     'End Time',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
@@ -699,8 +723,8 @@ const Stops = () => {
   const [apiData, setApiData] = useState() //data from api
 
   // Get the selected device name from the device list based on formData.Devices
-  const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
-  const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
+  const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
+  const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
 
   const getDevices = async (selectedGroup) => {
     const accessToken = Cookies.get('authToken')
@@ -726,8 +750,8 @@ const Stops = () => {
     }
   }
 
-  const getGroups = async (selectedUser = "") => {
-    setLoading(true);
+  const getGroups = async (selectedUser = '') => {
+    setLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
         headers: {
@@ -736,23 +760,23 @@ const Stops = () => {
       })
       if (response.data.groupsAssigned) {
         setGroups(response.data.groupsAssigned)
-        setLoading(false);
-        console.log("perticular user ke groups")
+        setLoading(false)
+        console.log('perticular user ke groups')
       } else if (response.data.groups) {
         setGroups(response.data.groups)
-        setLoading(false);
-        console.log("all groups")
+        setLoading(false)
+        console.log('all groups')
       }
     } catch (error) {
-      setLoading(false);
+      setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
     }
   }
   const getUser = async () => {
-    setLoading(true);
-    setGroups([]);
-    setDevices([]);
+    setLoading(true)
+    setGroups([])
+    setDevices([])
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
@@ -761,21 +785,20 @@ const Stops = () => {
       })
       if (response.data) {
         setUsers(response.data.users)
-        setLoading(false);
-        console.log("yaha tak thik hai")
+        setLoading(false)
+        console.log('yaha tak thik hai')
       }
     } catch (error) {
       console.error('Error fetching data:', error)
       throw error
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    getUser();
-    getGroups();
+    getUser()
+    getGroups()
   }, [])
-
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -787,7 +810,7 @@ const Stops = () => {
     }
   }
   const handleSubmit = async () => {
-    setStatusLoading(true);
+    setStatusLoading(true)
     console.log(formData)
     // Convert the dates to ISO format if they're provided
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : ''

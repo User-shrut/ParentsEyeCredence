@@ -98,7 +98,7 @@ const SearchTrip = ({
   const handleDropdownClick = (text) => {
     setButtonText(text) // Change button text based on the clicked item
     setDropdownOpen(false) // Close the dropdown after selection
-    handleSubmit(); // Submit form
+    handleSubmit() // Submit form
     setShowMap(true) // Show the map data
   }
 
@@ -248,9 +248,9 @@ const SearchTrip = ({
           value={
             formData.Devices
               ? {
-                value: formData.Devices,
-                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-              }
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -573,7 +573,14 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
                   height: '100px',
                 }}
               >
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
                   <Loader />
                 </div>
               </CTableDataCell>
@@ -581,10 +588,14 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
           ) : apiData?.finalTrip?.length > 0 ? (
             apiData.finalTrip.map((row, rowIndex) => (
               <CTableRow key={row.id || rowIndex} className="custom-row">
-                <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>
+                <CTableDataCell
+                  style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                >
                   {rowIndex + 1}
                 </CTableDataCell>
-                <CTableDataCell style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}>
+                <CTableDataCell
+                  style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                >
                   {row.name}
                 </CTableDataCell>
                 {/* Dynamically render table cells based on selected columns */}
@@ -600,7 +611,7 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
                             new Date(row.startTime).setHours(
                               new Date(row.startTime).getHours() - 5,
                               new Date(row.startTime).getMinutes() - 30,
-                            )
+                            ),
                           ).toLocaleString([], {
                             year: 'numeric',
                             month: '2-digit',
@@ -608,13 +619,13 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: false,
-                          });
+                          })
                         case 'End Time':
                           return new Date(
                             new Date(row.endTime).setHours(
                               new Date(row.endTime).getHours() - 5,
                               new Date(row.endTime).getMinutes() - 30,
-                            )
+                            ),
                           ).toLocaleString([], {
                             year: 'numeric',
                             month: '2-digit',
@@ -622,27 +633,35 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: false,
-                          });
+                          })
                         case 'Distance':
-                          return row.distance;
+                          return row.distance
                         case 'Total Distance':
-                          return row.totalDistance;
+                          return row.totalDistance
                         case 'Maximum Speed':
-                          return `${row.maxSpeed.toFixed(2)} km/h`;
+                          return `${row.maxSpeed.toFixed(2)} km/h`
                         case 'Average Speed':
-                          return `${row.avgSpeed.toFixed(2)} km/h`;
+                          return `${row.avgSpeed.toFixed(2)} km/h`
                         case 'Duration':
-                          return row.duration;
+                          return row.duration
                         case 'Start Address':
-                          return addressData[row.deviceId]?.startAddress || 'Fetching...';
+                          return addressData[row.deviceId]?.startAddress || 'Fetching...'
+                        case 'Start Co-ordinates':
+                          return row.startLatitude && row.startLongitude
+                            ? `${row.startLatitude}, ${row.startLongitude}`
+                            : 'Fetching Co-ordinates...'
                         case 'End Address':
-                          return addressData[row.deviceId]?.endAddress || 'Fetching...';
+                          return addressData[row.deviceId]?.endAddress || 'Fetching...'
+                        case 'End Co-ordinates':
+                          return row.endLatitude && row.endLongitude
+                            ? `${row.endLatitude}, ${row.endLongitude}`
+                            : 'Fetching Co-ordinates...'
                         case 'Driver':
-                          return row.driverName;
+                          return row.driverName
                         case 'Device Name':
-                          return row.device?.name || '--';
+                          return row.device?.name || '--'
                         default:
-                          return '--';
+                          return '--'
                       }
                     })()}
                   </CTableDataCell>
@@ -667,7 +686,6 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
           )}
         </CTableBody>
       </CTable>
-
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
@@ -704,12 +722,14 @@ const Trips = () => {
   const [columns] = useState([
     'Start Time',
     'Start Address',
+    'Start Co-ordinates',
     'Distance',
     'Average Speed',
     'Maximum Speed',
     'Total Distance',
     'End Time',
     'End Address',
+    'End Co-ordinates',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
   const [showMap, setShowMap] = useState(false) //show mapping data
@@ -718,8 +738,8 @@ const Trips = () => {
   const [apiData, setApiData] = useState() //data from api
 
   // Get the selected device name from the device list based on formData.Devices
-  const selectedDevice = devices.find(device => device.deviceId === formData.Devices);
-  const selectedDeviceName = selectedDevice ? selectedDevice.name : '';
+  const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
+  const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
 
   const getGroups = async (selectedUser = '') => {
     setLoading(true)
@@ -810,7 +830,7 @@ const Trips = () => {
   // };
 
   const handleSubmit = async () => {
-    setStatusLoading(true);
+    setStatusLoading(true)
     // Convert the dates to ISO format if they're provided
     const fromDate = formData.FromDate ? new Date(formData.FromDate).toISOString() : ''
     const toDate = formData.ToDate ? new Date(formData.ToDate).toISOString() : ''
@@ -833,7 +853,8 @@ const Trips = () => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-        });
+        },
+      )
       // console.log(response.data.deviceDataByTrips[0]);
 
       if (response.status == 200) {
@@ -849,7 +870,6 @@ const Trips = () => {
     } catch (error) {
       setStatusLoading(false)
       console.error('Error submitting form:', error)
-
     }
   }
 
