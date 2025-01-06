@@ -44,17 +44,16 @@ import { useSelector } from 'react-redux'
 import Select from 'react-select'
 import toast, { Toaster } from 'react-hot-toast'
 import { IoMdAdd } from 'react-icons/io'
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import { auto } from '@popperjs/core'
-import "../../../../src/app.css";
-
+import '../../../../src/app.css'
 
 const Geofences = () => {
-  const [deviceData , setDeviceData] = useState();
+  const [deviceData, setDeviceData] = useState()
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -65,25 +64,24 @@ const Geofences = () => {
   const [pageCount, setPageCount] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Select Geofence', 'Geofence Info']
-  const [filteredData, setFilteredData] = useState([]);
-
+  const [filteredData, setFilteredData] = useState([])
+  const [centerMap, setCenterMap] = useState({ latitude: 0, longitude: 0 })
 
   const handleEditModalClose = () => {
     setCurrentStep(0)
     setFormData({})
-    setEditModalOpen(false)}
-
+    setEditModalOpen(false)
+  }
 
   const handleAddModalClose = () => {
     setCurrentStep(0)
     setFormData({})
-    setAddModalOpen(false)}
+    setAddModalOpen(false)
+  }
 
-
-  const [deviceOptions, setDeviceOptions] = useState();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [deviceOptions, setDeviceOptions] = useState()
+  const [currentPage, setCurrentPage] = useState(1)
   // const [currentItemId, setCurrentItemId] = useState(null);
-
 
   // Go to the next step
   const handleNext = () => {
@@ -175,7 +173,6 @@ const Geofences = () => {
     console.log('abe yaar device data nh hai')
   }
 
-
   const [selectedDevices, setSelectedDevices] = useState([])
 
   const handleDeviceChange = (selected) => {
@@ -231,7 +228,6 @@ const Geofences = () => {
     }
   }
 
-
   const fetchDeviceData = async () => {
     const token = Cookies.get('authToken')
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
@@ -240,47 +236,50 @@ const Geofences = () => {
         'Content-Type': 'application/json',
       },
     })
-    if(response.data){
-      setDeviceData(response.data);
+    if (response.data) {
+      setDeviceData(response.data)
 
-      setDeviceOptions(response.data.devices?.map((device) => ({
-        value: device.deviceId,
-        label: device.name,
-      })))
+      setDeviceOptions(
+        response.data.devices?.map((device) => ({
+          value: device.deviceId,
+          label: device.name,
+        })),
+      )
     }
   }
 
   useEffect(() => {
-    fetchDeviceData();
-  },[])
+    fetchDeviceData()
+  }, [])
 
   // ##################### Filter data by search query #######################
   const filterGeofences = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
       const filtered = data.filter(
         (geofences) =>
-        //fixed app crash on geofence search
+          //fixed app crash on geofence search
 
-        (String(geofences?.name)?.toLowerCase().includes(searchQuery?.toLowerCase()))  ||
-        (String(geofences?.type)?.toLowerCase().includes(searchQuery?.toLowerCase()) )||
-        (String(geofences?.deviceIds)?.toLowerCase().includes(searchQuery?.toLowerCase()))
-      //     geofences.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      //     geofences.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      //     geofences.deviceIds.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
+          String(geofences?.name)?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+          String(geofences?.type)?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
+          String(geofences?.deviceIds)?.toLowerCase().includes(searchQuery?.toLowerCase()),
+        //     geofences.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        //     geofences.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        //     geofences.deviceIds.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredData(filtered)
+      console.log('Geofence detailsssssssssssssssss', filtered)
     }
-  };
+  }
 
   useEffect(() => {
     fetchGeofenceData()
   }, [limit, searchQuery])
 
   useEffect(() => {
-    filterGeofences(searchQuery);
-  }, [data, searchQuery]);
+    filterGeofences(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -322,7 +321,7 @@ const Geofences = () => {
         fetchGeofenceData()
         setFormData({})
         setPolygonCoords([])
-        setSelectedDevices([]);
+        setSelectedDevices([])
         setAddModalOpen(false)
       }
     } catch (error) {
@@ -381,9 +380,9 @@ const Geofences = () => {
   // ######################## Delete Geofence ################################
 
   const deleteGeofenceSubmit = async (item) => {
-    const confirmed = confirm('Do you want to delete this Geofence?');
+    const confirmed = confirm('Do you want to delete this Geofence?')
     // If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -407,45 +406,68 @@ const Geofences = () => {
     const dataToExport = filteredData.map((item, rowIndex) => {
       // Define row data for each item in the filteredData array
       const rowData = {
-        SN: rowIndex + 1,               // Serial Number
-        'Geofence Name': item.name || 'N/A',   // Name of the geofence
-        'Type': item.type || 'N/A',     // Type of the geofence
-        'Vehicles': (item.deviceIds.map( device => device.name).join( ) || "N/A"), // Number of vehicles
-      };
+        SN: rowIndex + 1, // Serial Number
+        'Geofence Name': item.name || 'N/A', // Name of the geofence
+        Type: item.type || 'N/A', // Type of the geofence
+        Vehicles: item.deviceIds.map((device) => device.name).join() || 'N/A', // Number of vehicles
+      }
 
-      return rowData; // Return row data in the correct format
-    });
+      return rowData // Return row data in the correct format
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport); // Convert data to worksheet format
-    const workbook = XLSX.utils.book_new(); // Create a new workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport) // Convert data to worksheet format
+    const workbook = XLSX.utils.book_new() // Create a new workbook
 
     // Append the worksheet to the workbook with the sheet name 'Geofence Data'
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Geofence Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Geofence Data')
 
     // Write the Excel file to the client's computer
-    XLSX.writeFile(workbook, 'geofence_data.xlsx');
-  };
-
+    XLSX.writeFile(workbook, 'geofence_data.xlsx')
+  }
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles'];
+    const doc = new jsPDF()
+    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles']
 
     // Extracting the relevant data for PDF export
     const tableRows = filteredData.map((item, index) => {
-      const vehicleCount = item.deviceIds.length || '0'; // Count of vehicles
+      const vehicleCount = item.deviceIds.length || '0' // Count of vehicles
       return [
         index + 1, // Serial Number
         item.name, // Geofence Name
         item.type, // Type
-        (item.deviceIds.map( device => device.name).join( ) || "N/A")
-      ];
-    });
+        item.deviceIds.map((device) => device.name).join() || 'N/A',
+      ]
+    })
 
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
-    doc.save('geofence_data.pdf');
-  };
+    doc.autoTable(tableColumn, tableRows, { startY: 20 })
+    doc.save('geofence_data.pdf')
+  }
+
+  function calculateCentroid(polygon) {
+    let totalLatitude = 0
+    let totalLongitude = 0
+    const numVertices = polygon.length
+
+    polygon.forEach((point) => {
+      totalLatitude += point.lat
+      totalLongitude += point.lng
+    })
+
+    return {
+      latitude: totalLatitude / numVertices,
+      longitude: totalLongitude / numVertices,
+    }
+  }
+
+  const handleRowClick = (polygon) => {
+    console.log('this is polygon', polygon)
+    const centroid = calculateCentroid(polygon)
+    console.log('this is centroid', centroid)
+
+    setCenterMap(centroid)
+  }
 
   //  ###############################################################
 
@@ -490,30 +512,38 @@ const Geofences = () => {
 
       <div className="row">
         <div className="col-12 col-md-6 position-relative">
-          <TableContainer  component={Paper}
-              sx={{
-                height: 'auto', // Set the desired height
-                overflowX: 'auto', // Enable horizontal scrollbar
-                overflowY: 'auto', // Enable vertical scrollbar if needed
-                marginBottom: '10px',
-                borderRadius: '10px',
-                border: '1px solid black'
-              }}>
-
-            <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
+          <TableContainer
+            component={Paper}
+            sx={{
+              height: 'auto', // Set the desired height
+              overflowX: 'auto', // Enable horizontal scrollbar
+              overflowY: 'auto', // Enable vertical scrollbar if needed
+              marginBottom: '10px',
+              borderRadius: '10px',
+              border: '1px solid black',
+            }}
+          >
+            <CTable
+              style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+              bordered
+              align="middle"
+              className="mb-2 border min-vh-25 rounded-top-3"
+              hover
+              responsive
+            >
               <CTableHead className="text-nowrap">
                 <CTableRow>
-                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                  <strong>SN</strong>
+                  <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                    <strong>SN</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className="ps-3 text-center bg-body-secondary text-center sr-no table-cell">
-                   <strong>Geofence Name</strong>
+                    <strong>Geofence Name</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
                     <strong>Type</strong>
                   </CTableHeaderCell>
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                   <strong>Vehicles</strong>
+                    <strong>Vehicles</strong>
                   </CTableHeaderCell>
 
                   <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
@@ -543,16 +573,39 @@ const Geofences = () => {
                   </>
                 ) : filteredData.length > 0 ? (
                   filteredData?.map((item, index) => (
-                    <CTableRow key={index}>
-                      <CTableDataCell className=" text-center"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index+1}</CTableDataCell>
-                      <CTableDataCell className=" text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.name}</CTableDataCell>
-                      <CTableDataCell className="text-center "  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.type}</CTableDataCell>
-                      <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}  >
+                    <CTableRow
+                      key={index}
+                      onClick={() => {
+                        handleRowClick(item.area)
+                      }}
+                    >
+                      <CTableDataCell
+                        className=" text-center"
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
+                        {(currentPage - 1) * limit + index + 1}
+                      </CTableDataCell>
+                      <CTableDataCell
+                        className=" text-center "
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
+                        {item.name}
+                      </CTableDataCell>
+                      <CTableDataCell
+                        className="text-center "
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
+                        {item.type}
+                      </CTableDataCell>
+                      <CTableDataCell
+                        className="text-center"
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
                         <CFormSelect
                           id="geofence"
                           value=""
                           className=" text-center border-2 "
-                          style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2",}}
+                          style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
                         >
                           <option value="">{item.deviceIds.length || '0'}</option>
                           {Array.isArray(item.deviceIds) &&
@@ -565,8 +618,11 @@ const Geofences = () => {
                       </CTableDataCell>
                       <CTableDataCell
                         className="text-center d-flex "
-                        style={{ justifyContent: 'center', alignItems: 'center' , backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
-
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                        }}
                       >
                         <IconButton aria-label="edit" onClick={() => handleEditGeofence(item)}>
                           <RiEdit2Fill
@@ -615,11 +671,10 @@ const Geofences = () => {
               style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
             >
               <CIcon icon={cilSettings} />
-
             </CDropdownToggle>
             <CDropdownMenu>
-              <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-              <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+              <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+              <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
           {pageCount > 1 && (
@@ -644,7 +699,9 @@ const Geofences = () => {
           )}
         </div>
         <div className="col-12 col-md-6">
-          <div style={{ flex: 1 }}><Gmap data={data} /></div>
+          <div style={{ flex: 1 }}>
+            <Gmap data={data} centerMap={centerMap} />
+          </div>
         </div>
       </div>
 

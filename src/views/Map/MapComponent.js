@@ -38,6 +38,10 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
     console.log('trcak clicked')
     navigate(`/salesman/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
   }
+  const handleClickOnHistoryTrack = (vehicle) => {
+    console.log('trcak clicked')
+    navigate(`/history/${vehicle.deviceId}/${vehicle.category}/${vehicle.name}`)
+  }
 
   useEffect(() => {
     console.log('filtered vehicle', filteredVehicles)
@@ -81,18 +85,8 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
               icon={iconImage(vehicle.category, vehicle)}
             >
               <Popup>
-                <div
-                  className="toolTip"
-                  style={{
-                    display: 'flex',
-                    fontSize: '.90rem',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '3px',
-                  }}
-                >
-                  <span style={{ textAlign: 'center', fontSize: '1.2rem' }}>
+                <div className="toolTip">
+                  <span style={{ textAlign: 'center', fontSize: '0.9rem' }}>
                     <strong> {vehicle.name}</strong>
                   </span>
                   <hr
@@ -106,12 +100,13 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
                     }}
                   />
                   <div className="toolTipContent">
-                    <span>
+                  <div>
                       <strong>
-                        <IoLocationSharp size={25} color="#FF7A00" />
+                        <RxLapTimer size={17} color="#FF7A00" />
                       </strong>{' '}
-                      {newAddress[vehicle.deviceId] || 'Loading...'}
-                    </span>
+                      {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
+                    </div>
+
                     <div
                       style={{
                         display: 'flex',
@@ -122,14 +117,14 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
                     >
                       <div>
                         <strong>
-                          <IoMdSpeedometer size={25} color="#FF7A00" />
+                          <IoMdSpeedometer size={17} color="#FF7A00" />
                         </strong>{' '}
                         {vehicle.speed.toFixed(2)} km/h{' '}
                       </div>
                     </div>
                     <div>
                       <strong>
-                        <HiOutlineStatusOnline size={25} color="#FF7A00" />
+                        <HiOutlineStatusOnline size={17} color="#FF7A00" />
                       </strong>{' '}
                       {(() => {
                         const sp = vehicle.speed
@@ -150,18 +145,19 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
                         }
                       })()}
                     </div>
-                    <div>
+                    <span>
                       <strong>
-                        <RxLapTimer size={25} color="#FF7A00" />
+                        <IoLocationSharp size={17} color="#FF7A00" />
                       </strong>{' '}
-                      {dayjs(vehicle.lastUpdate).format('YYYY-MM-DD HH:mm')}
-                    </div>
+                      {newAddress[vehicle.deviceId] || 'Loading...'}
+                    </span>
                     <div
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '10px',
+                        width:'100%',
                       }}
                     >
                       <button
@@ -169,12 +165,24 @@ const MainMap = ({ filteredVehicles, mapCenter, markerRefs }) => {
                         style={{
                           width: '100%',
                           color: 'white',
-                          fontSize: '1rem',
+                          fontSize: '0.6rem',
                           backgroundColor: '#000000',
                         }}
                         onClick={() => handleClickOnTrack(vehicle)}
                       >
                         Live Track
+                      </button>
+                      <button
+                        className="btn"
+                        style={{
+                          width: '100%',
+                          color: 'white',
+                          fontSize: '0.6rem',
+                          backgroundColor: '#000000',
+                        }}
+                        onClick={() => handleClickOnHistoryTrack(vehicle)}
+                      >
+                        History
                       </button>
                     </div>
                   </div>

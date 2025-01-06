@@ -1,9 +1,9 @@
 // import React, { useState, useRef, useEffect } from 'react';
 // import { GoogleMap, LoadScript, Marker, Polyline, Polygon } from '@react-google-maps/api';
 // import IconButton from '@mui/material/IconButton';
-// import DeleteIcon from '@mui/icons-material/Delete';  
-// import CropDinIcon from '@mui/icons-material/CropDin'; 
-// import PolylineIcon from '@mui/icons-material/Polyline'; 
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import CropDinIcon from '@mui/icons-material/CropDin';
+// import PolylineIcon from '@mui/icons-material/Polyline';
 // import { CTooltip } from '@coreui/react';
 
 // const containerStyle = {
@@ -119,17 +119,17 @@
 //           >
 //             <Marker position={center} />
 //             {path.length > 0 && (
-//               <Polyline 
-//                 path={path} 
-//                 options={{ 
-//                   strokeColor: '#FF0000', 
-//                   strokeOpacity: 0.8, 
-//                   strokeWeight: 2 
-//                 }} 
+//               <Polyline
+//                 path={path}
+//                 options={{
+//                   strokeColor: '#FF0000',
+//                   strokeOpacity: 0.8,
+//                   strokeWeight: 2
+//                 }}
 //               />
 //             )}
 //             {polygonPath.length > 0 && (
-//               <Polygon 
+//               <Polygon
 //                 path={polygonPath}
 //                 options={{
 //                   fillColor: '#FF0000',
@@ -143,23 +143,23 @@
 //           </GoogleMap>
 
 //           {/* Fullscreen Toggle Button */}
-//           <button 
-//             onClick={toggleFullscreen} 
+//           <button
+//             onClick={toggleFullscreen}
 //             style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'skyblue', zIndex: 1000 }}
 //           >
 //             {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
 //           </button>
 
 //           {/* LAT/LNG Form */}
-//           <button 
-//             onClick={toggleInputs}  
+//           <button
+//             onClick={toggleInputs}
 //             style={{ position: 'absolute', top: '50px', left: '10px', backgroundColor: 'skyblue', zIndex: 1000 }}
 //           >
 //             {showInputs ? 'LAT/LNG' : 'Click On LAT/LNG'}
 //           </button>
 //           {showInputs && (
-//             <form 
-//               onSubmit={handleSubmit} 
+//             <form
+//               onSubmit={handleSubmit}
 //               style={{
 //                 position: 'absolute',
 //                 top: '90px',
@@ -190,8 +190,8 @@
 
 //           {/* Icon buttons */}
 //           <CTooltip content='Line'>
-//             <IconButton 
-//               style={{ position: 'absolute', top: '60px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+//             <IconButton
+//               style={{ position: 'absolute', top: '60px', right: '10px', backgroundColor: 'white', zIndex: 1000 }}
 //               onClick={togglePolyline}
 //               color={isPolylineActive ? 'primary' : 'default'}
 //             >
@@ -200,8 +200,8 @@
 //           </CTooltip>
 
 //           <CTooltip content='Polygon'>
-//             <IconButton 
-//               style={{ position: 'absolute', top: '103px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+//             <IconButton
+//               style={{ position: 'absolute', top: '103px', right: '10px', backgroundColor: 'white', zIndex: 1000 }}
 //               onClick={togglePolygon}
 //               color={isPolygonActive ? 'primary' : 'default'}
 //             >
@@ -210,8 +210,8 @@
 //           </CTooltip>
 
 //           <CTooltip content='Delete'>
-//             <IconButton 
-//               style={{ position: 'absolute', top: '147px', right: '10px', backgroundColor: 'white', zIndex: 1000 }} 
+//             <IconButton
+//               style={{ position: 'absolute', top: '147px', right: '10px', backgroundColor: 'white', zIndex: 1000 }}
 //               onClick={clearAll}
 //             >
 //               <DeleteIcon />
@@ -225,7 +225,6 @@
 // };
 
 // export default Gmap;
-
 
 // For latitude and longitude show in console
 
@@ -278,7 +277,7 @@
 //   const mapContainerRef = useRef(null);
 
 //   console.log(data)
-//   const geofences = data; 
+//   const geofences = data;
 //   console.log(geofences)
 
 //   const toggleFullscreen = () => {
@@ -348,8 +347,6 @@
 
 // export default Gmap;
 
-
-
 // import React, { useState, useRef, useEffect } from 'react';
 // import { GoogleMap, LoadScript, Polygon, useLoadScript } from '@react-google-maps/api';
 // import IconButton from '@mui/material/IconButton';
@@ -377,9 +374,6 @@
 // };
 
 // const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik';
-
-
-
 
 // const Gmap = ({ data }) => {
 //   const { isLoaded, loadError } = useLoadScript({
@@ -441,7 +435,6 @@
 
 //           </GoogleMap>
 
-
 //         </div>
 //       </LoadScript>
 //     </div>
@@ -452,14 +445,14 @@
 
 // ###################################### Old Code ############################################################### //
 
-import React, { useState, useRef, useEffect } from 'react';
-import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CropDinIcon from '@mui/icons-material/CropDin';
-import PolylineIcon from '@mui/icons-material/Polyline';
-import { CTooltip } from '@coreui/react';
-import { Marker } from 'react-leaflet';
+import React, { useState, useRef, useEffect } from 'react'
+import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api'
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
+import CropDinIcon from '@mui/icons-material/CropDin'
+import PolylineIcon from '@mui/icons-material/Polyline'
+import { CTooltip } from '@coreui/react'
+import { Marker } from 'react-leaflet'
 
 const containerStyle = {
   width: '100%',
@@ -467,7 +460,7 @@ const containerStyle = {
   borderRadius: '10px',
   overflow: 'hidden',
   position: 'relative',
-};
+}
 
 const fullscreenContainerStyle = {
   width: '100%',
@@ -478,56 +471,66 @@ const fullscreenContainerStyle = {
   left: 0,
   zIndex: 1000,
   backgroundColor: '#fff',
-};
+}
 
-const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik';
+const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik'
 
-const markerPosition = { lat: 37.7749, lng: -122.4194 };
+const markerPosition = { lat: 37.7749, lng: -122.4194 }
 
-const Gmap = ({ data }) => {
+const Gmap = ({ data, centerMap }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
-  });
+  })
+
+  const [zoom, setZoom] = useState(14);
 
   const [center, setCenter] = useState({
     lat: 21.1285453,
     lng: 79.1036561,
-  });
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const mapContainerRef = useRef(null);
+  })
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const mapContainerRef = useRef(null)
 
   const geofences = data?.filter(
-    (geofence) => geofence.area.length > 0 && geofence.area.every((point) => point.lat && point.lng)
-  );
-  console.log('geofence hai ye ', geofences);
+    (geofence) =>
+      geofence.area.length > 0 && geofence.area.every((point) => point.lat && point.lng),
+  )
+  console.log('geofence hai ye ', geofences)
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      mapContainerRef.current.requestFullscreen();
+      mapContainerRef.current.requestFullscreen()
     } else {
-      document.exitFullscreen();
+      document.exitFullscreen()
     }
-  };
+  }
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+      setIsFullscreen(!!document.fullscreenElement)
+    }
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (centerMap?.latitude !== 0 && centerMap?.longitude !== 0) {
+      setCenter({ lat: centerMap.latitude, lng: centerMap.longitude })
+      setZoom(18) // Set zoom level to 20
+    }
+  }, [centerMap])
 
   // Handle loading and error states
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading...</div>;
+  if (loadError) return <div>Error loading maps</div>
+  if (!isLoaded) return <div>Loading...</div>
 
   return (
     <div ref={mapContainerRef} style={containerStyle}>
       <div style={{ position: 'relative' }}>
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
+        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={zoom}>
           {geofences && geofences.length > 0 ? (
             geofences.map((geofence, index) => (
               <Polygon
@@ -550,15 +553,7 @@ const Gmap = ({ data }) => {
         </GoogleMap>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Gmap;
-
-
-
-
-
-
-
-
+export default Gmap

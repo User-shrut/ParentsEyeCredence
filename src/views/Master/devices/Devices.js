@@ -53,7 +53,7 @@ import { cilSettings } from '@coreui/icons'
 import AddDeviceModal from './AddDeviceForm'
 import EditDeviceModal from './EditDeviceForm'
 import '../../../../src/app.css'
-import { getDevices, getGroups, getUsers } from '../../dashboard/dashApi'
+import { getDevices, getGroups, getUsers, Selector } from '../../dashboard/dashApi'
 import { default as Sselect } from 'react-select'
 import './Devices.css'
 
@@ -1033,6 +1033,7 @@ const Devices = () => {
             placeholder="Select a Group"
           />
         </div>
+        <Selector setFilteredData={setFilteredData} filteredData={filteredData} />
 
         <div className="d-flex">
           <div className="me-3 d-none d-md-block">

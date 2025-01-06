@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 import axios from 'axios'
 import useVehicleTracker from './useVehicleTracker'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import location from 'src/assets/location.png'
 import { duration } from 'dayjs' // Importing all vehicle icons
 
@@ -16,7 +16,12 @@ import Draggable from 'react-draggable'
 import '../../Reports/style/remove-gutter.css'
 import useGetVehicleIcon from '../../Reports/HistoryReport/useGetVehicleIcon'
 import useVehicleImage from '../../Reports/HistoryReport/useVehicleImage'
+import { IoMdSpeedometer } from 'react-icons/io'
+import { HiOutlineStatusOnline } from 'react-icons/hi'
+import { RxLapTimer } from 'react-icons/rx'
+import { IoLocationSharp } from 'react-icons/io5'
 
+import dayjs from 'dayjs'
 const MapController = ({ individualSalesMan, previousPosition, setPath }) => {
   const map = useMap()
   const animationRef = useRef(null)
@@ -111,9 +116,13 @@ const IndividualTrack = () => {
       fetchAddress()
     }
   }, [individualSalesMan])
-
+  const navigate = useNavigate()
   const iconImage = (item, category) => useGetVehicleIcon(item, category)
   const vehicleImage = (category, item) => useVehicleImage(category, item)
+  const handleClickOnTrack = (vehicle) => {
+    console.log('trcak clicked')
+    navigate(`/history/${deviceId}/${category}/${name}`)
+  }
 
   return (
     <>
@@ -144,6 +153,7 @@ const IndividualTrack = () => {
                           {name ? name : 'User Name'}
                         </h6>
                         <p>{address ? `${address}` : 'Address of User'}</p>
+                        <p>{individualSalesMan?.lastUpdate}</p>
                       </div>
                       <div className="col-5">
                         <img
@@ -184,46 +194,6 @@ const IndividualTrack = () => {
                         </p>
                       </div>
                     </div>
-                    {/* <div className="name">
-                      <div>
-                        <h6>{name ? name : 'User Name'}</h6>
-                        <p>{address ? `${address}` : 'Address of User'}</p>
-                      </div>
-                      <div className="nameImage">
-                        <img
-                          src={selectImage(
-                            category,
-                            individualSalesMan?.speed,
-                            individualSalesMan?.attributes?.ignition,
-                          )}
-                          className="nimg upperdata"
-                          alt="vehicle"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="parameters">
-                      <div className="col">
-                        <strong>Ignition</strong>
-                        {` : ${individualSalesMan?.attributes?.ignition ? 'On' : 'Off'}`}
-                      </div>
-                      <div className="col">
-                        <strong>Speed</strong>
-                        {` : ${Math.round(individualSalesMan?.speed)} kmph`}
-                      </div>
-                      <div className="col">
-                        <strong>Latitude</strong>
-                        {` : ${individualSalesMan?.latitude}`}
-                      </div>
-                      <div className="col">
-                        <strong>Longitude</strong>
-                        {` : ${individualSalesMan?.longitude}`}
-                      </div>
-                      <div className="col">
-                        <strong>Category</strong>
-                        {` : ${category}`}
-                      </div>
-                    </div> */}
                   </CCardBody>
                 </CCard>
               </Draggable>
@@ -234,8 +204,96 @@ const IndividualTrack = () => {
                   duration={2000}
                 >
                   <Popup>
-                    A pretty marker.
-                    <br /> Easily customizable.
+                    <div className="toolTip">
+                      <span style={{ textAlign: 'center', fontSize: '0.9rem' }}>
+                        <strong> {name ? name : 'User Name'}</strong>
+                      </span>
+                      <hr
+                        style={{
+                          width: '100%',
+                          height: '3px',
+                          marginBottom: '0px',
+                          marginTop: '5px',
+                          borderRadius: '5px',
+                          backgroundColor: '#000',
+                        }}
+                      />
+                      <div className="toolTipContent">
+                        <div>
+                          <strong>
+                            <RxLapTimer size={17} color="#FF7A00" />
+                          </strong>{' '}
+                          {dayjs(individualSalesMan.lastUpdate).format('YYYY-MM-DD HH:mm')}
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'start',
+                            gap: '10px',
+                          }}
+                        >
+                          <div>
+                            <strong>
+                              <IoMdSpeedometer size={17} color="#FF7A00" />
+                            </strong>{' '}
+                            {individualSalesMan.speed.toFixed(2)} km/h{' '}
+                          </div>
+                        </div>
+                        <div>
+                          <strong>
+                            <HiOutlineStatusOnline size={17} color="#FF7A00" />
+                          </strong>{' '}
+                          {(() => {
+                            const sp = individualSalesMan.speed
+                            const ig = individualSalesMan.attributes.ignition
+                            if (sp < 1 && ig == false) {
+                              return 'Stoped'
+                            }
+                            if (sp < 2 && ig == false) {
+                              return 'Idle'
+                            }
+                            if (sp > 2 && sp < 60 && ig == true) {
+                              return 'Running'
+                            }
+                            if (sp > 60 && ig == true) {
+                              return 'Over Speed'
+                            } else {
+                              return 'Inactive'
+                            }
+                          })()}
+                        </div>
+
+                        <span>
+                          <strong>
+                            <IoLocationSharp size={17} color="#FF7A00" />
+                          </strong>{' '}
+                          {'Loading...'}
+                        </span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                          }}
+                        >
+                          <button
+                            className="btn"
+                            style={{
+                              width: '100%',
+                              color: 'white',
+                              fontSize: '0.8rem',
+                              backgroundColor: '#000000',
+                            }}
+                            onClick={() => handleClickOnTrack(individualSalesMan)}
+                          >
+                            View History
+                          </button>
+                        </div>
+                      </div>
+                      {/* <strong></strong> {device.lastUpdate} km/h */}
+                    </div>
                   </Popup>
                 </ReactLeafletDriftMarker>
               )}
