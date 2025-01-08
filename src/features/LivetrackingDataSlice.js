@@ -222,8 +222,19 @@ const liveFeaturesSlice = createSlice({
 
 // WebSocket event listeners
 export const initializeSocket = (credentials) => (dispatch) => {
-  const convertedCredentialsIntoObject = JSON.parse(credentials)
-  console.log('convertedCredentialsIntoObjectttttttttttttttttttt', convertedCredentialsIntoObject)
+  if (!credentials) {
+    console.error('initializeSocket: credentials are undefined or null');
+    return;
+  }
+
+  let convertedCredentialsIntoObject;
+  try {
+    convertedCredentialsIntoObject = JSON.parse(credentials);
+    console.log('Converted credentials:', convertedCredentialsIntoObject);
+  } catch (error) {
+    console.error('Failed to parse credentials:', error.message);
+    return;
+  }
 
   // Handle connection event
   socket.on('connect', () => {
@@ -238,17 +249,20 @@ export const initializeSocket = (credentials) => (dispatch) => {
   // Listen for live vehicle data
   socket.emit('credentials', convertedCredentialsIntoObject);
   socket.on('all device data', (data) => {
-    dispatch(liveFeaturesSlice.actions.setVehicles(data))
-  })
+    console.log(data);
+    dispatch(liveFeaturesSlice.actions.setVehicles(data));
+  });
 
   // Listen for errors
   socket.on('error', (error) => {
-    dispatch(liveFeaturesSlice.actions.setError(error))
-  })
+    console.error('Socket error:', error);
+    dispatch(liveFeaturesSlice.actions.setError(error));
+  });
 
   // Example of emitting an event to the server
   socket.emit('client-message', { message: 'Hello from client!' });
 };
+
 
 
 // Export the actions
