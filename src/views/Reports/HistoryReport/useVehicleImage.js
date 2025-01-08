@@ -42,6 +42,7 @@ import autoRed from '../../../assets/vehicleList/Auto/autoRed.svg'
 import autoYellow from '../../../assets/vehicleList/Auto/autoYellow.svg'
 import autoOrange from '../../../assets/vehicleList/Auto/autoOrange.svg'
 import autoGray from '../../../assets/vehicleList/Auto/autoGray.svg'
+import dayjs from 'dayjs'
 
 // Image map to organize vehicle type and color associations
 const imageMap = {
@@ -123,7 +124,13 @@ const getCategory = (category) => {
       return 'car' // Default case
   }
 }
+const maxDiffInHours = 35
 
+function timeDiffIsLessThan35Hours(lastUpdate) {
+  const lastUpdateTime = dayjs(lastUpdate)
+  const now = dayjs()
+  return now.diff(lastUpdateTime, 'hour') <= maxDiffInHours
+}
 const useVehicleImage = (category, item) => {
   const cate = getCategory(category?.toLowerCase()) // Assuming getCategory is a helper function
 
@@ -137,14 +144,16 @@ const useVehicleImage = (category, item) => {
     const speed = item.speed || 0
 
     // Determine the appropriate image based on ignition and speed
-    if (!ignition && speed < 1) {
+    if (!ignition && speed < 1 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = images.red
-    } else if (ignition && speed > 2 && speed < 60) {
+    } else if (ignition && speed > 2 && speed < 60 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = images.green
-    } else if (ignition && speed < 2) {
+    } else if (ignition && speed < 2 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = images.yellow
-    } else if (ignition && speed > 60) {
+    } else if (ignition && speed > 60 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = images.orange
+    } else if (!timeDiffIsLessThan35Hours(item.lastUpdate)) {
+      image = images.gray
     }
   }
 

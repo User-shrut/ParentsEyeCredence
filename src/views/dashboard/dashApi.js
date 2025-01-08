@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import Select, { components } from 'react-select'
 import Cookies from 'js-cookie'
 import axios from 'axios'
+import dayjs from 'dayjs'
 
 const accessToken = Cookies.get('authToken') // Replace with your token
 
@@ -49,17 +50,33 @@ export const Selector = ({ setFilteredData, filteredData, fillDevices }) => {
     value: device.deviceId,
   }))
 
-  // Handle changes in selection and apply the filter automatically
-  const handleChange = (selected) => {
-    setSelectedOptions(selected)
+  // Add a "Select All" option
+  const selectAllOption = {
+    label: 'Select All',
+    value: 'select_all',
+  }
 
-    if (selected && selected.length > 0) {
-      const selectedDeviceIds = selected.map((option) => option.value)
-      const filtered = fillDevices.filter((device) => selectedDeviceIds.includes(device.deviceId))
-      setFilteredData(filtered)
+  const handleChange = (selected) => {
+    if (selected.some((option) => option.value === 'select_all')) {
+      // If "Select All" is selected, select all options
+      if (selectedOptions.length === deviceOptions.length) {
+        setSelectedOptions([])
+        setFilteredData(filteredData) // Show all data
+      } else {
+        setSelectedOptions(deviceOptions)
+        setFilteredData(fillDevices) // Filter to all devices
+      }
     } else {
-      // If no selection, show all data
-      setFilteredData(filteredData)
+      // Otherwise, update the selected options and filtered data
+      setSelectedOptions(selected)
+
+      if (selected && selected.length > 0) {
+        const selectedDeviceIds = selected.map((option) => option.value)
+        const filtered = fillDevices.filter((device) => selectedDeviceIds.includes(device.deviceId))
+        setFilteredData(filtered)
+      } else {
+        setFilteredData(filteredData) // Show all data
+      }
     }
   }
 
@@ -67,7 +84,7 @@ export const Selector = ({ setFilteredData, filteredData, fillDevices }) => {
     <div>
       <Select
         className="particularFilter"
-        options={deviceOptions} // Always uses the original filteredData for options
+        options={[selectAllOption, ...deviceOptions]} // Include "Select All" at the top
         isMulti
         value={selectedOptions}
         onChange={handleChange}
@@ -86,4 +103,29 @@ export const Selector = ({ setFilteredData, filteredData, fillDevices }) => {
       />
     </div>
   )
+}
+
+export function getTimeDifference(timestamp) {
+  const now = dayjs()
+  const time = dayjs(timestamp)
+  const diffInMilliseconds = now.diff(time) // Difference in milliseconds
+
+  // Calculate days, hours, and minutes
+  const days = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diffInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diffInMilliseconds % (1000 * 60 * 60)) / (1000 * 60))
+
+  // Format the difference in a human-readable format
+  let timeDifference = ''
+  if (days >= 0) {
+    timeDifference += `${days} d-`
+  }
+  if (hours >= 0) {
+    timeDifference += `${hours} hrs-`
+  }
+  if (minutes >= 0) {
+    timeDifference += `${minutes} min`
+  }
+
+  return timeDifference.trim() || 'Just now'
 }

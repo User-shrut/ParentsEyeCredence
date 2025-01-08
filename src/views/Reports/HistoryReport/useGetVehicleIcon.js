@@ -35,6 +35,7 @@ import truckyellowSvg from '../../../assets/AllTopViewVehicle/Truck-Y.svg'
 import truckgreenSvg from '../../../assets/AllTopViewVehicle/Truck-G.svg'
 import truckorangeSvg from '../../../assets/AllTopViewVehicle/Truck-O.svg'
 import truckgraySvg from '../../../assets/AllTopViewVehicle/Truck-Grey.svg'
+import dayjs from 'dayjs'
 
 const mapIcons = {
   bus: {
@@ -107,6 +108,14 @@ const getCategory = (category) => {
       return 'car' // Default case
   }
 }
+
+const maxDiffInHours = 35
+
+function timeDiffIsLessThan35Hours(lastUpdate) {
+  const lastUpdateTime = dayjs(lastUpdate)
+  const now = dayjs()
+  return now.diff(lastUpdateTime, 'hour') <= maxDiffInHours
+}
 const useGetVehicleIcon = (vehicle, cat) => {
   const speed = vehicle?.speed
   const ignition = vehicle?.attributes?.ignition
@@ -118,16 +127,22 @@ const useGetVehicleIcon = (vehicle, cat) => {
 
   // Determine the icon URL based on speed and ignition status
   let iconUrl
-  if (speed <= 2.0 && ignition) {
+  if (speed <= 2.0 && ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+    //idle
     iconUrl = selectedCategory['yellow']
-  } else if (speed > 2.0 && speed < 60 && ignition) {
-    iconUrl = selectedCategory['green']
-  } else if (speed > 60.0 && ignition) {
-    iconUrl = selectedCategory['orange']
-  } else if (speed <= 1.0 && !ignition) {
-    iconUrl = selectedCategory['red']
-  } else {
-    iconUrl = selectedCategory['gray']
+  } else if (
+    speed > 2.0 &&
+    speed < 60 &&
+    ignition &&
+    timeDiffIsLessThan35Hours(vehicle.lastUpdate)
+  ) {
+    iconUrl = selectedCategory['green'] // running
+  } else if (speed > 60.0 && ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+    iconUrl = selectedCategory['orange'] // overspeed
+  } else if (speed <= 1.0 && !ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+    iconUrl = selectedCategory['red'] // stop
+  } else if (!timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+    iconUrl = selectedCategory['gray'] // inactive
   }
 
   return L.divIcon({

@@ -1,16 +1,17 @@
-#group-select, #user-select{
+#group-select,
+#user-select {
   min-width: 14rem !important;
 }
 
-.fiterDevices{
+.fiterDevices {
   display: flex;
   gap: 10px;
   flex-direction: row;
   margin-left: 11% !important;
-  margin-right: 10px!important;
+  margin-right: 10px !important;
 }
 
-.particularFilter{
+.particularFilter {
   min-width: 14rem !important;
 }
 .refresh {
@@ -19,7 +20,19 @@
   font-size: 1.2rem;
   margin-left: 15px !important;
 }
-.refreshIcon
-{
+.refreshIcon {
   margin-bottom: 7px !important;
 }
+.css-1dyz3mf {
+  display: flex !important;
+  height: 2rem !important;
+  flex-direction: column !important;
+  overflow-x: scroll !important;
+  width: 10rem !important;
+  scrollbar-width: none; /* For Firefox */
+}
+
+.css-1dyz3mf::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
+}
+
