@@ -187,10 +187,15 @@
 // ##################################### New Alerts With address ################################################### //
 
 import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
   CDropdown,
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CRow,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -410,7 +415,7 @@ const Alerts = () => {
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <div className="d-flex justify-content-between mb-2">
         <div>
-          <h2>Alerts/Events</h2>
+          {/* <h2>Alerts/Events</h2> */}
         </div>
         <div className="d-flex">
           {/* Filteration */}
@@ -448,204 +453,224 @@ const Alerts = () => {
         </div>
       </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto',
-          overflowX: 'auto',
-          overflowY: 'auto',
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black',
-        }}
-      >
-        <CTable
-          style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
-          bordered
-          align="middle"
-          className="mb-2 border min-vh-25 rounded-top-3"
-          hover
-          responsive
-        >
-          <CTableHead className="text-nowrap">
-            <CTableRow className="bg-body-tertiary">
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                SN
-              </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                Device Name
-              </CTableHeaderCell>
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                Notification
-              </CTableHeaderCell>
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                Location
-              </CTableHeaderCell>
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                Message
-              </CTableHeaderCell>
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                Date/Time
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {loading ? (
-              <CTableRow>
-                <CTableDataCell colSpan="8" className="text-center">
-                  <div className="text-nowrap mb-2 text-center w-">
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ) : paginatedData.length > 0 ? (
-              paginatedData
-                .filter((item) => {
-                  const query = searchQuery.toLowerCase()
-                  return (
-                    item.name?.toLowerCase().includes(query) || // Filter by name
-                    item.type?.toLowerCase().includes(query) || // Filter by type
-                    item.address?.toLowerCase().includes(query) || // Filter by address
-                    item.message?.toLowerCase().includes(query) // Filter by message
-                  )
-                })
-                ?.map((item, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center ps-4"
-                    >
-                      {(currentPage - 1) * rowsPerPage + index + 1}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center ps-4"
-                    >
-                      {item.name}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center"
-                    >
-                      {item.type}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center"
-                    >
-                      {item.address || 'Fetching...'}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center"
-                    >
-                      {item.message}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      className="text-center pe-4"
-                    >
-                      {' '}
-                      {new Date(item.createdAt).toLocaleString('en-IN', {
-                        timeZone: 'Asia/Kolkata',
-                        hour12: false, // Use 24-hour format
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                      })}
-                    </CTableDataCell>
-                  </CTableRow>
-                ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan="8" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
-                  >
-                    <p className="mb-0 fw-bold">"No Alerts are Available"</p>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center text-white" style={{ color: 'white' }}>
+              <strong>Alerts and Events</strong>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto',
+                overflowX: 'auto',
+                overflowY: 'auto',
+                // marginBottom: '10px',
+                // borderRadius: '5px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody >
+                <CTable
+                  className="mb-0 border rounded-4"
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  hover
+                  responsive
+                >
+                  <CTableHead className="text-nowrap">
+                    <CTableRow className="bg-body-tertiary">
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        SN
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
+                        Device Name
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        Notification
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        Location
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        Message
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        Date/Time
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <CTableRow>
+                        <CTableDataCell colSpan="8" className="text-center">
+                          <div className="text-nowrap mb-2 text-center w-">
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ) : paginatedData.length > 0 ? (
+                      paginatedData
+                        .filter((item) => {
+                          const query = searchQuery.toLowerCase()
+                          return (
+                            item.name?.toLowerCase().includes(query) || // Filter by name
+                            item.type?.toLowerCase().includes(query) || // Filter by type
+                            item.address?.toLowerCase().includes(query) || // Filter by address
+                            item.message?.toLowerCase().includes(query) // Filter by message
+                          )
+                        })
+                        ?.map((item, index) => (
+                          <CTableRow key={index}>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center ps-4"
+                            >
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center ps-4"
+                            >
+                              {item.name}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center"
+                            >
+                              {item.type}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center"
+                            >
+                              {item.address || 'Fetching...'}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center"
+                            >
+                              {item.message}
+                            </CTableDataCell>
+                            <CTableDataCell
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className="text-center pe-4"
+                            >
+                              {' '}
+                              {new Date(item.createdAt).toLocaleString('en-IN', {
+                                timeZone: 'Asia/Kolkata',
+                                hour12: false, // Use 24-hour format
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                              })}
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="8" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">"No Alerts are Available"</p>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
 
-        <CDropdown className="position-fixed bottom-0 end-0 m-3">
-          <CDropdownToggle
-            color="secondary"
-            style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
-          >
-            <CIcon icon={cilSettings} />
-          </CDropdownToggle>
-          <CDropdownMenu>
-            <CDropdownItem onClick={downloadPDF}>PDF</CDropdownItem>
-            <CDropdownItem onClick={downloadExcel}>Excel</CDropdownItem>
-          </CDropdownMenu>
-        </CDropdown>
-      </TableContainer>
+              <CDropdown className="position-fixed bottom-0 end-0 m-3">
+                <CDropdownToggle
+                  color="secondary"
+                  style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
+                >
+                  <CIcon icon={cilSettings} />
+                </CDropdownToggle>
+                <CDropdownMenu>
+                  <CDropdownItem onClick={downloadPDF}>PDF</CDropdownItem>
+                  <CDropdownItem onClick={downloadExcel}>Excel</CDropdownItem>
+                </CDropdownMenu>
+              </CDropdown>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
+
 
       {/* Pagination */}
-
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <div>
-          <p className="mb-0">
-            Showing {(currentPage - 1) * rowsPerPage + 1} to{' '}
-            {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length}{' '}
-            entries
-          </p>
+      <div className="d-flex flex-column justify-content-between mt-1 mb-4">
+        {/* Top: Page Navigation Buttons */}
+        <div className="d-flex justify-content-center align-items-center mb-3">
+          <div className="d-flex align-items-center">
+            {/* First Button */}
+            <button
+              onClick={() => handlePageChange(1)} // Go to the first page
+              disabled={currentPage === 1}
+              className="btn btn-sm btn-outline-secondary mx-1"
+            >
+              First
+            </button>
+            {/* Previous Button */}
+            <button
+              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+              className="btn btn-sm btn-outline-secondary mx-1"
+            >
+              Prev
+            </button>
+            {/* Current Page */}
+            <p className="mb-0 mx-2">{currentPage}</p>
+            {/* Next Button */}
+            <button
+              onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="btn btn-sm btn-outline-secondary mx-1"
+            >
+              Next
+            </button>
+            {/* Last Button */}
+            <button
+              onClick={() => handlePageChange(totalPages)} // Go to the last page
+              disabled={currentPage === totalPages}
+              className="btn btn-sm btn-outline-secondary mx-1"
+            >
+              Last
+            </button>
+          </div>
         </div>
-        <div className="d-flex align-items-center">
-          {/* First Button */}
-          <button
-            onClick={() => handlePageChange(1)} // Go to the first page
-            disabled={currentPage === 1}
-            className="btn btn-sm btn-outline-secondary mx-1"
-          >
-            First
-          </button>
-          {/* Previous Button */}
-          <button
-            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-            disabled={currentPage === 1}
-            className="btn btn-sm btn-outline-secondary mx-1"
-          >
-            Prev
-          </button>
-          {/* Current Page */}
-          <p className="mb-0 mx-2">{currentPage}</p>
-          {/* Next Button */}
-          <button
-            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="btn btn-sm btn-outline-secondary mx-1"
-          >
-            Next
-          </button>
-          {/* Last Button */}
-          <button
-            onClick={() => handlePageChange(totalPages)} // Go to the last page
-            disabled={currentPage === totalPages}
-            className="btn btn-sm btn-outline-secondary mx-1"
-          >
-            Last
-          </button>
+
+        {/* Bottom: Showing Entries */}
+        <div className="d-flex justify-content-center align-items-center ">
+          <div>
+            <p className="mb-0">
+              Showing {(currentPage - 1) * rowsPerPage + 1} to{' '}
+              {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length}{' '}
+              entries
+            </p>
+          </div>
         </div>
       </div>
+
+
     </div>
   )
 }
