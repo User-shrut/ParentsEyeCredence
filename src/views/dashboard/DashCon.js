@@ -36,6 +36,7 @@ import {
   filterByCategory,
   filterByDevices,
   setVehicles,
+  changeVehicles,
 } from '../../features/LivetrackingDataSlice.js'
 import { setNewAddress } from '../../features/addressSlice.js'
 
@@ -110,14 +111,14 @@ import CIcon from '@coreui/icons-react'
 import { cilMenu } from '@coreui/icons'
 import Sidenew from '../../components/Sidenew.js'
 import Select from 'react-select'
-import { getUsers, getGroups, getDevices } from './dashApi.js'
+import { getUsers, getGroups, getDevices, getTimeDifference } from './dashApi.js'
 import zIndex from '@mui/material/styles/zIndex.js'
 import StatusButtons from './StatusButtons.js'
 
 const Dashboard = () => {
   const dispatch = useDispatch()
   const credentials = Cookies.get('crdntl')
-  const { filteredVehicles } = useSelector((state) => state.liveFeatures)
+  const { vehicles, filteredVehicles, loading } = useSelector((state) => state.liveFeatures)
   const { newAddress } = useSelector((state) => state.address)
   const [filter, setFilter] = useState('all')
   const [address, setAddress] = useState({})
@@ -165,27 +166,38 @@ const Dashboard = () => {
   }, []);
 
 
+  const maxDiffInHours = 35
+
+  function timeDiffIsLessThan35Hours(lastUpdate) {
+    const lastUpdateTime = dayjs(lastUpdate)
+    const now = dayjs()
+    return now.diff(lastUpdateTime, 'hour') <= maxDiffInHours
+  }
+
   const stoppedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
-        (vehicle) => vehicle.attributes.ignition === false && vehicle.speed < 1,
+        (vehicle) =>
+          vehicle.attributes.ignition === false &&
+          vehicle.speed < 1 &&
+          timeDiffIsLessThan35Hours(vehicle.lastUpdate),
       ).length,
   )
   const runningVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
         (vehicle) =>
-          vehicle.attributes.ignition === true && vehicle.speed > 2 && vehicle.speed < 60,
+          vehicle.attributes.ignition === true &&
+          vehicle.speed > 2 &&
+          vehicle.speed < 60 &&
+          timeDiffIsLessThan35Hours(vehicle.lastUpdate),
       ).length,
   )
   const inactiveVehiclesCount = useSelector(
     (state) =>
-      state.liveFeatures.vehicles.filter((vehicle) => {
-        const lastUpdate = dayjs(vehicle.lastUpdate)
-        const now = dayjs()
-        const duration = dayjs.duration(now.diff(lastUpdate))
-        return duration.asHours() > 24 || !(vehicle.status == 'online')
-      }).length,
+      state.liveFeatures.vehicles.filter(
+        (vehicle) => !timeDiffIsLessThan35Hours(vehicle.lastUpdate),
+      ).length,
   )
 
   const allVehiclesCount =
@@ -194,13 +206,19 @@ const Dashboard = () => {
   const idleVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
-        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed < 2,
+        (vehicle) =>
+          vehicle.attributes.ignition === true &&
+          vehicle.speed < 2 &&
+          timeDiffIsLessThan35Hours(vehicle.lastUpdate),
       ).length,
   )
   const overspeedVehiclesCount = useSelector(
     (state) =>
       state.liveFeatures.vehicles.filter(
-        (vehicle) => vehicle.attributes.ignition === true && vehicle.speed > 60,
+        (vehicle) =>
+          vehicle.attributes.ignition === true &&
+          vehicle.speed > 60 &&
+          timeDiffIsLessThan35Hours(vehicle.lastUpdate),
       ).length,
   )
 
@@ -298,15 +316,15 @@ const Dashboard = () => {
     const ignition = item.attributes.ignition
     const speed = item.speed || 0
 
-    if (!ignition && speed < 1) {
+    if (!ignition && speed < 1 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = imageMap[cate].red
-    } else if (ignition && speed > 2 && speed < 60) {
+    } else if (ignition && speed > 2 && speed < 60 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = imageMap[cate].green
-    } else if (ignition && speed < 2) {
+    } else if (ignition && speed < 2 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = imageMap[cate].yellow
-    } else if (ignition && speed > 60) {
+    } else if (ignition && speed > 60 && timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = imageMap[cate].orange
-    } else {
+    } else if (!timeDiffIsLessThan35Hours(item.lastUpdate)) {
       image = imageMap[cate].gray
     }
 
@@ -401,24 +419,24 @@ const Dashboard = () => {
         dispatch(filterInactiveVehicles())
         break
       case 'car':
-        dispatch(filterByCategory('car'))
+        dispatch(filterByCategory({ cat: 'car', data: filteredVehicles }))
         break
       case 'bus':
-        dispatch(filterByCategory('bus'))
+        dispatch(filterByCategory({ cat: 'bus', data: filteredVehicles }))
         break
       case 'truck':
-        dispatch(filterByCategory('truck'))
+        dispatch(filterByCategory({ cat: 'truck', data: filteredVehicles }))
         break
       case 'tracktor':
-        dispatch(filterByCategory('tracktor'))
+        dispatch(filterByCategory({ cat: 'tracktor', data: filteredVehicles }))
       case 'jcb':
-        dispatch(filterByCategory('jcb'))
+        dispatch(filterByCategory({ cat: 'jcb', data: filteredVehicles }))
         break
       case 'crean':
-        dispatch(filterByCategory('crean'))
+        dispatch(filterByCategory({ cat: 'crean', data: filteredVehicles }))
         break
       case 'motorcycle':
-        dispatch(filterByCategory('motorcycle'))
+        dispatch(filterByCategory({ cat: 'motorcycle', data: filteredVehicles }))
         break
       case 'geofence_1':
         dispatch(filterByGeofence(1))
@@ -459,7 +477,7 @@ const Dashboard = () => {
 
   const [selectedUser, setSelectedUser] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [sloading, setLoading] = useState(false)
   const [users, setUsers] = useState([])
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
@@ -519,6 +537,16 @@ const Dashboard = () => {
     }
   }, [selectedGroup])
 
+  const [firstLoad, setFirstLoad] = useState(true) // To track the first load
+
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => {
+      // Assuming no devices fetched for demonstration, set devices to empty array
+      setFirstLoad(false)
+    }, 4000) // Simulate a 2-second delay for fetching data
+  }, [])
+
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
@@ -558,7 +586,7 @@ const Dashboard = () => {
                           : null
                       }
                       onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
-                      isLoading={loading}
+                      isLoading={sloading}
                     />
                   </CHeaderNav>
 
@@ -579,7 +607,7 @@ const Dashboard = () => {
                           : null
                       }
                       onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
-                      isLoading={loading}
+                      isLoading={sloading}
                       placeholder="Select a Group"
                     />
                   </CHeaderNav>
@@ -647,9 +675,6 @@ const Dashboard = () => {
                   </CHeaderNav>
 
                   {/* Table Column Visibility */}
-                  <CHeaderNav className="ms-2 p-0 me-3">
-                    <TableColumnVisibility />
-                  </CHeaderNav>
 
                   <CHeaderNav
                     className="ms-2 p-0 me-3 refresh"
@@ -788,7 +813,10 @@ const Dashboard = () => {
               {/* <hr />
               <br /> */}
               <div className="tableNav">
-                <StatusButtons />
+                {/* <StatusButtons /> */}
+                <CHeaderNav className="ms-2 p-0 me-3">
+                  <TableColumnVisibility />
+                </CHeaderNav>
                 <CHeaderNav className="ms-2 p-0 me-2">
                   <form
                     className="d-flex searchBar"
@@ -879,7 +907,7 @@ const Dashboard = () => {
                               textOverflow: 'ellipsis',
                             }}
                           >
-                            Last Update
+                            &nbsp;&nbsp;Last Update&nbsp;&nbsp;
                           </CTableHeaderCell>
                         )}
                         {visibleColumns.cd && (
@@ -887,7 +915,8 @@ const Dashboard = () => {
                             className="bg-body-secondary text-center current-delay table-cell"
                             style={{ position: 'sticky', top: 0 }}
                           >
-                            &nbsp;&nbsp; C/D &nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C/D
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                           </CTableHeaderCell>
                         )}
                         {visibleColumns.sp && (
@@ -962,7 +991,27 @@ const Dashboard = () => {
                     </CTableHead>
 
                     <CTableBody>
-                      {filteredVehicles.length > 0 ? (
+                      {firstLoad ? (
+                        // Show skeleton loader while vehicles are loading
+                        <CTableRow>
+                          <CTableDataCell colSpan="15" className="text-center">
+                            <div className="text-nowrap mb-2 text-center">
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                            </div>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ) : filteredVehicles.length > 0 ? (
                         currentVehicles.map((item, index) => (
                           <CTableRow
                             key={index}
@@ -1096,33 +1145,16 @@ const Dashboard = () => {
                               <CTableDataCell
                                 style={{
                                   backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                  fontSize: '0.9rem',
                                 }}
                                 className="text-center cd current-delay table-cell"
                               >
                                 {(() => {
                                   // const device = salesman.find((device) => device.id === item.deviceId)
                                   if (item && item.lastUpdate) {
-                                    const now = dayjs()
-                                    const lastUpdate = dayjs(item.lastUpdate)
-                                    const duration = dayjs.duration(now.diff(lastUpdate))
-
-                                    const days = duration.days()
-                                    const hours = duration.hours()
-                                    const minutes = duration.minutes()
-                                    const seconds = duration.seconds()
-
-                                    // Conditional formatting based on duration values
-                                    if (days > 0) {
-                                      return `${days}d ${hours}h ${minutes}m`
-                                    } else if (hours > 0) {
-                                      return `${hours}h ${minutes}m`
-                                    } else if (minutes > 0) {
-                                      return `${minutes}m`
-                                    } else {
-                                      return `${seconds}s` // Display seconds if all else is zero
-                                    }
+                                    return <div>{getTimeDifference(item.lastUpdate)}</div> // Default if no device or lastUpdate
                                   }
-                                  return '0s' // Default if no device or lastUpdate
+                                  return null // You can add a fallback element or return null if you want nothing to show when the condition is false.
                                 })()}
                               </CTableDataCell>
                             )}
@@ -1301,19 +1333,8 @@ const Dashboard = () => {
                       ) : (
                         <CTableRow>
                           <CTableDataCell colSpan="15" className="text-center">
-                            <div className="text-nowrap mb-2 text-center w-">
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
+                            <div className="text-nowrap mb-2 text-center">
+                              <h4>No Vehicles Found.</h4>
                             </div>
                           </CTableDataCell>
                         </CTableRow>

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import Select, { components } from 'react-select'
 import Cookies from 'js-cookie'
 import axios from 'axios'
+import dayjs from 'dayjs'
 
 const accessToken = Cookies.get('authToken') // Replace with your token
 
@@ -40,77 +41,57 @@ export const getDevices = async (groupId) => {
   return response.data.data
 }
 
-export const Selector = ({ setFilteredData, filteredData }) => {
+export const Selector = ({ setFilteredData, filteredData, fillDevices }) => {
   const [selectedOptions, setSelectedOptions] = useState([])
-  const [tempSelectedOptions, setTempSelectedOptions] = useState([])
 
   // Initialize deviceOptions with the filteredData
-  const deviceOptions = filteredData.map((device) => ({
+  const deviceOptions = fillDevices.map((device) => ({
     label: device.name,
     value: device.deviceId,
   }))
 
-  // Handle changes in the temporary selection
+  // Add a "Select All" option
+  const selectAllOption = {
+    label: 'Select All',
+    value: 'select_all',
+  }
+
   const handleChange = (selected) => {
-    setTempSelectedOptions(selected)
-  }
-
-  // Apply the selected filters
-  const handleApply = () => {
-    setSelectedOptions(tempSelectedOptions)
-    if (tempSelectedOptions.length > 0) {
-      const selectedDeviceIds = tempSelectedOptions.map((option) => option.value)
-      const filtered = filteredData.filter((device) => selectedDeviceIds.includes(device.deviceId))
-      setFilteredData(filtered)
+    if (selected.some((option) => option.value === 'select_all')) {
+      // If "Select All" is selected, select all options
+      if (selectedOptions.length === deviceOptions.length) {
+        setSelectedOptions([])
+        setFilteredData(filteredData) // Show all data
+      } else {
+        setSelectedOptions(deviceOptions)
+        setFilteredData(fillDevices) // Filter to all devices
+      }
     } else {
-      setFilteredData(filteredData)
-    }
-  }
+      // Otherwise, update the selected options and filtered data
+      setSelectedOptions(selected)
 
-  // Custom MenuList to include the "Apply" button
-  const CustomMenuList = (props) => {
-    return (
-      <components.MenuList {...props}>
-        {props.children}
-        <div
-          style={{
-            padding: '10px',
-            borderTop: '1px solid #ccc',
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
-          <button
-            onClick={handleApply}
-            style={{
-              padding: '8px 12px',
-              backgroundColor: '#6a1b9a',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            Apply
-          </button>
-        </div>
-      </components.MenuList>
-    )
+      if (selected && selected.length > 0) {
+        const selectedDeviceIds = selected.map((option) => option.value)
+        const filtered = fillDevices.filter((device) => selectedDeviceIds.includes(device.deviceId))
+        setFilteredData(filtered)
+      } else {
+        setFilteredData(filteredData) // Show all data
+      }
+    }
   }
 
   return (
     <div>
       <Select
-        options={deviceOptions} // Always uses the original filteredData for options
+        className="particularFilter"
+        options={[selectAllOption, ...deviceOptions]} // Include "Select All" at the top
         isMulti
-        value={tempSelectedOptions}
+        value={selectedOptions}
         onChange={handleChange}
         placeholder="Select devices"
-        components={{ MenuList: CustomMenuList }}
         styles={{
           control: (base) => ({
             ...base,
-            border: '1px solid #6a1b9a',
             borderRadius: '4px',
           }),
           option: (base, state) => ({
@@ -122,4 +103,29 @@ export const Selector = ({ setFilteredData, filteredData }) => {
       />
     </div>
   )
+}
+
+export function getTimeDifference(timestamp) {
+  const now = dayjs()
+  const time = dayjs(timestamp)
+  const diffInMilliseconds = now.diff(time) // Difference in milliseconds
+
+  // Calculate days, hours, and minutes
+  const days = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diffInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diffInMilliseconds % (1000 * 60 * 60)) / (1000 * 60))
+
+  // Format the difference in a human-readable format
+  let timeDifference = ''
+  if (days >= 0) {
+    timeDifference += `${days} d-`
+  }
+  if (hours >= 0) {
+    timeDifference += `${hours} hrs-`
+  }
+  if (minutes >= 0) {
+    timeDifference += `${minutes} min`
+  }
+
+  return timeDifference.trim() || 'Just now'
 }

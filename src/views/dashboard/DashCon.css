@@ -175,7 +175,7 @@ td {
 }
 
 .current-delay {
-  width: 2% !important;
+  width: 10% !important;
   /* Adjust this value as per your requirement */
   /* white-space: nowrap !important; */
   overflow: hidden !important;
