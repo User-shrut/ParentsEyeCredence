@@ -6,5 +6,20 @@
   display: flex;
   gap: 10px;
   flex-direction: row;
-  margin-left: 28% !important;
+  margin-left: 11% !important;
+  margin-right: 10px!important;
+}
+
+.particularFilter{
+  min-width: 14rem !important;
+}
+.refresh {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  margin-left: 15px !important;
+}
+.refreshIcon
+{
+  margin-bottom: 7px !important;
 }

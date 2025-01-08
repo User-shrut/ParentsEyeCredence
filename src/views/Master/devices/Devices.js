@@ -31,6 +31,7 @@ import {
   CDropdownMenu,
   CDropdownToggle,
   CFormSelect,
+  CHeaderNav,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -56,6 +57,7 @@ import '../../../../src/app.css'
 import { getDevices, getGroups, getUsers, Selector } from '../../dashboard/dashApi'
 import { default as Sselect } from 'react-select'
 import './Devices.css'
+import { LuRefreshCw } from 'react-icons/lu'
 
 const Devices = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -970,17 +972,17 @@ const Devices = () => {
         try {
           const devicesData = await getDevices(selectedGroup)
           setFillDevices(devicesData)
-          const finalData = filteredData.filter((vehicle) =>
-            devicesData.some((device) => device.deviceId === vehicle.deviceId),
-          )
-          setFilteredData(finalData)
+          // const finalData = filteredData.filter((vehicle) =>
+          //   devicesData.some((device) => device.deviceId === vehicle.deviceId),
+          // )
+          setFilteredData(devicesData)
         } catch (error) {
           console.error('Error fetching devices:', error)
         }
       }
       fetchDevicesAndFilter()
     }
-  }, [selectedGroup, filteredData])
+  }, [selectedGroup])
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -993,7 +995,7 @@ const Devices = () => {
         <div className="fiterDevices">
           <Sselect
             id="user-select"
-            options={users.map((user) => ({
+            options={fillUsers.map((user) => ({
               value: user._id,
               label: user.username,
             }))}
@@ -1016,7 +1018,7 @@ const Devices = () => {
               minWidth: '10rem',
             }}
             id="group-select"
-            options={groups?.map((group) => ({
+            options={fillGroups?.map((group) => ({
               value: group._id,
               label: group.name,
             }))}
@@ -1033,7 +1035,12 @@ const Devices = () => {
             placeholder="Select a Group"
           />
         </div>
-        <Selector setFilteredData={setFilteredData} filteredData={filteredData} />
+        <Selector
+          className="particularFilter"
+          setFilteredData={setFilteredData}
+          filteredData={filteredData}
+          fillDevices={fillDevices}
+        />
 
         <div className="d-flex">
           <div className="me-3 d-none d-md-block">
@@ -1071,6 +1078,16 @@ const Devices = () => {
               </button>
             </div>
           )}
+          <div
+            className="ms-2 p-0 me-1 refresh"
+            onClick={() => {
+              window.location.reload()
+            }}
+          >
+            <LuRefreshCw
+            className="refreshIcon"
+            />
+          </div>
         </div>
       </div>
 
