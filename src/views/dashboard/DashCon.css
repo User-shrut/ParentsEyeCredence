@@ -186,6 +186,7 @@ td {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 12rem !important;
 }
 
 .countallCol {
@@ -263,6 +264,9 @@ td {
 
 .vehicle-card.inactive-vehicles {
   border-left: 6px solid #6c757d; /* Gray for Inactive */
+}
+.vehicle-card.new-vehicles {
+  border-left: 6px solid #13bbf3; /* Gray for Inactive */
 }
 
 .card-header {

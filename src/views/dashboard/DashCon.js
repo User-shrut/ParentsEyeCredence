@@ -38,6 +38,7 @@ import {
   setVehicles,
   changeVehicles,
 } from '../../features/LivetrackingDataSlice.js'
+import { fetchDevices } from '../../features/deviceSlice.js'
 import { setNewAddress } from '../../features/addressSlice.js'
 
 import MainMap from '../Map/MapComponent'
@@ -53,6 +54,7 @@ import carRed from '../../assets/vehicleList/Car/carRed.svg'
 import carYellow from '../../assets/vehicleList/Car/carYellow.svg'
 import carOrange from '../../assets/vehicleList/Car/carOrange.svg'
 import carGray from '../../assets/vehicleList/Car/carGray.svg'
+import carBlue from '../../assets/vehicleList/Car/Blue.svg'
 import white from '../../assets/vehicleList/Car/white.svg'
 
 //==============================BIKE========================================
@@ -119,6 +121,8 @@ const Dashboard = () => {
   const dispatch = useDispatch()
   const credentials = Cookies.get('crdntl')
   const { vehicles, filteredVehicles, loading } = useSelector((state) => state.liveFeatures)
+  const { devices: deviceList } = useSelector((state) => state.devices)
+
   const { newAddress } = useSelector((state) => state.address)
   const [filter, setFilter] = useState('all')
   const [address, setAddress] = useState({})
@@ -546,6 +550,33 @@ const Dashboard = () => {
     }, 2000) // Simulate a 2-second delay for fetching data
   }, [])
 
+  const [devicesWithoutPositions, setDevicesWithoutPositions] = useState([])
+
+  useEffect(() => {
+    const findDevicesWithoutPositions = async () => {
+      try {
+        const devices = dispatch(fetchDevices())
+        const missingDevices = []
+
+        // Iterate through devices and check if they have positions
+        for (const device of devices) {
+          const positions = filteredVehicles
+          if (positions.length === 0) {
+            missingDevices.push(device)
+          }
+        }
+
+        setDevicesWithoutPositions(missingDevices)
+        setLoading(false)
+      } catch (error) {
+        setLoading(false)
+      }
+    }
+
+    // Call the function to find devices without positions
+    findDevicesWithoutPositions()
+  }, [filteredVehicles])
+
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
@@ -702,7 +733,13 @@ const Dashboard = () => {
               {/* <br /> */}
               <CRow className="justify-content-around my-3 mb-2">
                 {/* All Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card all-vehicles"
                     onClick={() => dispatch(filterAllVehicles())}
@@ -720,7 +757,13 @@ const Dashboard = () => {
                 </CCol>
 
                 {/* Running Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card running-vehicles"
                     onClick={() => dispatch(filterRunningVehicles())}
@@ -738,7 +781,13 @@ const Dashboard = () => {
                 </CCol>
 
                 {/* Stopped Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card stopped-vehicles"
                     onClick={() => dispatch(filterStoppedVehicles())}
@@ -756,7 +805,13 @@ const Dashboard = () => {
                 </CCol>
 
                 {/* Idle Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card idle-vehicles"
                     onClick={() => dispatch(filterIdleVehicles())}
@@ -774,7 +829,13 @@ const Dashboard = () => {
                 </CCol>
 
                 {/* Overspeed Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card overspeed-vehicles"
                     onClick={() => dispatch(filterOverspeedVehicles())}
@@ -791,8 +852,39 @@ const Dashboard = () => {
                   </div>
                 </CCol>
 
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-1"
+                  style={{ width: '6rem !important' }}
+                >
+                  <div
+                    className="vehicle-card new-vehicles"
+                    // onClick={() => dispatch(filterInactiveVehicles())}
+                  >
+                    <div className="vehicle-info">
+                      <div className="vehicle-type text-muted">
+                        <strong>New</strong>
+                      </div>
+                      <div className="vehicle-count fs-4 fw-bold">
+                        {devicesWithoutPositions.length}
+                      </div>
+                    </div>
+                    <div className="vehicle-icon">
+                      <img style={{ width: '3.5rem' }} src={carBlue} alt="New Vehicles" />
+                    </div>
+                  </div>
+                </CCol>
+
                 {/* Inactive Vehicles */}
-                <CCol xs={12} md={2} xl={2} className="count-col mb-3">
+                <CCol
+                  xs={12}
+                  md={1}
+                  xl={2}
+                  className="count-col mb-2"
+                  style={{ width: '6rem !important' }}
+                >
                   <div
                     className="vehicle-card inactive-vehicles"
                     onClick={() => dispatch(filterInactiveVehicles())}

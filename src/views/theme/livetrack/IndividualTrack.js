@@ -38,7 +38,7 @@ const MapController = ({ individualSalesMan, previousPosition, setPath }) => {
         const { latitude: prevLat, longitude: prevLon } = previousPosition
         const start = [prevLat, prevLon]
         const end = targetPosition
-        const duration = 5000 // Total animation duration in milliseconds
+        const duration = 50000 // Total animation duration in milliseconds
 
         let startTime
 
