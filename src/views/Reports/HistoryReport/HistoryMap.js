@@ -395,7 +395,7 @@ const HistoryMap = ({
     setShowStopages((prev) => !prev)
     console.log('These are the stopages==================' + JSON.stringify(stopages))
   }
-
+  // NOT  IN  USE
   const arrowPositions = useMemo(() => {
     return poly.slice(1).map((pos, index) => {
       const [lat1, lon1] = poly[index]
@@ -407,6 +407,8 @@ const HistoryMap = ({
     })
   }, [poly])
 
+
+  // USEABLE CODE 
   const { longestStop, shortestStop, longestDuration, shortestDuration } =
     useStoppageTimes(stopages)
 
