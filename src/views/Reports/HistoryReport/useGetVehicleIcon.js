@@ -127,21 +127,21 @@ const useGetVehicleIcon = (vehicle, cat) => {
 
   // Determine the icon URL based on speed and ignition status
   let iconUrl
-  if (speed <= 2.0 && ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+  if (speed <= 2.0 && ignition && timeDiffIsLessThan35Hours(vehicle?.lastUpdate)) {
     //idle
     iconUrl = selectedCategory['yellow']
   } else if (
     speed > 2.0 &&
     speed < 60 &&
     ignition &&
-    timeDiffIsLessThan35Hours(vehicle.lastUpdate)
+    timeDiffIsLessThan35Hours(vehicle?.lastUpdate)
   ) {
     iconUrl = selectedCategory['green'] // running
-  } else if (speed > 60.0 && ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+  } else if (speed > 60.0 && ignition && timeDiffIsLessThan35Hours(vehicle?.lastUpdate)) {
     iconUrl = selectedCategory['orange'] // overspeed
-  } else if (speed <= 1.0 && !ignition && timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+  } else if (speed <= 1.0 && !ignition && timeDiffIsLessThan35Hours(vehicle?.lastUpdate)) {
     iconUrl = selectedCategory['red'] // stop
-  } else if (!timeDiffIsLessThan35Hours(vehicle.lastUpdate)) {
+  } else if (!timeDiffIsLessThan35Hours(vehicle?.lastUpdate)) {
     iconUrl = selectedCategory['gray'] // inactive
   }
 
