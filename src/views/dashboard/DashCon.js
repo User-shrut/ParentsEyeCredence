@@ -544,7 +544,7 @@ const Dashboard = () => {
     setTimeout(() => {
       // Assuming no devices fetched for demonstration, set devices to empty array
       setFirstLoad(false)
-    }, 4000) // Simulate a 2-second delay for fetching data
+    }, 2000) // Simulate a 2-second delay for fetching data
   }, [])
 
   return (
