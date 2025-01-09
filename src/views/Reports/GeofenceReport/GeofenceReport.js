@@ -939,8 +939,8 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
   };
 
 
-   // Export table data to Excel
-   const exportToExcel = () => {
+  // Export table data to Excel
+  const exportToExcel = () => {
     const tableColumns = selectedColumns.length > 0 ? selectedColumns : columns;
     const tableRows = apiData.map((data, index) => {
       return tableColumns.map((col) => renderColumnData(data, col));
@@ -997,7 +997,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
           {statusLoading ? (
             <CTableRow style={{ position: 'relative' }}>
               <CTableDataCell
-                colSpan={selectedColumns.length + 1}
+                colSpan={selectedColumns.length + 6}
                 style={{
                   backgroundColor: '#f8f9fa',
                   color: '#6c757d',
@@ -1030,7 +1030,7 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
             ) : (
               <CTableRow>
                 <CTableDataCell
-                  colSpan={selectedColumns.length + 1}
+                  colSpan={selectedColumns.length + 6}
                   style={{
                     backgroundColor: '#f8f9fa', // Light gray background
                     color: '#6c757d', // Darker text color

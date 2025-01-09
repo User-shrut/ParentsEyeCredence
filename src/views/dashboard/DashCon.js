@@ -141,16 +141,30 @@ const Dashboard = () => {
 
   // Fetch live vehicles when the component mounts
   useEffect(() => {
-    console.log('before initialize socket')
-    console.log('credentials: ', credentials)
-    dispatch(initializeSocket(credentials))
+    console.log('Before initializing socket');
+    console.log('Credentials:', credentials);
 
-    console.log('after initialize socket')
+    if (!credentials) {
+      console.error('Error: credentials are undefined or empty');
+      return;
+    }
+
+    try {
+      JSON.parse(credentials); // Quick validation to ensure credentials are valid JSON
+      dispatch(initializeSocket(credentials));
+    } catch (error) {
+      console.error('Invalid credentials format:', error.message);
+    }
+
+    console.log('After initializing socket');
 
     return () => {
-      socket.off('all device data')
-    }
-  }, [])
+      if (socket) {
+        socket.off('all device data');
+      }
+    };
+  }, []);
+
 
   const maxDiffInHours = 35
 
@@ -566,9 +580,9 @@ const Dashboard = () => {
                       value={
                         selectedUser
                           ? {
-                              value: selectedUser,
-                              label: users.find((user) => user._id === selectedUser)?.username,
-                            }
+                            value: selectedUser,
+                            label: users.find((user) => user._id === selectedUser)?.username,
+                          }
                           : null
                       }
                       onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
@@ -587,9 +601,9 @@ const Dashboard = () => {
                       value={
                         selectedGroup
                           ? {
-                              value: selectedGroup,
-                              label: groups.find((group) => group._id === selectedGroup)?.name,
-                            }
+                            value: selectedGroup,
+                            label: groups.find((group) => group._id === selectedGroup)?.name,
+                          }
                           : null
                       }
                       onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}

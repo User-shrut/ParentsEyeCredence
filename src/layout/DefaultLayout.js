@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 
 const DefaultLayout = () => {
-  
+
   return (
     <div>
 

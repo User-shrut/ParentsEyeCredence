@@ -524,7 +524,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
 
       <CTable bordered className="custom-table" style={{ overflowX: auto }}>
         <CTableHead>
-          <CTableRow>
+          <CTableRow >
             <CTableHeaderCell>SN</CTableHeaderCell>
             <CTableHeaderCell>Vehicle Name</CTableHeaderCell>
             {/* Dynamically render table headers based on selected columns */}
@@ -536,7 +536,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
         <CTableBody>
           {statusLoading ? (<CTableRow style={{ position: 'relative' }}>
             <CTableDataCell
-              colSpan={selectedColumns.length + 1}
+              colSpan={selectedColumns.length + 2}
               style={{
                 backgroundColor: '#f8f9fa',
                 color: '#6c757d',

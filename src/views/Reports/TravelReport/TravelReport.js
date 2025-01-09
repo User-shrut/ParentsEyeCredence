@@ -248,9 +248,9 @@ const SearchTrip = ({
           value={
             formData.Devices
               ? {
-                  value: formData.Devices,
-                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-                }
+                value: formData.Devices,
+                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+              }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -669,7 +669,7 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow key={selectedDeviceName}>
+            <CTableRow >
               <CTableDataCell
                 colSpan={selectedColumns.length + 2}
                 style={{
@@ -680,7 +680,7 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
                   padding: '16px',
                 }}
               >
-                No data available {selectedDeviceName}
+                No data available
               </CTableDataCell>
             </CTableRow>
           )}
