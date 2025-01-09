@@ -141,30 +141,29 @@ const Dashboard = () => {
 
   // Fetch live vehicles when the component mounts
   useEffect(() => {
-    console.log('Before initializing socket');
-    console.log('Credentials:', credentials);
+    console.log('Before initializing socket')
+    console.log('Credentials:', credentials)
 
     if (!credentials) {
-      console.error('Error: credentials are undefined or empty');
-      return;
+      console.error('Error: credentials are undefined or empty')
+      return
     }
 
     try {
-      JSON.parse(credentials); // Quick validation to ensure credentials are valid JSON
-      dispatch(initializeSocket(credentials));
+      JSON.parse(credentials) // Quick validation to ensure credentials are valid JSON
+      dispatch(initializeSocket(credentials))
     } catch (error) {
-      console.error('Invalid credentials format:', error.message);
+      console.error('Invalid credentials format:', error.message)
     }
 
-    console.log('After initializing socket');
+    console.log('After initializing socket')
 
     return () => {
       if (socket) {
-        socket.off('all device data');
+        socket.off('all device data')
       }
-    };
-  }, []);
-
+    }
+  }, [])
 
   const maxDiffInHours = 35
 
@@ -580,9 +579,9 @@ const Dashboard = () => {
                       value={
                         selectedUser
                           ? {
-                            value: selectedUser,
-                            label: users.find((user) => user._id === selectedUser)?.username,
-                          }
+                              value: selectedUser,
+                              label: users.find((user) => user._id === selectedUser)?.username,
+                            }
                           : null
                       }
                       onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
@@ -601,9 +600,9 @@ const Dashboard = () => {
                       value={
                         selectedGroup
                           ? {
-                            value: selectedGroup,
-                            label: groups.find((group) => group._id === selectedGroup)?.name,
-                          }
+                              value: selectedGroup,
+                              label: groups.find((group) => group._id === selectedGroup)?.name,
+                            }
                           : null
                       }
                       onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
@@ -1193,7 +1192,7 @@ const Dashboard = () => {
                                 }}
                                 className="text-center td total-distance table-cell"
                               >
-                                {`${Math.round(item.attributes.totalDistance)} km`}
+                                {`${Math.round(item.attributes.totalDistance / 1000)} km`}
                               </CTableDataCell>
                             )}
                             {visibleColumns.sat && (
