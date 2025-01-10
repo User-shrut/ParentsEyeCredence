@@ -38,6 +38,11 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CRow,
+  CCol,
+  CCard,
+  CCardHeader,
+  CCardBody,
 } from '@coreui/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Cookies from 'js-cookie'
@@ -56,7 +61,7 @@ import EditDeviceModal from './EditDeviceForm'
 import '../../../../src/app.css'
 import { getDevices, getGroups, getUsers, Selector } from '../../dashboard/dashApi'
 import { default as Sselect } from 'react-select'
-import './Devices.css'
+import '../index.css'
 import { LuRefreshCw } from 'react-icons/lu'
 
 const Devices = () => {
@@ -987,12 +992,12 @@ const Devices = () => {
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
+      <div className="d-flex gap- justify-content-end  mb-2">
+        {/* <div>
           <h2>Devices</h2>
-        </div>
+        </div> */}
         {/* HERE WE WILL ADD FILTER */}
-        <div className="fiterDevices">
+        <div className="fiterDevices d-flex">
           <Sselect
             id="user-select"
             options={fillUsers.map((user) => ({
@@ -1053,11 +1058,11 @@ const Devices = () => {
               onKeyDown={handleKeyDown}
             />
           </div>
-          <div className="me-3 d-none d-md-block">
+          {/* <div className="me-3 d-none d-md-block">
             <button onClick={handleSearch} variant="contained" className="btn btn-secondary">
               Search
             </button>
-          </div>
+          </div> */}
           {decodedToken.superadmin && (
             <div>
               {/* <button
@@ -1084,195 +1089,213 @@ const Devices = () => {
               window.location.reload()
             }}
           >
-            <LuRefreshCw
-            className="refreshIcon"
-            />
+            <LuRefreshCw className="refreshIcon" />
           </div>
         </div>
       </div>
-
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto', // Set the desired height
-          overflowX: 'auto', // Enable horizontal scrollbar
-          overflowY: 'auto', // Enable vertical scrollbar if needed
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black',
-        }}
-      >
-        <CTable
-          bordered
-          align="middle"
-          className="mb-2 borderless min-vh-25 rounded-top-3"
-          hover
-          responsive
-        >
-          <CTableHead
-            style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
-            bordered
-            align="middle"
-            className="mb-2 border min-vh-25 rounded-top-3"
-            hover
-            responsive
-          >
-            <CTableRow style={{ height: '6vh' }} className="text-nowrap ">
-              <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>SN</strong>
-              </CTableHeaderCell>
-              {columns.slice(1).map((column, index) => (
-                <CTableHeaderCell
-                  key={index}
-                  className="text-center bg-body-secondary text-center sr-no table-cell"
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader
+              className="grand d-flex justify-content-between align-items-center text-white"
+              style={{ color: 'white' }}
+            >
+              <strong>Device</strong>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                // marginBottom: '10px',
+                // borderRadius: '10px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody>
+                <CTable
+                  bordered
+                  align="middle"
+                  className="mb-2 border min-vh-25 rounded-top-3"
+                  hover
+                  responsive
                 >
-                  <strong>{column.Header}</strong>
-                </CTableHeaderCell>
-              ))}
-              {decodedToken.superadmin ? (
-                <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                  <strong>Actions</strong>
-                </CTableHeaderCell>
-              ) : null}
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {loading ? (
-              <CTableRow key="loading" style={{ border: '1px soild black' }}>
-                <CTableDataCell colSpan="16" className="text-center">
-                  <div className="text-nowrap mb-2 text-center w-">
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ) : filteredData.length > 0 ? (
-              filteredData?.map((item, index) => (
-                <CTableRow key={item._id}>
-                  <CTableDataCell
-                    style={{
-                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                      border: 'none',
-                    }}
+                  <CTableHead
+                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                    bordered
+                    align="middle"
+                    className="mb-2 border min-vh-25 rounded-top-3"
+                    hover
+                    responsive
                   >
-                    {currentPage * limit + index + 1}
-                  </CTableDataCell>
-                  {columns.slice(1).map((column) => (
-                    <CTableDataCell
-                      key={column.accessor}
-                      className="text-center"
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                    >
-                      {column.accessor === 'groups' ? (
-                        <CFormSelect
-                          id="groups"
-                          className=" text-center border-2"
-                          style={{
-                            width: '100px',
-                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                          }}
-                          value=""
+                    <CTableRow style={{ height: '6vh' }} className="text-nowrap ">
+                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        <strong>SN</strong>
+                      </CTableHeaderCell>
+                      {columns.slice(1).map((column, index) => (
+                        <CTableHeaderCell
+                          key={index}
+                          className="text-center bg-body-secondary text-center sr-no table-cell"
                         >
-                          <option>{item.groups?.length || '0'}</option>
-                          {Array.isArray(item.groups) &&
-                            item.groups.map((group) => (
-                              <option key={group._id} value={group._id}>
-                                {group.name || 'undefine group'}
-                              </option>
-                            ))}
-                        </CFormSelect>
-                      ) : column.accessor === 'geofences' ? (
-                        <CFormSelect
-                          id="geofence"
-                          className=" text-center border-2"
-                          style={{
-                            width: '120px',
-                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                          }}
-                          value=""
-                        >
-                          <option value="">{item.geofences?.length || '0'}</option>
-                          {Array.isArray(item.geofences) &&
-                            item.geofences.map((geofence, index) => (
-                              <option key={index} value={geofence._id}>
-                                {geofence.name}
-                              </option>
-                            ))}
-                        </CFormSelect>
-                      ) : column.accessor === 'users' ? (
-                        <CFormSelect
-                          id="users"
-                          className=" text-center border-2"
-                          style={{
-                            width: '120px',
-                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                          }}
-                          value=""
-                        >
-                          <option value="">{item.users?.length || '0'}</option>
-                          {Array.isArray(item.users) &&
-                            item.users.map((user) => (
-                              <option key={user._id} value={user._id}>
-                                {user.username}
-                              </option>
-                            ))}
-                        </CFormSelect>
-                      ) : column.accessor === 'Driver' ? (
-                        <div style={{ width: '120px' }}>{item[column.accessor]?.name || 'N/A'}</div>
-                      ) : item[column.accessor] ? (
-                        item[column.accessor]
-                      ) : (
-                        'N/A'
-                      )}
-                    </CTableDataCell>
-                  ))}
+                          <strong>{column.Header}</strong>
+                        </CTableHeaderCell>
+                      ))}
+                      {decodedToken.superadmin ? (
+                        <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                          <strong>Actions</strong>
+                        </CTableHeaderCell>
+                      ) : null}
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <CTableRow key="loading" style={{ border: '1px soild black' }}>
+                        <CTableDataCell colSpan="16" className="text-center">
+                          <div className="text-nowrap mb-2 text-center w-">
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ) : filteredData.length > 0 ? (
+                      filteredData?.map((item, index) => (
+                        <CTableRow key={item._id}>
+                          <CTableDataCell
+                            style={{
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                              border: 'none',
+                            }}
+                          >
+                            {currentPage * limit + index + 1}
+                          </CTableDataCell>
+                          {columns.slice(1).map((column) => (
+                            <CTableDataCell
+                              key={column.accessor}
+                              className="text-center"
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                            >
+                              {column.accessor === 'groups' ? (
+                                <CFormSelect
+                                  id="groups"
+                                  className=" text-center border-2"
+                                  style={{
+                                    width: '100px',
+                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                  }}
+                                  value=""
+                                >
+                                  <option>{item.groups?.length || '0'}</option>
+                                  {Array.isArray(item.groups) &&
+                                    item.groups.map((group) => (
+                                      <option key={group._id} value={group._id}>
+                                        {group.name || 'undefine group'}
+                                      </option>
+                                    ))}
+                                </CFormSelect>
+                              ) : column.accessor === 'geofences' ? (
+                                <CFormSelect
+                                  id="geofence"
+                                  className=" text-center border-2"
+                                  style={{
+                                    width: '120px',
+                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                  }}
+                                  value=""
+                                >
+                                  <option value="">{item.geofences?.length || '0'}</option>
+                                  {Array.isArray(item.geofences) &&
+                                    item.geofences.map((geofence, index) => (
+                                      <option key={index} value={geofence._id}>
+                                        {geofence.name}
+                                      </option>
+                                    ))}
+                                </CFormSelect>
+                              ) : column.accessor === 'users' ? (
+                                <CFormSelect
+                                  id="users"
+                                  className=" text-center border-2"
+                                  style={{
+                                    width: '120px',
+                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                  }}
+                                  value=""
+                                >
+                                  <option value="">{item.users?.length || '0'}</option>
+                                  {Array.isArray(item.users) &&
+                                    item.users.map((user) => (
+                                      <option key={user._id} value={user._id}>
+                                        {user.username}
+                                      </option>
+                                    ))}
+                                </CFormSelect>
+                              ) : column.accessor === 'Driver' ? (
+                                <div style={{ width: '120px' }}>
+                                  {item[column.accessor]?.name || 'N/A'}
+                                </div>
+                              ) : item[column.accessor] ? (
+                                item[column.accessor]
+                              ) : (
+                                'N/A'
+                              )}
+                            </CTableDataCell>
+                          ))}
 
-                  {decodedToken.superadmin ? (
-                    <CTableDataCell
-                      className="text-center d-flex"
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                    >
-                      <IconButton aria-label="edit" onClick={() => handleEditIconClick(item)}>
-                        <RiEdit2Fill
-                          style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
-                        />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteSelected(item)}
-                        sx={{ marginRight: '10px', color: 'red' }}
-                      >
-                        <AiFillDelete style={{ fontSize: '20px' }} />
-                      </IconButton>
-                    </CTableDataCell>
-                  ) : null}
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan="15" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
-                  >
-                    <p className="mb-0 fw-bold">"Oops! Looks like there's no device available."</p>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
+                          {decodedToken.superadmin ? (
+                            <CTableDataCell
+                              className="text-center d-flex"
+                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                            >
+                              <IconButton
+                                aria-label="edit"
+                                onClick={() => handleEditIconClick(item)}
+                              >
+                                <RiEdit2Fill
+                                  style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
+                                />
+                              </IconButton>
+                              <IconButton
+                                aria-label="delete"
+                                onClick={() => handleDeleteSelected(item)}
+                                sx={{ marginRight: '10px', color: 'red' }}
+                              >
+                                <AiFillDelete style={{ fontSize: '20px' }} />
+                              </IconButton>
+                            </CTableDataCell>
+                          ) : null}
+                        </CTableRow>
+                      ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="15" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">
+                              "Oops! Looks like there's no device available."
+                            </p>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
 
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
