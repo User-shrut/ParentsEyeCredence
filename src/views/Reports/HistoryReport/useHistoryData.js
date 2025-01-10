@@ -7,10 +7,9 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-
   useEffect(() => {
     const fetchData = async () => {
-      console.log("fetching start at his data")
+      console.log('fetching start at his data')
       if (fetch) {
         setLoading(true)
         setError(null)
@@ -23,15 +22,18 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
           }
 
           // Set up the query parameters
-          const convertToUTCWithOffset = (date) => {
+          const convertToISTWithOffset = (date) => {
             if (!date) return null // Handle null or undefined dates
-            const utcString = new Date(date).toISOString() // Convert to ISO string in UTC
-            return utcString.replace('Z', '+00:00') // Replace 'Z' with '+00:00' for the desired format
+            const utcDate = new Date(date) // Parse the date
+            const istOffset = 5.5 * 60 * 60 * 1000 // Offset for IST in milliseconds (+5:30 hours)
+            const istDate = new Date(utcDate.getTime() + istOffset) // Add IST offset
+            const isoStringWithIST = istDate.toISOString().replace('Z', '+05:30') // Replace 'Z' with '+05:30'
+            return isoStringWithIST // Return the formatted string
           }
 
           const params = {
-            from: convertToUTCWithOffset(from), // Convert `from` to UTC with offset
-            to: convertToUTCWithOffset(to), // Convert `to` to UTC with offset
+            from: convertToISTWithOffset(from), // Convert `from` to UTC with offset
+            to: convertToISTWithOffset(to), // Convert `to` to UTC with offset
             deviceId,
           }
 
@@ -44,7 +46,7 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
             params,
           })
 
-      console.log("fetching stop at his data")
+          console.log('fetching stop at his data')
 
           if (response.status === 200) {
             setData(response.data)
@@ -61,7 +63,6 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
     }
 
     fetchData()
-
   }, [url, from, to, deviceId, fetch])
 
   return { data, loading, error }
