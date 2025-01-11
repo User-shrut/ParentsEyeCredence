@@ -94,7 +94,6 @@ const IndividualTrack = () => {
     }
   }, [vehicleData])
 
-
   useEffect(() => {
     const fetchAddress = async () => {
       try {
@@ -252,7 +251,7 @@ const IndividualTrack = () => {
                             <strong>
                               <IoMdSpeedometer size={17} color="#FF7A00" />
                             </strong>{' '}
-                            {individualSalesMan.speed.toFixed(2)} km/h{' '}
+                            {individualSalesMan.speed.toFixed(2) * 1.6} km/h{' '}
                           </div>
                         </div>
                         <div>
