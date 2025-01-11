@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Autocomplete, InputAdornment, Chip, Checkbox } from "@mui/material";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material';
-import ListItemText from "@mui/material/ListItemText";
-import GroupIcon from '@mui/icons-material/Group';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Popper from '@mui/material/Popper';
-
+import { Autocomplete, InputAdornment, Chip, Checkbox } from '@mui/material'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
+import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material'
+import ListItemText from '@mui/material/ListItemText'
+import GroupIcon from '@mui/icons-material/Group'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import Popper from '@mui/material/Popper'
 import {
   TableContainer,
   Paper,
@@ -24,7 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  OutlinedInput
+  OutlinedInput,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -40,6 +39,12 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CHeaderNav,
+  CRow,
+  CCol,
+  CCard,
+  CCardHeader,
+  CCardBody,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import Loader from '../../../components/Loader/Loader'
@@ -50,13 +55,12 @@ import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
-import "../../../../src/app.css";
-
+import '../../../../src/app.css'
 
 const notificationTypes = [
   'statusOnline',
@@ -87,15 +91,14 @@ const Notification = () => {
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
   const accessToken = Cookies.get('authToken')
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([])
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState()
   const [devices, setDevices] = useState([])
   const [selectedDevices, setSelectedDevices] = useState([])
   const [selectedNotificationTypes, setSelectedNotificationTypes] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [devicesAlreadyAdded, setDevicesAlreadyAdded] = useState([]);
-
+  const [devicesAlreadyAdded, setDevicesAlreadyAdded] = useState([])
 
   const handleEditModalClose = () => setEditModalOpen(false)
   const handleAddModalClose = () => {
@@ -105,10 +108,8 @@ const Notification = () => {
   }
 
   const CustomListbox = (props) => {
-    return (
-      <ul {...props} style={{ maxHeight: '200px', overflowY: 'auto' }} />
-    );
-  };
+    return <ul {...props} style={{ maxHeight: '200px', overflowY: 'auto' }} />
+  }
 
   const style = {
     position: 'absolute',
@@ -144,7 +145,6 @@ const Notification = () => {
     }
   }
 
-  
   useEffect(() => {
     getGroups()
   }, [limit])
@@ -168,7 +168,7 @@ const Notification = () => {
         setLoading(false)
         const filtereddevices = response.data.notifications.map((item) => item.deviceId.name)
         setDevicesAlreadyAdded(filtereddevices)
-        console.log(("setdevicesalreadyadded", devicesAlreadyAdded));
+        console.log(('setdevicesalreadyadded', devicesAlreadyAdded))
       }
     } catch (error) {
       setLoading(false)
@@ -180,7 +180,7 @@ const Notification = () => {
   // ##################### Filter data by search query #######################
   const filterNotifications = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
       // const filtered = data.filter(
       //   (notification) =>
@@ -190,17 +190,18 @@ const Notification = () => {
 
       //changed the code as it was getting crashed while searching
       const filtered = data.filter((notification) => {
-        const deviceName = notification.deviceId?.name || ''; // Default to empty string if undefined
-        const typeName = notification.type?.name || ''; // Default to empty string if undefined
-  
-        return deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               typeName.toLowerCase().includes(searchQuery.toLowerCase());
-      });
-      setFilteredData(filtered);
-      setCurrentPage(1);
+        const deviceName = notification.deviceId?.name || '' // Default to empty string if undefined
+        const typeName = notification.type?.name || '' // Default to empty string if undefined
 
+        return (
+          deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          typeName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })
+      setFilteredData(filtered)
+      setCurrentPage(1)
     }
-  };
+  }
   const getDevices = async (selectedGroup) => {
     try {
       const response = await axios.get(
@@ -212,11 +213,10 @@ const Notification = () => {
         },
       )
       if (response.data.success) {
-        console.log("alreadyaddeddevices in setdevices", devicesAlreadyAdded);
+        console.log('alreadyaddeddevices in setdevices', devicesAlreadyAdded)
 
         setDevices(response.data.data)
-        console.log("devices es form me aa rhi he", devices);
-
+        console.log('devices es form me aa rhi he', devices)
       } else {
         setDevices([])
       }
@@ -224,7 +224,6 @@ const Notification = () => {
       setDevices([])
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-
     }
   }
 
@@ -233,8 +232,8 @@ const Notification = () => {
   }, [searchQuery])
 
   useEffect(() => {
-    filterNotifications(searchQuery);
-  }, [data, searchQuery]);
+    filterNotifications(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -251,19 +250,23 @@ const Notification = () => {
   const handleAddNotification = async (e) => {
     e.preventDefault()
     console.log(formData)
-    const selectedDevicesArray = selectedDevices.map((device) => device._id);
+    const selectedDevicesArray = selectedDevices.map((device) => device._id)
 
     const FormDataObj = {
-      "deviceId": selectedDevicesArray,
-      "type": selectedNotificationTypes,
+      deviceId: selectedDevicesArray,
+      type: selectedNotificationTypes,
     }
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/notifications`, FormDataObj, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/notifications`,
+        FormDataObj,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
 
       if (response.status === 201) {
         toast.success('Successfully Notification Created!')
@@ -283,7 +286,7 @@ const Notification = () => {
 
   const handleEditNotification = async (e) => {
     e.preventDefault()
-    console.log("formData in editnotification", formData)
+    console.log('formData in editnotification', formData)
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/notifications/${formData._id}`,
@@ -320,10 +323,9 @@ const Notification = () => {
   // ###################### Delete Group ##############################
 
   const handleDeleteNotification = async (item) => {
-
-    const confirmed = confirm('Do you want to delete this notification');
+    const confirmed = confirm('Do you want to delete this notification')
     // added the logic If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
     try {
       const response = await axios.delete(
         `${import.meta.env.VITE_API_URL}/notifications/${item._id}`,
@@ -350,10 +352,10 @@ const Notification = () => {
   }, [formData])
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF()
 
     // Define the columns based on the CTable structure
-    const tableColumn = ['SN', 'Device Name', 'Notifications'];
+    const tableColumn = ['SN', 'Device Name', 'Notifications']
 
     // Generate rows of data for the PDF
     const tableRows = filteredData.map((item, index) => {
@@ -363,17 +365,17 @@ const Notification = () => {
         item.deviceId?.name || '--', // Device Name
         item.type.length || '--', // Notifications (assuming type length is what you want here)
         // 'Actions' // Placeholder for Actions, you might want to define specific actions here
-      ];
+      ]
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Use autoTable to create the table in the PDF
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable(tableColumn, tableRows, { startY: 20 })
 
     // Save the generated PDF
-    doc.save('Notification_data.pdf');
-  };
+    doc.save('Notification_data.pdf')
+  }
 
   const exportToExcel = () => {
     // Map filtered data into the format required for export
@@ -381,53 +383,28 @@ const Notification = () => {
       const rowData = {
         SN: rowIndex + 1, // Include row index as SN
         'Device Name': item.deviceId?.name || 'N/A', // Device Name
-        'Notifications': item.type.length || '0', // Notifications count
+        Notifications: item.type.length || '0', // Notifications count
         // 'Actions': 'N/A' // Placeholder for Actions, adjust as needed
-      };
+      }
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+    const workbook = XLSX.utils.book_new()
 
     // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data')
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'Notification_data.xlsx');
-  };
+    XLSX.writeFile(workbook, 'Notification_data.xlsx')
+  }
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Notifications</h2>
-        </div>
-
-        <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-secondary"
-            >
-              Add Notifications
-            </button>
-          </div>
-        </div>
-      </div>
+      <div className="d-flex justify-content-between mb-2"></div>
       <div className="d-md-none mb-2">
         <input
           type="search"
@@ -437,128 +414,203 @@ const Notification = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto', // Set the desired height
-          overflowX: 'auto', // Enable horizontal scrollbar
-          overflowY: 'auto', // Enable vertical scrollbar if needed
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black'
-        }}
-      >
-        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-            <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>SN</strong> 
-              </CTableHeaderCell>
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Device Name</strong>
-              </CTableHeaderCell>
-              {/* <CTableHeaderCell className=" text-center text-white bg-secondary">
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader className="grand d-flex justify-content-between align-items-center">
+              <strong>Notification</strong>
+              <div className="d-flex">
+                <div className="me-3 d-none d-md-block">
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search for Notifications"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={() => setAddModalOpen(true)}
+                    variant="contained"
+                    className="btn text-white"
+                    style={{ backgroundColor: '#0a2d63' }}
+                  >
+                    Add Notifications
+                  </button>
+                </div>
+              </div>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                // marginBottom: '10px',
+                // borderRadius: '10px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody>
+                <CTable
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  className="mb-2 border min-vh-25 rounded-top-3"
+                  hover
+                  responsive
+                >
+                  <CTableHead className="text-nowrap">
+                    <CTableRow>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        <strong>SN</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        <strong>Device Name</strong>
+                      </CTableHeaderCell>
+                      {/* <CTableHeaderCell className=" text-center text-white bg-secondary">
                 Chennel
               </CTableHeaderCell> */}
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Notification</strong>
-              </CTableHeaderCell>
-
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>Actions</strong>
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {loading ? (
-              <>
-                <CTableRow>
-                  <CTableDataCell colSpan="4" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              </>
-            ) : filteredData.length > 0 ? (
-              filteredData?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{(currentPage - 1) * limit + index + 1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >{item.deviceId?.name}</CTableDataCell>
-                  {/* <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell> */}
-                  <CTableDataCell className="text-center p-0 " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}} >
-                    <CFormSelect
-                      id="type"
-                      value=""
-                      className=" text-center border-2 "
-                      style={{ width: '130px', margin: '0 auto' }}
-                    >
-                      <option value="">{item.type.length}</option>
-                      {Array.isArray(item.type) &&
-                        item.type.map((typ) => (
-                          <option key={typ} value={typ}>
-                            {typ}
-                          </option>
-                        ))}
-                    </CFormSelect>
-                  </CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex p-0"
-                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}
-                  >
-                    <IconButton aria-label="edit" onClick={() => handleClickNotification(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => handleDeleteNotification(item)}>
-                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
-                    </IconButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan="4" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
-                  >
-                    <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's no Notification you have created yet.
-                      <br /> Maybe it's time to create new Notification!"
-                    </p>
-                    <div>
-                      <button
-                        onClick={() => setAddModalOpen(true)}
-                        variant="contained"
-                        className="btn btn-primary m-3 text-white"
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
                       >
-                        <span>
-                          <IoMdAdd className="fs-5" />
-                        </span>{' '}
-                        Create Notification
-                      </button>
-                    </div>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
+                        <strong>Notification</strong>
+                      </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        <strong>Actions</strong>
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <>
+                        <CTableRow>
+                          <CTableDataCell colSpan="4" className="text-center">
+                            <div className="text-nowrap mb-2 text-center w-">
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                            </div>
+                          </CTableDataCell>
+                        </CTableRow>
+                      </>
+                    ) : filteredData.length > 0 ? (
+                      filteredData?.map((item, index) => (
+                        <CTableRow key={index}>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {(currentPage - 1) * limit + index + 1}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.deviceId?.name}
+                          </CTableDataCell>
+                          {/* <CTableDataCell className="text-center p-0">{item.channel}</CTableDataCell> */}
+                          <CTableDataCell
+                            className="text-center p-0 "
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            <CFormSelect
+                              id="type"
+                              value=""
+                              className=" text-center border-2 "
+                              style={{ width: '130px', margin: '0 auto' }}
+                            >
+                              <option value="">{item.type.length}</option>
+                              {Array.isArray(item.type) &&
+                                item.type.map((typ) => (
+                                  <option key={typ} value={typ}>
+                                    {typ}
+                                  </option>
+                                ))}
+                            </CFormSelect>
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center d-flex p-0"
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                            }}
+                          >
+                            <IconButton
+                              aria-label="edit"
+                              onClick={() => handleClickNotification(item)}
+                            >
+                              <RiEdit2Fill
+                                style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
+                              />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => handleDeleteNotification(item)}
+                            >
+                              <AiFillDelete
+                                style={{ fontSize: '20px', color: 'red', margin: '3px' }}
+                              />
+                            </IconButton>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="4" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">
+                              "Oops! Looks like there's no Notification you have created yet.
+                              <br /> Maybe it's time to create new Notification!"
+                            </p>
+                            <div>
+                              <button
+                                onClick={() => setAddModalOpen(true)}
+                                variant="contained"
+                                className="btn btn-primary m-3 text-white"
+                              >
+                                <span>
+                                  <IoMdAdd className="fs-5" />
+                                </span>{' '}
+                                Create Notification
+                              </button>
+                            </div>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
@@ -567,14 +619,16 @@ const Notification = () => {
           <CIcon icon={cilSettings} />
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      <div className='d-flex justify-content-center align-items-center'>
+      <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3"> {/* Adds margin to the right of pagination */}
+          <div className="me-3">
+            {' '}
+            {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
@@ -595,7 +649,7 @@ const Notification = () => {
             />
           </div>
           {/* Form Control */}
-          <div style={{ width: "90px" }}>
+          <div style={{ width: '90px' }}>
             <CFormSelect
               aria-label="Default select example"
               value={limit}
@@ -604,7 +658,7 @@ const Notification = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: 'ALL', value: '' }
+                { label: 'ALL', value: '' },
               ]}
             />
           </div>
@@ -629,7 +683,10 @@ const Notification = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddNotification} style={{display: 'flex',flexDirection: 'column'}}>
+            <form
+              onSubmit={handleAddNotification}
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
               {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel>Select Group</InputLabel>
                 <Select
@@ -680,13 +737,13 @@ const Notification = () => {
                   ))}
                 </Select>
               </FormControl> */}
-               <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <Autocomplete
                   options={groups} // List of devices
                   getOptionLabel={(option) => option.name} // Defines the label for each option
                   //onChange={(event, value) => setSelectedDevice(value)}
                   onChange={(event, value) => {
-                    console.log("value in autocomplete group", value);
+                    console.log('value in autocomplete group', value)
 
                     getDevices(value._id)
                   }} // Handle selection
@@ -699,7 +756,15 @@ const Notification = () => {
                         startAdornment: (
                           <>
                             <InputAdornment position="start">
-                              <GroupIcon sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }} />
+                              <GroupIcon
+                                sx={{
+                                  borderRadius: '50%',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                                  color: 'white',
+                                  padding: '5px',
+                                  fontSize: '28px',
+                                }}
+                              />
                             </InputAdornment>
                             {params.InputProps.startAdornment}
                           </>
@@ -710,7 +775,7 @@ const Notification = () => {
                   )}
                   filterOptions={(options, state) =>
                     options.filter((option) =>
-                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase()),
                     )
                   }
                   isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
@@ -723,12 +788,10 @@ const Notification = () => {
                   disableCloseOnSelect
                   getOptionLabel={(option) => option.name} // Defines the label for each option
                   onChange={(event, newValue) => {
-                    console.log("value in auto devices", newValue);
+                    console.log('value in auto devices', newValue)
 
                     setSelectedDevices(newValue)
-                  }
-                  }
-
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -739,7 +802,15 @@ const Notification = () => {
                         startAdornment: (
                           <>
                             <InputAdornment position="start">
-                              <DirectionsCarIcon sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }} />
+                              <DirectionsCarIcon
+                                sx={{
+                                  borderRadius: '50%',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                                  color: 'white',
+                                  padding: '5px',
+                                  fontSize: '28px',
+                                }}
+                              />
                             </InputAdornment>
                             {params.InputProps.startAdornment}
                           </>
@@ -758,12 +829,21 @@ const Notification = () => {
 
                   // )}
                   renderOption={(props, option, { selected }) => {
-                    const isDisabled = devicesAlreadyAdded.includes(option.name);
-                    { (() => console.log("Logging inside JSX:", devicesAlreadyAdded, "isDisabled", isDisabled))() } // Check if option.name is in devicesAlreadyAdded
+                    const isDisabled = devicesAlreadyAdded.includes(option.name)
+                    {
+                      ;(() =>
+                        console.log(
+                          'Logging inside JSX:',
+                          devicesAlreadyAdded,
+                          'isDisabled',
+                          isDisabled,
+                        ))()
+                    } // Check if option.name is in devicesAlreadyAdded
                     return (
-                      <li {...props} 
-                     // aria-disabled={isDisabled}
-                       >
+                      <li
+                        {...props}
+                        // aria-disabled={isDisabled}
+                      >
                         <Checkbox
                           style={{ marginRight: 8 }}
                           checked={selected}
@@ -777,11 +857,11 @@ const Notification = () => {
                           // }}
                         />
                       </li>
-                    );
+                    )
                   }}
                   filterOptions={(options, state) =>
                     options.filter((option) =>
-                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase()),
                     )
                   }
                   isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
@@ -797,23 +877,27 @@ const Notification = () => {
                   if (newValue.includes('All')) {
                     if (selectedNotificationTypes.length === notificationTypes.length) {
                       // Deselect all
-                      setSelectedNotificationTypes([]);
+                      setSelectedNotificationTypes([])
                     } else {
                       // Select all options except "All"
-                      setSelectedNotificationTypes(notificationTypes);
+                      setSelectedNotificationTypes(notificationTypes)
                     }
                   } else {
-                    setSelectedNotificationTypes(newValue);
+                    setSelectedNotificationTypes(newValue)
                   }
                 }}
-                ListboxComponent={CustomListbox} 
+                ListboxComponent={CustomListbox}
                 renderOption={(props, option, { selected }) => (
                   <li {...props}>
                     <Checkbox
                       icon={<CheckBoxOutlineBlank />}
                       checkedIcon={<CheckBox />}
                       style={{ marginRight: 8 }}
-                      checked={option === 'All' ? selectedNotificationTypes.length === notificationTypes.length : selected}
+                      checked={
+                        option === 'All'
+                          ? selectedNotificationTypes.length === notificationTypes.length
+                          : selected
+                      }
                     />
                     {option}
                   </li>
@@ -830,11 +914,11 @@ const Notification = () => {
                           <InputAdornment position="start">
                             <NotificationsIcon
                               sx={{
-                                borderRadius: "50%",
-                                backgroundColor: "rgba(0, 0, 0, 0.54)",
-                                color: "white",
-                                padding: "5px",
-                                fontSize: "28px",
+                                borderRadius: '50%',
+                                backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                                color: 'white',
+                                padding: '5px',
+                                fontSize: '28px',
                               }}
                             />
                           </InputAdornment>
@@ -843,17 +927,14 @@ const Notification = () => {
                       ),
                     }}
                   />
-                  
                 )}
-                
               />
 
-             
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px', marginLeft:'auto' }}
+                style={{ marginTop: '20px', marginLeft: 'auto' }}
               >
                 Submit
               </Button>
@@ -882,7 +963,10 @@ const Notification = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleEditNotification} style={{display: 'flex',flexDirection: 'column'}}>
+            <form
+              onSubmit={handleEditNotification}
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
               <FormControl style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <TextField
                   label="Device"
@@ -893,7 +977,13 @@ const Notification = () => {
                     startAdornment: (
                       <InputAdornment position="start">
                         <DirectionsCarIcon
-                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          sx={{
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                            color: 'white',
+                            padding: '5px',
+                            fontSize: '28px',
+                          }}
                         />
                       </InputAdornment>
                     ),
@@ -922,18 +1012,18 @@ const Notification = () => {
                   name="type"
                   value={formData.type || []}
                   onChange={(e) => {
-                    const selected = e.target.value;
+                    const selected = e.target.value
                     if (selected.includes('All')) {
                       if (formData.type?.length === notificationTypes.length) {
                         // Deselect all if "All" is selected
-                        setFormData({ ...formData, type: [] });
+                        setFormData({ ...formData, type: [] })
                       } else {
                         // Select all options
-                        setFormData({ ...formData, type: notificationTypes });
+                        setFormData({ ...formData, type: notificationTypes })
                       }
                     } else {
                       // Regular update
-                      setFormData({ ...formData, type: selected });
+                      setFormData({ ...formData, type: selected })
                     }
                   }}
                   input={
@@ -941,7 +1031,13 @@ const Notification = () => {
                       startAdornment={
                         <InputAdornment position="start">
                           <NotificationsIcon
-                            sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                            sx={{
+                              borderRadius: '50%',
+                              backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                              color: 'white',
+                              padding: '5px',
+                              fontSize: '28px',
+                            }}
                           />
                         </InputAdornment>
                       }
@@ -969,12 +1065,12 @@ const Notification = () => {
                   ))}
                 </Select>
               </FormControl>
-              
+
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px', marginLeft:'auto'}}
+                style={{ marginTop: '20px', marginLeft: 'auto' }}
               >
                 Edit
               </Button>

@@ -68,7 +68,6 @@ const AppSidebar = () => {
 
   const toggle = useSelector((state) => state.navbar)
 
-
   useEffect(() => {
     if (!token) {
       navigate('/login')
@@ -86,10 +85,10 @@ const AppSidebar = () => {
   return (
     <CSidebar
       className="border-end"
-      // style={{marginTop:"5%"}}  
-      // style={{backgroundColor: 'rgb(248,249,255)' }}
+      // style={{marginTop:"5%"}}
+      style={{ backgroundColor: '#0a2d63' }}
       fontcolor="rgb(0,0,0)"
-      colorScheme="light"
+      colorScheme="dark"
       position="fixed"
       unfoldable={sidebarShow}
       visible={sidebarShow}
@@ -103,9 +102,6 @@ const AppSidebar = () => {
 
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
           <img src={logo} alt="Logo" className="sidebar-brand-narrow" height={25} width={60} />
-          
-
-
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
@@ -115,12 +111,11 @@ const AppSidebar = () => {
       </CSidebarHeader>
       {navigatingNav && <AppSidebarNav items={navigatingNav} />}
       <CSidebarFooter className="border-top d-none d-lg-flex">
-        
-        <CTooltip content = 'Close'>
-        <CSidebarToggler
-         onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-          // onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
-        />
+        <CTooltip content="Close">
+          <CSidebarToggler
+            onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+            // onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
+          />
         </CTooltip>
 
         {/* <CHeaderToggler
@@ -129,8 +124,6 @@ const AppSidebar = () => {
         >
           <CIcon icon={cilDelete} size="xl" />
         </CHeaderToggler> */}
-
-
       </CSidebarFooter>
     </CSidebar>
   )

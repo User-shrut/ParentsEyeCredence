@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import ReactPaginate from 'react-paginate'
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import { FaUserGroup } from "react-icons/fa6";
-import './User.css'
+import ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
+import { FaUserGroup } from 'react-icons/fa6'
+import '../index.css'
 
 import {
   TableContainer,
@@ -36,7 +36,7 @@ import {
   DialogTitle,
   DialogActions,
   Autocomplete,
-  Chip
+  Chip,
 } from '@mui/material'
 import { RiEdit2Fill, RiAddBoxFill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
@@ -72,10 +72,10 @@ import { jwtDecode } from 'jwt-decode'
 import { IoMdAdd, IoMdAddCircle } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
 import CIcon from '@coreui/icons-react'
-import { cilSettings } from '@coreui/icons';
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
-import "../../../../src/app.css";
+import { cilSettings } from '@coreui/icons'
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
+import '../../../../src/app.css'
 
 const Users = () => {
   // somthing for testing
@@ -89,11 +89,11 @@ const Users = () => {
   // const [currentStep, setCurrentStep] = useState(0)
   // const steps = ['Personal Info', 'Permissions']
   const [isSuperAdmin, setSuperAdmin] = useState(false)
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([])
   const [groups, setGroups] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [token, setToken] = useState('')
-  const [searchQueryGroupField, setSearchQueryGroupField] = useState("");
+  const [searchQueryGroupField, setSearchQueryGroupField] = useState('')
 
   // Go to the next step
   // const handleNext = () => {
@@ -182,8 +182,6 @@ const Users = () => {
     }
   }
 
-
-
   const fetchGroups = async () => {
     const accessToken = Cookies.get('authToken')
     try {
@@ -206,38 +204,33 @@ const Users = () => {
     }
   }
 
-
   useEffect(() => {
-    fetchGroups();
+    fetchGroups()
   }, [])
-
-
-
 
   // ##################### Filter data by search query #######################
   const filterUsers = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
       const filtered = data.filter(
         (user) =>
           user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user?.mobile?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
+          user?.mobile?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredData(filtered)
       setCurrentPage(1)
-
     }
-  };
+  }
 
   useEffect(() => {
     fetchUserData()
   }, [limit, searchQuery])
 
   useEffect(() => {
-    filterUsers(searchQuery);
-  }, [data, searchQuery]);
+    filterUsers(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -312,9 +305,7 @@ const Users = () => {
       [name]: value,
     }))
 
-
-
-    console.log("this is value: ", formData);
+    console.log('this is value: ', formData)
   }
 
   // Handle permission changes
@@ -568,40 +559,36 @@ const Users = () => {
 
   const deleteUserSubmit = async (item) => {
     // Show a confirmation dialog
-    const confirmed = confirm('Do you want to delete this user?');
+    const confirmed = confirm('Do you want to delete this user?')
 
     // If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
 
-    console.log(item);
+    console.log(item)
     try {
-      const accessToken = Cookies.get('authToken');
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/user/${item._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const accessToken = Cookies.get('authToken')
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/user/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
 
       if (response.status === 200) {
-        toast.error('Successfully deleted User!');
-        fetchUserData();
+        toast.error('Successfully deleted User!')
+        fetchUserData()
       }
     } catch (error) {
       // Handle the error
-      console.error(error.response ? error.response.data : 'An error occurred');
+      console.error(error.response ? error.response.data : 'An error occurred')
     }
-  };
-
+  }
 
   // Excel and pdf download
 
   const exportToExcel = async () => {
     // Create a new workbook and add a worksheet
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('User Data');
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('User Data')
 
     // Define the headers
     worksheet.columns = [
@@ -610,31 +597,42 @@ const Users = () => {
       { header: 'Email', key: 'email', width: 30 },
       { header: 'Mobile No.', key: 'mobile', width: 15 },
       { header: 'Master Permissions', key: 'masterPermissions', width: 40 },
-      { header: 'Reports Permissions', key: 'reportsPermissions', width: 40 }
-    ];
+      { header: 'Reports Permissions', key: 'reportsPermissions', width: 40 },
+    ]
 
     // Add custom styles to headers
     worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };  // White font
+      cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } } // White font
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF6C757D' },  // Background color set to #6C757D
-      };
-      cell.alignment = { horizontal: 'center', vertical: 'middle' };
-    });
+        fgColor: { argb: 'FF6C757D' }, // Background color set to #6C757D
+      }
+      cell.alignment = { horizontal: 'center', vertical: 'middle' }
+    })
 
     // Map filtered data into the format required for export
     filteredData?.forEach((item, rowIndex) => {
-      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-        .filter((permission) => item[permission])
-        .join(', ') || 'N/A';
+      const masterPermissions =
+        ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+          .filter((permission) => item[permission])
+          .join(', ') || 'N/A'
 
-      const reportsPermissions = [
-        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
-      ]
-        .filter((permission) => item[permission])
-        .join(', ') || 'N/A';
+      const reportsPermissions =
+        [
+          'history',
+          'stop',
+          'travel',
+          'status',
+          'distance',
+          'idle',
+          'sensor',
+          'alerts',
+          'vehicle',
+          'geofenceReport',
+        ]
+          .filter((permission) => item[permission])
+          .join(', ') || 'N/A'
 
       // Add rows with mapped data
       worksheet.addRow({
@@ -643,75 +641,90 @@ const Users = () => {
         email: item.email || 'N/A',
         mobile: item.mobile || 'N/A',
         masterPermissions,
-        reportsPermissions
-      });
-    });
+        reportsPermissions,
+      })
+    })
 
     // Write the Excel file to a Blob and save it
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, 'user_data.xlsx');
-  };
-
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+    saveAs(blob, 'user_data.xlsx')
+  }
 
   const exportToPDF = async () => {
-
-
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
-    const tableColumn = ['SN', 'Name', 'Email', 'Mobile No.', 'Master Permissions', 'Reports Permissions'];
+    })
+    const tableColumn = [
+      'SN',
+      'Name',
+      'Email',
+      'Mobile No.',
+      'Master Permissions',
+      'Reports Permissions',
+    ]
 
     const tableRows = filteredData?.map((row, rowIndex) => {
-      const masterPermissions = ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-        .filter((permission) => row[permission])
-        .join(', ') || 'N/A';
+      const masterPermissions =
+        ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+          .filter((permission) => row[permission])
+          .join(', ') || 'N/A'
 
-      const reportsPermissions = [
-        'history', 'stop', 'travel', 'status', 'distance', 'idle', 'sensor', 'alerts', 'vehicle', 'geofenceReport'
-      ]
-        .filter((permission) => row[permission])
-        .join(', ') || 'N/A';
+      const reportsPermissions =
+        [
+          'history',
+          'stop',
+          'travel',
+          'status',
+          'distance',
+          'idle',
+          'sensor',
+          'alerts',
+          'vehicle',
+          'geofenceReport',
+        ]
+          .filter((permission) => row[permission])
+          .join(', ') || 'N/A'
 
       const rowData = [
         row.username || '--',
         row.email || '--',
         row.mobile || 'N/A',
         masterPermissions,
-        reportsPermissions
-      ];
+        reportsPermissions,
+      ]
 
-      return [rowIndex + 1, ...rowData];
-    });
+      return [rowIndex + 1, ...rowData]
+    })
 
     const columnStyles = {
-      2: { cellWidth: 35 } // Index 2 is the 'Email' column, setting width to 60 units (adjust as needed)
-    };
+      2: { cellWidth: 35 }, // Index 2 is the 'Email' column, setting width to 60 units (adjust as needed)
+    }
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 20,
       columnStyles: columnStyles,
-    });
-    doc.save('user_data.pdf');
-
+    })
+    doc.save('user_data.pdf')
   }
-
 
   // add group
 
   // State to manage dialog and new group name
-  const [openNewGroupDialog, setOpenNewGroupDialog] = useState(false);
-  const [newGroupName, setNewGroupName] = useState("");
+  const [openNewGroupDialog, setOpenNewGroupDialog] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
 
   // Function to handle opening the "Add New Group" dialog
   const handleNewGroup = () => {
-    setOpenNewGroupDialog(true);
-  };
+    setOpenNewGroupDialog(true)
+  }
 
   // Function to fetch the list of groups (GET request)
   const fetchGroupsData = async () => {
-    const accessToken = Cookies.get('authToken');  // Retrieve the stored access token
+    const accessToken = Cookies.get('authToken') // Retrieve the stored access token
     try {
       // Making a GET request to fetch groups from the API
       const response = await fetch(`${import.meta.env.VITE_API_URL}/group`, {
@@ -719,29 +732,29 @@ const Users = () => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Network response was not ok')
       }
 
-      const data = await response.json();
-      console.log('Fetched groups: ', data.groups);
-      setGroups(data.groups);  // Update the groups state with fetched data
+      const data = await response.json()
+      console.log('Fetched groups: ', data.groups)
+      setGroups(data.groups) // Update the groups state with fetched data
     } catch (error) {
-      console.error('Error fetching groups:', error);
-      toast.error('Failed to fetch groups');
+      console.error('Error fetching groups:', error)
+      toast.error('Failed to fetch groups')
     }
-  };
+  }
 
   // Function to handle the API call for adding a new group (POST request)
   const createNewGroup = async () => {
-    console.log('Save button clicked');
+    console.log('Save button clicked')
 
     // Check if the new group name is valid (not empty or just spaces)
     if (newGroupName.trim()) {
       try {
-        const accessToken = Cookies.get('authToken');  // Get the access token from cookies
+        const accessToken = Cookies.get('authToken') // Get the access token from cookies
 
         // Sending a POST request to create the new group
         const response = await axios.post(
@@ -752,35 +765,33 @@ const Users = () => {
               Authorization: `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
-          }
-        );
+          },
+        )
 
         if (response.status === 201) {
-          toast.success('Group created successfully');
+          toast.success('Group created successfully')
 
           // Fetch updated list of groups after creating a new one
-          await fetchGroupsData();  // Fetch groups to refresh the list
+          await fetchGroupsData() // Fetch groups to refresh the list
 
           // Reset dialog and input field after success
-          setOpenNewGroupDialog(false);
-          setNewGroupName('');
+          setOpenNewGroupDialog(false)
+          setNewGroupName('')
         }
       } catch (error) {
-        console.error('Error creating group:', error);
-        toast.error('An error occurred while creating the group');
+        console.error('Error creating group:', error)
+        toast.error('An error occurred while creating the group')
       }
     } else {
       // Show a warning if the group name is empty
-      toast.warn('Group name cannot be empty');
+      toast.warn('Group name cannot be empty')
     }
-  };
+  }
 
   // Using useEffect to fetch the groups list when the component mounts
   useEffect(() => {
-    fetchGroups();
-  }, []);
-
-
+    fetchGroups()
+  }, [])
 
   //  ####################################################
 
@@ -789,9 +800,7 @@ const Users = () => {
       <Toaster position="top-center" reverseOrder={false} />
       <div>
         <div className="d-flex justify-content-between mb-2">
-          <div>
-            {/* <h3>Users</h3> */}
-          </div>
+          <div>{/* <h3>Users</h3> */}</div>
 
           <div className="d-flex">
             {/* <div className="me-3 d-none d-md-block">
@@ -803,7 +812,6 @@ const Users = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div> */}
-
           </div>
         </div>
         <div className="mb-2 d-md-none">
@@ -822,14 +830,14 @@ const Users = () => {
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader className="grand d-flex justify-content-between align-items-center text-white" style={{ color: 'white' }}>
+            <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>USERS</strong>
               <div className="d-flex">
                 <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
-                    placeholder="search here...."
+                    placeholder="Search for Users"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -838,7 +846,8 @@ const Users = () => {
                   <button
                     onClick={() => setAddModalOpen(true)}
                     variant="contained"
-                    className="btn btn-secondary"
+                    className="btn text-white"
+                    style={{ backgroundColor: '#0a2d63' }}
                   >
                     Add User
                   </button>
@@ -856,30 +865,57 @@ const Users = () => {
                 // border: '1px solid black',
               }}
             >
-              <CCardBody >
-
-                <CTable style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive >
-                  <CTableHead className="text-nowrap " >
+              <CCardBody>
+                <CTable
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  className="mb-2 border min-vh-25 rounded-top-3"
+                  hover
+                  responsive
+                >
+                  <CTableHead className="text-nowrap ">
                     <CTableRow>
-                      <CTableHeaderCell className=" text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className=" text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>SN</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className=" text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className=" text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Name</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className="text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className="text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Email</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className="text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className="text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Mobile No.</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className=" text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className=" text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Master Permissions</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className=" text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className=" text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Reports Permissions</strong>
                       </CTableHeaderCell>
-                      <CTableHeaderCell className=" text-center table-cell" style={{ backgroundColor: '#c3cfe2' }}>
+                      <CTableHeaderCell
+                        className=" text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
                         <strong>Actions</strong>
                       </CTableHeaderCell>
                     </CTableRow>
@@ -888,7 +924,6 @@ const Users = () => {
                   <CTableBody>
                     {loading ? (
                       <CTableRow>
-
                         <CTableDataCell colSpan="8" className="text-center">
                           <div className="text-nowrap mb-2 text-center w-">
                             <p className="card-text placeholder-glow">
@@ -908,17 +943,50 @@ const Users = () => {
                       </CTableRow>
                     ) : filteredData.length > 0 ? (
                       filteredData?.map((item, index) => (
-                        <CTableRow key={index} className="p-0">
-                          <CTableDataCell className='text-center p-0' style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage - 1) * limit + index + 1}</CTableDataCell>
-                          <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.username}</CTableDataCell>
-                          <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{item.email}</CTableDataCell>
-                          <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                        <CTableRow
+                          key={index}
+                          className="p-0"
+                          style={{ fontSize: '13px', fontFamily: 'system-ui' }}
+                        >
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {(currentPage - 1) * limit + index + 1}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.username}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.email}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
                             {item.mobile || 'N/A'}
                           </CTableDataCell>
 
                           {/* Master Column */}
-                          <CTableDataCell className="text-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
-                            <CFormSelect id="periods" value="" className=" text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >
+                          <CTableDataCell
+                            className="text-center "
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            <CFormSelect
+                              id="periods"
+                              value=""
+                              className=" text-center"
+                              style={{
+                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                fontSize: '14px',
+                              }}
+                            >
                               <option value="">Master</option>
                               {[
                                 'users',
@@ -940,8 +1008,22 @@ const Users = () => {
                           </CTableDataCell>
 
                           {/* Reports Column */}
-                          <CTableDataCell className="align-items-center " style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
-                            <CFormSelect id="periods" value="" className="text-center border-2" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>
+                          <CTableDataCell
+                            className="align-items-center "
+                            style={{
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                              fontSize: '14px',
+                            }}
+                          >
+                            <CFormSelect
+                              id="periods"
+                              value=""
+                              className="text-center border-2"
+                              style={{
+                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                fontSize: '14px',
+                              }}
+                            >
                               <option value="">Reports</option>
                               {[
                                 'history',
@@ -966,7 +1048,11 @@ const Users = () => {
                           </CTableDataCell>
                           <CTableDataCell
                             className="text-center d-flex "
-                            style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                            }}
                           >
                             {/* <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                       <RiEdit2Fill
@@ -988,8 +1074,13 @@ const Users = () => {
                                     style={{ fontSize: '20px', color: 'black', margin: '2px' }}
                                   />
                                 </IconButton>
-                                <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
-                                  <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
+                                <IconButton
+                                  aria-label="delete"
+                                  onClick={() => deleteUserSubmit(item)}
+                                >
+                                  <AiFillDelete
+                                    style={{ fontSize: '20px', color: 'red', margin: '2px' }}
+                                  />
                                 </IconButton>
                               </CTableDataCell>
                             )}
@@ -998,10 +1089,13 @@ const Users = () => {
                                 className="text-center d-flex p-0"
                                 style={{ justifyContent: 'center', alignItems: 'center' }}
                               >
-
                                 <IconButton aria-label="edit">
                                   <RiEdit2Fill
-                                    style={{ fontSize: '20px', color: 'transparent', margin: '2px' }}
+                                    style={{
+                                      fontSize: '20px',
+                                      color: 'transparent',
+                                      margin: '2px',
+                                    }}
                                   />
                                 </IconButton>
                                 <IconButton aria-label="delete">
@@ -1014,7 +1108,6 @@ const Users = () => {
                                     }}
                                   />
                                 </IconButton>
-
                               </CTableDataCell>
                             )}
                             {!isSuperAdmin && item.username != token.user.username && (
@@ -1022,16 +1115,19 @@ const Users = () => {
                                 className="text-center d-flex p-0"
                                 style={{ justifyContent: 'center', alignItems: 'center' }}
                               >
-
                                 <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                                   <RiEdit2Fill
                                     style={{ fontSize: '20px', color: 'black', margin: '2px' }}
                                   />
                                 </IconButton>
-                                <IconButton aria-label="delete" onClick={() => deleteUserSubmit(item)}>
-                                  <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '2px' }} />
+                                <IconButton
+                                  aria-label="delete"
+                                  onClick={() => deleteUserSubmit(item)}
+                                >
+                                  <AiFillDelete
+                                    style={{ fontSize: '20px', color: 'red', margin: '2px' }}
+                                  />
                                 </IconButton>
-
                               </CTableDataCell>
                             )}
                           </CTableDataCell>
@@ -1067,12 +1163,10 @@ const Users = () => {
                   </CTableBody>
                 </CTable>
               </CCardBody>
-
             </TableContainer>
           </CCard>
         </CCol>
       </CRow>
-
 
       {/* </div> */}
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
@@ -1081,18 +1175,19 @@ const Users = () => {
           style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
         >
           <CIcon icon={cilSettings} />
-
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
       <br />
-      <div className='d-flex justify-content-center align-items-center'>
+      <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3"> {/* Adds margin to the right of pagination */}
+          <div className="me-3">
+            {' '}
+            {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
@@ -1110,11 +1205,11 @@ const Users = () => {
               nextClassName="page-item"
               nextLinkClassName="page-link"
               activeClassName="active"
-              activeLinkClassName="text-white"  // Active page text color (optional)
+              activeLinkClassName="text-white" // Active page text color (optional)
             />
           </div>
           {/* Form Control */}
-          <div style={{ width: "90px" }}>
+          <div style={{ width: '90px' }}>
             <CFormSelect
               aria-label="Default select example"
               value={limit}
@@ -1123,7 +1218,7 @@ const Users = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: 'ALL', value: '' }
+                { label: 'ALL', value: '' },
               ]}
             />
           </div>
@@ -1163,7 +1258,14 @@ const Users = () => {
             </Stepper> */}
 
             {/* {currentStep === 0 && ( */}
-            <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridGap: '0.7rem 1.5rem' }}>
+            <div
+              className="mt-3"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto auto auto',
+                gridGap: '0.7rem 1.5rem',
+              }}
+            >
               {/* Personal Info Step */}
               <TextField
                 label="User Name"
@@ -1279,40 +1381,35 @@ const Users = () => {
                   </Select>
                 </FormControl> */}
 
-
               <Autocomplete
                 multiple
                 id="groups-assigned"
-                options={[{ _id: "new", name: "Add New Group" }, ...groups]} // Add "Add New Group" as an option
+                options={[{ _id: 'new', name: 'Add New Group' }, ...groups]} // Add "Add New Group" as an option
                 getOptionLabel={(option) => option.name}
-                value={
-                  groups.filter((group) =>
-                    formData.groupsAssigned?.includes(group._id)
-                  ) || []
-                }
+                value={groups.filter((group) => formData.groupsAssigned?.includes(group._id)) || []}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
                 onChange={(event, value) => {
                   // Check if "Add New Group" is selected
-                  const isNewGroupSelected = value.some((item) => item._id === "new");
+                  const isNewGroupSelected = value.some((item) => item._id === 'new')
 
                   if (isNewGroupSelected) {
-                    const updatedValues = value.filter((item) => item._id !== "new");
+                    const updatedValues = value.filter((item) => item._id !== 'new')
                     handleInputChange({
                       target: {
-                        name: "groupsAssigned",
+                        name: 'groupsAssigned',
                         value: updatedValues.map((item) => item._id),
                       },
-                    });
+                    })
 
                     // Trigger "Add New Group" function
-                    handleNewGroup();
+                    handleNewGroup()
                   } else {
                     handleInputChange({
                       target: {
-                        name: "groupsAssigned",
+                        name: 'groupsAssigned',
                         value: value.map((item) => item._id),
                       },
-                    });
+                    })
                   }
                 }}
                 renderInput={(params) => (
@@ -1345,26 +1442,21 @@ const Users = () => {
                     component="li"
                     {...props}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      fontStyle: option._id === "new" ? "italic" : "normal",
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontStyle: option._id === 'new' ? 'italic' : 'normal',
                     }}
                   >
-                    {option._id === "new" && <IoMdAddCircle style={{ marginRight: 8 }} />}
+                    {option._id === 'new' && <IoMdAddCircle style={{ marginRight: 8 }} />}
                     {option.name}
                   </Box>
                 )}
                 renderTags={(selected, getTagProps) =>
                   selected.map((option, index) => (
-                    <Chip
-                      key={option._id}
-                      label={option.name}
-                      {...getTagProps({ index })}
-                    />
+                    <Chip key={option._id} label={option.name} {...getTagProps({ index })} />
                   ))
                 }
               />
-
 
               {/* // Dialog for creating a new group */}
               <Dialog open={openNewGroupDialog} onClose={() => setOpenNewGroupDialog(false)}>
@@ -1381,8 +1473,8 @@ const Users = () => {
                   <Button onClick={() => setOpenNewGroupDialog(false)}>Cancel</Button>
                   <Button
                     onClick={() => {
-                      createNewGroup();
-                      setOpenNewGroupDialog(false); // Close the dialog after saving
+                      createNewGroup()
+                      setOpenNewGroupDialog(false) // Close the dialog after saving
                     }}
                     disabled={!newGroupName.trim()}
                   >
@@ -1390,8 +1482,6 @@ const Users = () => {
                   </Button>
                 </DialogActions>
               </Dialog>
-
-
             </div>
             {/* )} */}
 
@@ -1541,7 +1631,8 @@ const Users = () => {
                               'vehicle',
                               'sensor',
                               'geofenceReport',
-                            ].filter((permission) => availablePermissions[permission])
+                            ]
+                              .filter((permission) => availablePermissions[permission])
                               .map((permission) => (
                                 <FormControlLabel
                                   key={permission}
@@ -1581,7 +1672,12 @@ const Users = () => {
                   Submit
                 </Button>
               )} */}
-              <Button onClick={handleSubmit} variant="contained" color="primary" style={{ marginLeft: 'auto' }}>
+              <Button
+                onClick={handleSubmit}
+                variant="contained"
+                color="primary"
+                style={{ marginLeft: 'auto' }}
+              >
                 Submit
               </Button>
             </div>
@@ -1621,13 +1717,20 @@ const Users = () => {
             </Stepper> */}
 
             {/* {currentStep === 0 && ( */}
-            <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridGap: '0.7rem 1.5rem' }} >
+            <div
+              className="mt-3"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto auto auto',
+                gridGap: '0.7rem 1.5rem',
+              }}
+            >
               {/* Personal Info Step */}
               <TextField
                 label="User Name"
                 variant="outlined"
                 name="username"
-                type='text'
+                type="text"
                 value={formData.username !== undefined ? formData.username : ''}
                 onChange={handleInputChange}
                 sx={{ marginBottom: '10px' }}
@@ -1650,7 +1753,6 @@ const Users = () => {
                 onChange={handleInputChange}
                 sx={{ marginBottom: '10px' }}
                 fullWidth
-
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -1697,13 +1799,13 @@ const Users = () => {
                 }}
               />
 
-              <FormControl fullWidth sx={{ marginBottom: 2 }} key={"group"}>
-                <InputLabel>{"Group"}</InputLabel>
+              <FormControl fullWidth sx={{ marginBottom: 2 }} key={'group'}>
+                <InputLabel>{'Group'}</InputLabel>
                 <Select
                   name="groupsAssigned"
                   value={formData.groupsAssigned || []}
                   onChange={handleInputChange}
-                  label={"Groups"}
+                  label={'Groups'}
                   multiple
                 >
                   {groups?.map((group) => (
@@ -1737,118 +1839,125 @@ const Users = () => {
               <div className="row w-100">
                 <div className="col">
                   <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-                      Master
-                    </AccordionSummary>
-                    <AccordionDetails>{isSuperAdmin ? (<FormGroup sx={{ color: 'black' }}>
-                      {[
-                        'users',
-                        'groups',
-                        'devices',
-                        'geofence',
-                        'driver',
-                        'maintenance',
-                        'notification'
-                      ]
-                        .map((permission) => (
-                          <FormControlLabel
-                            key={permission}
-                            control={
-                              <Checkbox
-                                name={permission}
-                                checked={formData.permissions[permission]}
-                                onChange={handlePermissionChange}
+                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Master</AccordionSummary>
+                    <AccordionDetails>
+                      {isSuperAdmin ? (
+                        <FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'users',
+                            'groups',
+                            'devices',
+                            'geofence',
+                            'driver',
+                            'maintenance',
+                            'notification',
+                          ].map((permission) => (
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                          ))}
+                        </FormGroup>
+                      ) : (
+                        <FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'users',
+                            'groups',
+                            'devices',
+                            'geofence',
+                            'driver',
+                            'maintenance',
+                            'notification',
+                          ]
+                            .filter((permission) => availablePermissions[permission])
+                            .map((permission) => (
+                              <FormControlLabel
+                                key={permission}
+                                control={
+                                  <Checkbox
+                                    name={permission}
+                                    checked={formData.permissions[permission]}
+                                    onChange={handlePermissionChange}
+                                  />
+                                }
+                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
                               />
-                            }
-                            label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                          />
-                        ))}
-                    </FormGroup>) : (<FormGroup sx={{ color: 'black' }}>
-                      {[
-                        'users',
-                        'groups',
-                        'devices',
-                        'geofence',
-                        'driver',
-                        'maintenance',
-                        'notification'
-                      ].filter((permission) => availablePermissions[permission])
-                        .map((permission) => (
-                          <FormControlLabel
-                            key={permission}
-                            control={
-                              <Checkbox
-                                name={permission}
-                                checked={formData.permissions[permission]}
-                                onChange={handlePermissionChange}
-                              />
-                            }
-                            label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                          />
-                        ))}
-                    </FormGroup>)}
+                            ))}
+                        </FormGroup>
+                      )}
                     </AccordionDetails>
                   </Accordion>
                 </div>
 
                 <div className="col">
                   <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-                      Reports
-                    </AccordionSummary>
+                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>Reports</AccordionSummary>
                     {/* //added logic of giving permissions of reports to only which are allowed */}
-                    <AccordionDetails>{isSuperAdmin ? (<FormGroup sx={{ color: 'black' }}>
-                      {[
-                        'history',
-                        'stop',
-                        'travel',
-                        'idle',
-                        'status',
-                        'distance',
-                        'alerts',
-                        'vehicle',
-                        'sensor',
-                        'geofenceReport',
-                      ].map((permission) => (
-                        <FormControlLabel
-                          key={permission}
-                          control={
-                            <Checkbox
-                              name={permission}
-                              checked={formData.permissions[permission]}
-                              onChange={handlePermissionChange}
+                    <AccordionDetails>
+                      {isSuperAdmin ? (
+                        <FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'history',
+                            'stop',
+                            'travel',
+                            'idle',
+                            'status',
+                            'distance',
+                            'alerts',
+                            'vehicle',
+                            'sensor',
+                            'geofenceReport',
+                          ].map((permission) => (
+                            <FormControlLabel
+                              key={permission}
+                              control={
+                                <Checkbox
+                                  name={permission}
+                                  checked={formData.permissions[permission]}
+                                  onChange={handlePermissionChange}
+                                />
+                              }
+                              label={permission.charAt(0).toUpperCase() + permission.slice(1)}
                             />
-                          }
-                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                        />
-                      ))}
-                    </FormGroup>) : (<FormGroup sx={{ color: 'black' }}>
-                      {[
-                        'history',
-                        'stop',
-                        'travel',
-                        'idle',
-                        'status',
-                        'distance',
-                        'alerts',
-                        'vehicle',
-                        'sensor',
-                        'geofenceReport',
-                      ].filter((permission) => availablePermissions[permission]).map((permission) => (
-                        <FormControlLabel
-                          key={permission}
-                          control={
-                            <Checkbox
-                              name={permission}
-                              checked={formData.permissions[permission]}
-                              onChange={handlePermissionChange}
-                            />
-                          }
-                          label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                        />
-                      ))}
-                    </FormGroup>)}
-
+                          ))}
+                        </FormGroup>
+                      ) : (
+                        <FormGroup sx={{ color: 'black' }}>
+                          {[
+                            'history',
+                            'stop',
+                            'travel',
+                            'idle',
+                            'status',
+                            'distance',
+                            'alerts',
+                            'vehicle',
+                            'sensor',
+                            'geofenceReport',
+                          ]
+                            .filter((permission) => availablePermissions[permission])
+                            .map((permission) => (
+                              <FormControlLabel
+                                key={permission}
+                                control={
+                                  <Checkbox
+                                    name={permission}
+                                    checked={formData.permissions[permission]}
+                                    onChange={handlePermissionChange}
+                                  />
+                                }
+                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                              />
+                            ))}
+                        </FormGroup>
+                      )}
                     </AccordionDetails>
                   </Accordion>
                 </div>
@@ -1872,7 +1981,12 @@ const Users = () => {
                   Submit
                 </Button>
               )} */}
-              <Button onClick={EditUserSubmit} variant="contained" color="primary" style={{ marginLeft: 'auto' }}>
+              <Button
+                onClick={EditUserSubmit}
+                variant="contained"
+                color="primary"
+                style={{ marginLeft: 'auto' }}
+              >
                 Submit
               </Button>
             </div>

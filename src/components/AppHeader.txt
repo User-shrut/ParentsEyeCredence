@@ -255,7 +255,7 @@ const AppHeader = () => {
 
   return (
     <CHeader position="sticky" className="p-0 darkBackground" ref={headerRef}>
-      <CContainer className="border-bottom px-4 flex" fluid>
+      <CContainer className="border-bottom px-4" fluid>
         <CHeaderToggler
           onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
           style={{ marginInlineStart: '-30px' }}
@@ -297,7 +297,7 @@ const AppHeader = () => {
         </CHeaderNav> */}
 
         {/**CURRENT */}
-        <CTabs className="ms-auto">
+        <CTabs>
           <CTabList variant="underline">
             <CTab onClick={handleHome} className="text-white" itemKey={1}>
               <FaHome className="me-2" /> Home

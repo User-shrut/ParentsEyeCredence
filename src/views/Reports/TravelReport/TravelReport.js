@@ -248,9 +248,9 @@ const SearchTrip = ({
           value={
             formData.Devices
               ? {
-                value: formData.Devices,
-                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-              }
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -321,9 +321,10 @@ const SearchTrip = ({
         <div className="d-flex justify-content-end">
           <div className="btn-group">
             <button
-              className="btn btn-secondary"
+              className="btn text-white"
               type="submit"
               onClick={() => handleDropdownClick('SHOW NOW')}
+              style={{ backgroundColor: '#0a2d63' }}
             >
               {buttonText}
             </button>
@@ -549,11 +550,17 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
       <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
-            <CTableHeaderCell>SN</CTableHeaderCell>
-            <CTableHeaderCell>Device</CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              SN
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              Device
+            </CTableHeaderCell>
             {/* Dynamically render table headers based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+                {column}
+              </CTableHeaderCell>
             ))}
           </CTableRow>
         </CTableHead>
@@ -669,7 +676,7 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
               </CTableRow>
             ))
           ) : (
-            <CTableRow >
+            <CTableRow>
               <CTableDataCell
                 colSpan={selectedColumns.length + 2}
                 style={{
@@ -878,7 +885,10 @@ const Trips = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+            <CCardHeader
+              className="d-flex justify-content-between align-items-center text-white"
+              style={{ backgroundColor: '#0a2d63' }}
+            >
               <strong>Travel Report</strong>
             </CCardHeader>
             <CCardBody>
@@ -905,7 +915,7 @@ const Trips = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center">
                 <strong>Travel Data {selectedDeviceName && `for ${selectedDeviceName}`}</strong>
                 {/* <CFormInput
                   placeholder="Search..."

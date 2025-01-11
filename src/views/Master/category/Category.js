@@ -13,7 +13,7 @@ import {
   Box,
   TextField,
   FormControl,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -29,6 +29,11 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CRow,
+  CCol,
+  CCard,
+  CCardHeader,
+  CCardBody,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import Loader from '../../../components/Loader/Loader'
@@ -39,14 +44,13 @@ import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF.
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF.
 import CIcon from '@coreui/icons-react'
-import CategoryIcon from '@mui/icons-material/Category';
+import CategoryIcon from '@mui/icons-material/Category'
 import { cilSettings } from '@coreui/icons'
-import "../../../../src/app.css";
-
+import '../../../../src/app.css'
 
 const Category = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -57,17 +61,18 @@ const Category = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  const [filteredData, setFilteredData] = useState([]);
-  const [currentPage , setCurrentPage] = useState(1)
+  const [filteredData, setFilteredData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleEditModalClose = () => {
     setFormData({})
-    setEditModalOpen(false)}
-
+    setEditModalOpen(false)
+  }
 
   const handleAddModalClose = () => {
     setFormData({})
-    setAddModalOpen(false)}
+    setAddModalOpen(false)
+  }
 
   const style = {
     position: 'absolute',
@@ -114,24 +119,23 @@ const Category = () => {
   // ##################### Filter data by search query #######################
   const filterCategory = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
-      const filtered = data.filter(
-        (category) =>
-          category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
-      setCurrentPage(1);
+      const filtered = data.filter((category) =>
+        category.categoryName.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredData(filtered)
+      setCurrentPage(1)
     }
-  };
+  }
 
   useEffect(() => {
     fetchCategoryData()
   }, [])
 
   useEffect(() => {
-    filterCategory(searchQuery);
-  }, [data, searchQuery]);
+    filterCategory(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -211,9 +215,9 @@ const Category = () => {
   // ###################### Delete Group ##############################
 
   const deleteCategorySubmit = async (item) => {
-    const confirmed = confirm('Do you want to delete this Category?');
+    const confirmed = confirm('Do you want to delete this Category?')
     // If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -236,76 +240,49 @@ const Category = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
       const rowData = {
-        SN: rowIndex + 1,                       // Serial Number
+        SN: rowIndex + 1, // Serial Number
         'Category Name': item.categoryName || 'N/A', // Category Name
         // 'Actions': 'Edit, Delete'               // Actions placeholder (can be detailed if necessary)
-      };
+      }
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+    const workbook = XLSX.utils.book_new()
 
     // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Category Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Category Data')
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'category_data.xlsx');
-  };
+    XLSX.writeFile(workbook, 'category_data.xlsx')
+  }
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF()
     // Define the columns based on the CTableHeaderCell names
-    const tableColumn = ['SN', 'Category Name']; // Adjust columns based on your table
+    const tableColumn = ['SN', 'Category Name'] // Adjust columns based on your table
     const tableRows = filteredData.map((item, index) => {
       // Each row will include the index, category name, and action placeholders
       return [
-        index + 1,                       // Serial Number
-        item.categoryName,               // Category Name
+        index + 1, // Serial Number
+        item.categoryName, // Category Name
         // 'Edit, Delete'                   // Actions placeholder (could be detailed if necessary)
-      ];
-    });
+      ]
+    })
 
     // Create the PDF table with the defined columns and rows
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.autoTable(tableColumn, tableRows, { startY: 20 })
     // Save the generated PDF
-    doc.save('category_data.pdf');
-  };
-
+    doc.save('category_data.pdf')
+  }
 
   //  ###############################################################
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Category</h2>
-        </div>
-
-        <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-secondary"
-            >
-              Add Category
-            </button>
-          </div>
-        </div>
-      </div>
       <div className="d-md-none mb-2">
         <input
           type="search"
@@ -315,106 +292,176 @@ const Category = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto', // Set the desired height
-          overflowX: 'auto', // Enable horizontal scrollbar
-          overflowY: 'auto', // Enable vertical scrollbar if needed
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black'
-        }}
-      >
-        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-            <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               SN
-              </CTableHeaderCell>
-
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                Category Name
-              </CTableHeaderCell>
-
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                Actions
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {loading ? (
-              <>
-                <CTableRow>
-                  <CTableDataCell colSpan="4" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              </>
-            ) : filteredData.length > 0 ? (
-              filteredData?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{(currentPage - 1) * limit + index+1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2"}}>{item.categoryName}</CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex p-0"
-                    style={{ justifyContent: 'center', alignItems: 'center',backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader className="grand d-flex justify-content-between align-items-center">
+              <strong>Category</strong>
+              <div className="d-flex">
+                <div className="me-3 d-none d-md-block">
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search Category"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={() => setAddModalOpen(true)}
+                    variant="contained"
+                    className="btn text-white"
+                    style={{ backgroundColor: '#0a2d63' }}
                   >
-                    <IconButton aria-label="edit" onClick={() => handleDeleteCategory(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteCategorySubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
-                    </IconButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan="3" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
-                  >
-                    <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's no Category available.
-                      <br /> Maybe it's time to create some Categories!"
-                    </p>
-                    <div>
-                      <button
-                        onClick={() => setAddModalOpen(true)}
-                        variant="contained"
-                        className="btn btn-primary m-3 text-white"
+                    Add Category
+                  </button>
+                </div>
+              </div>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                // marginBottom: '10px',
+                // borderRadius: '10px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody>
+                <CTable
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  className="mb-2 border min-vh-25 rounded-top-3"
+                  hover
+                  responsive
+                >
+                  <CTableHead className="text-nowrap">
+                    <CTableRow>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
                       >
-                        <span>
-                          <IoMdAdd className="fs-5" />
-                        </span>{' '}
-                        Add Category
-                      </button>
-                    </div>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
+                        SN
+                      </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        Category Name
+                      </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        Actions
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <>
+                        <CTableRow>
+                          <CTableDataCell colSpan="4" className="text-center">
+                            <div className="text-nowrap mb-2 text-center w-">
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                            </div>
+                          </CTableDataCell>
+                        </CTableRow>
+                      </>
+                    ) : filteredData.length > 0 ? (
+                      filteredData?.map((item, index) => (
+                        <CTableRow key={index}>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {(currentPage - 1) * limit + index + 1}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.categoryName}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center d-flex p-0"
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                            }}
+                          >
+                            <IconButton
+                              aria-label="edit"
+                              onClick={() => handleDeleteCategory(item)}
+                            >
+                              <RiEdit2Fill
+                                style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
+                              />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => deleteCategorySubmit(item)}
+                            >
+                              <AiFillDelete
+                                style={{ fontSize: '20px', color: 'red', margin: '3px' }}
+                              />
+                            </IconButton>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="3" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">
+                              "Oops! Looks like there's no Category available.
+                              <br /> Maybe it's time to create some Categories!"
+                            </p>
+                            <div>
+                              <button
+                                onClick={() => setAddModalOpen(true)}
+                                variant="contained"
+                                className="btn btn-primary m-3 text-white"
+                              >
+                                <span>
+                                  <IoMdAdd className="fs-5" />
+                                </span>{' '}
+                                Add Category
+                              </button>
+                            </div>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
@@ -423,11 +470,11 @@ const Category = () => {
           <CIcon icon={cilSettings} />
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-        {pageCount > 1 && (
+      {pageCount > 1 && (
         <ReactPaginate
           breakLabel="..."
           nextLabel="next >"
@@ -481,7 +528,13 @@ const Category = () => {
                     startAdornment: (
                       <InputAdornment position="start">
                         <CategoryIcon
-                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          sx={{
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                            color: 'white',
+                            padding: '5px',
+                            fontSize: '28px',
+                          }}
                         />
                       </InputAdornment>
                     ),
@@ -533,7 +586,13 @@ const Category = () => {
                     startAdornment: (
                       <InputAdornment position="start">
                         <CategoryIcon
-                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          sx={{
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                            color: 'white',
+                            padding: '5px',
+                            fontSize: '28px',
+                          }}
                         />
                       </InputAdornment>
                     ),

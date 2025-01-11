@@ -36,18 +36,12 @@
 
 // export default NotificationDropdown
 
-
 // ############################################### New Code ############################################## //
-
+import React from 'react'
 import { cilBell } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import {
-  CBadge,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-} from '@coreui/react'
+import { CBadge, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle } from '@coreui/react'
+import { Bell } from 'lucide-react'
 
 const NotificationDropdown = ({ notifications }) => {
   return (
@@ -63,7 +57,7 @@ const NotificationDropdown = ({ notifications }) => {
       </style>
       <CDropdown variant="nav-item">
         <CDropdownToggle placement="bottom-end" className="py-0 fs-5 pe-0" caret={false}>
-          <CIcon icon={cilBell} size="lg" />
+          <Bell color="white" className="mx-0" />
           {notifications?.length > 0 && (
             <CBadge
               color="danger"
@@ -75,27 +69,27 @@ const NotificationDropdown = ({ notifications }) => {
             </CBadge>
           )}
         </CDropdownToggle>
-        <CDropdownMenu className="pt-2" placement="bottom-end" style={{  width: '400px' }}>
-          { notifications.length > 0 ?(
-          notifications.map((notification, index) => (
-            <CDropdownItem
-              key={index}
-              className="custom-hover"
-              style={{
-                fontSize: '12px',
-                width: '100',
-                paddingInlineStart: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              {notification.message}
-            </CDropdownItem>
-          ))
-        ) : (
-            <CDropdownItem style={{textAlign:'center', fontSize:'12px'}}>
+        <CDropdownMenu className="pt-2" placement="bottom-end" style={{ width: '400px' }}>
+          {notifications.length > 0 ? (
+            notifications.map((notification, index) => (
+              <CDropdownItem
+                key={index}
+                className="custom-hover"
+                style={{
+                  fontSize: '12px',
+                  width: '100',
+                  paddingInlineStart: '5px',
+                  cursor: 'pointer',
+                }}
+              >
+                {notification.message}
+              </CDropdownItem>
+            ))
+          ) : (
+            <CDropdownItem style={{ textAlign: 'center', fontSize: '12px' }}>
               No Notification
             </CDropdownItem>
-         )}
+          )}
         </CDropdownMenu>
       </CDropdown>
     </>

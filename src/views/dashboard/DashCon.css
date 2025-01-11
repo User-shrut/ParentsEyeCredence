@@ -1,5 +1,5 @@
 .table-container::-webkit-scrollbar {
-  display: none !important;
+  scrollbar-width: 2px;
   /* Hides scrollbar for Chrome, Safari, and Edge */
 }
 
@@ -9,7 +9,7 @@
 
 /* For Firefox */
 .table-container {
-  scrollbar-width: 10px !important;
+  scrollbar-width: 0 !important;
   /* scrollbar-color: transparent transparent !important; */
 }
 
@@ -196,10 +196,12 @@ td {
 /* vehicle cart */
 .vehicle-card {
   background-color: #fff;
-  border-radius: 12px; /* Rounded corners */
+  border-radius: 12px;
+  /* Rounded corners */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: row; /* Align items in a row */
+  flex-direction: row;
+  /* Align items in a row */
   align-items: center;
   padding: 0.5rem;
   cursor: pointer;
@@ -208,20 +210,25 @@ td {
     box-shadow 0.3s ease;
   justify-content: space-between;
   text-align: center;
-  border: 2px solid transparent; /* Default border */
+  border: 2px solid transparent;
+  /* Default border */
   width: 100%;
-  height: 12vh; /* Reduced height for a smaller card */
+  height: 12vh;
+  /* Reduced height for a smaller card */
 }
 
 .vehicle-card:hover {
-  transform: scale(1.05); /* Slight zoom effect on hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Deeper shadow */
+  transform: scale(1.05);
+  /* Slight zoom effect on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  /* Deeper shadow */
 }
 
 .vehicle-info {
   flex-grow: 1;
   margin-left: 0.5rem;
-  text-align: left; /* Align text to the left */
+  text-align: left;
+  /* Align text to the left */
 }
 
 .vehicle-type {
@@ -235,43 +242,53 @@ td {
 }
 
 .vehicle-icon {
-  margin-right: 0.5rem; /* Slight margin to the right */
+  margin-right: 0.5rem;
+  /* Slight margin to the right */
 }
 
 .vehicle-icon img {
-  width: 3.5rem; /* Adjusted image size */
+  width: 3.5rem;
+  /* Adjusted image size */
 }
 
 .vehicle-card.all-vehicles {
-  border-left: 6px solid burlywood; /* Gray for All */
+  border-left: 6px solid burlywood;
+  /* Gray for All */
 }
 
 .vehicle-card.running-vehicles {
-  border-left: 6px solid #28a745; /* Green for Running */
+  border-left: 6px solid #28a745;
+  /* Green for Running */
 }
 
 .vehicle-card.stopped-vehicles {
-  border-left: 6px solid #dc3545; /* Red for Stopped */
+  border-left: 6px solid #dc3545;
+  /* Red for Stopped */
 }
 
 .vehicle-card.idle-vehicles {
-  border-left: 6px solid #ffc107; /* Yellow for Idle */
+  border-left: 6px solid #ffc107;
+  /* Yellow for Idle */
 }
 
 .vehicle-card.overspeed-vehicles {
-  border-left: 6px solid #fd7e14; /* Orange for Overspeed */
+  border-left: 6px solid #fd7e14;
+  /* Orange for Overspeed */
 }
 
 .vehicle-card.inactive-vehicles {
-  border-left: 6px solid #6c757d; /* Gray for Inactive */
+  border-left: 6px solid #6c757d;
+  /* Gray for Inactive */
 }
+
 .vehicle-card.new-vehicles {
-  border-left: 6px solid #13bbf3; /* Gray for Inactive */
+  border-left: 6px solid #13bbf3;
+  /* Gray for Inactive */
 }
 
 .card-header {
-  background: linear-gradient(to right, #43c6ac 5%, #f8ffae 95%) !important;
-  border-radius: 0% !important;
+  background: #e9ecef;
+  border-radius: 10px;
 }
 
 /* filter row */
@@ -283,10 +300,6 @@ td {
   flex-direction: row;
 }
 
-.filter-btn {
-  color: #ff7a00 !important;
-  border: 1px solid rgb(168, 166, 166) !important;
-}
 
 .tableNav {
   display: flex;
@@ -312,18 +325,19 @@ td {
   font-size: 1.2rem;
 }
 
-.searchBar{
+.searchBar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0px;
 }
-.input{
+
+.input {
   border-radius: 8px 0% 0% 8px !important;
 
 }
 
-.searchBtn{
+.searchBtn {
   border-radius: 0% 20% 20% 0%;
   display: flex;
   align-items: center;
@@ -334,20 +348,22 @@ td {
   transition: 0.4s;
 }
 
-.searchBtn:hover{
+.searchBtn:hover {
   background-color: white !important;
   color: rgba(245, 136, 2, 0.867) !important;
 }
 
-.searchIcon{
-  background: transparent !important;;
+.searchIcon {
+  background: transparent !important;
+  ;
   transition: 0.4s;
 }
-.searchIcon:hover{
+
+.searchIcon:hover {
   color: rgba(245, 136, 2, 0.867) !important;
 }
 
-#group-select, #user-select{
+#group-select,
+#user-select {
   min-width: 14rem !important;
 }
-

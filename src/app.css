@@ -1,26 +1,61 @@
 /* Pagination Link Styling */
 .pagination .page-link {
-    color: black; /* Default text color (Bootstrap's secondary) */
-    background-color: transparent;
-    border-color: #6c757d; /* Border color for page link */
-  }
-  
-  .pagination .page-link:hover {
-    color: #fff; /* Text color change on hover */
-    background-color: #6c757d; /* Background color change on hover */
-    border-color: #6c757d; /* Optional: border color change on hover */
-  }
-  
-  /* Active page styling */
-  .pagination .page-item.active .page-link {
-    color: #fff; /* White text for active page */
-    background-color: #6c757d; /* Secondary background color for active page */
-    border-color: #6c757d; /* Same border for active */
-  }
-  
-  /* Disabled state */
-  .pagination .page-item.disabled .page-link {
-    color: #6c757d; /* Disabled state with secondary color */
-    pointer-events: none;
-  }
-  
+  color: black;
+  /* Default text color (Bootstrap's secondary) */
+  background-color: transparent;
+  border-color: #6c757d;
+  /* Border color for page link */
+}
+
+.pagination .page-link:hover {
+  color: #fff;
+  /* Text color change on hover */
+  background-color: #6c757d;
+  /* Background color change on hover */
+  border-color: #6c757d;
+  /* Optional: border color change on hover */
+}
+
+/* Active page styling */
+.pagination .page-item.active .page-link {
+  color: #fff;
+  /* White text for active page */
+  background-color: #6c757d;
+  /* Secondary background color for active page */
+  border-color: #6c757d;
+  /* Same border for active */
+}
+
+/* Disabled state */
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  /* Disabled state with secondary color */
+  pointer-events: none;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 0;
+}
+
+.scrollBar::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #0a2d63;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #0a2d63;
+}

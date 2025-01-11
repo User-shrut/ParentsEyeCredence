@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Autocomplete, } from "@mui/material";
+import { Autocomplete } from '@mui/material'
 import {
   TableContainer,
   Paper,
@@ -16,10 +16,11 @@ import {
   InputAdornment,
   FormControl,
 } from '@mui/material'
-import { Select, MenuItem, } from '@mui/material';
+import { Select, MenuItem } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import {
+  CCardHeader,
   CDropdown,
   CDropdownItem,
   CDropdownMenu,
@@ -31,32 +32,31 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
-import Loader from '../../../components/Loader/Loader';
+import Loader from '../../../components/Loader/Loader'
 import CloseIcon from '@mui/icons-material/Close'
 import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
-import {
-  AccountCircle,
-  MailOutline,
-  Phone,
-} from '@mui/icons-material'
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import DialpadIcon from '@mui/icons-material/Dialpad';
-import HomeIcon from '@mui/icons-material/Home';
+import { AccountCircle, MailOutline, Phone } from '@mui/icons-material'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
+import TextSnippetIcon from '@mui/icons-material/TextSnippet'
+import DialpadIcon from '@mui/icons-material/Dialpad'
+import HomeIcon from '@mui/icons-material/Home'
 import { IoMdAdd } from 'react-icons/io'
-import toast, { Toaster } from 'react-hot-toast';
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
-import CIcon from '@coreui/icons-react';
-import { cilSettings } from '@coreui/icons';
-import "../../../../src/app.css";
-
+import toast, { Toaster } from 'react-hot-toast'
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
+import CIcon from '@coreui/icons-react'
+import { cilSettings } from '@coreui/icons'
+import '../../../../src/app.css'
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -67,18 +67,17 @@ const Driver = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [limit, setLimit] = useState(10)
   const [pageCount, setPageCount] = useState()
-  const [filteredData, setFilteredData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleEditModalClose = () => {
-    setEditModalOpen(false);
+    setEditModalOpen(false)
     setFormData({})
   }
   const handleAddModalClose = () => {
     setAddModalOpen(false)
-    setFormData({});
+    setFormData({})
   }
-
 
   const style = {
     position: 'absolute',
@@ -96,25 +95,24 @@ const Driver = () => {
   //validation Functions
 
   const validatePhone = (phone) => {
-    const phoneRegex = /^[0-9]{10}$/;
-    return phone ? phoneRegex.test(phone) : true; // Allow empty phone
-  };
-  
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return email ? emailRegex.test(email) : true; // Allow empty email
-  };
-  
-  const validateLicenseNumber = (licenseNumber) => {
-    const licenseRegex = /^[A-Za-z0-9]/; // Adjust the length as needed
-    return licenseNumber ? licenseRegex.test(licenseNumber) : true; // Allow empty license number
-  };
-  
-  const validateAadharNumber = (aadharNumber) => {
-    const aadharRegex = /^[0-9]/;
-    return aadharNumber ? aadharRegex.test(aadharNumber) : true; // Allow empty Aadhar
-  };
+    const phoneRegex = /^[0-9]{10}$/
+    return phone ? phoneRegex.test(phone) : true // Allow empty phone
+  }
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return email ? emailRegex.test(email) : true // Allow empty email
+  }
+
+  const validateLicenseNumber = (licenseNumber) => {
+    const licenseRegex = /^[A-Za-z0-9]/ // Adjust the length as needed
+    return licenseNumber ? licenseRegex.test(licenseNumber) : true // Allow empty license number
+  }
+
+  const validateAadharNumber = (aadharNumber) => {
+    const aadharRegex = /^[0-9]/
+    return aadharNumber ? aadharRegex.test(aadharNumber) : true // Allow empty Aadhar
+  }
 
   // ##################### getting data  ###################
   const fetchDriverData = async (page = 1) => {
@@ -139,37 +137,36 @@ const Driver = () => {
       setLoading(false)
       console.error('Error fetching data:', error)
       throw error // Re-throw the error for further handling if needed
-
     }
   }
 
   // ##################### Filter data by search query #######################
   const filterDrivers = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
       const filtered = data.filter(
         (driver) =>
           driver?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (String(driver?.phone)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (String(driver?.email)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          String(driver?.phone)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          String(driver?.email)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           driver?.device?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (String(driver?.licenseNumber)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (String(driver?.aadharNumber)?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          driver?.address?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
-      setCurrentPage(1);
+          String(driver?.licenseNumber)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          String(driver?.aadharNumber)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          driver?.address?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredData(filtered)
+      setCurrentPage(1)
     }
-  };
+  }
 
   useEffect(() => {
     fetchDriverData()
-  }, [limit, searchQuery]);
+  }, [limit, searchQuery])
 
   useEffect(() => {
-    filterDrivers(searchQuery);
-  }, [data, searchQuery]);
+    filterDrivers(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -179,30 +176,29 @@ const Driver = () => {
     fetchDriverData(page)
   }
 
-
   // #########################################################################
 
   //  ####################  Add Group ###########################
 
   const handleAddDriver = async (e) => {
     e.preventDefault()
-    console.log("formData", formData)
-     // Validation checks
-     if (!validatePhone(formData.phone)) {
-      toast.error("Invalid phone number. It should be 10 digits.");
-      return;
+    console.log('formData', formData)
+    // Validation checks
+    if (!validatePhone(formData.phone)) {
+      toast.error('Invalid phone number. It should be 10 digits.')
+      return
     }
     if (!validateEmail(formData.email)) {
-      toast.error("Invalid email format.");
-      return;
+      toast.error('Invalid email format.')
+      return
     }
     if (!validateLicenseNumber(formData.licenseNumber)) {
-      toast.error("Invalid license number. It should be alphanumeric and up to 15 characters.");
-      return;
+      toast.error('Invalid license number. It should be alphanumeric and up to 15 characters.')
+      return
     }
     if (!validateAadharNumber(formData.aadharNumber)) {
-      toast.error("Invalid Aadhar number. It should be exactly 12 digits.");
-      return;
+      toast.error('Invalid Aadhar number. It should be exactly 12 digits.')
+      return
     }
     try {
       const accessToken = Cookies.get('authToken')
@@ -222,7 +218,6 @@ const Driver = () => {
     } catch (error) {
       toast.error("This didn't work.")
       throw error.response ? error.response.data : new Error('An error occurred')
-
     }
   }
 
@@ -231,23 +226,23 @@ const Driver = () => {
 
   const EditDriverSubmit = async (e) => {
     e.preventDefault()
-    console.log(formData);
-    // Validation checks  
+    console.log(formData)
+    // Validation checks
     if (!validatePhone(formData.phone)) {
-      toast.error("Invalid phone number. It should be 10 digits.");
-      return;
+      toast.error('Invalid phone number. It should be 10 digits.')
+      return
     }
     if (!validateEmail(formData.email)) {
-      toast.error("Invalid email format.");
-      return;
+      toast.error('Invalid email format.')
+      return
     }
     if (!validateLicenseNumber(formData.licenseNumber)) {
-      toast.error("Invalid license number. It should be alphanumeric and up to 15 characters");
-      return;
+      toast.error('Invalid license number. It should be alphanumeric and up to 15 characters')
+      return
     }
     if (!validateAadharNumber(formData.aadharNumber)) {
-      toast.error("Invalid Aadhar number. It should be exactly 12 digits.");
-      return;
+      toast.error('Invalid Aadhar number. It should be exactly 12 digits.')
+      return
     }
     try {
       const accessToken = Cookies.get('authToken')
@@ -277,110 +272,102 @@ const Driver = () => {
     console.log(item)
     setEditModalOpen(true)
     setFormData({ ...item })
-    console.log("this is before edit", formData)
+    console.log('this is before edit', formData)
   }
-
 
   // ###################################################################
 
-
   // ###################### Delete Group ##############################
 
-
   const deleteDriverSubmit = async (item) => {
-
-    const confirmed = confirm('Do you want to delete this Driver?');
+    const confirmed = confirm('Do you want to delete this Driver?')
     // If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
     try {
       const accessToken = Cookies.get('authToken')
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/Driver/${item._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          },
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/Driver/${item._id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      )
+      })
 
       if (response.status === 200) {
         toast.error('Driver is deleted successfully')
         fetchDriverData()
       }
     } catch (error) {
-      toast.error("An error occurred")
+      toast.error('An error occurred')
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
 
-  const [fomData, setFomData] = useState({});
-  const [devices, setDevices] = useState([]);
-  const token = Cookies.get('authToken'); //
-
+  const [fomData, setFomData] = useState({})
+  const [devices, setDevices] = useState([])
+  const token = Cookies.get('authToken') //
 
   useEffect(() => {
     const fetchDevices = async () => {
-      console.log("fetch device me aaya hu...");
+      console.log('fetch device me aaya hu...')
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/device`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Network response was not ok')
         }
-        const data = await response.json();
-        console.log(data);
+        const data = await response.json()
+        console.log(data)
         const mappedDevices = data.devices.map((device) => ({
           deviceId: device.deviceId,
           name: device.name,
-        }));
+        }))
 
-        setDevices(mappedDevices); // Assuming the data returned contains device info
+        setDevices(mappedDevices) // Assuming the data returned contains device info
       } catch (error) {
-        console.error('Error fetching devices:', error);
+        console.error('Error fetching devices:', error)
       }
-    };
+    }
 
-    fetchDevices();
-  }, []);
+    fetchDevices()
+  }, [])
   const exportToExcel = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
       const rowData = {
-        'SN': rowIndex + 1, // Include row index as SN
+        SN: rowIndex + 1, // Include row index as SN
         'Driver Name': item.name || 'N/A',
         'Mobile No.': item.phone || 'N/A',
-        'Email': item.email || 'N/A',
+        Email: item.email || 'N/A',
         'Vehicle No.': item.device || 'N/A',
         'Lic. No.': item.licenseNumber || 'N/A',
         'Aadhar No.': item.aadharNumber || 'N/A',
-        'Address': item.address || 'N/A',
-        'Actions': '' // Actions column is usually empty in Excel
-      };
+        Address: item.address || 'N/A',
+        Actions: '', // Actions column is usually empty in Excel
+      }
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+    const workbook = XLSX.utils.book_new()
 
     // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Drivers Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Drivers Data')
 
     // Write the Excel file
-    XLSX.writeFile(workbook, 'drivers_data.xlsx');
-  };
+    XLSX.writeFile(workbook, 'drivers_data.xlsx')
+  }
 
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
     const tableColumn = [
       'SN',
       'Driver Name',
@@ -390,8 +377,8 @@ const Driver = () => {
       'Lic. No.',
       'Aadhar No.',
       'Address',
-      'Actions'
-    ];
+      'Actions',
+    ]
 
     const tableRows = filteredData.map((item, index) => {
       return [
@@ -403,45 +390,19 @@ const Driver = () => {
         item.licenseNumber || '--',
         item.aadharNumber || '--',
         item.address || '--',
-        '' // Actions column is usually empty in PDF
-      ];
-    });
+        '', // Actions column is usually empty in PDF
+      ]
+    })
 
-    doc.autoTable(tableColumn, tableRows, { startY: 15 });
-    doc.save('drivers_data.pdf');
-  };
+    doc.autoTable(tableColumn, tableRows, { startY: 15 })
+    doc.save('drivers_data.pdf')
+  }
 
   //  ###############################################################
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Driver</h2>
-        </div>
-
-        <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-secondary"
-            >
-              Add Driver
-            </button>
-          </div>
-        </div>
-      </div>
       <div className="mb-2 d-md-none">
         <input
           type="search"
@@ -452,136 +413,241 @@ const Driver = () => {
         />
       </div>
 
-
-
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto', // Set the desired height
-          overflowX: 'auto', // Enable horizontal scrollbar
-          overflowY: 'auto', // Enable vertical scrollbar if needed
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black'
-        }}
-      >
-        <CTable style={{ fontFamily: "Roboto, sans-serif", fontSize: '14px', }} bordered align="middle" className="mb-0 border" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow className='bg-body-tertiary'>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>SN</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Driver Name</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Mobile No.</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Email</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Vehicle no.</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Lic. No.</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Aadhar No.</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Address</strong>
-              </CTableHeaderCell>
-              <CTableHeaderCell
-                className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Actions</strong>
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-
-            {loading ? (
-              <CTableRow>
-                <CTableDataCell colSpan="10" className="text-center">
-                  <div className="text-nowrap mb-2 text-center w-">
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                    <p className="card-text placeholder-glow">
-                      <span className="placeholder col-12" />
-                    </p>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            ) : filteredData.length > 0 ? (
-              filteredData?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{(currentPage - 1) * limit + index + 1}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.name}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.phone}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.email? item.email:"N/A"}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.device}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.licenseNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.aadharNumber}</CTableDataCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}>{item.address? item.address:"N/A"}</CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex"
-                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2" }}
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between">
+              <strong>Driver</strong>
+              <div className="d-flex">
+                <div className="me-3 d-none d-md-block">
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search for Driver"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={() => setAddModalOpen(true)}
+                    variant="contained"
+                    className="btn btn-secondary"
+                    style={{ background: '#0a2d63' }}
                   >
-                    <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteDriverSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '5.3px' }} />
-                    </IconButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))) : (
-              <CTableRow>
-                <CTableDataCell colSpan="9" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
-                  >
-                    <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's nobody here yet.
-                      <br /> Maybe it's time to invite some drivers!"
-                    </p>
-                    <div>
-                      <button
-                        onClick={() => setAddModalOpen(true)}
-                        variant="contained"
-                        className="btn btn-primary m-3 text-white"
+                    Add Driver
+                  </button>
+                </div>
+              </div>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                // marginBottom: '10px',
+                // borderRadius: '10px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody>
+                <CTable
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  className="mb-0 border"
+                  hover
+                  responsive
+                >
+                  <CTableHead className="text-nowrap">
+                    <CTableRow className="bg-body-tertiary">
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
                       >
-                        <span>
-                          <IoMdAdd className="fs-5" />
-                        </span>{' '}
-                        Add Driver
-                      </button>
-                    </div>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
+                        <strong>SN</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Driver Name</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Mobile No.</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Email</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Vehicle no.</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Lic. No.</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Aadhar No.</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Address</strong>
+                      </CTableHeaderCell>
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ background: '#0a2d63' }}
+                      >
+                        <strong>Actions</strong>
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <CTableRow>
+                        <CTableDataCell colSpan="10" className="text-center">
+                          <div className="text-nowrap mb-2 text-center w-">
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                            <p className="card-text placeholder-glow">
+                              <span className="placeholder col-12" />
+                            </p>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ) : filteredData.length > 0 ? (
+                      filteredData?.map((item, index) => (
+                        <CTableRow key={index}>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {(currentPage - 1) * limit + index + 1}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.name}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.phone}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.email ? item.email : 'N/A'}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.device}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.licenseNumber}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.aadharNumber}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.address ? item.address : 'N/A'}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center d-flex"
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                            }}
+                          >
+                            <IconButton aria-label="edit" onClick={() => handleEditDriver(item)}>
+                              <RiEdit2Fill
+                                style={{ fontSize: '20px', color: 'lightBlue', margin: '5.3px' }}
+                              />
+                            </IconButton>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => deleteDriverSubmit(item)}
+                            >
+                              <AiFillDelete
+                                style={{ fontSize: '20px', color: 'red', margin: '5.3px' }}
+                              />
+                            </IconButton>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="9" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">
+                              "Oops! Looks like there's nobody here yet.
+                              <br /> Maybe it's time to invite some drivers!"
+                            </p>
+                            <div>
+                              <button
+                                onClick={() => setAddModalOpen(true)}
+                                variant="contained"
+                                className="btn btn-primary m-3 text-white"
+                              >
+                                <span>
+                                  <IoMdAdd className="fs-5" />
+                                </span>{' '}
+                                Add Driver
+                              </button>
+                            </div>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
@@ -590,14 +656,16 @@ const Driver = () => {
           <CIcon icon={cilSettings} />
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      <div className='d-flex justify-content-center align-items-center'>
+      <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3"> {/* Adds margin to the right of pagination */}
+          <div className="me-3">
+            {' '}
+            {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
@@ -618,7 +686,7 @@ const Driver = () => {
             />
           </div>
           {/* Form Control */}
-          <div style={{ width: "90px" }}>
+          <div style={{ width: '90px' }}>
             <CFormSelect
               aria-label="Default select example"
               value={limit}
@@ -627,7 +695,7 @@ const Driver = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: 'ALL', value: '' }
+                { label: 'ALL', value: '' },
               ]}
             />
           </div>
@@ -642,7 +710,12 @@ const Driver = () => {
       >
         <Box sx={style}>
           <div className="d-flex justify-content-between">
-            <Typography id="modal-modal-title" variant="h6" component="h2" style={{ paddingLeft: "26px" }}>
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              style={{ paddingLeft: '26px' }}
+            >
               Add New Driver
             </Typography>
             <IconButton
@@ -653,12 +726,21 @@ const Driver = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={handleAddDriver} style={{ display: 'flex', justifyContent: "flex-end", flexDirection: "column", }}>
-              <FormControl style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridGap: '3rem 1rem' }}>
+            <form
+              onSubmit={handleAddDriver}
+              style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column' }}
+            >
+              <FormControl
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto auto auto',
+                  gridGap: '3rem 1rem',
+                }}
+              >
                 <TextField
                   label="Driver Name"
                   name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
+                  value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   InputProps={{
@@ -672,7 +754,7 @@ const Driver = () => {
                 <TextField
                   label="Mobile No."
                   name="mobile"
-                  value={formData.phone !== undefined ? formData.phone : ""}
+                  value={formData.phone !== undefined ? formData.phone : ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
                   InputProps={{
@@ -686,7 +768,7 @@ const Driver = () => {
                 <TextField
                   label="Email"
                   name="email"
-                  value={formData.email !== undefined ? formData.email : ""}
+                  value={formData.email !== undefined ? formData.email : ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   InputProps={{
                     startAdornment: (
@@ -727,12 +809,14 @@ const Driver = () => {
                   options={devices} // List of devices
                   getOptionLabel={(option) => option.name} // Defines the label for each option
                   //onChange={(event, value) => setSelectedDevice(value)}
-                  onChange={(event, value) => setFormData({ ...formData, deviceId: value.deviceId })} // Handle selection
+                  onChange={(event, value) =>
+                    setFormData({ ...formData, deviceId: value.deviceId })
+                  } // Handle selection
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Select or Search Vehicle"
-                      placeholder='Start typing to search'
+                      placeholder="Start typing to search"
                       InputProps={{
                         ...params.InputProps,
                         startAdornment: (
@@ -749,16 +833,16 @@ const Driver = () => {
                   )}
                   filterOptions={(options, state) =>
                     options.filter((option) =>
-                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase()),
                     )
                   }
                   isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
                 />
 
                 <TextField
-                  label='Licence No.'
+                  label="Licence No."
                   name="lic"
-                  value={formData.licenseNumber !== undefined ? formData.licenseNumber : ""}
+                  value={formData.licenseNumber !== undefined ? formData.licenseNumber : ''}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                   required
                   InputProps={{
@@ -770,9 +854,9 @@ const Driver = () => {
                   }}
                 />
                 <TextField
-                  label='Aadhar No.'
+                  label="Aadhar No."
                   name="aadhar"
-                  value={formData.aadharNumber !== undefined ? formData.aadharNumber : ""}
+                  value={formData.aadharNumber !== undefined ? formData.aadharNumber : ''}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
                   required
                   InputProps={{
@@ -784,11 +868,10 @@ const Driver = () => {
                   }}
                 />
                 <TextField
-                  label='Address'
+                  label="Address"
                   name="Address"
-                  value={formData.address !== undefined ? formData.address : ""}
+                  value={formData.address !== undefined ? formData.address : ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -802,7 +885,7 @@ const Driver = () => {
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px',  marginLeft: "auto" }}
+                style={{ marginTop: '20px', marginLeft: 'auto' }}
               >
                 Submit
               </Button>
@@ -831,26 +914,35 @@ const Driver = () => {
             </IconButton>
           </div>
           <DialogContent>
-            <form onSubmit={EditDriverSubmit} style={{ display: 'flex', justifyContent: "flex-end", flexDirection: "column", }}>
-              <FormControl style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gridGap: '3rem 1rem' }}>
+            <form
+              onSubmit={EditDriverSubmit}
+              style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column' }}
+            >
+              <FormControl
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto auto auto',
+                  gridGap: '3rem 1rem',
+                }}
+              >
                 <TextField
                   label="Driver Name"
                   name="name"
-                  value={formData.name !== undefined ? formData.name : ""}
+                  value={formData.name !== undefined ? formData.name : ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
                 <TextField
                   label="Mobile No."
                   name="mobile"
-                  value={formData.phone !== undefined ? formData.phone : ""}
+                  value={formData.phone !== undefined ? formData.phone : ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
                 />
                 <TextField
                   label="Email"
                   name="email"
-                  value={formData.email !== undefined ? formData.email : ""}
+                  value={formData.email !== undefined ? formData.email : ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
 
@@ -883,7 +975,9 @@ const Driver = () => {
                   options={devices} // List of devices
                   getOptionLabel={(option) => option.name} // Defines the label for each option
                   //onChange={(event, value) => setSelectedDevice(value)}
-                  onChange={(event, value) => setFormData({ ...formData, deviceId: value.deviceId })} // Handle selection
+                  onChange={(event, value) =>
+                    setFormData({ ...formData, deviceId: value.deviceId })
+                  } // Handle selection
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -904,30 +998,30 @@ const Driver = () => {
                   )}
                   filterOptions={(options, state) =>
                     options.filter((option) =>
-                      option.name.toLowerCase().includes(state.inputValue.toLowerCase())
+                      option.name.toLowerCase().includes(state.inputValue.toLowerCase()),
                     )
                   }
                   isOptionEqualToValue={(option, value) => option.deviceId === value?.deviceId}
                 />
 
                 <TextField
-                  label='Lic No.'
+                  label="Lic No."
                   name="lic"
-                  value={formData.licenseNumber !== undefined ? formData.licenseNumber : ""}
+                  value={formData.licenseNumber !== undefined ? formData.licenseNumber : ''}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                   required
                 />
                 <TextField
-                  label='Aadhar No.'
+                  label="Aadhar No."
                   name="aadhar"
-                  value={formData.aadharNumber !== undefined ? formData.aadharNumber : ""}
+                  value={formData.aadharNumber !== undefined ? formData.aadharNumber : ''}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
                   required
                 />
                 <TextField
-                  label='Address'
+                  label="Address"
                   name="Address"
-                  value={formData.address !== undefined ? formData.address : ""}
+                  value={formData.address !== undefined ? formData.address : ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 />
               </FormControl>
@@ -935,7 +1029,7 @@ const Driver = () => {
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ marginTop: '20px',marginLeft: "auto" }}
+                style={{ marginTop: '20px', marginLeft: 'auto' }}
               >
                 Submit
               </Button>
@@ -943,7 +1037,6 @@ const Driver = () => {
           </DialogContent>
         </Box>
       </Modal>
-
     </div>
   )
 }

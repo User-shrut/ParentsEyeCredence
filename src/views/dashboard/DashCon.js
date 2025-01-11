@@ -19,6 +19,7 @@ import {
   useColorModes,
 } from '@coreui/react'
 import './DashCon.css'
+import { Paper, TableContainer } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -583,141 +584,6 @@ const Dashboard = () => {
       <CRow className="gutter-0">
         <CCol xs>
           <CCard style={{ borderRadius: '0px' }}>
-            <CCardHeader>
-              {isDashboard && (
-                <div className="d-flex flex-row flex-wrap justify-content-between" ref={mapRef}>
-                  {/* <CHeaderToggler
-                    onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-                    style={{ marginInlineStart: '-10px' }}
-                  >
-                    <CIcon icon={cilMenu} size="lg" />
-                  </CHeaderToggler> */}
-
-                  {/* First Filter - Status */}
-                  {/* <div> */}
-                  {/* User Select */}
-
-                  {/* <div className="filterOfGroupUser"> */}
-
-                  <CHeaderNav className="ms-1 p-0 me-3">
-                    <Select
-                      id="user-select"
-                      options={users.map((user) => ({
-                        value: user._id,
-                        label: user.username,
-                      }))}
-                      placeholder="Select User"
-                      value={
-                        selectedUser
-                          ? {
-                              value: selectedUser,
-                              label: users.find((user) => user._id === selectedUser)?.username,
-                            }
-                          : null
-                      }
-                      onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
-                      isLoading={sloading}
-                    />
-                  </CHeaderNav>
-
-                  {/* Group Select */}
-                  <CHeaderNav className="ms-1 p-0 me-3">
-                    <Select
-                      id="group-select"
-                      options={groups?.map((group) => ({
-                        value: group._id,
-                        label: group.name,
-                      }))}
-                      value={
-                        selectedGroup
-                          ? {
-                              value: selectedGroup,
-                              label: groups.find((group) => group._id === selectedGroup)?.name,
-                            }
-                          : null
-                      }
-                      onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
-                      isLoading={sloading}
-                      placeholder="Select a Group"
-                    />
-                  </CHeaderNav>
-                  {/* </div> */}
-
-                  {/* Filtered Vehicles */}
-                  {/* </div> */}
-
-                  <CHeaderNav className="ms-1 p-0 me-3">
-                    <select
-                      className="form-select header-inputs"
-                      aria-label="Default select example"
-                      value={filter1}
-                      onChange={(e) => setFilter1(e.target.value)}
-                    >
-                      <option selected>Status</option>
-                      <option value="all">All</option>
-                      <option value="running">Running</option>
-                      <option value="idle">Idle</option>
-                      <option value="stopped">Stop</option>
-                      <option value="overspeed">OverSpeed</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </CHeaderNav>
-
-                  {/* Second Filter - Category */}
-                  <CHeaderNav className="ms-2 p-0 me-3">
-                    <select
-                      className="form-select header-inputs"
-                      aria-label="Default select example"
-                      value={filter1}
-                      onChange={(e) => setFilter1(e.target.value)}
-                    >
-                      <option selected>Select By Category</option>
-                      <option value="car">Car</option>
-                      <option value="bus">Bus</option>
-                      <option value="motorcycle">Bike</option>
-                      <option value="truck">Truck</option>
-                      <option value="tractor">Tracktor</option>
-                      <option value="crean">Crean</option>
-                      <option value="jcb">JCB</option>
-                    </select>
-                  </CHeaderNav>
-
-                  {/* Search Field */}
-                  <CHeaderNav className="ms-2 p-0 me-3">
-                    <form
-                      className="d-flex searchBar"
-                      role="search"
-                      style={{ right: '0px' }}
-                      onSubmit={(e) => e.preventDefault()} // Prevent page refresh
-                    >
-                      <input
-                        className="form-control input"
-                        type="text"
-                        placeholder="Search vehicles by name"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        aria-label="Search"
-                      />
-                      <button className="btn btn-outline searchBtn" type="submit">
-                        <IoMdSearch className="searchIcon" style={{ color: '#fff' }} />
-                      </button>
-                    </form>
-                  </CHeaderNav>
-
-                  {/* Table Column Visibility */}
-
-                  <CHeaderNav
-                    className="ms-2 p-0 me-3 refresh"
-                    onClick={() => {
-                      window.location.reload()
-                    }}
-                  >
-                    <LuRefreshCw />
-                  </CHeaderNav>
-                </div>
-              )}
-            </CCardHeader>
-
             <CCardBody className="content mt-4">
               {/* <hr className="mt-0 mb-0" /> */}
               {/* <CRow>
@@ -903,12 +769,11 @@ const Dashboard = () => {
               </CRow>
               {/* <hr />
               <br /> */}
-              <div className="tableNav">
-                {/* <StatusButtons /> */}
-                <CHeaderNav className="ms-2 p-0 me-3">
-                  <TableColumnVisibility />
-                </CHeaderNav>
-                <CHeaderNav className="ms-2 p-0 me-2">
+
+              {/* <div className="tableNav"> */}
+              {/* <StatusButtons /> */}
+
+              {/* <CHeaderNav className="ms-2 p-0 me-2">
                   <form
                     className="d-flex searchBar"
                     role="search"
@@ -927,9 +792,774 @@ const Dashboard = () => {
                       <IoMdSearch className="searchIcon" style={{ color: '#fff' }} />
                     </button>
                   </form>
-                </CHeaderNav>
-              </div>
+                </CHeaderNav> */}
+              {/* </div> */}
 
+              {/**************************************************************************************************************** */}
+
+              {/**TABLE */}
+              <CRow>
+                <CCol xs>
+                  <CCard className="mb-4">
+                    <CCardHeader>
+                      {isDashboard && (
+                        <div
+                          className="d-flex flex-row flex-wrap justify-content-between"
+                          ref={mapRef}
+                        >
+                          {/* <CHeaderToggler
+                    onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+                    style={{ marginInlineStart: '-10px' }}
+                  >
+                    <CIcon icon={cilMenu} size="lg" />
+                  </CHeaderToggler> */}
+
+                          {/* First Filter - Status */}
+                          {/* <div> */}
+                          {/* User Select */}
+
+                          {/* <div className="filterOfGroupUser"> */}
+
+                          <CHeaderNav className="ms-1 p-0 me-3">
+                            <Select
+                              className="z-3"
+                              id="user-select"
+                              options={users.map((user) => ({
+                                value: user._id,
+                                label: user.username,
+                              }))}
+                              placeholder="Select User"
+                              value={
+                                selectedUser
+                                  ? {
+                                      value: selectedUser,
+                                      label: users.find((user) => user._id === selectedUser)
+                                        ?.username,
+                                    }
+                                  : null
+                              }
+                              onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
+                              isLoading={sloading}
+                            />
+                          </CHeaderNav>
+
+                          {/* Group Select */}
+                          <CHeaderNav className="ms-1 p-0 me-3">
+                            <Select
+                              className="z-3"
+                              id="group-select"
+                              options={groups?.map((group) => ({
+                                value: group._id,
+                                label: group.name,
+                              }))}
+                              value={
+                                selectedGroup
+                                  ? {
+                                      value: selectedGroup,
+                                      label: groups.find((group) => group._id === selectedGroup)
+                                        ?.name,
+                                    }
+                                  : null
+                              }
+                              onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
+                              isLoading={sloading}
+                              placeholder="Select a Group"
+                            />
+                          </CHeaderNav>
+                          {/* </div> */}
+
+                          {/* Filtered Vehicles */}
+                          {/* </div> */}
+
+                          {/* <CHeaderNav className="ms-1 p-0 me-3">
+                      <select
+                        className="form-select header-inputs"
+                        aria-label="Default select example"
+                        value={filter1}
+                        onChange={(e) => setFilter1(e.target.value)}
+                      >
+                        <option selected>Status</option>
+                        <option value="all">All</option>
+                        <option value="running">Running</option>
+                        <option value="idle">Idle</option>
+                        <option value="stopped">Stop</option>
+                        <option value="overspeed">OverSpeed</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </CHeaderNav> */}
+
+                          {/* Second Filter - Category */}
+                          <CHeaderNav className="ms-2 p-0 me-3">
+                            {/* <Select
+                              className="z-3"
+                              aria-label="Default select example"
+                              value={filter1}
+                              onChange={(e) => setFilter1(e.target.value)}
+                              placeholder="Select By Category"
+                              options={[
+                                { value: 'car', label: 'Car' },
+                                { value: 'bus', label: 'Bus' },
+                                { value: 'motorcycle', label: 'Bike' },
+                                { value: 'truck', label: 'Truck' },
+                                { value: 'tractor', label: 'Tractor' },
+                                { value: 'crane', label: 'Crane' },
+                                { value: 'jcb', label: 'JCB' },
+                              ]}
+                            /> */}
+                            <select
+                              className="form-select header-inputs"
+                              aria-label="Default select example"
+                              value={filter1}
+                              onChange={(e) => setFilter1(e.target.value)}
+                            >
+                              <option selected>Select By Category</option>
+                              <option value="car">Car</option>
+                              <option value="bus">Bus</option>
+                              <option value="motorcycle">Bike</option>
+                              <option value="truck">Truck</option>
+                              <option value="tractor">Tracktor</option>
+                              <option value="crean">Crean</option>
+                              <option value="jcb">JCB</option>
+                            </select>
+                          </CHeaderNav>
+
+                          <CHeaderNav className="ms-2 p-0 me-3">
+                            <TableColumnVisibility />
+                          </CHeaderNav>
+
+                          {/* Search Field */}
+                          <CHeaderNav className="ms-2 p-0 me-3">
+                            <form
+                              className="d-flex searchBar"
+                              role="search"
+                              style={{ right: '0px' }}
+                              onSubmit={(e) => e.preventDefault()} // Prevent page refresh
+                            >
+                              <input
+                                className="form-control input"
+                                type="text"
+                                placeholder="Search vehicles by name"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                aria-label="Search"
+                              />
+                              <button className="btn btn-outline searchBtn" type="submit">
+                                <IoMdSearch className="searchIcon" style={{ color: '#fff' }} />
+                              </button>
+                            </form>
+                          </CHeaderNav>
+
+                          {/* Table Column Visibility */}
+
+                          <CHeaderNav
+                            className="ms-2 p-0 me-3 refresh"
+                            onClick={() => {
+                              window.location.reload()
+                            }}
+                          >
+                            <LuRefreshCw />
+                          </CHeaderNav>
+                        </div>
+                      )}
+                    </CCardHeader>
+                    <TableContainer
+                      component={Paper}
+                      sx={{
+                        height: 'auto', // Set the desired height
+
+                        // overflowX: 'auto', // Enable horizontal scrollbar
+                        // overflowY: 'auto', // Enable vertical scrollbar if needed
+                        // marginBottom: '10px',
+                        // borderRadius: '10px',
+                        // border: '1px solid black',
+                      }}
+                    >
+                      <CCardBody>
+                        <CTable
+                          bordered
+                          className="my-2 border vehiclesTable mt-0"
+                          hover
+                          responsive
+                        >
+                          <CTableHead
+                            className="text-nowrap"
+                            style={{
+                              position: 'sticky',
+                              top: 0,
+                              zIndex: 1,
+                              backgroundColor: '#f8f9fa',
+                            }}
+                          >
+                            <CTableRow>
+                              {visibleColumns.srNo && (
+                                <CTableHeaderCell
+                                  className="text-center sr-no table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Sr No.
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.vehicle && (
+                                <CTableHeaderCell
+                                  className="text-center vehicle table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Vehicle
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.deviceName && (
+                                <CTableHeaderCell
+                                  className="text-center device-name table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Device Name
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.address && (
+                                <CTableHeaderCell
+                                  className="text-center address table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    width: '25%',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Address
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.lastUpdate && (
+                                <CTableHeaderCell
+                                  className="text-center last-update table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    width: '25%',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  &nbsp;&nbsp;Last Update&nbsp;&nbsp;
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.cd && (
+                                <CTableHeaderCell
+                                  className="text-center current-delay table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C/D
+                                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.sp && (
+                                <CTableHeaderCell
+                                  className="text-center speed table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Sp
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.distance && (
+                                <CTableHeaderCell
+                                  className="text-center distance table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Distance
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.td && (
+                                <CTableHeaderCell
+                                  className="text-center total-distance table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  T/D
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.sat && (
+                                <CTableHeaderCell
+                                  className="text-center satellite table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  GPS
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.ig && (
+                                <CTableHeaderCell
+                                  className="text-center ignition table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Ig
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.gps && (
+                                <CTableHeaderCell
+                                  className="text-center gps table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  GSM
+                                </CTableHeaderCell>
+                              )}
+                              {visibleColumns.power && (
+                                <CTableHeaderCell
+                                  className="text-center power table-cell"
+                                  style={{
+                                    position: 'sticky',
+                                    top: 0,
+                                    background: '#0a2d63',
+                                    color: 'white',
+                                  }}
+                                >
+                                  Power
+                                </CTableHeaderCell>
+                              )}
+                              <CTableHeaderCell
+                                className="text-center status table-cell"
+                                style={{
+                                  position: 'sticky',
+                                  top: 0,
+                                  width: '15%',
+                                  background: '#0a2d63',
+                                  color: 'white',
+                                }}
+                              >
+                                Track
+                              </CTableHeaderCell>
+                              <CTableHeaderCell
+                                className="text-center status table-cell"
+                                style={{
+                                  position: 'sticky',
+                                  top: 0,
+                                  width: '15%',
+                                  background: '#0a2d63',
+                                  color: 'white',
+                                }}
+                              >
+                                History
+                              </CTableHeaderCell>
+                            </CTableRow>
+                          </CTableHead>
+
+                          <CTableBody>
+                            {firstLoad ? (
+                              // Show skeleton loader while vehicles are loading
+                              <CTableRow>
+                                <CTableDataCell colSpan="15" className="text-center">
+                                  <div className="text-nowrap mb-2 text-center">
+                                    <p className="card-text placeholder-glow">
+                                      <span className="placeholder col-12" />
+                                    </p>
+                                    <p className="card-text placeholder-glow">
+                                      <span className="placeholder col-12" />
+                                    </p>
+                                    <p className="card-text placeholder-glow">
+                                      <span className="placeholder col-12" />
+                                    </p>
+                                    <p className="card-text placeholder-glow">
+                                      <span className="placeholder col-12" />
+                                    </p>
+                                  </div>
+                                </CTableDataCell>
+                              </CTableRow>
+                            ) : filteredVehicles.length > 0 ? (
+                              currentVehicles.map((item, index) => (
+                                <CTableRow
+                                  key={index}
+                                  className={`table-row collapsed trans`}
+                                  onClick={() =>
+                                    handleRowClick(item.latitude, item.longitude, index)
+                                  }
+                                >
+                                  {/* Sr No. */}
+                                  {visibleColumns.srNo && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center sr-no table-cell"
+                                    >
+                                      {currentPage * itemsPerPage + index + 1}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.vehicle && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center vehicle table-cell"
+                                    >
+                                      <div>
+                                        {(() => {
+                                          // const device = salesman.find((device) => device.id === item.deviceId)
+                                          return (
+                                            <img
+                                              src={item && selectImage(item.category, item)}
+                                              className="dashimg upperdata"
+                                              alt="vehicle"
+                                            />
+                                          )
+                                        })()}
+                                      </div>
+                                      {expandedRow === index && (
+                                        <>
+                                          <hr />
+                                          {(() => {
+                                            // const device = salesman.find(
+                                            //   (device) => device.id === item.deviceId,
+                                            // )
+                                            return (
+                                              <div className="upperdata">
+                                                {item ? item.category : 'Currently Not Available'}
+                                              </div>
+                                            )
+                                          })()}
+                                        </>
+                                      )}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.deviceName && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="device-name table-cell n text-center"
+                                    >
+                                      {(() => {
+                                        // const device = salesman.find((device) => device.id === item.deviceId)
+                                        if (item && item.name) {
+                                          const nameParts = item.name.split(' ')
+                                          const firstWord = nameParts[0]
+                                          const remainingWords = nameParts.slice(1).join(' ') // Join remaining words
+
+                                          return (
+                                            <>
+                                              <div className="upperdata">
+                                                <div>{firstWord}</div>{' '}
+                                                {/* First word on the first line */}
+                                                {remainingWords && <div>{remainingWords}</div>}{' '}
+                                                {/* Remaining words on the second line if present */}
+                                              </div>
+                                              {expandedRow === index && (
+                                                <>
+                                                  <hr />
+                                                  <div>
+                                                    <PiEngineFill />
+                                                  </div>
+                                                </>
+                                              )}
+                                            </>
+                                          )
+                                        }
+                                        return <div className="upperdata">Unknown</div>
+                                      })()}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.address && (
+                                    <CTableDataCell
+                                      className="text-center address table-cell"
+                                      style={{
+                                        minWidth: '500px',
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                    >
+                                      <span
+                                        className="upperdata"
+                                        style={{ fontSize: '1rem', textWrap: 'auto' }}
+                                      >
+                                        {newAddress[item.deviceId] || 'Loading...'}
+                                      </span>
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.lastUpdate && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center last-update table-cell"
+                                    >
+                                      {(() => {
+                                        // const device = salesman.find((device) => device.id === item.deviceId)
+                                        if (item && item.lastUpdate) {
+                                          const date = dayjs(item.lastUpdate).format('YYYY-MM-DD') // Format date
+                                          const time = dayjs(item.lastUpdate).format('HH:mm:ss') // Format time
+                                          return (
+                                            <div className="upperdata ld">
+                                              <div>{date}</div> {/* Date on one line */}
+                                              <div>{time}</div> {/* Time on the next line */}
+                                            </div>
+                                          )
+                                        }
+                                        return <div>N/A</div>
+                                      })()}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.cd && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                        fontSize: '0.9rem',
+                                      }}
+                                      className="text-center cd current-delay table-cell"
+                                    >
+                                      {(() => {
+                                        // const device = salesman.find((device) => device.id === item.deviceId)
+                                        if (item && item.lastUpdate) {
+                                          return <div>{getTimeDifference(item.lastUpdate)}</div> // Default if no device or lastUpdate
+                                        }
+                                        return null // You can add a fallback element or return null if you want nothing to show when the condition is false.
+                                      })()}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.sp && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center sp speed table-cell"
+                                    >
+                                      <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
+                                      {expandedRow === index && (
+                                        <>
+                                          <hr />
+                                          <div>
+                                            <PiEngineFill />
+                                          </div>
+                                        </>
+                                      )}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.distance && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center d distance table-cell"
+                                    >
+                                      {`${Math.round(item.attributes.distance)} km`}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.td && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center td total-distance table-cell"
+                                    >
+                                      {`${Math.round(item.attributes.totalDistance / 1000)} km`}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.sat && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center satelite table-cell"
+                                    >
+                                      <div
+                                        style={{ position: 'relative', display: 'inline-block' }}
+                                      >
+                                        <MdGpsNotFixed style={{ fontSize: '1.6rem' }} />{' '}
+                                        {/* Adjust icon size as needed */}
+                                        <span
+                                          style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '49%',
+                                            transform: 'translate(-50%, -50%)',
+                                            fontSize: '0.8rem', // Adjust text size
+                                            color: 'black',
+                                            fontWeight: 'bold',
+                                          }}
+                                        >
+                                          {item.attributes.sat}
+                                        </span>
+                                      </div>
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.ig && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center ignition table-cell"
+                                    >
+                                      {(() => {
+                                        const { ignition } = item.attributes
+
+                                        let iconColor = 'gray' // Default color
+                                        let iconText = 'N/A' // Default text
+
+                                        if (ignition) {
+                                          iconColor = 'green'
+                                          iconText = 'On'
+                                        } else if (ignition === false) {
+                                          iconColor = 'red'
+                                          iconText = 'Off'
+                                        }
+
+                                        return (
+                                          <div style={{ color: iconColor, fontSize: '1.1rem' }}>
+                                            <PiEngineFill />
+                                          </div>
+                                        )
+                                      })()}
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.gps && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center gps table-cell"
+                                    >
+                                      <div style={{ fontSize: '1.1rem' }}>
+                                        {item.valid ? (
+                                          <MdGpsFixed style={{ color: 'green' }} />
+                                        ) : (
+                                          <MdGpsFixed style={{ color: 'red' }} />
+                                        )}
+                                      </div>
+                                    </CTableDataCell>
+                                  )}
+                                  {visibleColumns.power && (
+                                    <CTableDataCell
+                                      style={{
+                                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                      }}
+                                      className="text-center power table-cell"
+                                    >
+                                      {(() => {
+                                        const power = item.attributes.battery
+
+                                        let iconColor = 'gray' // Default color
+                                        let iconText = 'N/A' // Default text
+
+                                        if (power) {
+                                          iconColor = 'green'
+                                          iconText = 'On'
+                                        } else if (power === false) {
+                                          iconColor = 'red'
+                                          iconText = 'Off'
+                                        }
+
+                                        return (
+                                          <div style={{ color: iconColor, fontSize: '1.2rem' }}>
+                                            <IoMdBatteryCharging />
+                                          </div>
+                                        )
+                                      })()}
+                                    </CTableDataCell>
+                                  )}
+                                  <CTableDataCell
+                                    style={{
+                                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                    }}
+                                    className="text-center status table-cell"
+                                  >
+                                    <button
+                                      className="btn shadow-sm"
+                                      style={{
+                                        backgroundColor: '#000000',
+                                        fontSize: '1rem',
+                                        color: 'white',
+                                      }}
+                                      onClick={() => handleClickOnTrack(item)}
+                                    >
+                                      Live Track
+                                    </button>
+                                  </CTableDataCell>
+                                  <CTableDataCell
+                                    style={{
+                                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                    }}
+                                    className="text-center status table-cell"
+                                  >
+                                    <button
+                                      className="btn shadow-sm"
+                                      style={{
+                                        backgroundColor: '#000000',
+                                        fontSize: '1rem',
+                                        color: 'white',
+                                      }}
+                                      onClick={() => handleClickOnHistory(item)}
+                                    >
+                                      View History
+                                    </button>
+                                  </CTableDataCell>
+                                </CTableRow>
+                              ))
+                            ) : (
+                              <CTableRow>
+                                <CTableDataCell colSpan="15" className="text-center">
+                                  <div className="text-nowrap mb-2 text-center">
+                                    <strong>No Vehicles Found....</strong>
+                                  </div>
+                                </CTableDataCell>
+                              </CTableRow>
+                            )}
+                          </CTableBody>
+                        </CTable>
+                      </CCardBody>
+                    </TableContainer>
+                  </CCard>
+                </CCol>
+              </CRow>
               <div className="table-container" style={{ overflowY: 'auto' }}>
                 <div
                   style={{
@@ -937,503 +1567,14 @@ const Dashboard = () => {
                     overflowX: 'auto',
                     overflowY: 'auto',
                     marginBottom: '10px',
-                    borderRadius: '10px',
+                    borderRadius: '5px',
                     border: '1px solid black',
                   }}
                 >
-                  <CTable bordered className="my-2 border vehiclesTable mt-0" hover responsive>
-                    <CTableHead
-                      className="text-nowrap"
-                      style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#f8f9fa' }}
-                    >
-                      <CTableRow>
-                        {visibleColumns.srNo && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center sr-no table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Sr No.
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.vehicle && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center vehicle table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Vehicle
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.deviceName && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center device-name table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Device Name
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.address && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center address table-cell"
-                            style={{
-                              position: 'sticky',
-                              top: 0,
-                              width: '25%',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            Address
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.lastUpdate && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center last-update table-cell"
-                            style={{
-                              position: 'sticky',
-                              top: 0,
-                              width: '25%',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            &nbsp;&nbsp;Last Update&nbsp;&nbsp;
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.cd && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center current-delay table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C/D
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.sp && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center speed table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Sp
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.distance && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center distance table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Distance
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.td && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center total-distance table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            T/D
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.sat && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center satellite table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            GPS
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.ig && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center ignition table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Ig
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.gps && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center gps table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            GSM
-                          </CTableHeaderCell>
-                        )}
-                        {visibleColumns.power && (
-                          <CTableHeaderCell
-                            className="bg-body-secondary text-center power table-cell"
-                            style={{ position: 'sticky', top: 0 }}
-                          >
-                            Power
-                          </CTableHeaderCell>
-                        )}
-                        <CTableHeaderCell
-                          className="bg-body-secondary text-center status table-cell"
-                          style={{ position: 'sticky', top: 0, width: '15%' }}
-                        >
-                          Track
-                        </CTableHeaderCell>
-                        <CTableHeaderCell
-                          className="bg-body-secondary text-center status table-cell"
-                          style={{ position: 'sticky', top: 0, width: '15%' }}
-                        >
-                          History
-                        </CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-
-                    <CTableBody>
-                      {firstLoad ? (
-                        // Show skeleton loader while vehicles are loading
-                        <CTableRow>
-                          <CTableDataCell colSpan="15" className="text-center">
-                            <div className="text-nowrap mb-2 text-center">
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                              <p className="card-text placeholder-glow">
-                                <span className="placeholder col-12" />
-                              </p>
-                            </div>
-                          </CTableDataCell>
-                        </CTableRow>
-                      ) : filteredVehicles.length > 0 ? (
-                        currentVehicles.map((item, index) => (
-                          <CTableRow
-                            key={index}
-                            className={`table-row collapsed trans`}
-                            onClick={() => handleRowClick(item.latitude, item.longitude, index)}
-                          >
-                            {/* Sr No. */}
-                            {visibleColumns.srNo && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center sr-no table-cell"
-                              >
-                                {currentPage * itemsPerPage + index + 1}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.vehicle && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center vehicle table-cell"
-                              >
-                                <div>
-                                  {(() => {
-                                    // const device = salesman.find((device) => device.id === item.deviceId)
-                                    return (
-                                      <img
-                                        src={item && selectImage(item.category, item)}
-                                        className="dashimg upperdata"
-                                        alt="vehicle"
-                                      />
-                                    )
-                                  })()}
-                                </div>
-                                {expandedRow === index && (
-                                  <>
-                                    <hr />
-                                    {(() => {
-                                      // const device = salesman.find(
-                                      //   (device) => device.id === item.deviceId,
-                                      // )
-                                      return (
-                                        <div className="upperdata">
-                                          {item ? item.category : 'Currently Not Available'}
-                                        </div>
-                                      )
-                                    })()}
-                                  </>
-                                )}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.deviceName && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="device-name table-cell n text-center"
-                              >
-                                {(() => {
-                                  // const device = salesman.find((device) => device.id === item.deviceId)
-                                  if (item && item.name) {
-                                    const nameParts = item.name.split(' ')
-                                    const firstWord = nameParts[0]
-                                    const remainingWords = nameParts.slice(1).join(' ') // Join remaining words
-
-                                    return (
-                                      <>
-                                        <div className="upperdata">
-                                          <div>{firstWord}</div>{' '}
-                                          {/* First word on the first line */}
-                                          {remainingWords && <div>{remainingWords}</div>}{' '}
-                                          {/* Remaining words on the second line if present */}
-                                        </div>
-                                        {expandedRow === index && (
-                                          <>
-                                            <hr />
-                                            <div>
-                                              <PiEngineFill />
-                                            </div>
-                                          </>
-                                        )}
-                                      </>
-                                    )
-                                  }
-                                  return <div className="upperdata">Unknown</div>
-                                })()}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.address && (
-                              <CTableDataCell
-                                className="text-center address table-cell"
-                                style={{
-                                  minWidth: '500px',
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                              >
-                                <span
-                                  className="upperdata"
-                                  style={{ fontSize: '1rem', textWrap: 'auto' }}
-                                >
-                                  {newAddress[item.deviceId] || 'Loading...'}
-                                </span>
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.lastUpdate && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center last-update table-cell"
-                              >
-                                {(() => {
-                                  // const device = salesman.find((device) => device.id === item.deviceId)
-                                  if (item && item.lastUpdate) {
-                                    const date = dayjs(item.lastUpdate).format('YYYY-MM-DD') // Format date
-                                    const time = dayjs(item.lastUpdate).format('HH:mm:ss') // Format time
-                                    return (
-                                      <div className="upperdata ld">
-                                        <div>{date}</div> {/* Date on one line */}
-                                        <div>{time}</div> {/* Time on the next line */}
-                                      </div>
-                                    )
-                                  }
-                                  return <div>N/A</div>
-                                })()}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.cd && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                  fontSize: '0.9rem',
-                                }}
-                                className="text-center cd current-delay table-cell"
-                              >
-                                {(() => {
-                                  // const device = salesman.find((device) => device.id === item.deviceId)
-                                  if (item && item.lastUpdate) {
-                                    return <div>{getTimeDifference(item.lastUpdate)}</div> // Default if no device or lastUpdate
-                                  }
-                                  return null // You can add a fallback element or return null if you want nothing to show when the condition is false.
-                                })()}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.sp && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center sp speed table-cell"
-                              >
-                                <div className="upperdata">{`${Math.round(item.speed)} kmph`}</div>
-                                {expandedRow === index && (
-                                  <>
-                                    <hr />
-                                    <div>
-                                      <PiEngineFill />
-                                    </div>
-                                  </>
-                                )}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.distance && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center d distance table-cell"
-                              >
-                                {`${Math.round(item.attributes.distance)} km`}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.td && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center td total-distance table-cell"
-                              >
-                                {`${Math.round(item.attributes.totalDistance / 1000)} km`}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.sat && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center satelite table-cell"
-                              >
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
-                                  <MdGpsNotFixed style={{ fontSize: '1.6rem' }} />{' '}
-                                  {/* Adjust icon size as needed */}
-                                  <span
-                                    style={{
-                                      position: 'absolute',
-                                      top: '50%',
-                                      left: '49%',
-                                      transform: 'translate(-50%, -50%)',
-                                      fontSize: '0.8rem', // Adjust text size
-                                      color: 'black',
-                                      fontWeight: 'bold',
-                                    }}
-                                  >
-                                    {item.attributes.sat}
-                                  </span>
-                                </div>
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.ig && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center ignition table-cell"
-                              >
-                                {(() => {
-                                  const { ignition } = item.attributes
-
-                                  let iconColor = 'gray' // Default color
-                                  let iconText = 'N/A' // Default text
-
-                                  if (ignition) {
-                                    iconColor = 'green'
-                                    iconText = 'On'
-                                  } else if (ignition === false) {
-                                    iconColor = 'red'
-                                    iconText = 'Off'
-                                  }
-
-                                  return (
-                                    <div style={{ color: iconColor, fontSize: '1.1rem' }}>
-                                      <PiEngineFill />
-                                    </div>
-                                  )
-                                })()}
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.gps && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center gps table-cell"
-                              >
-                                <div style={{ fontSize: '1.1rem' }}>
-                                  {item.valid ? (
-                                    <MdGpsFixed style={{ color: 'green' }} />
-                                  ) : (
-                                    <MdGpsFixed style={{ color: 'red' }} />
-                                  )}
-                                </div>
-                              </CTableDataCell>
-                            )}
-                            {visibleColumns.power && (
-                              <CTableDataCell
-                                style={{
-                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                                }}
-                                className="text-center power table-cell"
-                              >
-                                {(() => {
-                                  const power = item.attributes.battery
-
-                                  let iconColor = 'gray' // Default color
-                                  let iconText = 'N/A' // Default text
-
-                                  if (power) {
-                                    iconColor = 'green'
-                                    iconText = 'On'
-                                  } else if (power === false) {
-                                    iconColor = 'red'
-                                    iconText = 'Off'
-                                  }
-
-                                  return (
-                                    <div style={{ color: iconColor, fontSize: '1.2rem' }}>
-                                      <IoMdBatteryCharging />
-                                    </div>
-                                  )
-                                })()}
-                              </CTableDataCell>
-                            )}
-                            <CTableDataCell
-                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                              className="text-center status table-cell"
-                            >
-                              <button
-                                className="btn shadow-sm"
-                                style={{
-                                  backgroundColor: '#000000',
-                                  fontSize: '1rem',
-                                  color: 'white',
-                                }}
-                                onClick={() => handleClickOnTrack(item)}
-                              >
-                                Live Track
-                              </button>
-                            </CTableDataCell>
-                            <CTableDataCell
-                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                              className="text-center status table-cell"
-                            >
-                              <button
-                                className="btn shadow-sm"
-                                style={{
-                                  backgroundColor: '#000000',
-                                  fontSize: '1rem',
-                                  color: 'white',
-                                }}
-                                onClick={() => handleClickOnHistory(item)}
-                              >
-                                View History
-                              </button>
-                            </CTableDataCell>
-                          </CTableRow>
-                        ))
-                      ) : (
-                        <CTableRow>
-                          <CTableDataCell colSpan="15" className="text-center">
-                            <div className="text-nowrap mb-2 text-center">
-                              <h4>No Vehicles Found.</h4>
-                            </div>
-                          </CTableDataCell>
-                        </CTableRow>
-                      )}
-                    </CTableBody>
-                  </CTable>
+                  {/**TABLE HEADER NAV BAR */}
                 </div>
 
+                {/**PAGINATION */}
                 <div className="mt-3">
                   {' '}
                   {/* Adds margin to the right of pagination */}

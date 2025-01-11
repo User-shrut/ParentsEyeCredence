@@ -16,7 +16,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
@@ -32,24 +32,28 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CRow,
+  CCol,
+  CCard,
+  CCardHeader,
+  CCardBody,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
-import Loader from '../../../components/Loader/Loader';
-import CloseIcon from '@mui/icons-material/Close';
+import Loader from '../../../components/Loader/Loader'
+import CloseIcon from '@mui/icons-material/Close'
 import { MdConnectWithoutContact } from 'react-icons/md'
 import { AiOutlineUpload } from 'react-icons/ai'
 import ReactPaginate from 'react-paginate'
 import Cookies from 'js-cookie'
 import { IoMdAdd } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
-import * as XLSX from 'xlsx'; // For Excel export
-import jsPDF from 'jspdf'; // For PDF export
-import 'jspdf-autotable'; // For table formatting in PDF
+import * as XLSX from 'xlsx' // For Excel export
+import jsPDF from 'jspdf' // For PDF export
+import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
-import GroupIcon from '@mui/icons-material/Group';
+import GroupIcon from '@mui/icons-material/Group'
 import { cilSettings } from '@coreui/icons'
-import "../../../../src/app.css";
-
+import '../../../../src/app.css'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -62,17 +66,18 @@ const Group = () => {
   const [pageCount, setPageCount] = useState()
   // const handleEditModalClose = () => setEditModalOpen(false)
   // const handleAddModalClose = () => setAddModalOpen(false)
-  const [filteredData, setFilteredData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleEditModalClose = () => {
     setFormData({})
-    setEditModalOpen(false)}
-
+    setEditModalOpen(false)
+  }
 
   const handleAddModalClose = () => {
     setFormData({})
-    setAddModalOpen(false)}
+    setAddModalOpen(false)
+  }
 
   const style = {
     position: 'absolute',
@@ -121,24 +126,23 @@ const Group = () => {
   // ##################### Filter data by search query #######################
   const filterGroups = () => {
     if (!searchQuery) {
-      setFilteredData(data); // No query, show all drivers
+      setFilteredData(data) // No query, show all drivers
     } else {
-      const filtered = data.filter(
-        (group) =>
-          group.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
+      const filtered = data.filter((group) =>
+        group.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredData(filtered)
       setCurrentPage(1)
     }
-  };
+  }
 
   useEffect(() => {
     fetchGroupData()
   }, [limit, searchQuery])
 
   useEffect(() => {
-    filterGroups(searchQuery);
-  }, [data, searchQuery]);
+    filterGroups(searchQuery)
+  }, [data, searchQuery])
 
   const handlePageClick = (e) => {
     console.log(e.selected + 1)
@@ -151,7 +155,7 @@ const Group = () => {
   // #########################################################################
 
   //  ####################  Add Group ###########################
-  
+
   const handleAddGroup = async (e) => {
     e.preventDefault()
     console.log(formData)
@@ -218,10 +222,10 @@ const Group = () => {
   // ###################### Delete Group ##############################
 
   const deleteGroupSubmit = async (item) => {
-    const confirmed = confirm('Do you want to delete this user?');
+    const confirmed = confirm('Do you want to delete this user?')
 
     // If the user cancels, do nothing
-    if (!confirmed) return;
+    if (!confirmed) return
 
     try {
       const accessToken = Cookies.get('authToken')
@@ -232,7 +236,7 @@ const Group = () => {
       })
 
       if (response.status === 200) {
-        toast.error('group is deleted successfully')//success toast added in place of error
+        toast.error('group is deleted successfully') //success toast added in place of error
         fetchGroupData()
       }
     } catch (error) {
@@ -247,79 +251,53 @@ const Group = () => {
       const rowData = {
         SN: rowIndex + 1,
         Name: item.name || 'N/A',
-      };
+      }
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Create worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport); // Convert data to worksheet format
-    const workbook = XLSX.utils.book_new(); // Create a new workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport) // Convert data to worksheet format
+    const workbook = XLSX.utils.book_new() // Create a new workbook
 
     // Append the worksheet to the workbook with the sheet name 'User Data'
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Group Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Group Data')
 
     // Write the Excel file to the client's computer
-    XLSX.writeFile(workbook, 'group_data.xlsx');
-  };
+    XLSX.writeFile(workbook, 'group_data.xlsx')
+  }
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF()
 
     // Define the table headers
-    const tableColumn = ['SN', 'Group Name'];
+    const tableColumn = ['SN', 'Group Name']
 
     // Map over your filteredData to create rows
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = [
-        rowIndex + 1,                // Serial Number
-        item.name || '--',            // Group Name
-      ];
-      return rowData;
-    });
+        rowIndex + 1, // Serial Number
+        item.name || '--', // Group Name
+      ]
+      return rowData
+    })
 
     // Create table using autoTable
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 20
-    });
+      startY: 20,
+    })
 
     // Save the PDF
-    doc.save('group_data.pdf');
-  };
+    doc.save('group_data.pdf')
+  }
 
   //  ###############################################################
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Groups</h2>
-        </div>
-
-        <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-secondary"
-            >
-              Add Group
-            </button>
-          </div>
-        </div>
-      </div>
       <div className="d-md-none mb-2">
         <input
           type="search"
@@ -330,123 +308,195 @@ const Group = () => {
         />
       </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          height: 'auto', // Set the desired height
-          overflowX: 'auto', // Enable horizontal scrollbar
-          overflowY: 'auto', // Enable vertical scrollbar if needed
-          marginBottom: '10px',
-          borderRadius: '10px',
-          border: '1px solid black'
-        }}
-      >
-        <CTable style={{fontFamily: "Roboto, sans-serif", fontSize: '14px',}} bordered align="middle" className="mb-2 border min-vh-25 rounded-top-3" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-            <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>SN</strong>
-              </CTableHeaderCell>
-
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                <strong>Group Name</strong>
-              </CTableHeaderCell>
-
-              <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-               <strong>Actions</strong> 
-              </CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {loading ? (
-              <>
-                <CTableRow>
-                  <CTableDataCell colSpan="4" className="text-center">
-                    <div className="text-nowrap mb-2 text-center w-">
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-12" />
-                      </p>
-                    </div>
-                  </CTableDataCell>
-                </CTableRow>
-              </>
-            ) : filteredData.length > 0 ? (
-              filteredData?.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }} >{(currentPage -1 ) * limit + index+1}</CTableDataCell>
-                  <CTableDataCell className="text-center p-0"  style={{ backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}>{item.name}</CTableDataCell>
-                  <CTableDataCell
-                    className="text-center d-flex p-0"
-                    style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: index % 2 === 0 ? "#ffffff" : "#eeeeefc2", }}
-                    
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Group</strong>
+              <div className="d-flex">
+                <div className="me-3 d-none d-md-block">
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search for Group"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={() => setAddModalOpen(true)}
+                    variant="contained"
+                    className="btn text-white"
+                    style={{ backgroundColor: '#0a2d63' }}
                   >
-                    <IconButton  aria-label="edit" onClick={() => handleEditGroup(item)}>
-                      <RiEdit2Fill
-                        style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
-                      />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
-                      <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
-                    </IconButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))
-            ) : (
-              <CTableRow>
-                <CTableDataCell colSpan="3" className="text-center">
-                  <div
-                    className="d-flex flex-column justify-content-center align-items-center"
-                    style={{ height: '200px' }}
+                    Add Group
+                  </button>
+                </div>
+              </div>
+            </CCardHeader>
+            <TableContainer
+              component={Paper}
+              sx={{
+                height: 'auto', // Set the desired height
+                overflowX: 'auto', // Enable horizontal scrollbar
+                overflowY: 'auto', // Enable vertical scrollbar if needed
+                // marginBottom: '10px',
+                // borderRadius: '10px',
+                // border: '1px solid black',
+              }}
+            >
+              <CCardBody>
+                <CTable
+                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  bordered
+                  align="middle"
+                  className="mb-2 border min-vh-25 rounded-top-3"
+                  hover
+                  responsive
+                >
+                  <CTableHead
+                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                    bordered
+                    align="middle"
+                    className="mb-2 border min-vh-25 rounded-top-3"
+                    hover
+                    responsive
                   >
-                    <p className="mb-0 fw-bold">
-                      "Oops! Looks like there's no Groups available.
-                      <br /> Maybe it's time to create some Groups!"
-                    </p>
-                    <div>
-                      <button
-                        onClick={() => setAddModalOpen(true)}
-                        variant="contained"
-                        className="btn btn-primary m-3 text-white"
+                    <CTableRow style={{ height: '6vh' }} className="text-nowrap ">
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
                       >
-                        <span>
-                          <IoMdAdd className="fs-5" />
-                        </span>{' '}
-                        Add Group
-                      </button>
-                    </div>
-                  </div>
-                </CTableDataCell>
-              </CTableRow>
-            )}
-          </CTableBody>
-        </CTable>
-      </TableContainer>
+                        <strong>SN</strong>
+                      </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        <strong>Group Name</strong>
+                      </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className=" text-center text-white text-center sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
+                        <strong>Actions</strong>
+                      </CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {loading ? (
+                      <>
+                        <CTableRow>
+                          <CTableDataCell colSpan="4" className="text-center">
+                            <div className="text-nowrap mb-2 text-center w-">
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                              <p className="card-text placeholder-glow">
+                                <span className="placeholder col-12" />
+                              </p>
+                            </div>
+                          </CTableDataCell>
+                        </CTableRow>
+                      </>
+                    ) : filteredData.length > 0 ? (
+                      filteredData?.map((item, index) => (
+                        <CTableRow key={index}>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {(currentPage - 1) * limit + index + 1}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {item.name}
+                          </CTableDataCell>
+                          <CTableDataCell
+                            className="text-center d-flex p-0"
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                            }}
+                          >
+                            <IconButton aria-label="edit" onClick={() => handleEditGroup(item)}>
+                              <RiEdit2Fill
+                                style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
+                              />
+                            </IconButton>
+                            <IconButton aria-label="delete" onClick={() => deleteGroupSubmit(item)}>
+                              <AiFillDelete
+                                style={{ fontSize: '20px', color: 'red', margin: '3px' }}
+                              />
+                            </IconButton>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    ) : (
+                      <CTableRow>
+                        <CTableDataCell colSpan="3" className="text-center">
+                          <div
+                            className="d-flex flex-column justify-content-center align-items-center"
+                            style={{ height: '200px' }}
+                          >
+                            <p className="mb-0 fw-bold">
+                              "Oops! Looks like there's no Groups available.
+                              <br /> Maybe it's time to create some Groups!"
+                            </p>
+                            <div>
+                              <button
+                                onClick={() => setAddModalOpen(true)}
+                                variant="contained"
+                                className="btn btn-primary m-3 text-white"
+                              >
+                                <span>
+                                  <IoMdAdd className="fs-5" />
+                                </span>{' '}
+                                Add Group
+                              </button>
+                            </div>
+                          </div>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )}
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </TableContainer>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
           style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
         >
           <CIcon icon={cilSettings} />
-
         </CDropdownToggle>
         <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF} >PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel} >Excel</CDropdownItem>
+          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
-      <div className='d-flex justify-content-center align-items-center'>
+      <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3"> {/* Adds margin to the right of pagination */}
+          <div className="me-3">
+            {' '}
+            {/* Adds margin to the right of pagination */}
             <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
@@ -467,7 +517,7 @@ const Group = () => {
             />
           </div>
           {/* Form Control */}
-          <div style={{ width: "90px" }}>
+          <div style={{ width: '90px' }}>
             <CFormSelect
               aria-label="Default select example"
               value={limit}
@@ -514,7 +564,13 @@ const Group = () => {
                     startAdornment: (
                       <InputAdornment position="start">
                         <GroupIcon
-                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          sx={{
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                            color: 'white',
+                            padding: '5px',
+                            fontSize: '28px',
+                          }}
                         />
                       </InputAdornment>
                     ),
@@ -566,7 +622,13 @@ const Group = () => {
                     startAdornment: (
                       <InputAdornment position="start">
                         <GroupIcon
-                          sx={{ borderRadius: "50%", backgroundColor: "rgba(0, 0, 0, 0.54)", color: "white", padding: "5px", fontSize: "28px" }}
+                          sx={{
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.54)',
+                            color: 'white',
+                            padding: '5px',
+                            fontSize: '28px',
+                          }}
                         />
                       </InputAdornment>
                     ),
