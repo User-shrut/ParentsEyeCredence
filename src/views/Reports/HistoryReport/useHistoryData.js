@@ -27,7 +27,7 @@ const useHistoryData = (url, { from, to, deviceId }, fetch) => {
             const utcDate = new Date(date) // Parse the date
             const istOffset = 5.5 * 60 * 60 * 1000 // Offset for IST in milliseconds (+5:30 hours)
             const istDate = new Date(utcDate.getTime() + istOffset) // Add IST offset
-            const isoStringWithIST = istDate.toISOString().replace('Z', '+05:30') // Replace 'Z' with '+05:30'
+            const isoStringWithIST = istDate.toISOString() // Replace 'Z' with '+05:30'
             return isoStringWithIST // Return the formatted string
           }
 

@@ -169,3 +169,28 @@
 .fixedWidth{
   width: 10rem !important;
 }
+
+
+
+
+
+
+.map-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  border-radius: 15px;
+  border: 2px solid gray;
+}
+
+@media (max-width: 768px) {
+  .map-container {
+    height: 300px; /* Adjust height for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 250px; /* Further adjustment for very small screens */
+  }
+}

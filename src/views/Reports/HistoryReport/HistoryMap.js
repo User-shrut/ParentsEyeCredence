@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import 'leaflet/dist/leaflet.css'
 import useHistoryData from './useHistoryData'
 import ReactLeafletDriftMarker from 'react-leaflet-drift-marker'
+import DriftMarker from 'react-leaflet-drift-marker'
 import { IoMdPause, IoMdPlay } from 'react-icons/io'
 import { FaForward, FaBackward } from 'react-icons/fa'
 import { CButton } from '@coreui/react'
@@ -375,7 +376,7 @@ const HistoryMap = ({
         ) {
           // Only update the view if the position has changed significantly
           if ((currentPosition?.latitude, currentPosition?.longitude)) {
-            map.setView([currentPosition?.latitude, currentPosition?.longitude], zoomLevel)
+            map.setView([currentPosition?.latitude, currentPosition?.longitude])
             setLastPosition(currentPosition)
           }
         }
@@ -408,7 +409,7 @@ const HistoryMap = ({
   }, [poly])
 
 
-  // USEABLE CODE 
+  // USEABLE CODE
   const { longestStop, shortestStop, longestDuration, shortestDuration } =
     useStoppageTimes(stopages)
 
@@ -528,18 +529,19 @@ const HistoryMap = ({
                 }}
               />
               {renderMarkers()}
-              <Marker
+              <DriftMarker
                 position={[
                   positions[currentPositionIndex]?.latitude,
                   positions[currentPositionIndex]?.longitude,
                 ]}
-                duration={1000}
+                duration={190}
+                keepAtCenter
                 icon={iconImage}
               >
                 <Popup>
                   {`Vehicle at ${positions[currentPositionIndex]?.latitude}, ${positions[currentPositionIndex]?.longitude}`}
                 </Popup>
-              </Marker>
+              </DriftMarker>
             </>
           )}
 
