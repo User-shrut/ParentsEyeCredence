@@ -22,6 +22,7 @@ import { RxLapTimer } from 'react-icons/rx'
 import { IoLocationSharp } from 'react-icons/io5'
 
 import dayjs from 'dayjs'
+import { FaSatellite } from 'react-icons/fa'
 const MapController = ({ individualSalesMan, previousPosition, setPath }) => {
   const map = useMap()
   const animationRef = useRef(null)
@@ -93,6 +94,7 @@ const IndividualTrack = () => {
     }
   }, [vehicleData])
 
+
   useEffect(() => {
     const fetchAddress = async () => {
       try {
@@ -123,6 +125,11 @@ const IndividualTrack = () => {
     console.log('trcak clicked')
     navigate(`/history/${deviceId}/${category}/${name}`)
   }
+  const [isSatelliteView, setIsSatelliteView] = useState(false)
+
+  const toggleMapView = () => {
+    setIsSatelliteView((prev) => !prev)
+  }
 
   return (
     <>
@@ -139,8 +146,16 @@ const IndividualTrack = () => {
                 borderRadius: '5px',
               }}
             >
+              <div className="toggle-map-view" onClick={toggleMapView}>
+                <FaSatellite />
+              </div>
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={
+                  isSatelliteView
+                    ? 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+                    : // Satellite View
+                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' // Normal View
+                }
                 attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
               />
 
