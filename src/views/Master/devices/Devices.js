@@ -992,12 +992,12 @@ const Devices = () => {
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex gap- justify-content-end  mb-2">
+      <div className="d-flex gap- justify-content-end gap-3  mb-2">
         {/* <div>
           <h2>Devices</h2>
         </div> */}
         {/* HERE WE WILL ADD FILTER */}
-        <div className="fiterDevices d-flex">
+        <div className="fiterDevices d-flex gap-3">
           <Sselect
             id="user-select"
             options={fillUsers.map((user) => ({
@@ -1048,41 +1048,12 @@ const Devices = () => {
         />
 
         <div className="d-flex">
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="search here...."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
           {/* <div className="me-3 d-none d-md-block">
             <button onClick={handleSearch} variant="contained" className="btn btn-secondary">
               Search
             </button>
           </div> */}
-          {decodedToken.superadmin && (
-            <div>
-              {/* <button
-                onClick={() => {
-                  setAddModalOpen(true);
-                  setFormData({
-                    ...formData,
-                    installationdate: new Date().toISOString().split('T')[0],
-                  })
-                }}
-                variant="contained"
-                className="btn btn-secondary"
-              >
-                Add Device
-              </button> */}
-              <button onClick={handleOpen} variant="contained" className="btn btn-secondary">
-                Add Device
-              </button>
-            </div>
-          )}
+
           <div
             className="ms-2 p-0 me-1 refresh"
             onClick={() => {
@@ -1096,11 +1067,32 @@ const Devices = () => {
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader
-              className="grand d-flex justify-content-between align-items-center text-white"
-              style={{ color: 'white' }}
-            >
+            <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>Device</strong>
+              <div className="d-flex">
+                <div className="me-3 d-none d-md-block">
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search for Device"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                </div>
+                {decodedToken.superadmin && (
+                  <div>
+                    <button
+                      onClick={handleOpen}
+                      variant="contained"
+                      className="btn text-white"
+                      style={{ backgroundColor: '#0a2d63' }}
+                    >
+                      Add Device
+                    </button>
+                  </div>
+                )}
+              </div>
             </CCardHeader>
             <TableContainer
               component={Paper}
@@ -1130,19 +1122,26 @@ const Devices = () => {
                     responsive
                   >
                     <CTableRow style={{ height: '6vh' }} className="text-nowrap ">
-                      <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                      <CTableHeaderCell
+                        className="text-center text-center text-white sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63' }}
+                      >
                         <strong>SN</strong>
                       </CTableHeaderCell>
                       {columns.slice(1).map((column, index) => (
                         <CTableHeaderCell
                           key={index}
-                          className="text-center bg-body-secondary text-center sr-no table-cell"
+                          className="text-center text-center text-white sr-no table-cell"
+                          style={{ backgroundColor: '#0a2d63' }}
                         >
                           <strong>{column.Header}</strong>
                         </CTableHeaderCell>
                       ))}
                       {decodedToken.superadmin ? (
-                        <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
+                        <CTableHeaderCell
+                          className="text-center text-center text-white sr-no table-cell"
+                          style={{ backgroundColor: '#0a2d63' }}
+                        >
                           <strong>Actions</strong>
                         </CTableHeaderCell>
                       ) : null}

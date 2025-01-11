@@ -1,5 +1,5 @@
 .darkBackground {
-  background-color: whitesmoke;
+  background-color: #0a2d63;
 }
 
 .toggle-container {
@@ -9,9 +9,9 @@
   flex-direction: row;
 }
 
-.filter-btn {
-  color: #ff7a00 !important;
-}
+/* .filter-btn {
+  color: black !important;
+} */
 
 /* Custom hover color for CDropdownItem */
 .custom-dropdown-item:hover {

@@ -407,8 +407,7 @@ const HistoryMap = ({
     })
   }, [poly])
 
-
-  // USEABLE CODE 
+  // USEABLE CODE
   const { longestStop, shortestStop, longestDuration, shortestDuration } =
     useStoppageTimes(stopages)
 
@@ -486,7 +485,7 @@ const HistoryMap = ({
     }
   }, [currentPositionIndex, positions])
   return (
-    <div className="individualMap position-relative border border-5">
+    <div className="individualMap position-relative">
       <div className="graphAndMap" style={{ width: '100%' }}>
         <MapContainer
           ref={mapRef}

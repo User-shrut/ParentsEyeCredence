@@ -339,7 +339,8 @@ const SearchIdeal = ({
         <div className="d-flex justify-content-end">
           <div className="btn-group">
             <button
-              className="btn btn-secondary "
+              className="btn text-white"
+              style={{ backgroundColor: '#0a2d63' }}
               type="button"
               onClick={() => handleDropdownClick('SHOW NOW')}
             >
@@ -552,10 +553,16 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
       <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
-            <CTableHeaderCell>SN</CTableHeaderCell>
-            <CTableHeaderCell>Vehicle Name</CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              SN
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              Vehicle Name
+            </CTableHeaderCell>
             {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+                {column}
+              </CTableHeaderCell>
             ))}
           </CTableRow>
         </CTableHead>
@@ -935,7 +942,10 @@ const Ideal = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center text-white">
+            <CCardHeader
+              className="d-flex justify-content-between align-items-center text-white"
+              style={{ backgroundColor: '#0a2d63' }}
+            >
               <strong>Idle Report</strong>
             </CCardHeader>
             <CCardBody>
@@ -962,7 +972,7 @@ const Ideal = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center">
                 <strong>
                   All Idle Report List {selectedDeviceName && `for ${selectedDeviceName}`}
                 </strong>

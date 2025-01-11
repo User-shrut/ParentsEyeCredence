@@ -310,9 +310,10 @@ const SearchStop = ({
         <div className="d-flex justify-content-end">
           <div className="btn-group">
             <button
-              className="btn btn-secondary"
+              className="btn text-white"
               type="submit"
               onClick={() => handleDropdownClick('SHOW NOW')}
+              style={{ backgroundColor: '#0a2d63' }}
             >
               {buttonText}
             </button>
@@ -507,11 +508,17 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
       <CTable bordered className="custom-table">
         <CTableHead>
           <CTableRow>
-            <CTableHeaderCell>SN</CTableHeaderCell>
-            <CTableHeaderCell>Vehicle Name</CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              SN
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              Vehicle Name
+            </CTableHeaderCell>
             {/* Dynamically render table headers based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index}>{column}</CTableHeaderCell>
+              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+                {column}
+              </CTableHeaderCell>
             ))}
           </CTableRow>
         </CTableHead>
@@ -850,7 +857,10 @@ const Stops = () => {
       <CRow className="pt-3 gutter-0">
         <CCol xs={12} md={12} className="px-4">
           <CCard className="mb-4 p-0 shadow-lg rounded">
-            <CCardHeader className="d-flex justify-content-between align-items-center bg-secondary text-white">
+            <CCardHeader
+              className="d-flex justify-content-between align-items-center text-white"
+              style={{ backgroundColor: '#0a2d63' }}
+            >
               <strong>Stop Report</strong>
             </CCardHeader>
             <CCardBody>
@@ -876,7 +886,7 @@ const Stops = () => {
         <CRow className="justify-content-center mt-4 gutter-0">
           <CCol xs={12} className="px-4">
             <CCard className="p-0 mb-4 shadow-sm">
-              <CCardHeader className="d-flex justify-content-between align-items-center text-white">
+              <CCardHeader className="d-flex justify-content-between align-items-center">
                 <strong>All Stop List {selectedDeviceName && `for ${selectedDeviceName}`} </strong>
                 {/* <CFormInput
                   placeholder="Search..."

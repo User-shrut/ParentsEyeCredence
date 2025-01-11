@@ -56,7 +56,7 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="p-0 fs-5" caret={false}>
-        <CircleUserRound color="black" />
+        <CircleUserRound color="white" />
       </CDropdownToggle>
       <CDropdownMenu
         className="pt-0 mt-3 rounded"

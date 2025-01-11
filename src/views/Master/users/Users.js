@@ -830,17 +830,14 @@ const Users = () => {
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader
-              className="grand d-flex justify-content-between align-items-center text-white"
-              style={{ color: 'white' }}
-            >
+            <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>USERS</strong>
               <div className="d-flex">
                 <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
-                    placeholder="search here...."
+                    placeholder="Search for Users"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -849,7 +846,8 @@ const Users = () => {
                   <button
                     onClick={() => setAddModalOpen(true)}
                     variant="contained"
-                    className="btn btn-secondary"
+                    className="btn text-white"
+                    style={{ backgroundColor: '#0a2d63' }}
                   >
                     Add User
                   </button>
@@ -880,43 +878,43 @@ const Users = () => {
                     <CTableRow>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>SN</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Name</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className="text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Email</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className="text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Mobile No.</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Master Permissions</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Reports Permissions</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#c3cfe2' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
                       >
                         <strong>Actions</strong>
                       </CTableHeaderCell>
@@ -945,7 +943,11 @@ const Users = () => {
                       </CTableRow>
                     ) : filteredData.length > 0 ? (
                       filteredData?.map((item, index) => (
-                        <CTableRow key={index} className="p-0">
+                        <CTableRow
+                          key={index}
+                          className="p-0"
+                          style={{ fontSize: '13px', fontFamily: 'system-ui' }}
+                        >
                           <CTableDataCell
                             className="text-center p-0"
                             style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
@@ -979,8 +981,11 @@ const Users = () => {
                             <CFormSelect
                               id="periods"
                               value=""
-                              className=" text-center border-2"
-                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              className=" text-center"
+                              style={{
+                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                fontSize: '14px',
+                              }}
                             >
                               <option value="">Master</option>
                               {[
@@ -1005,13 +1010,19 @@ const Users = () => {
                           {/* Reports Column */}
                           <CTableDataCell
                             className="align-items-center "
-                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                            style={{
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                              fontSize: '14px',
+                            }}
                           >
                             <CFormSelect
                               id="periods"
                               value=""
                               className="text-center border-2"
-                              style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                              style={{
+                                backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                fontSize: '14px',
+                              }}
                             >
                               <option value="">Reports</option>
                               {[

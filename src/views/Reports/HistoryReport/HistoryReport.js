@@ -100,7 +100,10 @@ const HistoryReport = () => {
         <CRow className="pt-3 gutter-0">
           <CCol xs={12} md={12} className="px-4">
             <CCard className="mb-4 p-0 shadow-lg rounded">
-              <CCardHeader className="d-flex justify-content-between align-items-center  text-white">
+              <CCardHeader
+                className="d-flex justify-content-between align-items-center text-white"
+                style={{ backgroundColor: '#0a2d63' }}
+              >
                 <strong>History Report</strong>
               </CCardHeader>
               <CCardBody>
@@ -144,7 +147,12 @@ const HistoryReport = () => {
                   <CButton
                     color="primary"
                     type="submit"
-                    style={{ height: '3rem', width: '8rem', marginTop: '1rem' }}
+                    style={{
+                      height: '3rem',
+                      width: '8rem',
+                      marginTop: '1rem',
+                      backgroundColor: '#0a2d63',
+                    }}
                   >
                     Show
                   </CButton>

@@ -55,7 +55,12 @@ const TableColumnVisibility = () => {
 
   return (
     <div>
-      <Button className='filter-btn' onClick={handleReset}>Filter Columns</Button>
+      {/* <Button className="bg-white" style={{ color: 'black' }} onClick={handleReset}>
+        Filter Columns
+      </Button> */}
+      <button className="btn bg-white" onClick={handleReset}>
+        Filter Columns
+      </button>
       <Modal
         open={open}
         onClose={handleClose}

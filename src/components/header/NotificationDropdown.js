@@ -57,7 +57,7 @@ const NotificationDropdown = ({ notifications }) => {
       </style>
       <CDropdown variant="nav-item">
         <CDropdownToggle placement="bottom-end" className="py-0 fs-5 pe-0" caret={false}>
-          <Bell color="black" className="mx-0" />
+          <Bell color="white" className="mx-0" />
           {notifications?.length > 0 && (
             <CBadge
               color="danger"
