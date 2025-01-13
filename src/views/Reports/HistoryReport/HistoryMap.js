@@ -3,8 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import 'leaflet/dist/leaflet.css'
 import useHistoryData from './useHistoryData'
 import ReactLeafletDriftMarker from 'react-leaflet-drift-marker'
+import DriftMarker from 'react-leaflet-drift-marker'
 import { IoMdPause, IoMdPlay } from 'react-icons/io'
 import { FaForward, FaBackward } from 'react-icons/fa'
+import { FaSatellite } from 'react-icons/fa6'
 import { CButton } from '@coreui/react'
 import useStoppageTimes from './useStoppageTimes.js'
 import useVehicleImage from './useVehicleImage.js'
@@ -109,7 +111,7 @@ const HistoryMap = ({
   const [showStopages, setShowStopages] = useState(true)
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
-  const [speed, setSpeed] = useState(2.5)
+  const [speed, setSpeed] = useState(2)
   const [zoomLevel, setZoomLevel] = useState(14)
   const [progress, setProgress] = useState(0)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -375,7 +377,7 @@ const HistoryMap = ({
         ) {
           // Only update the view if the position has changed significantly
           if ((currentPosition?.latitude, currentPosition?.longitude)) {
-            map.setView([currentPosition?.latitude, currentPosition?.longitude], zoomLevel)
+            map.setView([currentPosition?.latitude, currentPosition?.longitude])
             setLastPosition(currentPosition)
           }
         }
@@ -484,6 +486,12 @@ const HistoryMap = ({
       setTotalDistance(accumulatedDistance)
     }
   }, [currentPositionIndex, positions])
+
+  const [isSatelliteView, setIsSatelliteView] = useState(false)
+
+  const toggleMapView = () => {
+    setIsSatelliteView((prev) => !prev)
+  }
   return (
     <div className="individualMap position-relative">
       <div className="graphAndMap" style={{ width: '100%' }}>
@@ -507,9 +515,17 @@ const HistoryMap = ({
             border: '2px solid gray',
           }}
         >
+          <div className="toggle-map-view" onClick={toggleMapView}>
+            <FaSatellite />
+          </div>
           <MapZoomController />
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url={
+              isSatelliteView
+                ? 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+                : // Satellite View
+                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' // Normal View
+            }
             attribution="&copy; Credence Tracker, HB Gadget Solutions Nagpur"
           />
           {positions.length > 0 && (
@@ -527,18 +543,19 @@ const HistoryMap = ({
                 }}
               />
               {renderMarkers()}
-              <Marker
+              <DriftMarker
                 position={[
                   positions[currentPositionIndex]?.latitude,
                   positions[currentPositionIndex]?.longitude,
                 ]}
-                duration={1000}
+                duration={190}
+                keepAtCenter
                 icon={iconImage}
               >
                 <Popup>
                   {`Vehicle at ${positions[currentPositionIndex]?.latitude}, ${positions[currentPositionIndex]?.longitude}`}
                 </Popup>
-              </Marker>
+              </DriftMarker>
             </>
           )}
 
@@ -692,7 +709,7 @@ const HistoryMap = ({
                         className="speed-toggle"
                         onChange={(e) => setSpeed(Number(e.target.value))}
                       >
-                        <option value={2.4}>1x</option>
+                        <option value={2}>1x</option>
                         <option value={3.2}>2x</option>
                         <option value={4.2}>3x</option>
                       </select>

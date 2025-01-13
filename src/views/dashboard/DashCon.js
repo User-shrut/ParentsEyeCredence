@@ -1401,7 +1401,7 @@ const Dashboard = () => {
                                       }}
                                       className="text-center td total-distance table-cell"
                                     >
-                                      {`${Math.round(item.attributes.totalDistance / 1000)} km`}
+                                      {`${Math.round(item.TD)} km`}
                                     </CTableDataCell>
                                   )}
                                   {visibleColumns.sat && (

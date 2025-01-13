@@ -186,3 +186,48 @@
 .fixedWidth {
   width: 10rem !important;
 }
+
+.toggle-map-view {
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  z-index: 1000;
+  background: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.toggle-map-view:hover {
+  background-color: #f0f0f0;
+}
+
+
+
+
+
+
+
+.map-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  border-radius: 15px;
+  border: 2px solid gray;
+}
+
+@media (max-width: 768px) {
+  .map-container {
+    height: 300px;
+    /* Adjust height for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 250px;
+    /* Further adjustment for very small screens */
+  }
+}

@@ -247,9 +247,9 @@ const SearchDistance = ({
       <CCol md={2}>
         <CFormLabel htmlFor="fromDate">From Date</CFormLabel>
         <CFormInput
-          type="datetime-local"
+          type="date"
           id="fromDate"
-          value={formData.FromDate ? formData.FromDate.slice(0, 16) : ''} // Display local datetime value
+          // value={formData.FromDate ? formData.FromDate.slice(0, 16) : ''} // Display local datetime value
           onChange={(e) => handleDateChange('FromDate', e.target.value)} // Use handleDateChange for conversion
           required
         />
@@ -258,9 +258,9 @@ const SearchDistance = ({
       <CCol md={2}>
         <CFormLabel htmlFor="toDate">To Date</CFormLabel>
         <CFormInput
-          type="datetime-local"
+          type="date"
           id="toDate"
-          value={formData.ToDate ? formData.ToDate.slice(0, 16) : ''} // Display local datetime value
+          // value={formData.ToDate ? formData.ToDate.slice(0, 16) : ''} // Display local datetime value
           onChange={(e) => handleDateChange('ToDate', e.target.value)} // Use handleDateChange for conversion
           required
         />
