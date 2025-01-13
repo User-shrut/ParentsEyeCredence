@@ -54,6 +54,7 @@ import CIcon from '@coreui/icons-react'
 import GroupIcon from '@mui/icons-material/Group'
 import { cilSettings } from '@coreui/icons'
 import '../../../../src/app.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const Group = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -314,7 +315,7 @@ const Group = () => {
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Group</strong>
               <div className="d-flex">
-                <div className="me-3 d-none d-md-block">
+                {/* <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
@@ -322,6 +323,24 @@ const Group = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                </div> */}
+                <div className="me-3 d-none d-md-block">
+                  <div className="input-group">
+                    <InputBase
+                      type="search"
+                      className="form-control border"
+                      style={{ height: '40px' }}
+                      placeholder="Search for Device"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <IconButton
+                      className="bg-white rounded-end border disable"
+                      style={{ height: '40px' }}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </div>
                 </div>
                 <div>
                   <button
@@ -348,7 +367,7 @@ const Group = () => {
             >
               <CCardBody>
                 <CTable
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  style={{ fontSize: '14px' }}
                   bordered
                   align="middle"
                   className="mb-2 border min-vh-25 rounded-top-3"
@@ -356,7 +375,7 @@ const Group = () => {
                   responsive
                 >
                   <CTableHead
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                    style={{ fontSize: '14px' }}
                     bordered
                     align="middle"
                     className="mb-2 border min-vh-25 rounded-top-3"

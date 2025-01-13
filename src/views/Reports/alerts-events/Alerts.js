@@ -17,7 +17,7 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { Paper, TableContainer } from '@mui/material'
+import { Paper, TableContainer, IconButton, InputBase } from '@mui/material'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -27,6 +27,7 @@ import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 // import '../../../utils.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -236,10 +237,11 @@ const Alerts = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Alerts and Events</strong>
-              <div className="d-flex">
+              <div className="d-flex gap-3" style={{ width: '600px' }}>
                 {/* Filteration */}
                 <select
                   className="form-select me-3"
+                  style={{ width: '150px' }}
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                 >
@@ -253,6 +255,7 @@ const Alerts = () => {
                 {/* Pagination */}
                 <select
                   className="form-select me-3"
+                  style={{ width: '150px' }}
                   value={rowsPerPage}
                   onChange={handleRowsPerPageChange}
                 >
@@ -262,13 +265,29 @@ const Alerts = () => {
                   <option value={500}>500 rows</option>
                 </select>
                 {/* Search */}
-                <input
+                {/* <input
                   type="search"
                   className="form-control me-3"
                   placeholder="Search for Alerts & Events"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                /> */}
+                <div className="input-group">
+                  <InputBase
+                    type="search"
+                    className="form-control border"
+                    style={{ height: '40px' }}
+                    placeholder="Search for Device"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                </div>
               </div>
             </CCardHeader>
             <TableContainer
@@ -285,7 +304,7 @@ const Alerts = () => {
               <CCardBody>
                 <CTable
                   className="mb-0 border rounded-4"
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  style={{ fontSize: '14px' }}
                   bordered
                   align="middle"
                   hover

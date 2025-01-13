@@ -39,6 +39,7 @@ import {
   Box,
   FormControl,
   InputAdornment,
+  InputBase,
 } from '@mui/material'
 import {
   CTable,
@@ -67,6 +68,7 @@ import CIcon from '@coreui/icons-react'
 import ViewComfyIcon from '@mui/icons-material/ViewComfy'
 import { cilSettings } from '@coreui/icons'
 import '../../../../src/app.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const Model = () => {
   const [data, setData] = useState([])
@@ -298,9 +300,6 @@ const Model = () => {
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
       {/* Header and Add Category button */}
-      <div className="d-flex justify-content-between mb-2">
-        <Typography variant="h4">Model</Typography>
-      </div>
 
       {/* Table */}
       <CRow>
@@ -308,8 +307,8 @@ const Model = () => {
           <CCard className="mb-4">
             <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>Model</strong>
-              <div className="d-flex  justify-content-center align-items-center">
-                <div className="me-3 d-none d-md-block">
+              <div className="d-flex gap-3 justify-content-center align-items-center">
+                {/* <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
@@ -318,13 +317,28 @@ const Model = () => {
                     value={searchQuery}
                     onChange={handleSearchChange}
                   />
+                </div> */}
+                <div className="input-group">
+                  <InputBase
+                    type="search"
+                    className="form-control border"
+                    style={{ height: '40px' }}
+                    placeholder="Search for Device"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
                 </div>
-
                 <button
                   onClick={handleAddModalOpen} // Open add modal on button click
                   variant="contained"
                   className="btn text-white"
-                  style={{ backgroundColor: '#0a2d63' }}
+                  style={{ backgroundColor: '#0a2d63', width: '140px' }}
                 >
                   Add Model
                 </button>
@@ -343,7 +357,7 @@ const Model = () => {
             >
               <CCardBody>
                 <CTable
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  style={{ fontSize: '14px' }}
                   bordered
                   align="middle"
                   className="mb-2 border min-vh-25 rounded-top-3"

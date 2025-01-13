@@ -1071,14 +1071,24 @@ const Devices = () => {
               <strong>Device</strong>
               <div className="d-flex">
                 <div className="me-3 d-none d-md-block">
-                  <input
-                    type="search"
-                    className="form-control"
-                    placeholder="Search for Device"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  />
+                  <div className="input-group">
+                    <InputBase
+                      type="search"
+                      className="form-control border"
+                      style={{ height: '40px' }}
+                      placeholder="Search for Device"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                    />
+                    <IconButton
+                      className="bg-white rounded-end border disable"
+                      style={{ height: '40px' }}
+                      onClick={handleSearch}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </div>
                 </div>
                 {decodedToken.superadmin && (
                   <div>
@@ -1114,7 +1124,6 @@ const Devices = () => {
                   responsive
                 >
                   <CTableHead
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
                     bordered
                     align="middle"
                     className="mb-2 border min-vh-25 rounded-top-3"
@@ -1147,11 +1156,11 @@ const Devices = () => {
                       ) : null}
                     </CTableRow>
                   </CTableHead>
-                  <CTableBody>
+                  <CTableBody style={{ fontSize: '14px' }}>
                     {loading ? (
                       <CTableRow key="loading" style={{ border: '1px soild black' }}>
                         <CTableDataCell colSpan="16" className="text-center">
-                          <div className="text-nowrap mb-2 text-center w-">
+                          <div className="text-nowrap mb-2 text-center">
                             <p className="card-text placeholder-glow">
                               <span className="placeholder col-12" />
                             </p>

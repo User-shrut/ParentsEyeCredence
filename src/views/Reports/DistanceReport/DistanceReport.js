@@ -34,6 +34,8 @@ import autoTable from 'jspdf-autotable'
 import { auto } from '@popperjs/core'
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
+import { IconButton, InputBase } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
 
 // import '../../../utils.css'
 
@@ -783,12 +785,19 @@ const Distance = () => {
                   All Distance Report List {selectedDeviceName && `for ${selectedDeviceName}`}
                 </strong>{' '}
                 {/* Show the device name here */}
-                <CFormInput
-                  placeholder="Search for Vehicle Number"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ width: '250px' }}
-                />
+                <div className="input-group" style={{ width: '300px' }}>
+                  <CFormInput
+                    placeholder="Search for Vehicle Number"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                </div>
               </CCardHeader>
               <CCardBody>
                 <ShowDistance

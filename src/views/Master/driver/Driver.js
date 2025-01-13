@@ -57,6 +57,7 @@ import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import '../../../../src/app.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const Driver = () => {
   const [addModalOpen, setAddModalOpen] = useState(false)
@@ -418,8 +419,8 @@ const Driver = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between">
               <strong>Driver</strong>
-              <div className="d-flex">
-                <div className="me-3 d-none d-md-block">
+              <div className="d-flex gap-3">
+                {/* <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
@@ -427,13 +428,29 @@ const Driver = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                </div> */}
+                <div className="input-group">
+                  <InputBase
+                    type="search"
+                    className="form-control border"
+                    style={{ height: '40px' }}
+                    placeholder="Search for Device"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
                 </div>
                 <div>
                   <button
                     onClick={() => setAddModalOpen(true)}
                     variant="contained"
                     className="btn btn-secondary"
-                    style={{ background: '#0a2d63' }}
+                    style={{ background: '#0a2d63', width: '120px' }}
                   >
                     Add Driver
                   </button>
@@ -452,14 +469,7 @@ const Driver = () => {
               }}
             >
               <CCardBody>
-                <CTable
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
-                  bordered
-                  align="middle"
-                  className="mb-0 border"
-                  hover
-                  responsive
-                >
+                <CTable bordered align="middle" className="mb-0 border" hover responsive>
                   <CTableHead className="text-nowrap">
                     <CTableRow className="bg-body-tertiary">
                       <CTableHeaderCell
@@ -518,7 +528,7 @@ const Driver = () => {
                       </CTableHeaderCell>
                     </CTableRow>
                   </CTableHead>
-                  <CTableBody>
+                  <CTableBody style={{ fontSize: '14px' }}>
                     {loading ? (
                       <CTableRow>
                         <CTableDataCell colSpan="10" className="text-center">

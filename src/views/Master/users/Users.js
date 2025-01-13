@@ -76,6 +76,7 @@ import { cilSettings } from '@coreui/icons'
 import jsPDF from 'jspdf' // For PDF export
 import 'jspdf-autotable' // For table formatting in PDF
 import '../../../../src/app.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const Users = () => {
   // somthing for testing
@@ -833,7 +834,7 @@ const Users = () => {
             <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>USERS</strong>
               <div className="d-flex">
-                <div className="me-3 d-none d-md-block">
+                {/* <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
@@ -841,6 +842,24 @@ const Users = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                </div> */}
+                <div className="me-3 d-none d-md-block">
+                  <div className="input-group">
+                    <InputBase
+                      type="search"
+                      className="form-control border"
+                      style={{ height: '40px' }}
+                      placeholder="Search for Device"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <IconButton
+                      className="bg-white rounded-end border disable"
+                      style={{ height: '40px' }}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </div>
                 </div>
                 <div>
                   <button
@@ -867,7 +886,7 @@ const Users = () => {
             >
               <CCardBody>
                 <CTable
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  style={{ fontSize: '14px' }}
                   bordered
                   align="middle"
                   className="mb-2 border min-vh-25 rounded-top-3"
@@ -943,11 +962,7 @@ const Users = () => {
                       </CTableRow>
                     ) : filteredData.length > 0 ? (
                       filteredData?.map((item, index) => (
-                        <CTableRow
-                          key={index}
-                          className="p-0"
-                          style={{ fontSize: '13px', fontFamily: 'system-ui' }}
-                        >
+                        <CTableRow key={index} className="p-0" style={{ fontSize: '13px' }}>
                           <CTableDataCell
                             className="text-center p-0"
                             style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
