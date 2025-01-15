@@ -643,6 +643,8 @@ import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
 import '../../../utils.css'
 import { IoSearchSharp } from 'react-icons/io5'
+import { IconButton, InputBase } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
 
 const SearchGeofence = ({
   formData,
@@ -1260,12 +1262,19 @@ const GeofenceReports = () => {
             <CCard className="p-0 mb-4 shadow-sm">
               <CCardHeader className="d-flex justify-content-between align-items-center">
                 <strong>Geofence Report Results</strong>
-                <CFormInput
-                  placeholder="Search for Vehicle Number"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ width: '250px' }}
-                />
+                <div className="input-group" style={{ width: '300px' }}>
+                  <CFormInput
+                    placeholder="Search for Vehicle Number"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                </div>
               </CCardHeader>
               <CCardBody>
                 <ShowGeofence

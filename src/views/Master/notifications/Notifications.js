@@ -61,6 +61,7 @@ import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import '../../../../src/app.css'
+import SearchIcon from '@mui/icons-material/Search'
 
 const notificationTypes = [
   'statusOnline',
@@ -419,8 +420,8 @@ const Notification = () => {
           <CCard className="mb-4">
             <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>Notification</strong>
-              <div className="d-flex">
-                <div className="me-3 d-none d-md-block">
+              <div className="d-flex gap-3">
+                {/* <div className="me-3 d-none d-md-block">
                   <input
                     type="search"
                     className="form-control"
@@ -428,13 +429,29 @@ const Notification = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                </div> */}
+                <div className="input-group">
+                  <InputBase
+                    type="search"
+                    className="form-control border"
+                    style={{ height: '40px' }}
+                    placeholder="Search for Device"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <IconButton
+                    className="bg-white rounded-end border disable"
+                    style={{ height: '40px' }}
+                  >
+                    <SearchIcon />
+                  </IconButton>
                 </div>
                 <div>
                   <button
                     onClick={() => setAddModalOpen(true)}
                     variant="contained"
                     className="btn text-white"
-                    style={{ backgroundColor: '#0a2d63' }}
+                    style={{ backgroundColor: '#0a2d63', width: '150px' }}
                   >
                     Add Notifications
                   </button>
@@ -454,7 +471,7 @@ const Notification = () => {
             >
               <CCardBody>
                 <CTable
-                  style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                  style={{ fontSize: '14px' }}
                   bordered
                   align="middle"
                   className="mb-2 border min-vh-25 rounded-top-3"

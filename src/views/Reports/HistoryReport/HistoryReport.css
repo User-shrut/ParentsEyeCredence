@@ -6,41 +6,48 @@
   background-color: #e7e7e7;
 
 }
-.name{
+
+.name {
   font-weight: bold !important;
   font-size: 0.8rem !important;
 }
-.upperBox{
+
+.upperBox {
   height: 16rem !important;
 }
-.individualMap
-{
+
+.individualMap {
   display: flex;
   flex-direction: row;
   gap: 15px;
   padding: 5px;
 }
-.vehicle{
+
+.vehicle {
   margin-top: 10px;
   width: 60px;
 }
-.head-img-info{
+
+.head-img-info {
   display: flex;
   flex-direction: row;
   gap: 35px;
 }
-.trip-divi{
+
+.trip-divi {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.pro{
+
+.pro {
   margin-top: 20px;
   display: flex;
   flex-direction: row;
   gap: 5px;
 }
-.center{
+
+.center {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -48,7 +55,7 @@
   margin-bottom: 20px;
 }
 
-.address{
+.address {
   font-size: 0.9rem;
 }
 
@@ -69,6 +76,7 @@
   transition: background-color 0.3s;
   height: 2rem;
 }
+
 .speed-toggle {
   background-color: rgb(11, 11, 11);
   color: white;
@@ -104,9 +112,12 @@
 }
 
 .slider {
-  transform: rotate(-90deg); /* Rotate the slider to make it vertical */
-  width: 150px; /* Height of the slider in rotated state */
-  appearance: none; /* Removes default styles */
+  transform: rotate(-90deg);
+  /* Rotate the slider to make it vertical */
+  width: 150px;
+  /* Height of the slider in rotated state */
+  appearance: none;
+  /* Removes default styles */
   background: #ddd;
   height: 8px;
   border-radius: 5px;
@@ -128,36 +139,41 @@
 .slider::-webkit-slider-thumb:hover {
   background: rgb(11, 11, 11);
 }
-.info-stops{
+
+.info-stops {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
+
 /* .divide{
   display: flex;
   flex-direction: row;
   gap: 15px;
 }*/
 
-.bolder{
+.bolder {
   font-weight: 600;
   width: auto;
   font-size: 1rem !important;
 }
-.lighter{
+
+.lighter {
   font-weight: 500;
   font-size: 1rem !important;
 }
 
 .custom-select .form-select {
-  height: 35px !important; /* Adjust the height to your desired value */
+  height: 35px !important;
+  /* Adjust the height to your desired value */
 }
 
 .custom-select .form-select option {
-  padding: 5px 10px !important; /* Adjust padding to reduce the size of each option */
+  padding: 5px 10px !important;
+  /* Adjust padding to reduce the size of each option */
 }
 
-.infoNav{
+.infoNav {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -166,7 +182,8 @@
   border-radius: 6px;
   margin-top: 10px;
 }
-.fixedWidth{
+
+.fixedWidth {
   width: 10rem !important;
 }
 
@@ -203,12 +220,14 @@
 
 @media (max-width: 768px) {
   .map-container {
-    height: 300px; /* Adjust height for smaller screens */
+    height: 300px;
+    /* Adjust height for smaller screens */
   }
 }
 
 @media (max-width: 480px) {
   .map-container {
-    height: 250px; /* Further adjustment for very small screens */
+    height: 250px;
+    /* Further adjustment for very small screens */
   }
 }

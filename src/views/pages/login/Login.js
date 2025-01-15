@@ -5,8 +5,8 @@ import Cookies from 'js-cookie'
 import './login.css'
 import Logo from '../../../assets/brand/logo.png'
 import toast, { Toaster } from 'react-hot-toast'
-import { FaUserAlt } from "react-icons/fa";
-import { RiLockPasswordFill } from "react-icons/ri";
+import { FaUserAlt } from 'react-icons/fa'
+import { RiLockPasswordFill } from 'react-icons/ri'
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -33,7 +33,7 @@ const Login = () => {
       // Store the token and navigate on success
       if (token) {
         // Store the JWT token in a cookie
-        Cookies.set('crdntl', JSON.stringify(credentials));
+        Cookies.set('crdntl', JSON.stringify(credentials))
         const cookieOptions = {
           secure: false, // Only allow cookies over HTTPS , so turn true
           // sameSite: 'Strict', // Strictly same-site cookie
@@ -45,7 +45,6 @@ const Login = () => {
 
         Cookies.set('authToken', token, cookieOptions)
         navigate('/dashboard')
-
       } else {
         alert(response.data.message)
       }
@@ -68,21 +67,25 @@ const Login = () => {
             </div>
           </div>
 
-
-          <div className="col-12 col-md-6 d-flex justify-content-center position-relative" style={{paddingTop:'35px'}}>
+          <div
+            className="col-12 col-md-6 d-flex justify-content-center position-relative"
+            style={{ paddingTop: '35px' }}
+          >
             <div
               className="card border-2 shadow-lg"
               style={{
-                maxWidth: '500px',  // Reduced width for smaller card
+                maxWidth: '500px', // Reduced width for smaller card
                 borderRadius: '15px',
-                maxHeight: '600px',  // Reduced height for smaller card
+                maxHeight: '600px', // Reduced height for smaller card
                 backgroundColor: '#f7f6e7',
                 width: '100%', // Ensures the card stays responsive
                 height: '100%',
-                padding: '1rem',  // Added padding for better spacing inside the card
+                padding: '1rem', // Added padding for better spacing inside the card
               }}
             >
-              <div className="card-body d-flex flex-column h-100 p-3"> {/* Reduced padding for smaller form */}
+              <div className="card-body d-flex flex-column h-100 p-3">
+                {' '}
+                {/* Reduced padding for smaller form */}
                 <div className="text-center mt-3 mb-4">
                   <img
                     src="CR-LOGO.png"
@@ -94,44 +97,69 @@ const Login = () => {
                     <strong>Navigating Towards a Secured Future</strong>
                   </h2>
                 </div>
-                <h2 className="card-title text-center mb-3" style={{ fontWeight: 'bold', color: '#333' }}>
+                <h2
+                  className="card-title text-center mb-3"
+                  style={{ fontWeight: 'bold', color: '#333' }}
+                >
                   Welcome Back
                 </h2>
                 <p className="text-center text-secondary">
                   <strong>Please enter your details</strong>
                 </p>
                 <form onSubmit={handleLogin}>
-                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
+                  <div className="mb-3">
+                    {' '}
+                    {/* Reduced bottom margin for inputs */}
                     <label htmlFor="username" className="form-label text-black username-label">
-                      <strong><b>UserName</b></strong>
+                      <strong>
+                        <b>UserName</b>
+                      </strong>
                     </label>
-                    <div className="input-group" style={{ borderRadius: '10px', border: '1px solid orange' }}>
-                      <span className="input-group-text" id="basic-addon1"><FaUserAlt /></span>
+                    <div
+                      className="input-group"
+                      style={{ borderRadius: '10px', border: '1px solid orange' }}
+                    >
+                      <span className="input-group-text" id="basic-addon1">
+                        <FaUserAlt />
+                      </span>
                       <input
                         type="text"
                         className="form-control form-control-lg username-input"
                         id="username"
                         placeholder="Username"
                         value={credentials.username}
-                        onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                        onChange={(e) =>
+                          setCredentials({ ...credentials, username: e.target.value })
+                        }
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="mb-3"> {/* Reduced bottom margin for inputs */}
+                  <div className="mb-3">
+                    {' '}
+                    {/* Reduced bottom margin for inputs */}
                     <label htmlFor="password" className="form-label text-black password-label">
-                      <strong><b>Password</b></strong>
+                      <strong>
+                        <b>Password</b>
+                      </strong>
                     </label>
-                    <div className="input-group" style={{ borderRadius: '10px', border: '1px solid orange' }}>
-                      <span className="input-group-text" id="basic-addon1"><RiLockPasswordFill /></span>
+                    <div
+                      className="input-group"
+                      style={{ borderRadius: '10px', border: '1px solid orange' }}
+                    >
+                      <span className="input-group-text" id="basic-addon1">
+                        <RiLockPasswordFill />
+                      </span>
                       <input
                         type="password"
                         className="form-control form-control-lg password-input"
                         id="password"
                         placeholder="Password"
                         value={credentials.password}
-                        onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                        onChange={(e) =>
+                          setCredentials({ ...credentials, password: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -145,15 +173,19 @@ const Login = () => {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
-                    <label className="form-check-label ms-2 remember-label" htmlFor="remember" style={{ fontSize: '0.8rem' }}>
-                     <strong>Remember for 30 days</strong> 
+                    <label
+                      className="form-check-label ms-2 remember-label"
+                      htmlFor="remember"
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      <strong>Remember for 30 days</strong>
                     </label>
                   </div>
 
                   <button
                     type="submit"
                     className="btn btn-lg w-100 fw-bold hover-button"
-                    style={{ padding: '0.5rem' }} 
+                    style={{ padding: '0.5rem' }}
                   >
                     Log In
                   </button>
@@ -161,9 +193,6 @@ const Login = () => {
               </div>
             </div>
           </div>
-
-
-
         </div>
       </div>
     </>

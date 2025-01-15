@@ -1,70 +1,90 @@
 .video-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  .video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 100%;
-    width: auto;
-    transform: translate(-50%, -50%);
-  }
-  .slogan{
-    font-size: 1.2rem;
-    font-family: cursive;
-    color: black;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  transform: translate(-50%, -50%);
+}
+
+.slogan {
+  font-size: 1.2rem;
+
+  color: black;
 }
 
 .hover-button {
   background-color: #FF7A00;
   color: white;
   border-radius: 10px;
-  transition: background-color 0.3s ease, color 0.3s ease;;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  ;
 }
 
 .hover-button:hover {
-  background-color: greenyellow; /* Slightly darker shade for hover effect */
-  color: black; /* Change text color to black on hover */
+  background-color: greenyellow;
+  /* Slightly darker shade for hover effect */
+  color: black;
+  /* Change text color to black on hover */
 }
 
 /* Username style */
 /* Styling for input group and input field */
 .input-group {
-  width: 100%; /* Ensure the input group takes up full width */
+  width: 100%;
+  /* Ensure the input group takes up full width */
 }
 
 .input-group-text {
-  background-color: transparent; /* Make sure the background is transparent */
-  border: 1px solid orange; /* Border color for the icon area */
-  border-radius: 10px 0 0 10px; /* Rounded corners on the left */
-  padding: 0.375rem 0.75rem; /* Padding for the icon */
-  color: #FF7A00; /* Set the color of the icon */
+  background-color: transparent;
+  /* Make sure the background is transparent */
+  border: 1px solid orange;
+  /* Border color for the icon area */
+  border-radius: 10px 0 0 10px;
+  /* Rounded corners on the left */
+  padding: 0.375rem 0.75rem;
+  /* Padding for the icon */
+  color: #FF7A00;
+  /* Set the color of the icon */
 }
 
 .username-input {
   transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  background-color: #fff;  /* Default background */
-  border-radius: 0 10px 10px 0;  /* Rounded corners on the right */
-  border: 1px solid orange;  /* Border color for the input field */
+  background-color: #fff;
+  /* Default background */
+  border-radius: 0 10px 10px 0;
+  /* Rounded corners on the right */
+  border: 1px solid orange;
+  /* Border color for the input field */
 }
 
 /* Hover effect for input field */
 .username-input:hover {
-  border: 2px solid #FF7A00;  /* Border color on hover */
-  background-color: #fff8e0;  /* Light yellow background */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);  /* Add shadow effect */
+  border: 2px solid #FF7A00;
+  /* Border color on hover */
+  background-color: #fff8e0;
+  /* Light yellow background */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);
+  /* Add shadow effect */
 }
 
 /* Focus effect for input field */
 .username-input:focus {
-  outline: none;  /* Remove default outline */
-  border: 2px solid #FF7A00;  /* Highlight border color */
-  background-color: #fff8e0;  /* Maintain the background color */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);  /* Enhance shadow on focus */
+  outline: none;
+  /* Remove default outline */
+  border: 2px solid #FF7A00;
+  /* Highlight border color */
+  background-color: #fff8e0;
+  /* Maintain the background color */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);
+  /* Enhance shadow on focus */
 }
 
 /* Label hover effect */
@@ -73,8 +93,10 @@
 }
 
 .username-label:hover {
-  color: #FF7A00;  /* Change the label color */
-  transform: scale(1.05);  /* Slightly increase size of the label */
+  color: #FF7A00;
+  /* Change the label color */
+  transform: scale(1.05);
+  /* Slightly increase size of the label */
 }
 
 /* Password style */
@@ -86,88 +108,117 @@
 /* Style for the input field */
 .password-input {
   transition: border 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  padding-left: 20px;  /* Space for any icon or just padding for a better look */
-  background-color: #fff;  /* Default background */
+  padding-left: 20px;
+  /* Space for any icon or just padding for a better look */
+  background-color: #fff;
+  /* Default background */
   border-radius: 10px;
-  border: 1px solid orange;  /* Border color for the input field */
-  width: 100%;  /* Ensures full width of container */
+  border: 1px solid orange;
+  /* Border color for the input field */
+  width: 100%;
+  /* Ensures full width of container */
 }
 
 /* Hover effect for label */
 .password-label:hover {
-  color: #FF7A00;  /* Change the label color on hover */
-  transform: scale(1.05);  /* Slightly increase size of the label */
+  color: #FF7A00;
+  /* Change the label color on hover */
+  transform: scale(1.05);
+  /* Slightly increase size of the label */
 }
 
 /* Hover effect for input field */
 .password-input:hover {
-  border: 2px solid #FF7A00;  /* Change border color on hover */
-  background-color: #fff8e0;  /* Light yellow background on hover */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);  /* Add shadow effect */
+  border: 2px solid #FF7A00;
+  /* Change border color on hover */
+  background-color: #fff8e0;
+  /* Light yellow background on hover */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);
+  /* Add shadow effect */
 }
 
 /* Focus effect for input field */
 .password-input:focus {
-  outline: none;  /* Remove default outline */
-  border: 2px solid #FF7A00;  /* Highlight border color */
-  background-color: #fff8e0;  /* Keep the background color on focus */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);  /* Enhance shadow on focus */
+  outline: none;
+  /* Remove default outline */
+  border: 2px solid #FF7A00;
+  /* Highlight border color */
+  background-color: #fff8e0;
+  /* Keep the background color on focus */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);
+  /* Enhance shadow on focus */
 }
 
 /* Optional: Label for focused input */
-.password-input:focus + .password-label {
-  color: #FF7A00;  /* Change label color when the input is focused */
+.password-input:focus+.password-label {
+  color: #FF7A00;
+  /* Change label color when the input is focused */
 }
 
 /* Style for the checkbox input */
 .remember-checkbox {
   transition: border 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;  /* Makes it clear that it's clickable */
-  border-radius: 5px;  /* Rounded corners */
-  width: 20px;  /* Set the width of the checkbox */
-  height: 20px;  /* Set the height of the checkbox */
-  background-color: #fff; /* Default background */
-  border: 2px solid #ddd; /* Default border color */
+  cursor: pointer;
+  /* Makes it clear that it's clickable */
+  border-radius: 5px;
+  /* Rounded corners */
+  width: 20px;
+  /* Set the width of the checkbox */
+  height: 20px;
+  /* Set the height of the checkbox */
+  background-color: #fff;
+  /* Default background */
+  border: 2px solid #ddd;
+  /* Default border color */
 }
 
 /* Hover effect for checkbox */
 .remember-checkbox:hover {
-  border-color: #FF7A00;  /* Change border color on hover */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);  /* Add shadow effect */
+  border-color: #FF7A00;
+  /* Change border color on hover */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.5);
+  /* Add shadow effect */
 }
 
 /* Focus effect for checkbox */
 .remember-checkbox:focus {
-  outline: none;  /* Remove default outline */
-  border-color: #FF7A00;  /* Highlight border color */
-  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);  /* Enhance shadow on focus */
+  outline: none;
+  /* Remove default outline */
+  border-color: #FF7A00;
+  /* Highlight border color */
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.8);
+  /* Enhance shadow on focus */
 }
 
 /* Checked state of the checkbox */
 .remember-checkbox:checked {
-  background-color: #FF7A00;  /* Orange background when checked */
-  border-color: #FF7A00;  /* Orange border when checked */
+  background-color: #FF7A00;
+  /* Orange background when checked */
+  border-color: #FF7A00;
+  /* Orange border when checked */
 }
 
 /* Optional: Label effect on hover (only color change, no effect on box) */
 .remember-label:hover {
-  color: #FF7A00;  /* Change label color on hover */
+  color: #FF7A00;
+  /* Change label color on hover */
 }
 
 /* Optional: Label effect on focus (only color change, no effect on box) */
-.remember-checkbox:focus + .remember-label {
-  color: #FF7A00;  /* Change label color when checkbox is focused */
+.remember-checkbox:focus+.remember-label {
+  color: #FF7A00;
+  /* Change label color when checkbox is focused */
 }
 
-  
-  @media (max-width: 768px) {
-    .video {
-      width: 100%;
-      height: auto;
-    }
-  }
 
-  /* Extra small devices (phones, 0px and up) */
+@media (max-width: 768px) {
+  .video {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Extra small devices (phones, 0px and up) */
 @media (max-width: 576px) {
   .video {
     width: 100%;
