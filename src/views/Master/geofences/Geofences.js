@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import {
   CDropdown,
@@ -33,6 +33,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Tooltip,
 } from '@mui/material'
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete, AiOutlineUserAdd } from 'react-icons/ai'
@@ -49,8 +50,10 @@ import jsPDF from 'jspdf' // For PDF export
 import 'jspdf-autotable' // For table formatting in PDF
 import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
-import { auto } from '@popperjs/core'
+import { auto, right } from '@popperjs/core'
 import '../../../../src/app.css'
+import { FaExpand, FaCompress, FaStop, FaPen, FaLocationArrow, FaLayerGroup, FaMap, FaSatellite } from 'react-icons/fa';
+import { MdGpsFixed, MdPolyline } from "react-icons/md";
 
 const Geofences = () => {
   const [deviceData, setDeviceData] = useState()
@@ -71,12 +74,18 @@ const Geofences = () => {
     setCurrentStep(0)
     setFormData({})
     setEditModalOpen(false)
+    setIsDrawing(false)
+    setPolygonCoords([])
+    setRadius(false)
   }
 
   const handleAddModalClose = () => {
     setCurrentStep(0)
     setFormData({})
     setAddModalOpen(false)
+    setIsDrawing(false)
+    setPolygonCoords([])
+    // setSelectedLocation({})
   }
 
   const [deviceOptions, setDeviceOptions] = useState()
@@ -183,20 +192,72 @@ const Geofences = () => {
 
   const [selectedLocation, setSelectedLocation] = useState({ lat: 21.1458, lng: 79.0882 })
   const [polygonCoords, setPolygonCoords] = useState([])
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mapType, setMapType] = useState('roadmap'); // Default map type
+  const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false); // Controls the layer menu visibility
+
+  const toggleLayerMenu = () => setIsLayerMenuOpen(!isLayerMenuOpen);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   // Load Google Maps API
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik', // Replace with your API key
   })
 
+  const [isDrawing, setIsDrawing] = useState(false); // To track whether the user is drawing
+  const [radius, setRadius] = useState(null); // Initial radius in meters (500 meters)
+
+  // Handler for clicks on the map
   const onMapClick = (event) => {
-    const newCoords = {
-      lat: event.latLng.lat(),
-      lng: event.latLng.lng(),
+    if (isDrawing) {
+      // Add new point to the polygon when clicked
+      const newCoords = [...polygonCoords, { lat: event.latLng.lat(), lng: event.latLng.lng() }];
+      setPolygonCoords(newCoords);
     }
-    setPolygonCoords((prev) => [...prev, newCoords]) // Add new coordinates to the polygon
-    setSelectedLocation(newCoords)
-  }
+    // Update the selected location with the clicked position
+    setSelectedLocation({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+  };
+
+  const toggleDrawing = () => {
+    setIsDrawing((prev) => !prev); // Toggle between drawing and stopping
+  };
+
+  // Start drawing mode
+  const startDrawing = () => {
+    setIsDrawing(true); // Enable drawing mode
+  };
+
+  // Stop drawing mode
+  const stopDrawing = () => {
+    setIsDrawing(false); // Disable drawing mode
+  };
+
+
+  // const onMapClick = (event) => {
+  //   const newCoords = {
+  //     lat: event.latLng.lat(),
+  //     lng: event.latLng.lng(),
+  //   }
+  //   setPolygonCoords((prev) => [...prev, newCoords]) // Add new coordinates to the polygon
+  //   setSelectedLocation(newCoords)
+  // }
+
+  // Handle radius input change
+  const handleRadiusChange = (e) => {
+    const newRadius = e.target.value === "" ? null : Number(e.target.value); // Handle empty input
+    if (newRadius === null || newRadius >= 0) {
+      setRadius(newRadius);
+      console.log("Circle ka radius", newRadius);
+    }
+  };
 
   if (polygonCoords) {
     console.log('this is selected points', polygonCoords)
@@ -329,6 +390,10 @@ const Geofences = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+
+  // Radius Gefonces
+
+
 
   // ###########################################################################
   // ######################  Edit Geofence ###################################
@@ -469,6 +534,7 @@ const Geofences = () => {
     setCenterMap(centroid)
   }
 
+
   //  ###############################################################
 
   return (
@@ -479,26 +545,48 @@ const Geofences = () => {
           <h2>Geofence</h2>
         </div>
 
-        <div className="d-flex">
+        <div className="d-flex align-items-center justify-content-between">
+          {/* Search input (only visible on medium and larger screens) */}
           <div className="me-3 d-none d-md-block">
             <input
               type="search"
               className="form-control"
-              placeholder="search here..."
+              placeholder="Search here..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div>
+
+          {/* Action buttons */}
+          <div className="d-flex align-items-center">
             <button
               onClick={() => setAddModalOpen(true)}
-              variant="contained"
-              className="btn btn-secondary"
+              className="btn btn-secondary me-2"
             >
               Add Geofence
             </button>
+
+            {/* Dropdown Menu */}
+            <CDropdown className="position-relative">
+              <CDropdownToggle
+                color="secondary"
+                style={{
+                  borderRadius: '50%',
+                  padding: '10px',
+                  height: '48px',
+                  width: '48px',
+                }}
+              >
+                <CIcon icon={cilSettings} />
+              </CDropdownToggle>
+              <CDropdownMenu>
+                <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+                <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
+              </CDropdownMenu>
+            </CDropdown>
           </div>
         </div>
+
       </div>
       <div className="d-md-none mb-2">
         <input
@@ -509,7 +597,6 @@ const Geofences = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-
       <div className="row">
         <div className="col-12 col-md-6 position-relative">
           <TableContainer
@@ -665,18 +752,6 @@ const Geofences = () => {
               </CTableBody>
             </CTable>
           </TableContainer>
-          <CDropdown className="position-absolute bottom-0 start-0 m-3">
-            <CDropdownToggle
-              color="secondary"
-              style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
-            >
-              <CIcon icon={cilSettings} />
-            </CDropdownToggle>
-            <CDropdownMenu>
-              <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
-              <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
-            </CDropdownMenu>
-          </CDropdown>
           {pageCount > 1 && (
             <ReactPaginate
               breakLabel="..."
@@ -705,188 +780,289 @@ const Geofences = () => {
         </div>
       </div>
 
+      {/* Add Modal */}
+
       <Modal open={addModalOpen} onClose={handleAddModalClose}>
         <Box
           sx={{
-            ...style,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
             backgroundColor: '#f7f9fc',
             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-            borderRadius: '12px',
+            borderRadius: 0, // Optional: Remove border-radius for a true fullscreen look
             padding: '30px',
+            overflow: 'auto', // Handle content overflow
           }}
         >
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <Typography variant="h6" sx={{ color: '#333', fontWeight: 'bold', fontSize: '24px' }}>
+            <Typography variant="h5" sx={{
+              color: '#2c3e50', fontWeight: 'bold', fontSize: '26px', display: 'flex', alignItems: 'center',
+            }}>
               <span role="img" aria-label="user">
                 <AiOutlineUserAdd className="fs-2" />
               </span>{' '}
               Add New Geofence
             </Typography>
             <IconButton onClick={handleAddModalClose}>
-              <CloseIcon />
+              <CloseIcon style={{ color: '#2c3e50' }} />
             </IconButton>
           </div>
 
-          {/* Step-by-step form with progress indicator */}
-          <div>
-            <Stepper activeStep={currentStep} alternativeLabel>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
+          {/* All content in a single step */}
+          <div className="mt-3">
+            {/* Google Map */}
+            {isLoaded ? (
 
-            {currentStep === 0 && (
-              <div className="mt-3">
-                {isLoaded ? (
-                  <GoogleMap
-                    mapContainerStyle={{ height: '400px', width: '100%' }}
-                    center={selectedLocation}
-                    zoom={13}
-                    onClick={onMapClick}
-                  >
-                    {polygonCoords.length > 0 && (
-                      <Polygon
-                        paths={polygonCoords}
-                        options={{
-                          fillColor: 'lightblue',
-                          fillOpacity: 0.5,
-                          strokeColor: 'blue',
-                          strokeOpacity: 1,
-                          strokeWeight: 2,
-                        }}
-                      />
-                    )}
-                    <Marker position={selectedLocation} />
-                  </GoogleMap>
-                ) : (
-                  <div>Loading Google Maps...</div>
-                )}
-              </div>
-            )}
+              <div>
+                <div className='d-flex'>
+                  <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                    <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
+                    <input
+                      type="number"
+                      value={radius}
+                      onChange={handleRadiusChange} // Handle radius input change
+                      min="1"
+                      style={{
+                        marginLeft: '10px',
+                        padding: '8px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
 
-            {currentStep === 1 && (
-              <div className="mt-3">
-                <TextField
-                  fullWidth
-                  label="Geofence Name"
-                  name="name"
-                  value={formData.name !== undefined ? formData.name : ''}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-
-                <Select
-                  placeholder="Select Place Type..."
-                  value={PlaceType.find((option) => option.value === formData.type) || ''}
-                  onChange={(selectedOption) =>
-                    setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
-                  }
-                  options={PlaceType}
-                  styles={{
-                    container: (base) => ({
-                      ...base,
-                      marginTop: '20px',
-                      marginBottom: '20px',
-                    }),
-                  }}
-                />
-
-                <Select
-                  isMulti
-                  options={deviceOptions}
-                  onChange={handleDeviceChange}
-                  value={selectedDevices}
-                  placeholder="Select devices"
-                  styles={{
-                    container: (base) => ({
-                      ...base,
-                      marginTop: '20px',
-                      marginBottom: '20px',
-                    }),
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Navigation buttons */}
-            <div className="d-flex justify-content-between" style={{ marginTop: '20px' }}>
-              {currentStep > 0 && (
-                <Button onClick={handleBack} variant="outlined">
-                  Back
-                </Button>
-              )}
-              {currentStep < steps.length - 1 ? (
-                <Button onClick={handleNext} variant="contained" color="primary">
-                  Next
-                </Button>
-              ) : (
-                <Button onClick={handleAddGeofence} variant="contained" color="primary">
-                  Submit
-                </Button>
-              )}
-            </div>
-          </div>
-        </Box>
-      </Modal>
-      <Modal
-        open={editModalOpen}
-        onClose={handleEditModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <div className="d-flex justify-content-between">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Edit New Geofence
-            </Typography>
-            <IconButton
-              // style={{ marginLeft: 'auto', marginTop: '-40px', color: '#aaa' }}
-              onClick={handleEditModalClose}
-            >
-              <CloseIcon />
-            </IconButton>
-          </div>
-          <DialogContent>
-            <form onSubmit={EditGeofenceSubmit}>
-              <Typography variant="subtitle1" style={{ marginTop: '20px' }}>
-                Select Geofence Location:
-              </Typography>
-              {/* Check if Google Maps is loaded */}
-              {isLoaded ? (
                 <GoogleMap
-                  mapContainerStyle={{ height: '300px', width: '100%' }}
-                  center={selectedLocation}
+                  mapContainerStyle={{
+                    width: '100%', height: isFullscreen ? '100vh' : '500px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                  }}
+                  center={selectedLocation} // Map centers on the selected location
                   zoom={13}
-                  onClick={onMapClick} // Set marker on click
+                  onClick={onMapClick} // Set new center on map click
+                  options={{
+                    fullscreenControl: false, // Enable fullscreen button
+                    mapTypeId: mapType, // Dynamic map type
+                  }}
                 >
+
+                  {/* Fullscreen Toggle Button */}
+                  <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        zIndex: 1,
+                        backgroundColor: 'white',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                        borderRadius: '10px'
+                      }}
+                    >
+                      <IconButton onClick={toggleFullscreen} color="primary" style={{ padding: '10px' }}>
+                        {isFullscreen ? <FaCompress size={24} /> : <FaExpand size={24} />}
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* Start Drawing Button */}
+                  <Tooltip title={isDrawing ? 'Stop Drawing Polyline' : 'Start Drawing Polyine'}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '80px', // Space the buttons vertically
+                        right: '10px',
+                        zIndex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                      }}
+                    >
+                      <IconButton
+                        onClick={toggleDrawing} // Toggle between start and stop drawing
+                        color={isDrawing ? 'secondary' : 'primary'} // Change button color based on state
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
+                        {isDrawing ? <FaStop size={20} /> : <MdPolyline size={20} />} {/* Ternary operator */}
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* My Location Button */}
+                  <Tooltip title="Use My Location">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '130px',
+                        right: '10px',
+                        zIndex: 1,
+                      }}
+                    >
+                      <IconButton
+                        onClick={() => {
+                          navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                              const { latitude, longitude } = position.coords;
+                              setSelectedLocation({ lat: latitude, lng: longitude });
+                            },
+                            (error) => {
+                              console.error('Error fetching location:', error);
+                            }
+                          );
+                        }}
+                        color="primary"
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
+                        <MdGpsFixed size={20} />
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* Layer Control */}
+                  <Tooltip title="Layer Control">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '180px',
+                        right: '9px',
+                        zIndex: 1,
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <IconButton onClick={toggleLayerMenu} color="primary" style={{ backgroundColor: 'white', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', padding: '10px' }}>
+                        <FaLayerGroup size={20} />
+                      </IconButton>
+                      {isLayerMenuOpen && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '50px',
+                            right: '0px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                          }}
+                        >
+                          <Tooltip title="Roadmap">
+                            <IconButton
+                              onClick={() => setMapType('roadmap')}
+                              color={mapType === 'roadmap' ? 'primary' : 'default'}
+                              style={{
+                                backgroundColor: mapType === 'roadmap' ? '#3498db' : 'white',
+                                color: mapType === 'roadmap' ? 'white' : 'black',
+                                padding: '10px',
+                              }}
+                            >
+                              <FaMap size={20} />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Satellite View">
+                            <IconButton
+                              onClick={() => setMapType('satellite')}
+                              color={mapType === 'satellite' ? 'primary' : 'default'}
+                              style={{
+                                backgroundColor: mapType === 'satellite' ? '#3498db' : 'white',
+                                color: mapType === 'satellite' ? 'white' : 'black',
+                                padding: '10px',
+                              }}
+                            >
+                              <FaSatellite size={20} />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      )}
+                    </div>
+                  </Tooltip>
+
+                  {/* Drawing the polygon if coordinates are available */}
                   {polygonCoords.length > 0 && (
                     <Polygon
                       paths={polygonCoords}
                       options={{
-                        fillColor: 'lightblue',
+                        fillColor: 'rgba(53, 223, 81, 0.5)',
                         fillOpacity: 0.5,
-                        strokeColor: 'blue',
+                        strokeColor: '#2980b9',
                         strokeOpacity: 1,
                         strokeWeight: 2,
                       }}
                     />
                   )}
+
+                  {/* Marker at the selected location (used for both polygon and circle center) */}
                   <Marker position={selectedLocation} />
+
+                  {/* Circle drawn at selected location */}
+                  <Circle
+                    center={selectedLocation} // Circle's center is the selected location
+                    radius={radius} // Circle radius in meters
+                    options={{
+                      fillColor: 'rgba(53, 223, 81, 0.5)',
+                      fillOpacity: 0.5,
+                      strokeColor: '#2980b9',
+                      strokeOpacity: 1,
+                      strokeWeight: 2,
+                    }}
+                  />
                 </GoogleMap>
-              ) : (
-                <div>Loading Google Maps...</div>
-              )}
-              <br />
+
+              </div>
+
+            ) : (
+              <div>Loading Google Maps...</div>
+            )}
+
+            {/* Form Fields */}
+            <div className="mt-4"
+              style={{
+                backgroundColor: '#ffffff', // Light background
+                padding: '20px',
+                borderRadius: '10px', // Rounded corners
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow
+                border: '1px solid #e0e0e0', // Optional border
+              }}>
+
+              {/* Geofence Name Input */}
               <TextField
                 fullWidth
                 label="Geofence Name"
                 name="name"
-                value={formData.name !== undefined ? formData.name : ''}
+                value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+                sx={{
+                  marginBottom: '20px', // Add spacing below the input
+                  '& .MuiInputLabel-root': {
+                    color: '#34495e', // Label color
+                    fontWeight: 'bold',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#dfe6e9', // Border color
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#3498db', // Border color on hover
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#3498db', // Border color when focused
+                    },
+                  },
+                }}
               />
+
+              {/* Select Place Type */}
               <Select
                 placeholder="Select Place Type..."
                 value={PlaceType.find((option) => option.value === formData.type) || ''}
@@ -900,9 +1076,23 @@ const Geofences = () => {
                     marginTop: '20px',
                     marginBottom: '20px',
                   }),
+                  control: (base) => ({
+                    ...base,
+                    borderColor: '#dfe6e9', // Border color
+                    boxShadow: 'none',
+                    '&:hover': {
+                      borderColor: '#3498db', // Border color on hover
+                    },
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: '#7f8c8d', // Placeholder color
+                    fontWeight: '500',
+                  }),
                 }}
               />
 
+              {/* Select Devices */}
               <Select
                 isMulti
                 options={deviceOptions}
@@ -912,24 +1102,379 @@ const Geofences = () => {
                 styles={{
                   container: (base) => ({
                     ...base,
-                    marginTop: '20px',
-                    marginBottom: '20px',
+                    marginBottom: '20px', // Add spacing below the dropdown
+                  }),
+                  control: (base) => ({
+                    ...base,
+                    borderColor: '#dfe6e9', // Border color
+                    boxShadow: 'none',
+                    '&:hover': {
+                      borderColor: '#3498db', // Border color on hover
+                    },
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: '#7f8c8d', // Placeholder color
+                    fontWeight: '500',
                   }),
                 }}
               />
+            </div>
+          </div>
 
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                style={{ marginTop: '20px' }}
-              >
-                Submit
-              </Button>
-            </form>
-          </DialogContent>
+          {/* Submit Button */}
+          <div className="d-flex justify-content-end" style={{ marginTop: '20px' }}>
+            <Button onClick={handleAddGeofence} variant="contained" color="primary">
+              Submit
+            </Button>
+          </div>
         </Box>
       </Modal>
+
+      {/* Editi Modal */}
+      <Modal
+        open={editModalOpen}
+        onClose={handleEditModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f7f9fc',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            borderRadius: 0, // Optional: Remove border-radius for a true fullscreen look
+            padding: '30px',
+            overflow: 'auto', // Handle content overflow
+          }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Typography id="modal-modal-title" variant="h5" component="h2">
+              Edit New Geofence
+            </Typography>
+            <IconButton onClick={handleEditModalClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          {/* Google Map */}
+          <div className="mt-3">
+            {isLoaded ? (
+              <div>
+                <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                  <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
+                  <input
+                    type="number"
+                    value={radius}
+                    onChange={handleRadiusChange} // Handle radius input change
+                    min="1"
+                    style={{
+                      marginLeft: '10px',
+                      padding: '8px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                    }}
+                  />
+                </div>
+
+                <GoogleMap
+                  mapContainerStyle={{ width: '100%', height: isFullscreen ? '100vh' : '500px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', }}
+                  center={selectedLocation}
+                  zoom={13}
+                  onClick={onMapClick}
+                  options={{
+                    fullscreenControl: false, // Enable fullscreen button
+                    mapTypeId: mapType, // Dynamic map type
+                  }}
+                >
+
+                  {/* Fullscreen Toggle Button */}
+                  <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        zIndex: 1,
+                        backgroundColor: 'white',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                      }}
+                    >
+                      <IconButton onClick={toggleFullscreen} color="primary" style={{ padding: '10px' }}>
+                        {isFullscreen ? <FaCompress size={24} /> : <FaExpand size={24} />}
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* Start Drawing Button */}
+                  <Tooltip title={isDrawing ? 'Stop Drawing Polyline' : 'Start Drawing Polyline'}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '80px', // Space the buttons vertically
+                        right: '10px',
+                        zIndex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                      }}
+                    >
+                      <IconButton
+                        onClick={toggleDrawing} // Toggle between start and stop drawing
+                        color={isDrawing ? 'secondary' : 'primary'} // Change button color based on state
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
+                        {isDrawing ? <FaStop size={20} /> : <MdPolyline size={20} />} {/* Ternary operator */}
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* My Location Button */}
+                  <Tooltip title="Use My Location">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '130px',
+                        right: '10px',
+                        zIndex: 1,
+                      }}
+                    >
+                      <IconButton
+                        onClick={() => {
+                          navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                              const { latitude, longitude } = position.coords;
+                              setSelectedLocation({ lat: latitude, lng: longitude });
+                            },
+                            (error) => {
+                              console.error('Error fetching location:', error);
+                            }
+                          );
+                        }}
+                        color="primary"
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
+                        <MdGpsFixed size={20} />
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+
+                  {/* Layer Control */}
+                  <Tooltip title="Layer Control">
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '180px',
+                        right: '9px',
+                        zIndex: 1,
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <IconButton onClick={toggleLayerMenu} color="primary" style={{ backgroundColor: 'white', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', padding: '10px' }}>
+                        <FaLayerGroup size={20} />
+                      </IconButton>
+                      {isLayerMenuOpen && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '50px',
+                            right: '0px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                          }}
+                        >
+                          <Tooltip title="Roadmap">
+                            <IconButton
+                              onClick={() => setMapType('roadmap')}
+                              color={mapType === 'roadmap' ? 'primary' : 'default'}
+                              style={{
+                                backgroundColor: mapType === 'roadmap' ? '#3498db' : 'white',
+                                color: mapType === 'roadmap' ? 'white' : 'black',
+                                padding: '10px',
+                              }}
+                            >
+                              <FaMap size={20} />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Satellite View">
+                            <IconButton
+                              onClick={() => setMapType('satellite')}
+                              color={mapType === 'satellite' ? 'primary' : 'default'}
+                              style={{
+                                backgroundColor: mapType === 'satellite' ? '#3498db' : 'white',
+                                color: mapType === 'satellite' ? 'white' : 'black',
+                                padding: '10px',
+                              }}
+                            >
+                              <FaSatellite size={20} />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      )}
+                    </div>
+                  </Tooltip>
+
+                  {/* Drawing the polygon if coordinates are available */}
+                  {polygonCoords.length > 0 && (
+                    <Polygon
+                      paths={polygonCoords}
+                      options={{
+                        fillColor: 'rgba(53, 223, 81, 0.5)',
+                        fillOpacity: 0.5,
+                        strokeColor: '#2980b9',
+                        strokeOpacity: 1,
+                        strokeWeight: 2,
+                      }}
+                    />
+                  )}
+
+                  {/* Marker at the selected location (used for both polygon and circle center) */}
+                  <Marker position={selectedLocation} />
+
+                  {/* Circle drawn at selected location */}
+                  <Circle
+                    center={selectedLocation} // Circle's center is the selected location
+                    radius={radius} // Circle radius in meters
+                    options={{
+                      fillColor: 'rgba(53, 223, 81, 0.5)',
+                      fillOpacity: 0.5,
+                      strokeColor: '#2980b9',
+                      strokeOpacity: 1,
+                      strokeWeight: 2,
+                    }}
+                  />
+
+                </GoogleMap>
+              </div>
+            ) : (
+              <div>Loading Google Maps...</div>
+            )}
+          </div>
+
+          {/* Form Fields */}
+          <div
+            className="mt-4"
+            style={{
+              backgroundColor: '#ffffff', // Light background
+              padding: '20px',
+              borderRadius: '10px', // Rounded corners
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow
+              border: '1px solid #e0e0e0', // Optional border
+            }}
+          >
+            {/* Geofence Name Input */}
+            <TextField
+              fullWidth
+              label="Geofence Name"
+              name="name"
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              sx={{
+                marginBottom: '20px', // Add spacing below the input
+                '& .MuiInputLabel-root': {
+                  color: '#34495e', // Label color
+                  fontWeight: 'bold',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#dfe6e9', // Border color
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#3498db', // Border color on hover
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#3498db', // Border color when focused
+                  },
+                },
+              }}
+            />
+
+            {/* Select Place Type */}
+            <Select
+              placeholder="Select Place Type..."
+              value={PlaceType.find((option) => option.value === formData.type) || ''}
+              onChange={(selectedOption) =>
+                setFormData({ ...formData, type: selectedOption ? selectedOption.value : '' })
+              }
+              options={PlaceType}
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  marginBottom: '20px', // Add spacing below the dropdown
+                }),
+                control: (base) => ({
+                  ...base,
+                  borderColor: '#dfe6e9', // Border color
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#3498db', // Border color on hover
+                  },
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: '#7f8c8d', // Placeholder color
+                  fontWeight: '500',
+                }),
+              }}
+            />
+
+            {/* Select Devices */}
+            <Select
+              isMulti
+              options={deviceOptions}
+              onChange={handleDeviceChange}
+              value={selectedDevices}
+              placeholder="Select devices"
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  marginBottom: '20px', // Add spacing below the dropdown
+                }),
+                control: (base) => ({
+                  ...base,
+                  borderColor: '#dfe6e9', // Border color
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#3498db', // Border color on hover
+                  },
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: '#7f8c8d', // Placeholder color
+                  fontWeight: '500',
+                }),
+              }}
+            />
+          </div>
+
+
+          {/* Submit Button */}
+          <div className="d-flex justify-content-end" style={{ marginTop: '20px' }}>
+            <Button variant="contained" color="primary" onClick={EditGeofenceSubmit}>
+              Submit
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+
+
     </div>
   )
 }
