@@ -35,6 +35,8 @@ const Alerts = () => {
   const [data, setData] = useState([])
   const [notificationIDs, setNotificationIDs] = useState()
   const [filteredData, setFilteredData] = useState([])
+  const [devices, setDevices] = useState([])
+  const [filterDevice, setFilterDevice] = useState('') // State for device filter
   const [filterType, setFilterType] = useState('') // State for selected filter
   const [currentPage, setCurrentPage] = useState(1) // Current page number
   const [rowsPerPage, setRowsPerPage] = useState(20) // Rows per page
@@ -59,6 +61,32 @@ const Alerts = () => {
     'alarm',
     'maintenanceRequired',
   ]
+
+  const getDevices = async () => {
+    setLoading(true)
+    try {
+      const [newApiResponse] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_URL}/device`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }),
+      ])
+      // Process responses if needed
+      const newApiData = newApiResponse.data.devices //.slice(2857,2858)
+
+      console.log('areeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+      const deviceNames = newApiData.map((device) => device.name) // Extract names
+      setDevices(deviceNames)
+      console.log(newApiData)
+      console.log('Device Name: ', deviceNames)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setDevices([])
+      setLoading(false)
+      throw error // Re-throw the error for further handling if needed
+    }
+  }
 
   const fetchNotificationData = async (page = 1) => {
     setLoading(true)
@@ -87,6 +115,7 @@ const Alerts = () => {
 
   useEffect(() => {
     fetchNotificationData()
+    getDevices()
   }, [])
 
   const getAlerts = async (deviceIds) => {
@@ -238,6 +267,20 @@ const Alerts = () => {
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Alerts and Events</strong>
               <div className="d-flex gap-3" style={{ width: '600px' }}>
+                {/**Devices */}
+                <select
+                  className="form-select me-3"
+                  style={{ width: '150px' }}
+                  value={filterDevice}
+                  onChange={(e) => setFilterDevice(e.target.value)}
+                >
+                  <option value="">Devices</option>
+                  {devices.map((device) => (
+                    <option key={device} value={device}>
+                      {device}
+                    </option>
+                  ))}
+                </select>
                 {/* Filteration */}
                 <select
                   className="form-select me-3"
