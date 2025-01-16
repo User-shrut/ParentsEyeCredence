@@ -445,15 +445,18 @@
 
 // ###################################### Old Code ############################################################### //
 
+/** @jsxImportSource @emotion/react */
 import React, { useState, useRef, useEffect } from 'react'
 import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api'
-import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
-import CropDinIcon from '@mui/icons-material/CropDin'
-import PolylineIcon from '@mui/icons-material/Polyline'
+import { IconButton } from '@mui/material'
+import LayersIcon from '@mui/icons-material/Layers'
+import SatelliteIcon from '@mui/icons-material/Satellite'
+import MapIcon from '@mui/icons-material/Map'
+import MyLocationIcon from '@mui/icons-material/MyLocation'
 import { CTooltip } from '@coreui/react'
-import { Marker } from 'react-leaflet'
+import { css, keyframes } from '@emotion/react'
 
+// Styles for the map container
 const containerStyle = {
   width: '100%',
   height: '500px',
@@ -462,95 +465,185 @@ const containerStyle = {
   position: 'relative',
 }
 
-const fullscreenContainerStyle = {
-  width: '100%',
-  height: '100vh',
-  position: 'fixed',
-  borderRadius: '10px',
-  top: 0,
-  left: 0,
-  zIndex: 1000,
-  backgroundColor: '#fff',
-}
+// Animation for layer options
+const slideDown = keyframes`
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`
 
+// Google Maps API Key
 const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik'
 
-const markerPosition = { lat: 37.7749, lng: -122.4194 }
+// Default marker position
+const defaultMarkerPosition = { lat: 37.7749, lng: -122.4194 }
 
 const Gmap = ({ data, centerMap }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
   })
 
-  const [zoom, setZoom] = useState(14)
-
+  const [zoom, setZoom] = useState(14) // Default zoom level
   const [center, setCenter] = useState({
     lat: 21.1285453,
     lng: 79.1036561,
-  })
-  const [isFullscreen, setIsFullscreen] = useState(false)
+  }) // Default map center
+  const [mapType, setMapType] = useState('roadmap') // Map type state (roadmap/satellite)
+  const [currentLocation, setCurrentLocation] = useState(null) // User's current location
+  const [showLayerOptions, setShowLayerOptions] = useState(false) // Show/hide layer options
   const mapContainerRef = useRef(null)
 
+  // Extract geofences from data
   const geofences = data?.filter(
     (geofence) =>
       geofence.area.length > 0 && geofence.area.every((point) => point.lat && point.lng),
   )
-  console.log('geofence hai ye ', geofences)
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      mapContainerRef.current.requestFullscreen()
+  // Fetch user's current location
+  const fetchCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          setCurrentLocation({ lat: latitude, lng: longitude })
+          setCenter({ lat: latitude, lng: longitude })
+          setZoom(18) // Zoom in to the user's location
+        },
+        (error) => {
+          console.error('Error fetching current location:', error.message)
+          alert('Unable to fetch your location. Please enable location services.')
+        },
+      )
     } else {
-      document.exitFullscreen()
+      alert('Geolocation is not supported by your browser.')
     }
   }
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
-    }
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange)
-    }
-  }, [])
-
+  // Update map center when `centerMap` changes
   useEffect(() => {
     if (centerMap?.latitude !== 0 && centerMap?.longitude !== 0) {
       setCenter({ lat: centerMap.latitude, lng: centerMap.longitude })
-      setZoom(18) // Set zoom level to 20
+      setZoom(18) // Set zoom level closer for specific location
     }
   }, [centerMap])
 
-  // Handle loading and error states
+  // Handle map loading or error states
   if (loadError) return <div>Error loading maps</div>
   if (!isLoaded) return <div>Loading...</div>
 
   return (
     <div ref={mapContainerRef} style={containerStyle}>
-      <div style={{ position: 'relative' }}>
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={zoom}>
-          {geofences && geofences.length > 0 ? (
-            geofences.map((geofence, index) => (
-              <Polygon
-                key={index}
-                path={geofence.area.map(({ lat, lng }) => ({ lat, lng }))}
-                options={{
-                  fillColor: '#FF0000',
-                  fillOpacity: 0.35,
-                  strokeColor: '#FF0000',
-                  strokeOpacity: 0.8,
-                  strokeWeight: 2,
-                }}
-              />
-            ))
-          ) : (
-            <div>No geofence data available</div>
-          )}
+      {/* Google Map */}
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        zoom={zoom}
+        mapTypeId={mapType} // Set the map type based on state
+        options={{
+          fullscreenControl: false, // Enable fullscreen button
+        }}
+      >
+        {/* Render geofences if available */}
+        {geofences &&
+          geofences.length > 0 &&
+          geofences.map((geofence, index) => (
+            <Polygon
+              key={index}
+              path={geofence.area.map(({ lat, lng }) => ({ lat, lng }))}
+              options={{
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+              }}
+            />
+          ))}
 
-          <MarkerF position={markerPosition} />
-        </GoogleMap>
+        {/* Default Marker */}
+        <MarkerF position={defaultMarkerPosition} />
+
+        {/* Current Location Marker */}
+        {currentLocation && <MarkerF position={currentLocation} />}
+      </GoogleMap>
+
+      {/* Control Buttons */}
+      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>
+        {/* Current Location Button */}
+        <CTooltip content="Go to Current Location">
+          <IconButton
+            onClick={fetchCurrentLocation}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              marginBottom: '10px',
+            }}
+          >
+            <MyLocationIcon />
+          </IconButton>
+        </CTooltip>
+        <br></br>
+
+        {/* Layer Icon */}
+        <CTooltip content="Map Layers">
+          <IconButton
+            onClick={() => setShowLayerOptions(!showLayerOptions)}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              marginBottom: '10px',
+            }}
+          >
+            <LayersIcon />
+          </IconButton>
+        </CTooltip>
+
+        {/* Layer Options with Animation */}
+        {showLayerOptions && (
+          <div
+            css={css`
+              animation: ${slideDown} 0.3s ease-out;
+              position: absolute;
+              top: 90px;
+              left: -10px;
+              border-radius: 10px;
+              padding: 10px;
+              z-index: 101;
+            `}
+          >
+            <CTooltip content="Satellite View">
+              <IconButton
+                onClick={() => setMapType('satellite')}
+                style={{
+                  backgroundColor: mapType === 'satellite' ? '#f0f0f0' : 'white',
+                  borderRadius: '50%',
+                  marginBottom: '5px',
+                }}
+              >
+                <SatelliteIcon />
+              </IconButton>
+            </CTooltip>
+
+            <CTooltip content="Default Map View">
+              <IconButton
+                onClick={() => setMapType('roadmap')}
+                style={{
+                  backgroundColor: mapType === 'roadmap' ? '#f0f0f0' : 'white',
+                  borderRadius: '50%',
+                }}
+              >
+                <MapIcon />
+              </IconButton>
+            </CTooltip>
+          </div>
+        )}
       </div>
     </div>
   )
