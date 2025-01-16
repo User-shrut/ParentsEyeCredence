@@ -85,6 +85,8 @@ const Geofences = () => {
     setAddModalOpen(false)
     setIsDrawing(false)
     setPolygonCoords([])
+    setRadius(null)
+    setSelectedDevices([])
     // setSelectedLocation({})
   }
 
@@ -219,8 +221,23 @@ const Geofences = () => {
   const onMapClick = (event) => {
     if (isDrawing) {
       // Add new point to the polygon when clicked
+      setRadius(null);
       const newCoords = [...polygonCoords, { lat: event.latLng.lat(), lng: event.latLng.lng() }];
       setPolygonCoords(newCoords);
+    }
+    if (!isDrawing) {
+      // Add new point to the polygon when clicked
+      const latlong = [polygonCoords[polygonCoords.length - 1]]
+      setPolygonCoords([...latlong])
+      // const newCoords = [...polygonCoords, { lat: event.latLng.lat(), lng: event.latLng.lng() }];
+      setPolygonCoords((polygonCoords) =>
+        polygonCoords.map((item) => ({
+          ...item,
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng(),
+        }))
+      );
+      // setPolygonCoords(newCoords);
     }
     // Update the selected location with the clicked position
     setSelectedLocation({ lat: event.latLng.lat(), lng: event.latLng.lng() });
@@ -254,8 +271,15 @@ const Geofences = () => {
   const handleRadiusChange = (e) => {
     const newRadius = e.target.value === "" ? null : Number(e.target.value); // Handle empty input
     if (newRadius === null || newRadius >= 0) {
+      if (polygonCoords.length > 1 ) {
+        const latlong = [polygonCoords[polygonCoords.length - 1]]
+      // console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL CCCCCCCCCCCCC", latlong);
+
+        setPolygonCoords(latlong)
+      }
       setRadius(newRadius);
-      console.log("Circle ka radius", newRadius);
+      console.log("Circle ka radiusssssssssssssssss", newRadius);
+      console.log("polygonCoordsssssssssssssssssssss", polygonCoords);
     }
   };
 
@@ -354,12 +378,20 @@ const Geofences = () => {
 
   const handleAddGeofence = async (e) => {
     e.preventDefault()
-    console.log(polygonCoords)
-    console.log(formData)
-    const updatedFormData = {
-      ...formData,
-      area: polygonCoords, // Add your polygonCoords here
-      deviceIds: selectedDevices.map((device) => device.value),
+    console.log("formData",formData)
+    let updatedFormData
+    if (polygonCoords.length == 1) {
+       updatedFormData = {
+        ...formData,
+        area: [{circle:`Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})`}], // Add your polygonCoords here
+        deviceIds: selectedDevices.map((device) => device.value),
+      }
+    } else {
+       updatedFormData = {
+        ...formData,
+        area: polygonCoords, // Add your polygonCoords here
+        deviceIds: selectedDevices.map((device) => device.value),
+      }
     }
 
     console.log('this is updated formdata: ', updatedFormData)
@@ -819,9 +851,11 @@ const Geofences = () => {
             {isLoaded ? (
 
               <div>
-                <div className='d-flex'>
+                {
+                  !isDrawing ? (
+                    <div className='d-flex'>
                   <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                    <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
+                    <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
                     <input
                       type="number"
                       value={radius}
@@ -836,6 +870,28 @@ const Geofences = () => {
                     />
                   </div>
                 </div>
+                  ) : (
+                  <div className='d-flex'>
+                  <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                    <label style={{ fontWeight: '500', color: '#2c3e50'}}>Set Circle Radius (in meters): </label>
+                    <input
+                      type="number"
+                      value={radius}
+                      disabled
+                      onChange={handleRadiusChange} // Handle radius input change
+                      min="1"
+                      style={{
+                        marginLeft: '10px',
+                        padding: '8px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
+                  )
+                }
+                
 
                 <GoogleMap
                   mapContainerStyle={{
