@@ -556,21 +556,9 @@
 //   ]
 // }
 
-
 // export default _nav
 
-
-
-
-
-
-
-
-
-
-
 // ################################### NEW CODE CHANGE FOR SIDEBAR ################################################//
-
 
 import React, { useEffect, useState } from 'react'
 import { IoLocationOutline } from 'react-icons/io5'
@@ -590,7 +578,7 @@ import { TbReportAnalytics } from 'react-icons/tb'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import { RiPinDistanceFill } from 'react-icons/ri'
 import { PiMapPinAreaFill } from 'react-icons/pi'
-import { BiSupport } from "react-icons/bi";
+import { BiSupport } from 'react-icons/bi'
 
 const _nav = (role, decodedToken) => {
   let devices,
@@ -615,7 +603,7 @@ const _nav = (role, decodedToken) => {
   console.log(decodedToken)
 
   if (role != 'superadmin') {
-    ({
+    ;({
       devices,
       users,
       driver,
@@ -631,7 +619,7 @@ const _nav = (role, decodedToken) => {
       stop,
       travel,
       idle,
-      sensor,
+      // sensor,
       alerts,
       // vehicle,
       geofenceReport,
@@ -645,7 +633,10 @@ const _nav = (role, decodedToken) => {
       to: '/dashboard',
       icon: (
         <div style={{ display: 'flex', alignItems: 'center' }} title="Dashboard">
-          <MdOutlineSpaceDashboard  color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
+          <MdOutlineSpaceDashboard
+            color="#FF7A00"
+            style={{ marginRight: '15px', fontSize: '30px' }}
+          />
         </div>
       ),
     },
@@ -667,7 +658,6 @@ const _nav = (role, decodedToken) => {
                 />
               </div>
             ),
-
 
             items: [
               {
@@ -847,17 +837,17 @@ const _nav = (role, decodedToken) => {
                   </div>
                 ),
               },
-              {
-                component: CNavItem,
-                name: 'Sensor Reports',
-                to: '/sensorreports',
+              // {
+              //   component: CNavItem,
+              //   name: 'Sensor Reports',
+              //   to: '/sensorreports',
 
-                icon: (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <MdSensors style={{ marginRight: '15px', fontSize: '25px' }} />
-                  </div>
-                ),
-              },
+              //   icon: (
+              //     <div style={{ display: 'flex', alignItems: 'center' }}>
+              //       <MdSensors style={{ marginRight: '15px', fontSize: '25px' }} />
+              //     </div>
+              //   ),
+              // },
               {
                 component: CNavItem,
                 name: 'Alerts/Events',
@@ -917,9 +907,12 @@ const _nav = (role, decodedToken) => {
           (devices || users || groups || geofence || driver || notification || maintenance) && {
             component: CNavItem,
             name: 'Master',
-            visible: true,  // This can be a boolean or controlled by a state.
+            visible: true, // This can be a boolean or controlled by a state.
             icon: (
-              <div style={{ display: 'flex', alignItems: 'center' , color : "#FF7A00"}} title="Master">
+              <div
+                style={{ display: 'flex', alignItems: 'center', color: '#FF7A00' }}
+                title="Master"
+              >
                 <LiaFileInvoiceDollarSolid style={{ marginRight: '15px', fontSize: '30px' }} />
               </div>
             ),
@@ -928,7 +921,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Devices',
                 to: '/devices',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FaCar style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -939,7 +932,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Users',
                 to: '/users',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FaUserAlt style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -950,7 +943,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Group',
                 to: '/group',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FaUserGroup style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -961,7 +954,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Geofences',
                 to: '/geofences',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <PiMapPinAreaFill style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -972,7 +965,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Driver',
                 to: '/driver',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <GrUserWorker style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -983,7 +976,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Notifications',
                 to: '/notifications',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <IoMdNotifications style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -994,7 +987,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Maintenance',
                 to: '/maintenance',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <GrHostMaintenance style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1009,16 +1002,19 @@ const _nav = (role, decodedToken) => {
             stop ||
             travel ||
             idle ||
-            sensor ||
+            // sensor ||
             alerts ||
             dayreport ||
             vehicle ||
             geofenceReport) && {
             component: CNavItem,
             name: 'Report',
-            visible: true,  // This can be a boolean or controlled by a state.
+            visible: true, // This can be a boolean or controlled by a state.
             icon: (
-              <div style={{ display: 'flex', alignItems: 'center', color : "#FF7A00" }} title="Report">
+              <div
+                style={{ display: 'flex', alignItems: 'center', color: '#FF7A00' }}
+                title="Report"
+              >
                 <TbReport style={{ marginRight: '15px', fontSize: '30px' }} />
               </div>
             ),
@@ -1027,7 +1023,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Status Reports',
                 to: '/statusreports',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <TbReportAnalytics style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1038,7 +1034,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Distance Reports',
                 to: '/distancereports',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <GiPathDistance style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1049,7 +1045,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'History',
                 to: '/history',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FaHistory style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1060,7 +1056,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Stops',
                 to: '/stops',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <BsFillSignStopFill style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1071,7 +1067,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Travels Report',
                 to: '/travelsreport',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <RiPinDistanceFill style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1082,29 +1078,29 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Idle Report',
                 to: '/idlereport',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FaStopwatch style={{ marginRight: '15px', fontSize: '25px' }} />
                   </div>
                 ),
               },
-              sensor && {
-                component: CNavItem,
-                name: 'Sensor Reports',
-                to: '/sensorreports',
-                visible: true,  // This can be a boolean or controlled by a state.
-                icon: (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <MdSensors style={{ marginRight: '15px', fontSize: '25px' }} />
-                  </div>
-                ),
-              },
+              // sensor && {
+              //   component: CNavItem,
+              //   name: 'Sensor Reports',
+              //   to: '/sensorreports',
+              //   visible: true, // This can be a boolean or controlled by a state.
+              //   icon: (
+              //     <div style={{ display: 'flex', alignItems: 'center' }}>
+              //       <MdSensors style={{ marginRight: '15px', fontSize: '25px' }} />
+              //     </div>
+              //   ),
+              // },
               alerts && {
                 component: CNavItem,
                 name: 'Alerts/Events',
                 to: '/alerts-events',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <MdEventNote style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1126,7 +1122,7 @@ const _nav = (role, decodedToken) => {
                 component: CNavItem,
                 name: 'Geofence Report',
                 to: '/geofencereport',
-                visible: true,  // This can be a boolean or controlled by a state.
+                visible: true, // This can be a boolean or controlled by a state.
                 icon: (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <PiMapPinAreaFill style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -1138,9 +1134,12 @@ const _nav = (role, decodedToken) => {
           {
             component: CNavItem,
             name: 'Expense Management',
-            visible: true,  // This can be a boolean or controlled by a state.
+            visible: true, // This can be a boolean or controlled by a state.
             icon: (
-              <div style={{ display: 'flex', alignItems: 'center', color : "#FF7A00" }} title="Expense Management">
+              <div
+                style={{ display: 'flex', alignItems: 'center', color: '#FF7A00' }}
+                title="Expense Management"
+              >
                 <FaRegEdit style={{ marginRight: '15px', fontSize: '30px' }} />
               </div>
             ),
@@ -1156,21 +1155,21 @@ const _nav = (role, decodedToken) => {
       name: 'Chat Bot',
       to: '/chatbot',
       icon: (
-        <div style={{ display: 'flex', alignItems: 'center' , color : "#FF7A00"}}>
+        <div style={{ display: 'flex', alignItems: 'center', color: '#FF7A00' }}>
           <BsChatDots color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
         </div>
       ),
     },
-    {
-      component: CNavItem,
-      name: 'Help & Support',
-      to: '/h&s',
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center', color : "#FF7A00" }}>
-          <BiSupport color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
-        </div>
-      ),
-    },
+    // {
+    //   component: CNavItem,
+    //   name: 'Help & Support',
+    //   to: '/h&s',
+    //   icon: (
+    //     <div style={{ display: 'flex', alignItems: 'center', color: '#FF7A00' }}>
+    //       <BiSupport color="#FF7A00" style={{ marginRight: '15px', fontSize: '30px' }} />
+    //     </div>
+    //   ),
+    // },
   ]
 }
 

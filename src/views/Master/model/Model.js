@@ -338,7 +338,7 @@ const Model = () => {
                   onClick={handleAddModalOpen} // Open add modal on button click
                   variant="contained"
                   className="btn text-white"
-                  style={{ backgroundColor: '#0a2d63', width: '140px' }}
+                  style={{ backgroundColor: '#0a2d63', width: '160px' }}
                 >
                   Add Model
                 </button>

@@ -1019,7 +1019,7 @@ const Devices = () => {
           />
           <Sselect
             style={{
-              zIndex: '99999999999999',
+              zIndex: '1000',
               minWidth: '10rem',
             }}
             id="group-select"

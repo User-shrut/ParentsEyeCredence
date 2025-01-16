@@ -482,7 +482,7 @@ const Gmap = ({ data, centerMap }) => {
     googleMapsApiKey: apiKey,
   })
 
-  const [zoom, setZoom] = useState(14);
+  const [zoom, setZoom] = useState(14)
 
   const [center, setCenter] = useState({
     lat: 21.1285453,

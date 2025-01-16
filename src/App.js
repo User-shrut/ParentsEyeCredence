@@ -5,8 +5,23 @@ import { Provider, useSelector, useDispatch } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import Loader from './components/Loader/Loader'
-import HelpSupp from './views/forms/help-support/HelpSupp'
-
+import RaiseTicket from './views/forms/help-support/RaiseTicket'
+const HelpSupp = React.lazy(() => import('./views/forms/help-support/HelpSupp'))
+const GettingStarted = React.lazy(
+  () => import('./components/articles/gettingStarted/GettingStarted'),
+)
+const GettingStartedForAcc = React.lazy(
+  () => import('./components/articles/gettingStarted/GettingStartedForAcc'),
+)
+const GettingStartedForUser = React.lazy(
+  () => import('./components/articles/gettingStarted/GettindStartedForUser'),
+)
+const TheBasicsOfCredence = React.lazy(
+  () => import('./components/articles/gettingStarted/TheBasicsOfCredence'),
+)
+const NavigatingCredence = React.lazy(
+  () => import('./components/articles/artcle/NavigatingCredence'),
+)
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
@@ -35,12 +50,7 @@ const App = () => {
     setColorMode(storedTheme)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-
-
   // device data load when app is loaded
-  
-
-  
 
   return (
     <HashRouter>
@@ -58,6 +68,15 @@ const App = () => {
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
           <Route path="*" name="Home" element={<DefaultLayout />} />
           <Route path="/HelpSupp" element={<HelpSupp />} />
+          <Route path="/HelpSupp/Getting-started" element={<GettingStarted />} />
+          <Route
+            path="/HelpSupp/Getting-started/For-Accounts-Admins"
+            element={<GettingStartedForAcc />}
+          />
+          <Route path="/HelpSupp/Getting-started/For-User" element={<GettingStartedForUser />} />
+          <Route path="/HelpSupp/The-Basics-Of-Credence" element={<TheBasicsOfCredence />} />
+          <Route path="/HelpSupp/Navigating-Credence" element={<NavigatingCredence />} />
+          <Route path="/HelpSupp/Raise-Ticket" element={<RaiseTicket />} />
         </Routes>
       </Suspense>
     </HashRouter>

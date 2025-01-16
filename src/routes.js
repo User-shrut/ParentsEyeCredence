@@ -13,7 +13,7 @@ const Driver = React.lazy(() => import('./views/Master/driver/Driver.js'))
 const Notifications = React.lazy(() => import('./views/Master/notifications/Notifications.js'))
 const Maintenance = React.lazy(() => import('./views/Master/maintenance/Maintenance.js'))
 const Category = React.lazy(() => import('./views/Master/category/Category.js'))
-const Model= React.lazy(() => import('./views/Master/model/Model.js'))
+const Model = React.lazy(() => import('./views/Master/model/Model.js'))
 // reports
 const Combine = React.lazy(() => import('./views/Reports/StatusReports/StatusReport.js'))
 const Custom = React.lazy(() => import('./views/Reports/DistanceReport/DistanceReport.js'))
@@ -33,7 +33,10 @@ const InventoryManagment = React.lazy(() => import('./views/ExpenseManagement/In
 
 // additional
 const ChatBot = React.lazy(() => import('./views/theme/chatbot/ChatBot'))
-const HelpSupp = React.lazy(() => import('./views/forms/help-support/HelpSupp'))
+const HelpSupport = React.lazy(() => import('./views/forms/help-support/HelpSupp.js'))
+const GettingStarted = React.lazy(
+  () => import('./components/articles/gettingStarted/GettingStarted.js'),
+)
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -46,17 +49,17 @@ const routes = [
     name: 'IndividualTrack',
     element: IndividualTrack,
   },
-  { path: '/notifications', name: 'Notifications', element: Notifications},
-  { path: '/devices', name: 'Devices', element: Devices},
-  { path: '/geofences', name: 'Geofence',element: Geofences},
+  { path: '/notifications', name: 'Notifications', element: Notifications },
+  { path: '/devices', name: 'Devices', element: Devices },
+  { path: '/geofences', name: 'Geofence', element: Geofences },
   { path: '/group', name: 'Group', element: Group },
   { path: '/maintenance', name: 'Maintenance', element: Maintenance },
   { path: '/driver', name: 'Driver', element: Driver },
   { path: '/users', name: 'Users', element: Users },
-  { path: '/category', name: 'Category', element: Category},
-  { path: '/model', name: 'Model', element: Model},
-  { path: '/statusreports', name: 'Combine', element:Combine },
-  { path: '/distancereports', name: 'Custom', element: Custom},
+  { path: '/category', name: 'Category', element: Category },
+  { path: '/model', name: 'Model', element: Model },
+  { path: '/statusreports', name: 'Combine', element: Combine },
+  { path: '/distancereports', name: 'Custom', element: Custom },
   { path: '/history', name: 'History', element: History },
   {
     path: '/history/:deviceId/:category/:name',
@@ -69,13 +72,12 @@ const routes = [
   { path: '/sensorreports', name: 'Schedule', element: Schedules },
   { path: '/alerts-events', name: 'Alerts', element: Alerts },
   // { path: '/vehiclereport', name: 'Summary', element: Summary },
-  { path: '/geofencereport', name: 'Geofence Report', element: Customchart},
+  { path: '/geofencereport', name: 'Geofence Report', element: Customchart },
   { path: '/invoice', name: 'Invoice', element: InvoiceForm },
   { path: '/po', name: 'PO', element: Po },
   { path: '/inventory-management', name: 'Inventory Management', element: InventoryManagment },
   { path: '/chatbot', name: 'ChatBot', element: ChatBot },
-  { path: '/h&s', name: 'Help & Support', element: HelpSupp },
-
-
+  { path: '/h&s', name: 'Help & Support', element: HelpSupport },
+  { path: '/HelpSupp/getting-started', name: 'Getting Started', element: GettingStarted },
 ]
 export default routes

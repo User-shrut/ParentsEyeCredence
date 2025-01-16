@@ -313,7 +313,7 @@ const AppHeader = () => {
             <div className="vr mx-3 bg-white"></div>
             {role === 'superadmin' && (
               <CTab onClick={handleExpense} className="text-white" itemKey={4}>
-                <TbReportSearch className="me-2" /> Expense Management
+                <TbReportSearch className="me-2" /> Supports
               </CTab>
             )}
           </CTabList>
