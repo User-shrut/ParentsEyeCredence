@@ -73,3 +73,12 @@
     background-color: #020d1c;
     color: white;
 }
+
+.goBack {
+    font-weight: 600;
+}
+
+.goBack:hover {
+    color: #0a2d63;
+    text-decoration: underline;
+}

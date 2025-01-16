@@ -154,9 +154,6 @@ function Contact() {
               {/**TICKET TYPES */}
               <CForm className="row g-3">
                 <CCol>
-                  <label htmlFor="inputState" className="form-label">
-                    Group (Optional)
-                  </label>
                   <CFormSelect id="inputState" style={{ width: '300px', height: '40px' }}>
                     <option>Ticket Type</option>
                     {ticketTypes.map((type, key) => (
@@ -166,7 +163,7 @@ function Contact() {
                 </CCol>
               </CForm>
             </div>
-            <div className="d-flex gap-5 mt-4">
+            <div className="d-flex gap-5">
               {/**RANGE DATE ADDED FILTER */}
               <div>
                 <DateRangeFilter

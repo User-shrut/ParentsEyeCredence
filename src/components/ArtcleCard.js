@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React from 'react'
 import { CCard, CCardBody, CCardLink, CCardSubtitle, CCardText, CCardTitle } from '@coreui/react'
-import { Lightbulb, WalletCards, MessageCircleQuestion } from 'lucide-react'
+import { Lightbulb, WalletCards, MessageCircleQuestion, Ticket } from 'lucide-react'
 import '../views/forms/help-support/index.css'
 import { useNavigate } from 'react-router-dom'
 
@@ -21,6 +21,10 @@ function ArticleCard() {
 
   const handleTheBasicsOfCredence = () => {
     navigate('/HelpSupp/The-Basics-Of-Credence')
+  }
+
+  const handleSupport = () => {
+    navigate('/HelpSupp/Raise-Ticket')
   }
   return (
     <div className="d-flex justify-content-between">
@@ -117,7 +121,7 @@ function ArticleCard() {
       >
         <CCardBody className="text-center">
           <div>
-            <WalletCards
+            <Ticket
               className="text-warning"
               style={{
                 fontSize: '2rem',
@@ -127,10 +131,13 @@ function ArticleCard() {
               }}
             />
           </div>
-          <CCardTitle className="hover-title" onClick={handleGettingStarted}>
+          <CCardTitle className="hover-title">
             {' '}
-            <strong>Subscription & Billing</strong>
+            <strong>Raise a Ticket</strong>
           </CCardTitle>
+          <CCardText style={{ fontSize: '15px', fontWeight: '600', opacity: '0.8' }}>
+            Contact us for further assistance.
+          </CCardText>
           <div
             style={{
               fontSize: '13px',
@@ -141,15 +148,16 @@ function ArticleCard() {
               lineHeight: '1.6',
             }}
           >
-            <CCardText className="hover-text" onClick={handleGettingStartedForAcc}>
-              Getting Started for Account Owners and Admins
-            </CCardText>
-            <CCardText className="hover-text" onClick={handleGettingStartedForUser}>
-              Getting Started for Users
-            </CCardText>
-            <CCardText className="hover-text" onClick={handleTheBasicsOfCredence}>
-              The Basics of Credence Tracker
-            </CCardText>
+            <div className="text-center">
+              <p>Submit a support ticket and our team will respond within 24 hours.</p>
+              <button
+                onClick={handleSupport}
+                className="btn bg-primary text-white"
+                style={{ fontWeight: 'bold' }}
+              >
+                Raise Ticket
+              </button>
+            </div>
           </div>
         </CCardBody>
       </CCard>
