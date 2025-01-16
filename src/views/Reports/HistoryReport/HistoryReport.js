@@ -11,17 +11,17 @@ import {
   CFormInput,
   CRow,
   CFormLabel,
-  CFormSelect,
-  CSpinner,
 } from '@coreui/react'
 
 import { fetchDevices } from '../../../features/deviceSlice.js'
-
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
 import HistoryMap from './HistoryMap'
 import './HistoryReport.css'
 import '../../../utils.css'
+
+// Import react-select
+import Select from 'react-select'
 
 const HistoryReport = () => {
   const { deviceId: urlDeviceId, category, name } = useParams() // Retrieve params from URL
@@ -71,9 +71,15 @@ const HistoryReport = () => {
     dispatch(fetchDevices())
   }, [dispatch])
 
-  const handleDeviceChange = (event) => {
-    setDeviceId(event.target.value)
+  const handleDeviceChange = (selectedOption) => {
+    setDeviceId(selectedOption ? selectedOption.value : '')
   }
+
+  // Transform devices to the format react-select expects
+  const deviceOptions = devices.map((device) => ({
+    value: device.deviceId,
+    label: device.name,
+  }))
 
   return (
     <>
@@ -108,7 +114,8 @@ const HistoryReport = () => {
               </CCardHeader>
               <CCardBody>
                 <CForm style={{ display: 'flex', gap: '4rem' }} onSubmit={handleSubmit}>
-                  <div>
+
+                  <div style={{ width: '20rem' }}>
                     <CFormLabel htmlFor="fromDateTime">From Date-Time</CFormLabel>
                     <CFormInput
                       type="datetime-local"
@@ -118,7 +125,7 @@ const HistoryReport = () => {
                     />
                   </div>
 
-                  <div>
+                  <div style={{ width: '20rem' }}>
                     <CFormLabel htmlFor="toDateTime">To Date-Time</CFormLabel>
                     <CFormInput
                       type="datetime-local"
@@ -128,30 +135,27 @@ const HistoryReport = () => {
                     />
                   </div>
 
-                  <CFormSelect
-                    id="device-select"
-                    value={deviceId}
-                    onChange={handleDeviceChange}
-                    style={{ height: '3rem', width: '12rem', marginTop: '1rem' }}
-                  >
-                    <option value="" disabled>
-                      Select a Device
-                    </option>
-                    {devices.map((device, index) => (
-                      <option key={index} value={device.deviceId}>
-                        {device.name}
-                      </option>
-                    ))}
-                  </CFormSelect>
+                  {/* Searchable device select using react-select */}
+                  <div style={{ width: '20rem', }}>
+                    <CFormLabel htmlFor="toDateTime">Devices</CFormLabel>
+                    <Select
+                      id="device-select"
+                      value={deviceOptions.find((device) => device.value === deviceId)}
+                      onChange={handleDeviceChange}
+                      options={deviceOptions}
+                      placeholder="Select a Device"
+                    />
+                  </div>
 
                   <CButton
                     color="primary"
                     type="submit"
                     style={{
-                      height: '3rem',
-                      width: '8rem',
-                      marginTop: '1rem',
+                      height: '2.5rem',
+                      width: '10rem',
+                      marginTop: '2rem',
                       backgroundColor: '#0a2d63',
+                      marginLeft: '40px'
                     }}
                   >
                     Show

@@ -1004,19 +1004,19 @@ const Devices = () => {
               value: user._id,
               label: user.username,
             }))}
-            placeholder="Select User"
+            placeholder="Select a User"
             value={
               selectedUser
                 ? {
-                    value: selectedUser,
-                    label: users.find((user) => user._id === selectedUser)?.username,
-                  }
+                  value: selectedUser,
+                  label: users?.find((user) => user._id === selectedUser)?.username || "",
+                }
                 : null
             }
-            onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
+            onChange={(selectedOption) => setSelectedUser(selectedOption?.value || null)}
             isLoading={fillLoading}
-            placeholder="Select a User"
           />
+
           <Sselect
             style={{
               zIndex: '99999999999999',
@@ -1030,21 +1030,20 @@ const Devices = () => {
             value={
               selectedGroup
                 ? {
-                    value: selectedGroup,
-                    label: groups.find((group) => group._id === selectedGroup)?.name,
-                  }
+                  value: selectedGroup,
+                  label: groups.find((group) => group._id === selectedGroup)?.name,
+                }
                 : null
             }
-            onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
+            onChange={(selectedOption) => setSelectedGroup(selectedOption?.value || null)}
             isLoading={fillLoading}
-            placeholder="Select a Group"
           />
         </div>
         <Selector
           className="particularFilter"
           setFilteredData={setFilteredData}
           filteredData={filteredData}
-          fillDevices={fillDevices}
+          fillDevices={data}
         />
 
         <div className="d-flex">
