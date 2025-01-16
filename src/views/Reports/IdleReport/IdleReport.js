@@ -51,6 +51,7 @@ const SearchIdeal = ({
   columns,
   showMap,
   setShowMap,
+  handlePutName,
 }) => {
   const [validated, setValidated] = useState(false)
   const [showDateInputs, setShowDateInputs] = useState(false)
@@ -59,6 +60,14 @@ const SearchIdeal = ({
   // State to manage button text
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
+
+  // For username show in pdf
+  const [putName, setPutName] = useState("")
+
+  useEffect(() => {
+    handlePutName(putName)
+  }, [putName])
+
 
   const handleFormSubmit = (event) => {
     const form = event.currentTarget
@@ -100,29 +109,7 @@ const SearchIdeal = ({
     >
       <CCol md={3}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
-        {/* <CFormSelect
-          id="user"
-          required
-          value={selectedU}
-          onChange={(e) => {
-            const selectedUser = e.target.value;
-            setSelectedU(selectedUser)
-            console.log("Selected user:", selectedUser);
-            getGroups(selectedUser);
-          }}
-        >
-          <option value="">Choose a user...</option>
-          {loading ? (<option>Loading Users...</option>) : (
-            users?.length > 0 ? (
-              users?.map((user) => (
-                <option key={user._id} value={user._id}>{user.username}</option>
-              ))
-            ) : (
-              <option disabled>No Users in this Account</option>
-            )
-          )
-          }
-        </CFormSelect> */}
+
         <Select
           id="user"
           options={
@@ -140,6 +127,8 @@ const SearchIdeal = ({
           onChange={(selectedOption) => {
             const selectedUser = selectedOption?.value
             setSelectedU(selectedUser)
+            setPutName(selectedOption.label)
+            console.log('putNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:', putName)
             console.log('Selected user:', selectedUser)
             getGroups(selectedUser)
           }}
@@ -229,9 +218,9 @@ const SearchIdeal = ({
           value={
             formData.Devices
               ? {
-                  value: formData.Devices,
-                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-                }
+                value: formData.Devices,
+                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+              }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -353,8 +342,9 @@ const SearchIdeal = ({
   )
 }
 
-const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading }) => {
+const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, selectedPeriod, }) => {
   const [dataWithAddresses, setDataWithAddresses] = useState([])
+  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa", selectedUserName)
 
   // Function to get address from latitude and longitude
   const getAddressFromLatLng = async (latitude, longitude) => {
@@ -407,20 +397,66 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
 
   // PDF Download Function
   const downloadPDF = () => {
-    const doc = new jsPDF()
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
-    const tableRows = []
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading centered
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    const title = 'Credence Tracker';
+    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Idle Reports" heading
+    doc.setFontSize(18);
+    const subtitle = 'Idle Reports';
+    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+
+    // Add user and device details
+    const details = [
+      `User Name: ${selectedUserName || 'N/A'}`,
+      `Group Name: ${selectedGroupName || 'N/A'}`,
+      `Vehicle Name: ${selectedDeviceName || 'N/A'}`,
+      `Period: ${selectedPeriod || 'N/A'} | From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
+    ];
+    let yPosition = 35;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    details.forEach((detail) => {
+      doc.text(detail, 14, yPosition);
+      yPosition += 8;
+    });
+
+    // Define table columns and rows
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
+    const tableRows = [];
 
     dataWithAddresses.forEach((row, rowIndex) => {
-      row.data.forEach((nestedRow, nestedIndex) => {
+      row.data.forEach((nestedRow) => {
         const rowData = [
-          rowIndex + 1, // Serial Number
-          row.device?.name || selectedDeviceName || '--', // Fetch Vehicle Name
+          rowIndex + 1,
+          row.device?.name || selectedDeviceName || '--',
           ...selectedColumns.map((column) => {
-            if (column === 'Vehicle Status') return nestedRow.vehicleStatus
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus || '--';
             if (column === 'Duration')
-              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
-            if (column === 'Location') return nestedRow.address || nestedRow.location
+              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
+            if (column === 'Location') return nestedRow.address || nestedRow.location || '--';
+            if (column === 'Co-ordinates') return nestedRow.location || "--";
             if (column === 'Start Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
@@ -434,7 +470,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              })
+              });
             if (column === 'End Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
@@ -448,33 +484,47 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              })
+              });
             if (column === 'Total Duration')
-              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
-            return '--'
+              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
+            return '--';
           }),
-        ]
-        tableRows.push(rowData)
-      })
-    })
+        ];
+        tableRows.push(rowData);
+      });
+    });
 
-    // Generate the table with borders
+    // Generate the table with improved styling
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
+      startY: yPosition + 1,
       styles: {
-        lineWidth: 0.5, // Set thickness of inner borders
-        lineColor: [0, 0, 0], // Set color for borders (black)
-        halign: 'center', // Horizontal alignment for text in cells
-        valign: 'middle', // Vertical alignment for text in cells
+        fontSize: 10,
+        halign: 'center',
+        valign: 'middle',
+        lineColor: [0, 0, 0],
+        lineWidth: 0.5,
       },
-      tableLineWidth: 0.5, // Set thickness for outer borders
-      tableLineColor: [0, 0, 0], // Set outer border color (black)
-      margin: { top: 10 }, // Adjust top margin if necessary
-    })
+      headStyles: {
+        fillColor: [54, 162, 235], // Light blue header
+        textColor: [255, 255, 255],
+        fontSize: 12,
+        fontStyle: 'bold',
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray rows
+      },
+      tableLineWidth: 0.5,
+      tableLineColor: [0, 0, 0],
+      margin: { top: 10 },
+    });
 
-    doc.save(`${selectedDeviceName || 'Idle_Report'}.pdf`)
-  }
+    // Save the PDF with a descriptive name
+    doc.save(`${selectedDeviceName || 'Idle_Report'}_Idle_Reports_${date}.pdf`);
+  };
+
+
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -493,6 +543,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 .toISOString()
                 .substr(11, 8)
             if (column === 'Location') rowData['Location'] = nestedRow.address || nestedRow.location
+            if (column === 'Co-ordinates') rowData['Co-ordinates'] = nestedRow.location
             if (column === 'Start Time')
               rowData['Start Time'] = new Date(
                 new Date(nestedRow.arrivalTime).setHours(
@@ -799,9 +850,22 @@ const Ideal = () => {
 
   const [apiData, setApiData] = useState() //data from api
 
+  const [selectedUserName, setSelectedUserName] = useState('')
+  const [putName, setPutName] = useState("")
+
+  useEffect(() => {
+    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+  }, [putName])
+
+
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
   const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
+
+  const handlePutName = (name) => {
+    setPutName(name)
+    console.log("putName", putName)
+  }
 
   const getDevices = async (selectedGroup) => {
     const accessToken = Cookies.get('authToken')
@@ -827,6 +891,9 @@ const Ideal = () => {
     }
   }
 
+  const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
+  const selectedGroupName = selectedGroup ? selectedGroup.name : ''
+
   const getGroups = async (selectedUser = '') => {
     setLoading(true)
     try {
@@ -844,6 +911,13 @@ const Ideal = () => {
         setLoading(false)
         console.log('all groups')
       }
+
+      // After setting groups, find the selected group
+      const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
+      const selectedGroupName = selectedGroup ? selectedGroup.name : ''
+      console.log('Selected Group:', selectedGroupName)
+
+
     } catch (error) {
       setLoading(false)
       console.error('Error fetching data:', error)
@@ -864,6 +938,13 @@ const Ideal = () => {
         setUsers(response.data.users)
         setLoading(false)
         console.log('yaha tak thik hai')
+
+        // After setting the users, find the selected user based on formData.User
+        const selectedUser = usersData.find((user) => user.userId === formData.User);
+        const selectedUserName = selectedUser ? selectedUser.username : '';
+        setSelectedUserName(selectedUserName);
+        console.log('Selected User:', selectedUserName);
+
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -919,7 +1000,7 @@ const Ideal = () => {
 
       // console.log(response.data.deviceDataByStatus[0]);
 
-      console.log('All Status reports')
+      console.log('All Idles reports')
 
       if (response.status == 200) {
         console.log(response.data.data)
@@ -936,6 +1017,16 @@ const Ideal = () => {
       console.error('Error submitting form:', error)
     }
   }
+
+  // Example of extracting values similar to `selectedGroup`
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
+  const selectedPeriod = formData.Periods || '';
+
+  console.log('Selected From Date:', selectedFromDate);
+  console.log('Selected To Date:', selectedToDate);
+  console.log('Selected Period:', selectedPeriod);
+
 
   return (
     <>
@@ -962,6 +1053,7 @@ const Ideal = () => {
                 showMap={showMap}
                 setShowMap={setShowMap}
                 columns={columns}
+                handlePutName={handlePutName}
               />
             </CCardBody>
           </CCard>
@@ -989,6 +1081,11 @@ const Ideal = () => {
                   selectedDeviceName={selectedDeviceName}
                   selectedColumns={selectedColumns}
                   statusLoading={statusLoading}
+                  selectedGroupName={selectedGroupName}
+                  selectedUserName={putName}
+                  selectedFromDate={selectedFromDate}
+                  selectedToDate={selectedToDate}
+                  selectedPeriod={selectedPeriod}
                 />
               </CCardBody>
             </CCard>

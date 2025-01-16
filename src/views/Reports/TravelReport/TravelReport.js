@@ -47,12 +47,20 @@ const SearchTrip = ({
   columns,
   showMap,
   setShowMap,
+  handlePutName,
 }) => {
   const [validated, setValidated] = useState(false)
   const [buttonText, setButtonText] = useState('SHOW NOW')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const [selectedU, setSelectedU] = useState()
   const [selectedG, setSelectedG] = useState()
+
+  // For username show in pdf
+  const [putName, setPutName] = useState("")
+
+  useEffect(() => {
+    handlePutName(putName)
+  }, [putName])
 
   // Date conversion function to convert the given date to the desired format
   const convertToDesiredFormat = (inputDate) => {
@@ -116,29 +124,6 @@ const SearchTrip = ({
     >
       <CCol md={2}>
         <CFormLabel htmlFor="devices">User</CFormLabel>
-        {/* <CFormSelect
-          id="user"
-          required
-          value={selectedU}
-          onChange={(e) => {
-            const selectedUser = e.target.value;
-            setSelectedU(selectedUser)
-            console.log("Selected user:", selectedUser);
-            getGroups(selectedUser);
-          }}
-        >
-          <option value="">Choose a user...</option>
-          {loading ? (<option>Loading Users...</option>) : (
-            users?.length > 0 ? (
-              users?.map((user) => (
-                <option key={user._id} value={user._id}>{user.username}</option>
-              ))
-            ) : (
-              <option disabled>No Users in this Account</option>
-            )
-          )
-          }
-        </CFormSelect> */}
         <Select
           id="user"
           options={
@@ -156,6 +141,8 @@ const SearchTrip = ({
           onChange={(selectedOption) => {
             const selectedUser = selectedOption?.value
             setSelectedU(selectedUser)
+            setPutName(selectedOption.label)
+            console.log('putNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:', putName)
             console.log('Selected user:', selectedUser)
             getGroups(selectedUser)
           }}
@@ -248,9 +235,9 @@ const SearchTrip = ({
           value={
             formData.Devices
               ? {
-                  value: formData.Devices,
-                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-                }
+                value: formData.Devices,
+                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+              }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -335,9 +322,9 @@ const SearchTrip = ({
   )
 }
 
-const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
+const TripTable = ({ apiData, selectedColumns, statusLoading, selectedDeviceName, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, }) => {
   const [addressData, setAddressData] = useState({})
-
+  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa", selectedUserName)
   // Function to get address based on latitude and longitude using Nominatim API
   const getAddress = async (latitude, longitude) => {
     try {
@@ -376,88 +363,140 @@ const TripTable = ({ apiData, selectedColumns, statusLoading }) => {
   }, [apiData])
 
   // PDF Download Function
-  const downloadPDF = () => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-    })
 
-    const tableColumn = ['SN', 'Device', ...selectedColumns] // Add 'SN' (serial number) column at the start
-    const tableRows = []
+  const downloadPDF = () => {
+    const doc = new jsPDF({ orientation: 'landscape' });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    const title = 'Credence Tracker';
+    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Status Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Trips Reports';
+    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+
+    // Add user and device details
+    const details = [
+      `User Name: ${selectedUserName || '--'}`,
+      `Group Name: ${selectedGroupName || '--'}`,
+      `Vehicle Name: ${selectedDeviceName || '--'}`,
+      `From Date: ${selectedFromDate || '--'} , To Date: ${selectedToDate || '--'}`,
+    ];
+
+    let yPosition = 35;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    details.forEach((detail) => {
+      doc.text(detail, 14, yPosition);
+      yPosition += 8; // Spacing between lines
+    });
+
+    // Define table columns and rows
+    const tableColumn = ['SN', 'Device', ...selectedColumns];
+    const tableRows = [];
 
     apiData.finalTrip.forEach((row, rowIndex) => {
       const tableRow = [
-        rowIndex + 1, // Add Serial Number (row index + 1 for human-readable format)
-        row.name,
+        rowIndex + 1, // Serial Number
+        row.name || '--',
         ...selectedColumns.map((column) => {
           if (column === 'Start Time') {
-            return new Date(
-              new Date(row.startTime).setHours(
-                new Date(row.startTime).getHours() - 5,
-                new Date(row.startTime).getMinutes() - 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            return new Date(row.startTime)
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           }
           if (column === 'End Time') {
-            return new Date(
-              new Date(row.endTime).setHours(
-                new Date(row.endTime).getHours() - 5,
-                new Date(row.endTime).getMinutes() - 30,
-              ),
-            ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            return new Date(row.endTime)
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           }
           if (column === 'Distance') {
-            const distanceValue = parseFloat(row.distance) // Extract numeric part
-            return isNaN(distanceValue) ? '--' : distanceValue.toFixed(2) + ' km'
+            const distanceValue = parseFloat(row.distance);
+            return isNaN(distanceValue) ? '--' : `${distanceValue.toFixed(2)} km`;
           }
           if (column === 'Total Distance') {
-            const totalDistanceValue = parseFloat(row.totalDistance) // Extract numeric part
-            return isNaN(totalDistanceValue) ? '--' : totalDistanceValue.toFixed(2) + ' km'
+            const totalDistanceValue = parseFloat(row.totalDistance);
+            return isNaN(totalDistanceValue) ? '--' : `${totalDistanceValue.toFixed(2)} km`;
           }
           if (column === 'Maximum Speed') {
-            return (Number(row.maxSpeed) || 0).toFixed(2) + ' km/h'
+            return `${(Number(row.maxSpeed) || 0).toFixed(2)} km/h`;
           }
           if (column === 'Average Speed') {
-            return (Number(row.avgSpeed) || 0).toFixed(2) + ' km/h'
+            return `${(Number(row.avgSpeed) || 0).toFixed(2)} km/h`;
           }
           if (column === 'Duration') {
-            return row.duration || '--'
+            return row.duration || '--';
+          }
+          if (column === 'Start Co-ordinates') {
+            return row.startLatitude && row.startLongitude
+              ? `${row.startLatitude}, ${row.startLongitude}`
+              : 'Fetching Co-ordinates...';
           }
           if (column === 'Start Address') {
-            return addressData[row.deviceId]?.startAddress || 'Fetching...'
+            return addressData[row.deviceId]?.startAddress || 'Fetching...';
+          }
+          if (column === 'End Co-ordinates') {
+            return row.endLatitude && row.endLongitude
+              ? `${row.endLatitude}, ${row.endLongitude}`
+              : 'Fetching Co-ordinates...';
           }
           if (column === 'End Address') {
-            return addressData[row.deviceId]?.endAddress || 'Fetching...'
+            return addressData[row.deviceId]?.endAddress || 'Fetching...';
           }
           if (column === 'Driver') {
-            return row.driverName || '--'
+            return row.driverName || '--';
           }
-          if (column === 'Device Name') {
-            return row.device?.name || '--'
-          }
-          return '--'
+          return '--';
         }),
-      ]
-      tableRows.push(tableRow)
-    })
+      ];
+      tableRows.push(tableRow);
+    });
 
-    // Add autoTable with border styling options
+    // Add styled autoTable
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: yPosition + 1,
       styles: {
-        lineWidth: 0.5, // Border line thickness
-        lineColor: [0, 0, 0], // Border color (black)
-        halign: 'center', // Horizontal alignment for text
-        valign: 'middle', // Vertical alignment for text
+        fontSize: 10,
+        halign: 'center',
+        valign: 'middle',
+        lineColor: [0, 0, 0],
+        lineWidth: 0.5,
       },
-      tableLineWidth: 0.5, // Outer border line width
-      tableLineColor: [0, 0, 0], // Outer border color (black)
-      margin: { top: 20 }, // Margin from the top
-    })
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue header
+        textColor: [255, 255, 255],
+        fontSize: 12,
+        fontStyle: 'bold',
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray rows
+      },
+      margin: { top: 20 },
+    });
 
-    doc.save('trip-table.pdf')
-  }
+    // Save the PDF with descriptive filename
+    doc.save(`${selectedDeviceName || 'Report'}_Trips_Report_${date}.pdf`);
+  };
+
+
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -744,59 +783,21 @@ const Trips = () => {
 
   const [apiData, setApiData] = useState() //data from api
 
-  // Get the selected device name from the device list based on formData.Devices
-  const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
-  const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
+  const [selectedUserName, setSelectedUserName] = useState('')
+  const [putName, setPutName] = useState("")
 
-  const getGroups = async (selectedUser = '') => {
-    setLoading(true)
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
-        headers: {
-          Authorization: 'Bearer ' + accessToken,
-        },
-      })
-      if (response.data.groupsAssigned) {
-        setGroups(response.data.groupsAssigned)
-        setLoading(false)
-        console.log('perticular user ke groups')
-      } else if (response.data.groups) {
-        setGroups(response.data.groups)
-        setLoading(false)
-        console.log('all groups')
-      }
-    } catch (error) {
-      setLoading(false)
-      console.error('Error fetching data:', error)
-      throw error
-    }
-  }
-  const getUser = async () => {
-    setLoading(true)
-    setGroups([])
-    setDevices([])
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
-        headers: {
-          Authorization: 'Bearer ' + accessToken,
-        },
-      })
-      if (response.data) {
-        setUsers(response.data.users)
-        setLoading(false)
-        console.log('yaha tak thik hai')
-      }
-    } catch (error) {
-      setLoading(false)
-      console.error('Error fetching data:', error)
-      throw error
-    }
+  const handlePutName = (name) => {
+    setPutName(name)
+    console.log("putName", putName)
   }
 
   useEffect(() => {
-    getUser()
-    getGroups()
-  }, [])
+    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+  }, [putName])
+
+  // Get the selected device name from the device list based on formData.Devices
+  const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
+  const selectedDeviceName = selectedDevice ? selectedDevice.name : ''
 
   const getDevices = async (selectedGroup) => {
     setLoading(true)
@@ -820,6 +821,74 @@ const Trips = () => {
       throw error // Re-throw the error for further handling if needed
     }
   }
+
+  const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
+  const selectedGroupName = selectedGroup ? selectedGroup.name : ''
+
+  const getGroups = async (selectedUser = '') => {
+    setLoading(true)
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/group/${selectedUser}`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data.groupsAssigned) {
+        setGroups(response.data.groupsAssigned)
+        setLoading(false)
+        console.log('perticular user ke groups')
+      } else if (response.data.groups) {
+        setGroups(response.data.groups)
+        setLoading(false)
+        console.log('all groups')
+      }
+      // After setting groups, find the selected group
+      const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
+      const selectedGroupName = selectedGroup ? selectedGroup.name : ''
+      console.log('Selected Group:', selectedGroupName)
+
+    } catch (error) {
+      setLoading(false)
+      console.error('Error fetching data:', error)
+      throw error
+    }
+  }
+
+
+  const getUser = async () => {
+    setLoading(true)
+    setGroups([])
+    setDevices([])
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        },
+      })
+      if (response.data) {
+        setUsers(response.data.users)
+        setLoading(false)
+        console.log('yaha tak thik hai')
+
+        // After users are set, update selectedUserName based on formData.User
+        const selectedUser = users.find((user) => user.userId === formData.User);
+        const selectedUserName = selectedUser ? selectedUser.username : '';
+        setSelectedUserName(selectedUserName);
+        console.log('Selected Userrerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr:', selectedUserName);
+
+      }
+    } catch (error) {
+      setLoading(false)
+      console.error('Error fetching data:', error)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+    getUser()
+    getGroups()
+  }, [])
+
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -880,6 +949,15 @@ const Trips = () => {
     }
   }
 
+  // Example of extracting values similar to `selectedGroup`
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
+  const selectedPeriod = formData.Periods || '';
+
+  console.log('Selected From Date:', selectedFromDate);
+  console.log('Selected To Date:', selectedToDate);
+  console.log('Selected Period:', selectedPeriod);
+
   return (
     <>
       <CRow className="pt-3 gutter-0">
@@ -905,6 +983,7 @@ const Trips = () => {
                 columns={columns}
                 showMap={showMap}
                 setShowMap={setShowMap}
+                handlePutName={handlePutName}
               />
             </CCardBody>
           </CCard>
@@ -930,6 +1009,11 @@ const Trips = () => {
                   selectedColumns={selectedColumns}
                   statusLoading={statusLoading}
                   selectedDeviceName={selectedDeviceName}
+                  selectedGroupName={selectedGroupName}
+                  selectedUserName={putName}
+                  selectedFromDate={selectedFromDate}
+                  selectedToDate={selectedToDate}
+                  selectedPeriod={selectedPeriod}
                 />
               </CCardBody>
             </CCard>
