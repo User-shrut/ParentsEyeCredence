@@ -603,7 +603,7 @@ const Gmap = ({ data, centerMap, polydata }) => {
           ))}
 
 
-        {geofences.length > 0 &&
+        {convertedArea.length > 0 &&
           convertedArea.map((geofence, index) => (
             <Circle
               key={index}
