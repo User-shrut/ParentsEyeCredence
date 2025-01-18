@@ -726,7 +726,7 @@ const Dashboard = () => {
                 >
                   <div
                     className="vehicle-card new-vehicles"
-                    // onClick={() => dispatch(filterInactiveVehicles())}
+                  // onClick={() => dispatch(filterInactiveVehicles())}
                   >
                     <div className="vehicle-info">
                       <div className="vehicle-type text-muted">
@@ -831,10 +831,10 @@ const Dashboard = () => {
                               value={
                                 selectedUser
                                   ? {
-                                      value: selectedUser,
-                                      label: users.find((user) => user._id === selectedUser)
-                                        ?.username,
-                                    }
+                                    value: selectedUser,
+                                    label: users.find((user) => user._id === selectedUser)
+                                      ?.username,
+                                  }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
@@ -854,10 +854,10 @@ const Dashboard = () => {
                               value={
                                 selectedGroup
                                   ? {
-                                      value: selectedGroup,
-                                      label: groups.find((group) => group._id === selectedGroup)
-                                        ?.name,
-                                    }
+                                    value: selectedGroup,
+                                    label: groups.find((group) => group._id === selectedGroup)
+                                      ?.name,
+                                  }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
@@ -1335,7 +1335,7 @@ const Dashboard = () => {
                                       {(() => {
                                         // const device = salesman.find((device) => device.id === item.deviceId)
                                         if (item && item.lastUpdate) {
-                                          const date = dayjs(item.lastUpdate).format('YYYY-MM-DD') // Format date
+                                          const date = dayjs(item.lastUpdate).format('YYYY/MM/DD') // Format date
                                           const time = dayjs(item.lastUpdate).format('HH:mm:ss') // Format time
                                           return (
                                             <div className="upperdata ld">
