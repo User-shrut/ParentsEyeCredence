@@ -118,10 +118,10 @@ export function getTimeDifference(timestamp) {
   // Format the difference in a human-readable format
   let timeDifference = ''
   if (days >= 0) {
-    timeDifference += `${days} d-`
+    timeDifference += `${days} d/ `
   }
   if (hours >= 0) {
-    timeDifference += `${hours} hrs-`
+    timeDifference += `${hours} hrs/ `
   }
   if (minutes >= 0) {
     timeDifference += `${minutes} min`

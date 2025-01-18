@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
   CDropdown,
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
   CFormSelect,
+  CRow,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -54,6 +59,7 @@ import { auto, right } from '@popperjs/core'
 import '../../../../src/app.css'
 import { FaExpand, FaCompress, FaStop, FaPen, FaLocationArrow, FaLayerGroup, FaMap, FaSatellite } from 'react-icons/fa';
 import { MdGpsFixed, MdPolyline } from "react-icons/md";
+import { IoAnalyticsOutline } from "react-icons/io5";
 
 const Geofences = () => {
   const [deviceData, setDeviceData] = useState()
@@ -63,12 +69,15 @@ const Geofences = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(8)
   const [pageCount, setPageCount] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = ['Select Geofence', 'Geofence Info']
   const [filteredData, setFilteredData] = useState([])
   const [centerMap, setCenterMap] = useState({ latitude: 0, longitude: 0 })
+
+
+  const [selectedLocation, setSelectedLocation] = useState({ lat: 21.1458, lng: 79.0882 })
 
   const handleEditModalClose = () => {
     setCurrentStep(0)
@@ -77,6 +86,7 @@ const Geofences = () => {
     setIsDrawing(false)
     setPolygonCoords([])
     setRadius(false)
+    setSelectedDevices([])
   }
 
   const handleAddModalClose = () => {
@@ -87,7 +97,6 @@ const Geofences = () => {
     setPolygonCoords([])
     setRadius(null)
     setSelectedDevices([])
-    // setSelectedLocation({})
   }
 
   const [deviceOptions, setDeviceOptions] = useState()
@@ -192,7 +201,6 @@ const Geofences = () => {
 
   // ############ map code #################################
 
-  const [selectedLocation, setSelectedLocation] = useState({ lat: 21.1458, lng: 79.0882 })
   const [polygonCoords, setPolygonCoords] = useState([])
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapType, setMapType] = useState('roadmap'); // Default map type
@@ -271,9 +279,9 @@ const Geofences = () => {
   const handleRadiusChange = (e) => {
     const newRadius = e.target.value === "" ? null : Number(e.target.value); // Handle empty input
     if (newRadius === null || newRadius >= 0) {
-      if (polygonCoords.length > 1 ) {
+      if (polygonCoords.length > 1) {
         const latlong = [polygonCoords[polygonCoords.length - 1]]
-      // console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL CCCCCCCCCCCCC", latlong);
+        // console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL CCCCCCCCCCCCC", latlong);
 
         setPolygonCoords(latlong)
       }
@@ -378,16 +386,16 @@ const Geofences = () => {
 
   const handleAddGeofence = async (e) => {
     e.preventDefault()
-    console.log("formData",formData)
+    console.log("formData", formData)
     let updatedFormData
     if (polygonCoords.length == 1) {
-       updatedFormData = {
+      updatedFormData = {
         ...formData,
-        area: [{circle:`Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})`}], // Add your polygonCoords here
+        area: [{ circle: `Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})` }], // Add your polygonCoords here
         deviceIds: selectedDevices.map((device) => device.value),
       }
     } else {
-       updatedFormData = {
+      updatedFormData = {
         ...formData,
         area: polygonCoords, // Add your polygonCoords here
         deviceIds: selectedDevices.map((device) => device.value),
@@ -416,61 +424,72 @@ const Geofences = () => {
         setPolygonCoords([])
         setSelectedDevices([])
         setAddModalOpen(false)
+        setIsDrawing(false)
+        setRadius(null)
+        // setSelectedLocation({})
+
       }
     } catch (error) {
-      toast.error('An error occured')
-      throw error.response ? error.response.data : new Error('An error occurred')
+      toast.error(error.response.data.message)
+      throw error.response ? error.response.data.message : new Error('An error occurred')
     }
   }
-
-  // Radius Gefonces
-
-
 
   // ###########################################################################
   // ######################  Edit Geofence ###################################
 
   const EditGeofenceSubmit = async (e) => {
-    e.preventDefault()
-    console.log(formData)
+    e.preventDefault();
+    console.log("FormData before submission:", formData);
 
+    // Construct the edited data
     const editedData = {
       ...formData,
-      area: polygonCoords, // Add your polygonCoords here
+      area: polygonCoords.length === 1
+        ? [{ circle: `Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})` }]
+        : polygonCoords, // Handle single circle or polygon coordinates
       deviceIds: selectedDevices.map((device) => device.value),
-    }
+    };
+
     try {
-      const accessToken = Cookies.get('authToken')
+      const accessToken = Cookies.get('authToken');
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/Geofence/${formData._id}`,
         editedData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
-        },
-      )
+        }
+      );
 
       if (response.status === 200) {
-        toast.success('Geofence is edited successfully')
-        fetchGeofenceData()
-        setFormData({})
-        setPolygonCoords([])
-        setEditModalOpen(false)
+        toast.success('Geofence has been updated successfully!');
+        fetchGeofenceData(); // Refresh the geofence data
+        setFormData({});
+        setPolygonCoords([]);
+        setSelectedDevices([]);
+        setCurrentStep(0)
+        setIsDrawing(false)
+        setRadius(false)
+        setEditModalOpen(false); // Close the edit modal
+        // setSelectedLocation({})
       }
     } catch (error) {
-      toast.error('An error occured')
-      throw error.response ? error.response.data : new Error('An error occurred')
+      console.error("Error occurred during geofence update:", error.response || error);
+      toast.error(error.response.data.message);
     }
-  }
+  };
 
   const handleEditGeofence = async (item) => {
-    console.log(item)
-    // setCurrentItemId(item._id);
-    setEditModalOpen(true)
-    setFormData({ ...item })
-    console.log('this is before edit', formData)
-  }
+    console.log("Geofence item to edit:", item);
+    setEditModalOpen(true); // Open the edit modal
+    setFormData({ ...item }); // Populate the form with the item's data
+    setPolygonCoords(item.area || []); // Populate polygon coordinates if present
+    setSelectedDevices(item.deviceIds || []); // Populate selected devices if present
+  };
+
 
   // #########################################################################
 
@@ -542,15 +561,32 @@ const Geofences = () => {
     doc.save('geofence_data.pdf')
   }
 
+
+  // Show Co-ordinates of Polyline and circle centroid of lat lng
+
   function calculateCentroid(polygon) {
     let totalLatitude = 0
     let totalLongitude = 0
     const numVertices = polygon.length
 
-    polygon.forEach((point) => {
-      totalLatitude += point.lat
-      totalLongitude += point.lng
-    })
+    if (polygon.length == 1) {
+      const match = polygon[0].circle.match(/Circle\(([\d.-]+) ([\d.-]+),/);
+      console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", match)
+      if (match) {
+        totalLatitude = parseFloat(match[1]);
+        totalLongitude = parseFloat(match[2]);
+      } else {
+        return null;
+      }
+    } else {
+      polygon.forEach((point) => {
+        totalLatitude += point.lat
+        totalLongitude += point.lng
+      })
+
+    }
+
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAA", totalLatitude, totalLongitude)
 
     return {
       latitude: totalLatitude / numVertices,
@@ -558,7 +594,9 @@ const Geofences = () => {
     }
   }
 
+  const [polydata, setPolyData] = useState()
   const handleRowClick = (polygon) => {
+    setPolyData(polygon)
     console.log('this is polygon', polygon)
     const centroid = calculateCentroid(polygon)
     console.log('this is centroid', centroid)
@@ -572,54 +610,6 @@ const Geofences = () => {
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="d-flex justify-content-between mb-2">
-        <div>
-          <h2>Geofence</h2>
-        </div>
-
-        <div className="d-flex align-items-center justify-content-between">
-          {/* Search input (only visible on medium and larger screens) */}
-          <div className="me-3 d-none d-md-block">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="Search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {/* Action buttons */}
-          <div className="d-flex align-items-center">
-            <button
-              onClick={() => setAddModalOpen(true)}
-              className="btn btn-secondary me-2"
-            >
-              Add Geofence
-            </button>
-
-            {/* Dropdown Menu */}
-            <CDropdown className="position-relative">
-              <CDropdownToggle
-                color="secondary"
-                style={{
-                  borderRadius: '50%',
-                  padding: '10px',
-                  height: '48px',
-                  width: '48px',
-                }}
-              >
-                <CIcon icon={cilSettings} />
-              </CDropdownToggle>
-              <CDropdownMenu>
-                <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
-                <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
-              </CDropdownMenu>
-            </CDropdown>
-          </div>
-        </div>
-
-      </div>
       <div className="d-md-none mb-2">
         <input
           type="search"
@@ -631,159 +621,213 @@ const Geofences = () => {
       </div>
       <div className="row">
         <div className="col-12 col-md-6 position-relative">
-          <TableContainer
-            component={Paper}
-            sx={{
-              height: 'auto', // Set the desired height
-              overflowX: 'auto', // Enable horizontal scrollbar
-              overflowY: 'auto', // Enable vertical scrollbar if needed
-              marginBottom: '10px',
-              borderRadius: '10px',
-              border: '1px solid black',
-            }}
-          >
-            <CTable
-              style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
-              bordered
-              align="middle"
-              className="mb-2 border min-vh-25 rounded-top-3"
-              hover
-              responsive
-            >
-              <CTableHead className="text-nowrap">
-                <CTableRow>
-                  <CTableHeaderCell className="text-center bg-body-secondary text-center sr-no table-cell">
-                    <strong>SN</strong>
-                  </CTableHeaderCell>
-                  <CTableHeaderCell className="ps-3 text-center bg-body-secondary text-center sr-no table-cell">
-                    <strong>Geofence Name</strong>
-                  </CTableHeaderCell>
-                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                    <strong>Type</strong>
-                  </CTableHeaderCell>
-                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                    <strong>Vehicles</strong>
-                  </CTableHeaderCell>
-
-                  <CTableHeaderCell className=" text-center bg-body-secondary text-center sr-no table-cell">
-                    <strong>Actions</strong>
-                  </CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {loading ? (
-                  <>
-                    <div className="text-nowrap mb-2" style={{ width: '240px' }}>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                      </p>
-                      <p className="card-text placeholder-glow">
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                        <span className="placeholder col-8" />
-                      </p>
+          <CRow>
+            <CCol xs>
+              <CCard>
+                <CCardHeader className="grand d-flex justify-content-between align-items-center">
+                  <strong>Geofences</strong>
+                  <div className='d-flex'>
+                    <div className="me-3 d-none d-md-block">
+                      <input
+                        type="search"
+                        className="form-control"
+                        placeholder="Search here..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
                     </div>
-                  </>
-                ) : filteredData.length > 0 ? (
-                  filteredData?.map((item, index) => (
-                    <CTableRow
-                      key={index}
-                      onClick={() => {
-                        handleRowClick(item.area)
-                      }}
+                    {/* Action buttons */}
+                    <div className="d-flex align-items-center">
+                      <button
+                        onClick={() => setAddModalOpen(true)}
+                        className="btn btn-secondary me-2"
+                      >
+                        Add Geofence
+                      </button>
+                    </div>
+                  </div>
+                </CCardHeader>
+                <CCardBody>
+                  <TableContainer
+                    component={Paper}
+                    sx={{
+                      height: 'auto', // Set the desired height
+                      overflowX: 'auto', // Enable horizontal scrollbar
+                      overflowY: 'auto', // Enable vertical scrollbar if needed
+                      // marginBottom: '10px',
+                      // borderRadius: '10px',
+                      // border: '1px solid black',
+                    }}
+                  >
+                    <CTable
+                      style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
+                      bordered
+                      align="middle"
+                      className="mb-2 min-vh-25"
+                      hover
+                      responsive
                     >
-                      <CTableDataCell
-                        className=" text-center"
-                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      >
-                        {(currentPage - 1) * limit + index + 1}
-                      </CTableDataCell>
-                      <CTableDataCell
-                        className=" text-center "
-                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      >
-                        {item.name}
-                      </CTableDataCell>
-                      <CTableDataCell
-                        className="text-center "
-                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      >
-                        {item.type}
-                      </CTableDataCell>
-                      <CTableDataCell
-                        className="text-center"
-                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                      >
-                        <CFormSelect
-                          id="geofence"
-                          value=""
-                          className=" text-center border-2 "
-                          style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                        >
-                          <option value="">{item.deviceIds.length || '0'}</option>
-                          {Array.isArray(item.deviceIds) &&
-                            item.deviceIds.map((device, index) => (
-                              <option key={index} value={device.name}>
-                                {device.name}
-                              </option>
-                            ))}
-                        </CFormSelect>
-                      </CTableDataCell>
-                      <CTableDataCell
-                        className="text-center d-flex "
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                        }}
-                      >
-                        <IconButton aria-label="edit" onClick={() => handleEditGeofence(item)}>
-                          <RiEdit2Fill
-                            style={{ fontSize: '20px', color: 'lightBlue', margin: '3px' }}
-                          />
-                        </IconButton>
-                        <IconButton aria-label="delete" onClick={() => deleteGeofenceSubmit(item)}>
-                          <AiFillDelete style={{ fontSize: '20px', color: 'red', margin: '3px' }} />
-                        </IconButton>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))
-                ) : (
-                  <CTableRow>
-                    <CTableDataCell colSpan="8" className="text-center">
-                      <div
-                        className="d-flex flex-column justify-content-center align-items-center"
-                        style={{ height: '200px' }}
-                      >
-                        <p className="mb-0 fw-bold">
-                          "Oops! Looks like there's No Geofence Created.
-                          <br /> Maybe it's time to Create New Geofence!"
-                        </p>
-                        <div>
-                          <button
-                            onClick={() => setAddModalOpen(true)}
-                            variant="contained"
-                            className="btn btn-primary m-3 text-white"
+                      <CTableHead className="text-nowrap">
+                        <CTableRow className="bg-body-tertiary">
+                          <CTableHeaderCell
+                            className="text-center text-white"
+                            style={{ background: '#0a2d63' }}
                           >
-                            <span>
-                              <IoMdAdd className="fs-5" />
-                            </span>{' '}
-                            Create Geofence
-                          </button>
-                        </div>
-                      </div>
-                    </CTableDataCell>
-                  </CTableRow>
-                )}
-              </CTableBody>
-            </CTable>
-          </TableContainer>
+                            <strong>SN</strong>
+                          </CTableHeaderCell>
+                          <CTableHeaderCell
+                            className="text-center text-white"
+                            style={{ background: '#0a2d63' }}
+                          >
+                            <strong>Geofence Name</strong>
+                          </CTableHeaderCell>
+                          <CTableHeaderCell
+                            className="text-center text-white"
+                            style={{ background: '#0a2d63' }}
+                          >
+                            <strong>Type</strong>
+                          </CTableHeaderCell>
+                          <CTableHeaderCell
+                            className="text-center text-white"
+                            style={{ background: '#0a2d63' }}
+                          >
+                            <strong>Vehicles</strong>
+                          </CTableHeaderCell>
+                          <CTableHeaderCell
+                            className="text-center text-white"
+                            style={{ background: '#0a2d63' }}
+                          >
+                            <strong>Actions</strong>
+                          </CTableHeaderCell>
+                        </CTableRow>
+                      </CTableHead>
+                      <CTableBody>
+                        {loading ? (
+                          <CTableRow>
+                            <CTableDataCell colSpan="5" className="text-center">
+                              <div className="text-nowrap mb-2" style={{ width: '240px' }}>
+                                <p className="placeholder-glow">
+                                  {[...Array(5)].map((_, i) => (
+                                    <span key={i} className="placeholder col-8" />
+                                  ))}
+                                </p>
+                              </div>
+                            </CTableDataCell>
+                          </CTableRow>
+                        ) : filteredData.length > 0 ? (
+                          filteredData.map((item, index) => (
+                            <CTableRow
+                              key={index}
+                              onClick={() => handleRowClick(item.area)}
+                            >
+                              <CTableDataCell
+                                className="text-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
+                                {(currentPage - 1) * limit + index + 1}
+                              </CTableDataCell>
+                              <CTableDataCell
+                                className="text-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
+                                {item.name}
+                              </CTableDataCell>
+                              <CTableDataCell
+                                className="text-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
+                                {item.type}
+                              </CTableDataCell>
+                              <CTableDataCell
+                                className="text-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
+                                <CFormSelect
+                                  id="geofence"
+                                  value=""
+                                  className="text-center"
+                                  style={{
+                                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                  }}
+                                >
+                                  <option value="">{item.deviceIds.length || '0'}</option>
+                                  {Array.isArray(item.deviceIds) &&
+                                    item.deviceIds.map((device, i) => (
+                                      <option key={i} value={device.name}>
+                                        {device.name}
+                                      </option>
+                                    ))}
+                                </CFormSelect>
+                              </CTableDataCell>
+                              <CTableDataCell className="text-center d-flex justify-content-center align-items-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
+                                <IconButton
+                                  aria-label="edit"
+                                  onClick={() => handleEditGeofence(item)}
+                                >
+                                  <RiEdit2Fill
+                                    style={{
+                                      fontSize: '20px',
+                                      color: 'lightBlue',
+                                      margin: '3px',
+                                    }}
+                                  />
+                                </IconButton>
+                                <IconButton
+                                  aria-label="delete"
+                                  onClick={() => deleteGeofenceSubmit(item)}
+                                >
+                                  <AiFillDelete
+                                    style={{
+                                      fontSize: '20px',
+                                      color: 'red',
+                                      margin: '3px',
+                                    }}
+                                  />
+                                </IconButton>
+                              </CTableDataCell>
+                            </CTableRow>
+                          ))
+                        ) : (
+                          <CTableRow>
+                            <CTableDataCell colSpan="5" className="text-center">
+                              <div
+                                className="d-flex flex-column justify-content-center align-items-center"
+                                style={{ height: '200px' }}
+                              >
+                                <p className="mb-0 fw-bold">
+                                  "Oops! Looks like there's No Geofence Created.
+                                  <br /> Maybe it's time to Create New Geofence!"
+                                </p>
+                                <button
+                                  onClick={() => setAddModalOpen(true)}
+                                  className="btn btn-primary m-3 text-white"
+                                >
+                                  <IoMdAdd className="fs-5" /> Create Geofence
+                                </button>
+                              </div>
+                            </CTableDataCell>
+                          </CTableRow>
+                        )}
+                      </CTableBody>
+                    </CTable>
+                  </TableContainer>
+                </CCardBody>
+              </CCard>
+            </CCol>
+          </CRow>
+
           {pageCount > 1 && (
             <ReactPaginate
               breakLabel="..."
@@ -807,8 +851,37 @@ const Geofences = () => {
         </div>
         <div className="col-12 col-md-6">
           <div style={{ flex: 1 }}>
-            <Gmap data={data} centerMap={centerMap} />
+            <Gmap data={data} centerMap={centerMap} polydata={polydata} />
           </div>
+          <div
+            className="d-flex justify-content-end align-items-center"
+            style={{
+              position: 'fixed', // Fixed to ensure it stays in the viewport
+              bottom: '10px', // Distance from the bottom of the viewport
+              right: '10px', // Distance from the right of the viewport
+              zIndex: 1000, // Ensures it stays above other elements
+            }}
+          >
+            {/* Dropdown Menu */}
+            <CDropdown>
+              <CDropdownToggle
+                color="secondary"
+                style={{
+                  borderRadius: '50%',
+                  padding: '10px',
+                  height: '48px',
+                  width: '48px',
+                }}
+              >
+                <CIcon icon={cilSettings} />
+              </CDropdownToggle>
+              <CDropdownMenu>
+                <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
+                <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
+              </CDropdownMenu>
+            </CDropdown>
+          </div>
+
         </div>
       </div>
 
@@ -854,44 +927,44 @@ const Geofences = () => {
                 {
                   !isDrawing ? (
                     <div className='d-flex'>
-                  <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                    <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
-                    <input
-                      type="number"
-                      value={radius}
-                      onChange={handleRadiusChange} // Handle radius input change
-                      min="1"
-                      style={{
-                        marginLeft: '10px',
-                        padding: '8px',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                      }}
-                    />
-                  </div>
-                </div>
+                      <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                        <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
+                        <input
+                          type="number"
+                          value={radius}
+                          onChange={handleRadiusChange} // Handle radius input change
+                          min="1"
+                          style={{
+                            marginLeft: '10px',
+                            padding: '8px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      </div>
+                    </div>
                   ) : (
-                  <div className='d-flex'>
-                  <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                    <label style={{ fontWeight: '500', color: '#2c3e50'}}>Set Circle Radius (in meters): </label>
-                    <input
-                      type="number"
-                      value={radius}
-                      disabled
-                      onChange={handleRadiusChange} // Handle radius input change
-                      min="1"
-                      style={{
-                        marginLeft: '10px',
-                        padding: '8px',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                      }}
-                    />
-                  </div>
-                </div>
+                    <div className='d-flex'>
+                      <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                        <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
+                        <input
+                          type="number"
+                          value={radius}
+                          disabled
+                          onChange={handleRadiusChange} // Handle radius input change
+                          min="1"
+                          style={{
+                            marginLeft: '10px',
+                            padding: '8px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      </div>
+                    </div>
                   )
                 }
-                
+
 
                 <GoogleMap
                   mapContainerStyle={{
@@ -947,7 +1020,7 @@ const Geofences = () => {
                           padding: '10px',
                         }}
                       >
-                        {isDrawing ? <FaStop size={20} /> : <MdPolyline size={20} />} {/* Ternary operator */}
+                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />} {/* Ternary operator */}
                       </IconButton>
                     </div>
                   </Tooltip>
@@ -1290,7 +1363,7 @@ const Geofences = () => {
                           padding: '10px',
                         }}
                       >
-                        {isDrawing ? <FaStop size={20} /> : <MdPolyline size={20} />} {/* Ternary operator */}
+                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />} {/* Ternary operator */}
                       </IconButton>
                     </div>
                   </Tooltip>

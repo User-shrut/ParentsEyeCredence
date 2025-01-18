@@ -1,3 +1,4 @@
+
 // import React, { useState, useRef, useEffect } from 'react';
 // import { GoogleMap, LoadScript, Marker, Polyline, Polygon } from '@react-google-maps/api';
 // import IconButton from '@mui/material/IconButton';
@@ -446,24 +447,26 @@
 // ###################################### Old Code ############################################################### //
 
 /** @jsxImportSource @emotion/react */
-import React, { useState, useRef, useEffect } from 'react'
-import { GoogleMap, MarkerF, Polygon, useLoadScript } from '@react-google-maps/api'
-import { IconButton } from '@mui/material'
-import LayersIcon from '@mui/icons-material/Layers'
-import SatelliteIcon from '@mui/icons-material/Satellite'
-import MapIcon from '@mui/icons-material/Map'
-import MyLocationIcon from '@mui/icons-material/MyLocation'
-import { CTooltip } from '@coreui/react'
-import { css, keyframes } from '@emotion/react'
+import React, { useState, useRef, useEffect } from 'react';
+import { GoogleMap, MarkerF, Polygon, useLoadScript, Circle } from '@react-google-maps/api';
+import { IconButton } from '@mui/material';
+import LayersIcon from '@mui/icons-material/Layers';
+import SatelliteIcon from '@mui/icons-material/Satellite';
+import MapIcon from '@mui/icons-material/Map';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { CTooltip } from '@coreui/react';
+import { css, keyframes } from '@emotion/react';
+// import { Circle } from 'lucide-react';
+
 
 // Styles for the map container
 const containerStyle = {
   width: '100%',
-  height: '500px',
+  height: '78vh',
   borderRadius: '10px',
   overflow: 'hidden',
   position: 'relative',
-}
+};
 
 // Animation for layer options
 const slideDown = keyframes`
@@ -475,66 +478,100 @@ const slideDown = keyframes`
     transform: translateY(0);
     opacity: 1;
   }
-`
+`;
 
 // Google Maps API Key
-const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik'
+const apiKey = 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik';
 
 // Default marker position
-const defaultMarkerPosition = { lat: 37.7749, lng: -122.4194 }
+const defaultMarkerPosition = { lat: 37.7749, lng: -122.4194 };
 
-const Gmap = ({ data, centerMap }) => {
+const Gmap = ({ data, centerMap, polydata }) => {
+  console.log("polydataaaaaaaaaaaaaaaaaaaaaa", polydata)
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
-  })
+  });
 
-  const [zoom, setZoom] = useState(14) // Default zoom level
+  const [zoom, setZoom] = useState(14); // Default zoom level
   const [center, setCenter] = useState({
     lat: 21.1285453,
     lng: 79.1036561,
-  }) // Default map center
-  const [mapType, setMapType] = useState('roadmap') // Map type state (roadmap/satellite)
-  const [currentLocation, setCurrentLocation] = useState(null) // User's current location
-  const [showLayerOptions, setShowLayerOptions] = useState(false) // Show/hide layer options
-  const mapContainerRef = useRef(null)
+  }); // Default map center
+  const [mapType, setMapType] = useState('roadmap'); // Map type state (roadmap/satellite)
+  const [currentLocation, setCurrentLocation] = useState(null); // User's current location
+  const [showLayerOptions, setShowLayerOptions] = useState(false); // Show/hide layer options
+  const mapContainerRef = useRef(null);
 
   // Extract geofences from data
+  // console.log("Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data)
   const geofences = data?.filter(
     (geofence) =>
       geofence.area.length > 0 && geofence.area.every((point) => point.lat && point.lng),
+  );
+  // console.log("geofencessssssssssssssssssssssssssssssssssssssss", geofences)
+
+  const circleGeofence = data?.filter(
+    (circleGeofence) =>
+      circleGeofence.area.length == 1
   )
+  console.log("circleGeofenceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", circleGeofence)
+
+
+  const convertGeofence = (geofence) => {
+    // Extracting data using regex
+    const regex = /Circle\(([-\d.]+) ([-\d.]+), (\d+(\.\d+)?)\)/;
+    const match = geofence.area[0].circle.match(regex);
+
+    if (match) {
+      const lat = parseFloat(match[1]); // Latitude
+      const lng = parseFloat(match[2]); // Longitude
+      const radius = parseFloat(match[3]); // Radius
+
+      return [{ lat, lng }, radius]; // Return the required format
+    }
+
+    return null; // Return null if not matching the expected format
+  };
+
+  // Converting area
+  const convertedArea = circleGeofence.map((index) => convertGeofence(index));
+
+  console.log("convertedAreaaaaaaaaaaaaaaaaaaaaaaaaaaa", convertedArea);
+
+
+
 
   // Fetch user's current location
   const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords
-          setCurrentLocation({ lat: latitude, lng: longitude })
-          setCenter({ lat: latitude, lng: longitude })
-          setZoom(18) // Zoom in to the user's location
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+          setCenter({ lat: latitude, lng: longitude });
+          setZoom(18); // Zoom in to the user's location
         },
         (error) => {
-          console.error('Error fetching current location:', error.message)
-          alert('Unable to fetch your location. Please enable location services.')
+          console.error('Error fetching current location:', error.message);
+          alert('Unable to fetch your location. Please enable location services.');
         },
-      )
+      );
     } else {
-      alert('Geolocation is not supported by your browser.')
+      alert('Geolocation is not supported by your browser.');
     }
-  }
+  };
 
   // Update map center when `centerMap` changes
   useEffect(() => {
     if (centerMap?.latitude !== 0 && centerMap?.longitude !== 0) {
-      setCenter({ lat: centerMap.latitude, lng: centerMap.longitude })
-      setZoom(18) // Set zoom level closer for specific location
+      setCenter({ lat: centerMap.latitude, lng: centerMap.longitude });
+      setZoom(18); // Set zoom level closer for specific location
     }
-  }, [centerMap])
+  }, [centerMap]);
 
   // Handle map loading or error states
-  if (loadError) return <div>Error loading maps</div>
-  if (!isLoaded) return <div>Loading...</div>
+  if (loadError) return <div>Error loading maps</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div ref={mapContainerRef} style={containerStyle}>
@@ -549,17 +586,34 @@ const Gmap = ({ data, centerMap }) => {
         }}
       >
         {/* Render geofences if available */}
-        {geofences &&
-          geofences.length > 0 &&
+        {geofences.length > 0 &&
           geofences.map((geofence, index) => (
             <Polygon
               key={index}
               path={geofence.area.map(({ lat, lng }) => ({ lat, lng }))}
               options={{
-                fillColor: '#FF0000',
+                fillColor: 'red',
                 fillOpacity: 0.35,
-                strokeColor: '#FF0000',
+                strokeColor: '#2980b9',
                 strokeOpacity: 0.8,
+                strokeWeight: 2,
+              }}
+            />
+
+          ))}
+
+
+        {geofences.length > 0 &&
+          convertedArea.map((geofence, index) => (
+            <Circle
+              key={index}
+              center={geofence[0]} // Circle's center is the selected location
+              radius={geofence[1]} // Circle radius in meters
+              options={{
+                fillColor: 'red',
+                fillOpacity: 0.5,
+                strokeColor: '#2980b9',
+                strokeOpacity: 1,
                 strokeWeight: 2,
               }}
             />
@@ -567,6 +621,7 @@ const Gmap = ({ data, centerMap }) => {
 
         {/* Default Marker */}
         <MarkerF position={defaultMarkerPosition} />
+
 
         {/* Current Location Marker */}
         {currentLocation && <MarkerF position={currentLocation} />}
@@ -588,7 +643,7 @@ const Gmap = ({ data, centerMap }) => {
             <MyLocationIcon />
           </IconButton>
         </CTooltip>
-        <br></br>
+        <br />
 
         {/* Layer Icon */}
         <CTooltip content="Map Layers">
@@ -646,7 +701,7 @@ const Gmap = ({ data, centerMap }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Gmap
+export default Gmap;

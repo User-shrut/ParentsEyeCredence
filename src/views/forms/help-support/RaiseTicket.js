@@ -62,15 +62,10 @@ function Contact() {
     vehicle: '',
     ticketType: '',
     description: '',
-  })
-  const statusCounts = {
-    all: 100,
-    pending: 20,
-    answered: 50,
-    closed: 30,
-  }
-
+  }) 
   const [ticketData, setTicketData] = useState([])
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
 
   // Fetch vehicles
   const fetchDevices = useCallback(async () => {
@@ -176,6 +171,8 @@ function Contact() {
 
   const handleDateRangeChange = (startDate, endDate) => {
     console.log('Date range changed:', { startDate, endDate })
+    setStartDate(startDate);
+    setEndDate(endDate);
   }
 
   useEffect(() => {
@@ -183,22 +180,63 @@ function Contact() {
     fetchRaiseTicketGet()
   }, [])
 
-  const filteredTickets = ticketData.filter((ticket) => {
-    if (!ticket) return false
+//   const filteredTickets = ticketData.filter((ticket) => {
+//     if (!ticket) return false
 
-    const searchLower = (searchTerm || '').toLowerCase()
-    const ticketIdLower = (ticket.ticketId || '').toLowerCase()
-    const ticketTypeLower = (ticket.ticketType || '').toLowerCase()
-    const descriptionLower = (ticket.description || '').toLowerCase()
+//     const ticketDateAdded = new Date(ticket.createdAt);
+//     const ticketDateUpdated = new Date(ticket.updatedAt);
+//     console.log("ticketDateAdded", ticketDateAdded);
+//     // console.log("ticketDateUpdated", ticketDateUpdated);
 
-    return (
-      ticketIdLower.includes(searchLower) ||
-      ticketTypeLower.includes(searchLower) ||
-      descriptionLower.includes(searchLower)
-    )
-  })
+//     const matchesSearchTerm = (
+//       ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+
+//     const matchesDateRange = (
+//       (startDate ? ticketDateAdded >= startDate : true) &&
+//       (endDate ? ticketDateAdded <= new Date(endDate.setHours(23, 59, 59, 999)) : true) &&
+//       (startDate ? ticketDateUpdated >= startDate : true) &&
+//       (endDate ? ticketDateUpdated <= new Date(endDate.setHours(23, 59, 59, 999)) : true)
+//     );
+    
+  
+
+//     return matchesSearchTerm && matchesDateRange;
+// });
 
   // Helper function to format the date
+ 
+ // Preprocess startDate and endDate
+
+const filteredTickets = ticketData.filter((ticket) => {
+  if (!ticket) return false;
+
+  const processedStartDate = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : null; // Start of the day
+const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : null; // End of the day
+
+
+  const ticketDateAdded = new Date(ticket.createdAt);
+  const ticketDateUpdated = new Date(ticket.updatedAt);
+
+  const matchesSearchTerm = (
+    ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const matchesDateRange = (
+    (processedStartDate ? ticketDateAdded >= processedStartDate : true) &&
+    (processedEndDate ? ticketDateAdded <= processedEndDate : true) &&
+    (processedStartDate ? ticketDateUpdated >= processedStartDate : true) &&
+    (processedEndDate ? ticketDateUpdated <= processedEndDate : true)
+  );
+
+  return matchesSearchTerm && matchesDateRange;
+});
+
+ 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
