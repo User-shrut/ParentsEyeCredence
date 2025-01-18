@@ -475,11 +475,10 @@ const Geofences = () => {
         setRadius(false)
         setEditModalOpen(false); // Close the edit modal
         // setSelectedLocation({})
-
       }
     } catch (error) {
       console.error("Error occurred during geofence update:", error.response || error);
-      toast.error('An error occurred while updating the geofence.');
+      toast.error(error.response.data.message);
     }
   };
 
@@ -655,16 +654,16 @@ const Geofences = () => {
                       height: 'auto', // Set the desired height
                       overflowX: 'auto', // Enable horizontal scrollbar
                       overflowY: 'auto', // Enable vertical scrollbar if needed
-                      marginBottom: '10px',
-                      borderRadius: '10px',
-                      border: '1px solid black',
+                      // marginBottom: '10px',
+                      // borderRadius: '10px',
+                      // border: '1px solid black',
                     }}
                   >
                     <CTable
                       style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}
                       bordered
                       align="middle"
-                      className="mb-2 border min-vh-25 rounded-top-3"
+                      className="mb-2 min-vh-25"
                       hover
                       responsive
                     >
@@ -768,7 +767,11 @@ const Geofences = () => {
                                     ))}
                                 </CFormSelect>
                               </CTableDataCell>
-                              <CTableDataCell className="text-center d-flex justify-content-center align-items-center">
+                              <CTableDataCell className="text-center d-flex justify-content-center align-items-center"
+                                style={{
+                                  backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
+                                }}
+                              >
                                 <IconButton
                                   aria-label="edit"
                                   onClick={() => handleEditGeofence(item)}
