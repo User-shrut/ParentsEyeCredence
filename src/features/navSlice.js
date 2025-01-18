@@ -1,6 +1,5 @@
 // import { createSlice } from '@reduxjs/toolkit'
 
-
 // const navSlice = createSlice({
 //     name: 'navbar',
 //     initialState: {
@@ -27,34 +26,27 @@
 // export const { setToggleSidebar } = navSlice.actions
 // export default navSlice.reducer
 
-
-
-
-
 import { createSlice } from '@reduxjs/toolkit'
 
-
 const navSlice = createSlice({
-    name: 'navbar',
-    initialState: {
-        home: false,
-        master: true,
-        reports: false,
-        expense: false,
-        support:false,
-
+  name: 'navbar',
+  initialState: {
+    home: false,
+    master: true,
+    reports: false,
+    expense: false,
+    support: false,
+  },
+  reducers: {
+    // ?action?
+    setToggleSidebar: (state, action) => {
+      state.home = action.payload.home
+      state.master = action.payload.master
+      state.reports = action.payload.reports
+      state.expense = action.payload.expense
+      state.support = action.payload.support
     },
-    reducers: {
-        // ?action?
-        setToggleSidebar: (state, action) => {
-            state.home = action.payload.home;
-            state.master = action.payload.master;
-            state.reports = action.payload.reports;
-            state.expense = action.payload.expense;
-            state.support = action.payload.support;
-
-        },
-    },
+  },
 })
 
 export const { setToggleSidebar } = navSlice.actions

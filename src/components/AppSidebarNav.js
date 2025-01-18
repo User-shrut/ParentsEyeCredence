@@ -145,19 +145,15 @@
 //   items: PropTypes.arrayOf(PropTypes.any).isRequired,
 // };
 
-
-
 // ############################# New Change on navigation sidebar ################################################# //
 
-
-
-import React from 'react';
-import PropTypes from 'prop-types';
-import { NavLink } from 'react-router-dom';
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
-import { useSelector } from 'react-redux';
-import { CBadge, CNavLink, CSidebarNav } from '@coreui/react';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { NavLink } from 'react-router-dom'
+import SimpleBar from 'simplebar-react'
+import 'simplebar-react/dist/simplebar.min.css'
+import { useSelector } from 'react-redux'
+import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
 
 export const AppSidebarNav = ({ items }) => {
   // Utility function to create the navigation link structure
@@ -177,11 +173,11 @@ export const AppSidebarNav = ({ items }) => {
         </CBadge>
       )}
     </>
-  );
+  )
 
   // Function to create individual navigation items
   const navItem = (item, index, indent = false) => {
-    const { component: Component, name, badge, icon, ...rest } = item;
+    const { component: Component, name, badge, icon, ...rest } = item
     return (
       <Component as="div" key={index}>
         {rest.to || rest.href ? (
@@ -192,64 +188,64 @@ export const AppSidebarNav = ({ items }) => {
           navLink(name, icon, badge, indent)
         )}
       </Component>
-    );
-  };
+    )
+  }
 
- // Function to create navigation groups
-const navGroup = (item, index) => {
-  const { component: Component, name, icon, items: subItems, ...rest } = item;
-  return (
-    <Component compact as="div" key={index} {...rest}>
-      <div className="nav-link">
-        {navLink(name, icon)} {/* Always show the nav link */}
-      </div>
-      {subItems?.map((subItem, subIndex) =>
-        subItem.items ? navGroup(subItem, subIndex) : navItem(subItem, subIndex, true),
-      )}
-    </Component>
-  );
-};
+  // Function to create navigation groups
+  const navGroup = (item, index) => {
+    const { component: Component, name, icon, items: subItems, ...rest } = item
+    return (
+      <Component compact as="div" key={index} {...rest}>
+        {/* <div className="nav-link">
+          {navLink(name, icon)}  */}
+        {/* </div> */}
+        {subItems?.map((subItem, subIndex) =>
+          subItem.items ? navGroup(subItem, subIndex) : navItem(subItem, subIndex, true),
+        )}
+      </Component>
+    )
+  }
 
   // Selectors to determine which section to show
-  const { home, master, reports, expense, support } = useSelector((state) => state.navbar);
+  const { home, master, reports, expense, support } = useSelector((state) => state.navbar)
 
   // Filter items based on active section dashboard
   const filterItemsForSection = (section) => {
-    console.log('Filtering for master dashboard:', section);
+    console.log('Filtering for master dashboard:', section)
     if (section === 'home') {
-      return items.filter((item) => item.name === 'Dashboard');
+      return items.filter((item) => item.name === 'Dashboard')
     }
-    return items;
-  };
+    return items
+  }
 
   // Filter items based on active section master
   const filterItemsForSection1 = (section) => {
-    console.log('Filtering for master section:', section);
+    console.log('Filtering for master section:', section)
     if (section === 'master') {
-      const filteredItems = items.filter((item) => item.name === 'Master');
-      console.log('Filtered items for master:', filteredItems);
-      return filteredItems;
+      const filteredItems = items.filter((item) => item.name === 'Master')
+      console.log('Filtered items for master:', filteredItems)
+      return filteredItems
     }
-    return items;
-  };
+    return items
+  }
 
   // Filter items based on active section Reports
   const filterItemsForSection2 = (section) => {
-    console.log('Filtering for reports section:', section);
+    console.log('Filtering for reports section:', section)
     if (section === 'reports') {
-      return items.filter((item) => item.name === 'Report');
+      return items.filter((item) => item.name === 'Report')
     }
-    return items;
-  };
+    return items
+  }
 
   // Filter items based on active section Expense Management
   const filterItemsForSection3 = (section) => {
-    console.log('Filtering for Expense management section:', section);
+    console.log('Filtering for Expense management section:', section)
     if (section === 'expense') {
-      return items.filter((item) => item.name === 'Expense Management');
+      return items.filter((item) => item.name === 'Expense Management')
     }
-    return items;
-  };
+    return items
+  }
 
   // Render the sidebar navigation
   return (
@@ -294,9 +290,9 @@ const navGroup = (item, index) => {
         </CSidebarNav>
       )}
     </>
-  );
-};
+  )
+}
 
 AppSidebarNav.propTypes = {
   items: PropTypes.arrayOf(PropTypes.any).isRequired,
-};
+}

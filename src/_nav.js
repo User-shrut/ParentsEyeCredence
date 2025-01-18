@@ -893,9 +893,10 @@ const _nav = (role, decodedToken) => {
               </div>
             ),
             items: [
-              { component: CNavItem, name: 'Invoice', to: '/invoice' },
-              { component: CNavItem, name: 'PO', to: '/po' },
-              { component: CNavItem, name: 'Inventory', to: '/inventory-management' },
+              // { component: CNavItem, name: 'Invoice', to: '/invoice' },
+              // { component: CNavItem, name: 'PO', to: '/po' },
+              // { component: CNavItem, name: 'Inventory', to: '/inventory-management' },
+              { component: CNavItem, name: 'Answer Ticket', to: '/answer-ticket' },
             ],
           },
         ]

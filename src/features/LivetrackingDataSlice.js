@@ -223,47 +223,45 @@ const liveFeaturesSlice = createSlice({
 // WebSocket event listeners
 export const initializeSocket = (credentials) => (dispatch) => {
   if (!credentials) {
-    console.error('initializeSocket: credentials are undefined or null');
-    return;
+    console.error('initializeSocket: credentials are undefined or null')
+    return
   }
 
-  let convertedCredentialsIntoObject;
+  let convertedCredentialsIntoObject
   try {
-    convertedCredentialsIntoObject = JSON.parse(credentials);
-    console.log('Converted credentials:', convertedCredentialsIntoObject);
+    convertedCredentialsIntoObject = JSON.parse(credentials)
+    console.log('Converted credentials:', convertedCredentialsIntoObject)
   } catch (error) {
-    console.error('Failed to parse credentials:', error.message);
-    return;
+    console.error('Failed to parse credentials:', error.message)
+    return
   }
 
   // Handle connection event
   socket.on('connect', () => {
-    console.log('Connected to the socket server');
-  });
+    console.log('Connected to the socket server')
+  })
 
   // Handle disconnection event
   socket.on('disconnect', () => {
-    console.log('Disconnected from the socket server');
-  });
+    console.log('Disconnected from the socket server')
+  })
 
   // Listen for live vehicle data
-  socket.emit('credentials', convertedCredentialsIntoObject);
+  socket.emit('credentials', convertedCredentialsIntoObject)
   socket.on('all device data', (data) => {
-    console.log(data);
-    dispatch(liveFeaturesSlice.actions.setVehicles(data));
-  });
+    console.log(data)
+    dispatch(liveFeaturesSlice.actions.setVehicles(data))
+  })
 
   // Listen for errors
   socket.on('error', (error) => {
-    console.error('Socket error:', error);
-    dispatch(liveFeaturesSlice.actions.setError(error));
-  });
+    console.error('Socket error:', error)
+    dispatch(liveFeaturesSlice.actions.setError(error))
+  })
 
   // Example of emitting an event to the server
-  socket.emit('client-message', { message: 'Hello from client!' });
-};
-
-
+  socket.emit('client-message', { message: 'Hello from client!' })
+}
 
 // Export the actions
 export const {
