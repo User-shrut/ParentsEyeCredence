@@ -1008,9 +1008,9 @@ const Devices = () => {
             value={
               selectedUser
                 ? {
-                  value: selectedUser,
-                  label: users?.find((user) => user._id === selectedUser)?.username || "",
-                }
+                    value: selectedUser,
+                    label: users?.find((user) => user._id === selectedUser)?.username || '',
+                  }
                 : null
             }
             onChange={(selectedOption) => setSelectedUser(selectedOption?.value || null)}
@@ -1030,9 +1030,9 @@ const Devices = () => {
             value={
               selectedGroup
                 ? {
-                  value: selectedGroup,
-                  label: groups.find((group) => group._id === selectedGroup)?.name,
-                }
+                    value: selectedGroup,
+                    label: groups.find((group) => group._id === selectedGroup)?.name,
+                  }
                 : null
             }
             onChange={(selectedOption) => setSelectedGroup(selectedOption?.value || null)}
