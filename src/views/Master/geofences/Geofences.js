@@ -430,8 +430,8 @@ const Geofences = () => {
 
       }
     } catch (error) {
-      toast.error('An error occured')
-      throw error.response ? error.response.data : new Error('An error occurred')
+      toast.error(error.response.data.message)
+      throw error.response ? error.response.data.message : new Error('An error occurred')
     }
   }
 
