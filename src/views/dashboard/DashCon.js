@@ -204,8 +204,7 @@ const Dashboard = () => {
       ).length,
   )
 
-  const allVehiclesCount =
-    useSelector((state) => state.liveFeatures.vehicles.length) + inactiveVehiclesCount
+  const allVehiclesCount = useSelector((state) => state.liveFeatures.vehicles.length)
 
   const idleVehiclesCount = useSelector(
     (state) =>

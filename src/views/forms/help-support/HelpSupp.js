@@ -11,13 +11,20 @@ function HelpSupp() {
     navigate('/HelpSupp/Raise-Ticket')
   }
 
+  const handleNavigateBack = () => {
+    navigate(-1)
+  }
+
   return (
-    <div style={{ backgroundColor: 'white', borderBottom: '1px solid #dee2e6' }}>
+    <div style={{ backgroundColor: 'white', borderBottom: '1px solid #dee2e6', height: '80vh' }}>
       <div className="mb-5 mx-5">
         {/**HEADER */}
         <div>
-          <div className="ms-5 pt-2">
+          <div className="ms-5 pt-2 d-flex justify-content-between">
             <img src={logo} style={{ width: '180px' }} />
+            <span className="mt-3 goBack btn border-0" onClick={handleNavigateBack}>
+              Go Back
+            </span>
           </div>
           <div className="container py-4">
             <div className="d-flex flex-column gap-3 text-center">
@@ -51,7 +58,7 @@ function HelpSupp() {
         {/**ARTICLES */}
         <ArticleCard />
         {/**CONTACT SUPPORT */}
-        <div className="text-center mt-5">
+        {/* <div className="text-center mt-5">
           <h5>
             {' '}
             <strong>Still need help?</strong>
@@ -66,7 +73,7 @@ function HelpSupp() {
           >
             Raise Ticket
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   )

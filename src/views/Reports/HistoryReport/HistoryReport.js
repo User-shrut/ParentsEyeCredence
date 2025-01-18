@@ -114,7 +114,6 @@ const HistoryReport = () => {
               </CCardHeader>
               <CCardBody>
                 <CForm style={{ display: 'flex', gap: '4rem' }} onSubmit={handleSubmit}>
-
                   <div style={{ width: '20rem' }}>
                     <CFormLabel htmlFor="fromDateTime">From Date-Time</CFormLabel>
                     <CFormInput
@@ -136,8 +135,8 @@ const HistoryReport = () => {
                   </div>
 
                   {/* Searchable device select using react-select */}
-                  <div style={{ width: '20rem', }}>
-                    <CFormLabel htmlFor="toDateTime">Devices</CFormLabel>
+                  <div style={{ width: '20rem' }}>
+                    <CFormLabel htmlFor="device">Devices</CFormLabel>
                     <Select
                       id="device-select"
                       value={deviceOptions.find((device) => device.value === deviceId)}
@@ -155,7 +154,7 @@ const HistoryReport = () => {
                       width: '10rem',
                       marginTop: '2rem',
                       backgroundColor: '#0a2d63',
-                      marginLeft: '40px'
+                      marginLeft: '40px',
                     }}
                   >
                     Show
