@@ -100,18 +100,18 @@ const DateRangeFilter = ({ onDateRangeChange, title }) => {
   }
 
   const handleApply = () => {
-    let start = selectedStartDate;
-    let end = selectedEndDate;
+    let start = selectedStartDate
+    let end = selectedEndDate
 
     if (selectedStartDate && !selectedEndDate) {
-      end = selectedStartDate; // Set end date to start date if only start date is selected
+      end = selectedStartDate // Set end date to start date if only start date is selected
     } else if (selectedEndDate && !selectedStartDate) {
-      start = selectedEndDate; // Set start date to end date if only end date is selected
+      start = selectedEndDate // Set start date to end date if only end date is selected
     }
 
-    console.log('Applying Date Range:', start, end);
-    onDateRangeChange(start, end);
-    setIsCalendarOpen(false);
+    console.log('Applying Date Range:', start, end)
+    onDateRangeChange(start, end)
+    setIsCalendarOpen(false)
   }
 
   const handleClear = () => {
@@ -260,7 +260,7 @@ const DateRangeFilter = ({ onDateRangeChange, title }) => {
             <button
               onClick={handleApply}
               // disabled={!selectedStartDate || !selectedEndDate}
-              disabled={!selectedStartDate && !selectedEndDate}
+              // disabled={!selectedStartDate && !selectedEndDate}
               className="btn btn-primary"
               style={{ backgroundColor: '#6f42c1', borderColor: '#6f42c1' }}
             >

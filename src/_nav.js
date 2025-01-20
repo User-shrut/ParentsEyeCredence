@@ -579,6 +579,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import { RiPinDistanceFill } from 'react-icons/ri'
 import { PiMapPinAreaFill } from 'react-icons/pi'
 import { BiSupport } from 'react-icons/bi'
+import { TicketCheck } from 'lucide-react'
 
 const _nav = (role, decodedToken) => {
   let devices,
@@ -896,7 +897,16 @@ const _nav = (role, decodedToken) => {
               // { component: CNavItem, name: 'Invoice', to: '/invoice' },
               // { component: CNavItem, name: 'PO', to: '/po' },
               // { component: CNavItem, name: 'Inventory', to: '/inventory-management' },
-              { component: CNavItem, name: 'Answer Ticket', to: '/answer-ticket' },
+              {
+                component: CNavItem,
+                name: 'Answer Ticket',
+                to: '/answer-ticket',
+                icon: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <TicketCheck style={{ marginRight: '15px', fontSize: '30px' }} />
+                  </div>
+                ),
+              },
             ],
           },
         ]

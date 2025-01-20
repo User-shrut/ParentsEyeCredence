@@ -49,6 +49,8 @@ function AnswerTicket() {
   const token = Cookies.get('authToken')
 
   // State
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
   const [ticketData, setTicketData] = useState([])
   const [activeButton, setActiveButton] = useState(null)
   const [vehicleData, setVehicleData] = useState([])
@@ -180,6 +182,8 @@ function AnswerTicket() {
 
   const handleDateRangeChange = (startDate, endDate) => {
     console.log('Date range changed:', { startDate, endDate })
+    setStartDate(startDate)
+    setEndDate(endDate)
   }
 
   useEffect(() => {
@@ -190,21 +194,33 @@ function AnswerTicket() {
   const filteredTickets = ticketData.filter((ticket) => {
     if (!ticket) return false
 
-    const searchLower = (searchTerm || '').toLowerCase()
-    const ticketIdLower = (ticket.ticketId || '').toLowerCase()
-    const ticketTypeLower = (ticket.ticketType || '').toLowerCase()
-    const descriptionLower = (ticket.description || '').toLowerCase()
+    // Ticket type filter
+    const matchesTicketType = formData.ticketType ? ticket.ticketType === formData.ticketType : true
 
-    // Filter by ticketType if selected
-    const isTicketTypeMatch = formData.ticketType
-      ? ticketTypeLower.includes(formData.ticketType.toLowerCase())
+    // Status filter
+    const matchesStatus = filterStatus === 'all' ? true : ticket.status === filterStatus
+
+    // Search term filter
+    const matchesSearchTerm = searchTerm
+      ? ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
       : true
 
-    return (
-      ticketIdLower.includes(searchLower) ||
-      ticketTypeLower.includes(searchLower) ||
-      descriptionLower.includes(searchLower)
-    )
+    // Date range filter
+    const processedStartDate = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : null
+    const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : null
+    const ticketDateAdded = new Date(ticket.createdAt)
+    const ticketDateUpdated = new Date(ticket.updatedAt)
+
+    const matchesDateRange =
+      (processedStartDate ? ticketDateAdded >= processedStartDate : true) &&
+      (processedEndDate ? ticketDateAdded <= processedEndDate : true) &&
+      (processedStartDate ? ticketDateUpdated >= processedStartDate : true) &&
+      (processedEndDate ? ticketDateUpdated <= processedEndDate : true)
+
+    // Combine all filters
+    return matchesTicketType && matchesStatus && matchesSearchTerm && matchesDateRange
   })
 
   // Helper function to format the date
@@ -219,11 +235,11 @@ function AnswerTicket() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8 // Change as needed
-  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(filterTicketStatus.length / rowsPerPage)
+  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(filteredTickets.length / rowsPerPage)
   const paginatedTickets =
     rowsPerPage === 'All'
-      ? filterTicketStatus
-      : filterTicketStatus.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+      ? filteredTickets
+      : filteredTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="px-3 mt-2">
@@ -251,7 +267,7 @@ function AnswerTicket() {
             value={formData.ticketType}
             onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
           >
-            <option value="">Ticket Type</option>
+            <option value="">All</option>
             {TICKET_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}

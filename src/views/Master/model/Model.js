@@ -1,33 +1,10 @@
 import React, { useState, useEffect } from 'react'
-// import {
-//   TableContainer, Paper, IconButton, Typography, TextField, Button, Modal, Box, FormControl
-// } from '@mui/material';
 import { RiEdit2Fill } from 'react-icons/ri'
 import { AiFillDelete } from 'react-icons/ai'
 import AddIcon from '@mui/icons-material/Add'
 import CloseIcon from '@mui/icons-material/Close'
 import axios from 'axios'
 import Cookies from 'js-cookie' // Importing js-cookie for managing cookies
-// import {
-//   CTable,
-//   CTableBody,
-//   CTableRow,
-//   CTableHead,
-//   CTableHeaderCell,
-//   CTableDataCell,
-//   CTableContainer
-// } from '@coreui/react';
-// import {
-//   TableContainer as MuiTableContainer, // Renaming to avoid confusion
-//   Paper,
-//   IconButton,
-//   Typography,
-//   TextField,
-//   Button,
-//   Modal,
-//   Box,
-//   FormControl,
-// } from '@mui/material';
 import {
   TableContainer,
   Paper,
