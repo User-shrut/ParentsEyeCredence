@@ -13,6 +13,41 @@
   /* scrollbar-color: transparent transparent !important; */
 }
 
+
+/* ###################################### */
+/* Scroll bar size inside dashboard table */
+
+.table-responsive {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+/* Customize scrollbar for Webkit-based browsers (Chrome, Safari, Edge) */
+.table-responsive::-webkit-scrollbar {
+  height: 5px;
+  /* Make the scrollbar height thin */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background-color: #0a2d63;
+  /* Scrollbar color */
+  border-radius: 2px;
+  /* Rounded edges */
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+  /* Darker color on hover */
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  /* Background of the scrollbar track */
+}
+
+/* ############################# */
+
+
 .content {
   padding-top: 0 !important;
 }
