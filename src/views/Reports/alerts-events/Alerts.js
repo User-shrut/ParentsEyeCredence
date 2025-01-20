@@ -17,7 +17,7 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { Paper, TableContainer, IconButton, InputBase } from '@mui/material'
+import { Paper, TableContainer, IconButton, InputBase, Autocomplete, TextField, CircularProgress } from '@mui/material'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -63,30 +63,24 @@ const Alerts = () => {
   ]
 
   const getDevices = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const [newApiResponse] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL}/device`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }),
-      ])
-      // Process responses if needed
-      const newApiData = newApiResponse.data.devices //.slice(2857,2858)
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      console.log('areeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
-      const deviceNames = newApiData.map((device) => device.name) // Extract names
-      setDevices(deviceNames)
-      console.log(newApiData)
-      console.log('Device Name: ', deviceNames)
+      const newApiData = response.data.devices;
+      const deviceNames = newApiData.map((device) => device.name);
+      setDevices(deviceNames);
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching data:', error)
-      setDevices([])
-      setLoading(false)
-      throw error // Re-throw the error for further handling if needed
+      console.error('Error fetching data:', error);
+      setLoading(false);
     }
-  }
+  };
+
 
   const fetchNotificationData = async (page = 1) => {
     setLoading(true)
@@ -266,25 +260,46 @@ const Alerts = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Alerts and Events</strong>
-              <div className="d-flex gap-3" style={{ width: '600px' }}>
-                {/**Devices */}
-                <select
-                  className="form-select me-3"
-                  style={{ width: '150px' }}
+              <div className="d-flex gap-3" style={{ width: '100%', maxWidth: '800px', height:'55px',}}>
+
+                {/** Devices Dropdown */}
+                <Autocomplete
                   value={filterDevice}
-                  onChange={(e) => setFilterDevice(e.target.value)}
-                >
-                  <option value="">Devices</option>
-                  {devices.map((device) => (
-                    <option key={device} value={device}>
-                      {device}
-                    </option>
-                  ))}
-                </select>
-                {/* Filteration */}
+                  onChange={(e, newValue) => setFilterDevice(newValue)}
+                  options={devices}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Device"
+                      variant="outlined"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loading ? <CircularProgress color="inherit" size={15} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                      style={{
+                        width: '250px',
+                        borderRadius: '4px',
+                        height: '65px',
+                      }}
+                    />
+                  )}
+                  isOptionEqualToValue={(option, value) => option === value}
+                  disableClearable
+                />
+
+                {/** Notification Types Dropdown */}
                 <select
-                  className="form-select me-3"
-                  style={{ width: '150px' }}
+                  className="form-select"
+                  style={{
+                    width: '150px',
+                    borderRadius: '4px',
+                    height: '55px',
+                  }}
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                 >
@@ -295,10 +310,15 @@ const Alerts = () => {
                     </option>
                   ))}
                 </select>
-                {/* Pagination */}
+
+                {/** Rows Per Page Dropdown */}
                 <select
-                  className="form-select me-3"
-                  style={{ width: '150px' }}
+                  className="form-select"
+                  style={{
+                    width: '150px',
+                    borderRadius: '4px',
+                    height: '55px',
+                  }}
                   value={rowsPerPage}
                   onChange={handleRowsPerPageChange}
                 >
@@ -307,32 +327,36 @@ const Alerts = () => {
                   <option value={200}>200 rows</option>
                   <option value={500}>500 rows</option>
                 </select>
-                {/* Search */}
-                {/* <input
-                  type="search"
-                  className="form-control me-3"
-                  placeholder="Search for Alerts & Events"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                /> */}
-                <div className="input-group">
+
+                {/** Search Bar */}
+                <div className="input-group" style={{ flex: 1, minWidth: '200px', maxWidth: '250px' }}>
                   <InputBase
                     type="search"
                     className="form-control border"
-                    style={{ height: '40px' }}
+                    style={{
+                      height: '55px',
+                      borderRadius: '4px 0 0 4px',
+                      padding: '0 10px',
+                    }}
                     placeholder="Search for Device"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <IconButton
-                    className="bg-white rounded-end border disable"
-                    style={{ height: '40px' }}
+                    className="bg-white border"
+                    style={{
+                      height: '55px',
+                      borderRadius: '0 4px 4px 0',
+                      borderLeft: 'none',
+                    }}
                   >
                     <SearchIcon />
                   </IconButton>
                 </div>
               </div>
             </CCardHeader>
+
+
             <TableContainer
               component={Paper}
               sx={{
