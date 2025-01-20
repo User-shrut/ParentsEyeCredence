@@ -1008,9 +1008,9 @@ const Devices = () => {
             value={
               selectedUser
                 ? {
-                    value: selectedUser,
-                    label: users?.find((user) => user._id === selectedUser)?.username || '',
-                  }
+                  value: selectedUser,
+                  label: users?.find((user) => user._id === selectedUser)?.username || '',
+                }
                 : null
             }
             onChange={(selectedOption) => setSelectedUser(selectedOption?.value || null)}
@@ -1030,9 +1030,9 @@ const Devices = () => {
             value={
               selectedGroup
                 ? {
-                    value: selectedGroup,
-                    label: groups.find((group) => group._id === selectedGroup)?.name,
-                  }
+                  value: selectedGroup,
+                  label: groups.find((group) => group._id === selectedGroup)?.name,
+                }
                 : null
             }
             onChange={(selectedOption) => setSelectedGroup(selectedOption?.value || null)}
@@ -1319,49 +1319,49 @@ const Devices = () => {
       <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            {/* Pagination */}
-            <div className="me-3">
-              <ReactPaginate
-                breakLabel="..."
-                nextLabel="next >"
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={5}
-                pageCount={
-                  searchQuery ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)
-                }
-                previousLabel="< previous"
-                renderOnZeroPageCount={null}
-                marginPagesDisplayed={2}
-                containerClassName="pagination justify-content-center"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-                activeClassName="active"
-              />
-            </div>
+          {/* <div className="d-flex justify-content-between align-items-center mb-3"> */}
+          {/* Pagination */}
+          <div className="me-3">
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={5}
+              pageCount={
+                searchQuery ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)
+              }
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              marginPagesDisplayed={2}
+              containerClassName="pagination justify-content-center"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              activeClassName="active"
+            />
+          </div>
 
-            {/* Items Per Page Selector */}
-            <div style={{ width: '100px' }}>
-              <CFormSelect
-                aria-label="Select items per page"
-                value={limit}
-                onChange={(e) => setLimit(e.target.value)}
-                options={[
-                  { label: '20', value: '20' },
-                  { label: '50', value: '50' },
-                  { label: '100', value: '100' },
-                  { label: '500', value: '500' },
-                  { label: 'All', value: data.length }, // Dynamically set "All" to total data length
-                ]}
-              />
-            </div>
+          {/* Items Per Page Selector */}
+          <div style={{ width: '90px' }}>
+            <CFormSelect
+              aria-label="Select items per page"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              options={[
+                { label: '20', value: '20' },
+                { label: '50', value: '50' },
+                { label: '100', value: '100' },
+                { label: '500', value: '500' },
+                { label: 'All', value: data.length }, // Dynamically set "All" to total data length
+              ]}
+            />
           </div>
         </div>
       </div>
+      {/* </div> */}
       {addModalOpen && (
         <AddDeviceModal
           open={addModalOpen}
