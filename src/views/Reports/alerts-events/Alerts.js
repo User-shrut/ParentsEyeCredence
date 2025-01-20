@@ -15,9 +15,19 @@ import {
   CTableDataCell,
   CTableHead,
   CTableHeaderCell,
+  CFormLabel,
   CTableRow,
 } from '@coreui/react'
-import { Paper, TableContainer, IconButton, InputBase, Autocomplete, TextField, CircularProgress } from '@mui/material'
+import Select from 'react-select'
+import {
+  Paper,
+  TableContainer,
+  IconButton,
+  InputBase,
+  Autocomplete,
+  TextField,
+  CircularProgress,
+} from '@mui/material'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -28,8 +38,11 @@ import 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 // import '../../../utils.css'
 import SearchIcon from '@mui/icons-material/Search'
+import { useParams } from 'react-router-dom'
 
 const Alerts = () => {
+  const { deviceId: urlDeviceId, category, name } = useParams() // Retrieve params from URL
+  const [deviceId, setDeviceId] = useState(urlDeviceId || '')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
@@ -42,6 +55,7 @@ const Alerts = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20) // Rows per page
   const totalPages = Math.ceil(filteredData.length / rowsPerPage)
   const accessToken = Cookies.get('authToken')
+  const [selectedD, setSelectedD] = useState()
 
   const notificationTypes = [
     'deviceMoving',
@@ -63,24 +77,29 @@ const Alerts = () => {
   ]
 
   const getDevices = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      });
+      })
 
-      const newApiData = response.data.devices;
-      const deviceNames = newApiData.map((device) => device.name);
-      setDevices(deviceNames);
-      setLoading(false);
+      const newApiData = response.data.devices
+      const deviceNames = newApiData.map((device) => device.name)
+      setDevices(deviceNames)
+      setLoading(false)
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
+      console.error('Error fetching data:', error)
+      setLoading(false)
     }
-  };
+  }
 
+  // Transform devices to the format react-select expects
+  const deviceOptions = devices.map((device) => ({
+    value: device,
+    label: device,
+  }))
 
   const fetchNotificationData = async (page = 1) => {
     setLoading(true)
@@ -243,11 +262,19 @@ const Alerts = () => {
     setRowsPerPage(Number(event.target.value))
     setCurrentPage(1) // Reset to first page when changing rows per page
   }
+
+  const handleDeviceChange = (selectedOption) => {
+    setDeviceId(selectedOption ? selectedOption.value : '')
+    setFilterDevice(selectedOption)
+  }
+
   // Calculate paginated data
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage,
   )
+
+  console.log(devices)
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -260,10 +287,9 @@ const Alerts = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Alerts and Events</strong>
-              <div className="d-flex gap-3" style={{ width: '100%', maxWidth: '800px', height:'55px',}}>
-
+              <div className="d-flex gap-3" style={{ width: '100%', maxWidth: '800px' }}>
                 {/** Devices Dropdown */}
-                <Autocomplete
+                {/* <Autocomplete
                   value={filterDevice}
                   onChange={(e, newValue) => setFilterDevice(newValue)}
                   options={devices}
@@ -284,13 +310,25 @@ const Alerts = () => {
                       style={{
                         width: '250px',
                         borderRadius: '4px',
-                        height: '65px',
+                        backgroundColor: 'white',
+                        color: 'black',
                       }}
                     />
                   )}
                   isOptionEqualToValue={(option, value) => option === value}
                   disableClearable
-                />
+                /> */}
+
+                <div style={{ width: '500px' }}>
+                  <Select
+                    id="device-select"
+                    value={deviceOptions.find((device) => device.value === deviceId)}
+                    onChange={handleDeviceChange}
+                    options={deviceOptions}
+                    placeholder="Select a Device"
+                    style={{ height: '40px' }}
+                  />
+                </div>
 
                 {/** Notification Types Dropdown */}
                 <select
@@ -298,7 +336,7 @@ const Alerts = () => {
                   style={{
                     width: '150px',
                     borderRadius: '4px',
-                    height: '55px',
+                    height: '40px',
                   }}
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
@@ -315,9 +353,9 @@ const Alerts = () => {
                 <select
                   className="form-select"
                   style={{
-                    width: '150px',
+                    width: '200px',
                     borderRadius: '4px',
-                    height: '55px',
+                    height: '40px',
                   }}
                   value={rowsPerPage}
                   onChange={handleRowsPerPageChange}
@@ -329,14 +367,13 @@ const Alerts = () => {
                 </select>
 
                 {/** Search Bar */}
-                <div className="input-group" style={{ flex: 1, minWidth: '200px', maxWidth: '250px' }}>
+                <div className="input-group">
                   <InputBase
                     type="search"
                     className="form-control border"
                     style={{
-                      height: '55px',
                       borderRadius: '4px 0 0 4px',
-                      padding: '0 10px',
+                      height: '40px',
                     }}
                     placeholder="Search for Device"
                     value={searchQuery}
@@ -345,9 +382,9 @@ const Alerts = () => {
                   <IconButton
                     className="bg-white border"
                     style={{
-                      height: '55px',
                       borderRadius: '0 4px 4px 0',
                       borderLeft: 'none',
+                      height: '40px',
                     }}
                   >
                     <SearchIcon />
@@ -355,7 +392,6 @@ const Alerts = () => {
                 </div>
               </div>
             </CCardHeader>
-
 
             <TableContainer
               component={Paper}

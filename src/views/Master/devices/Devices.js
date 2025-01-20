@@ -1319,43 +1319,46 @@ const Devices = () => {
       <div className="d-flex justify-content-center align-items-center">
         <div className="d-flex">
           {/* Pagination */}
-          <div className="me-3">
-            {' '}
-            {/* Adds margin to the right of pagination */}
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel="next >"
-              onPageChange={handlePageClick}
-              pageRangeDisplayed={5}
-              pageCount={
-                searchQuery ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)
-              } // Set based on the total pages from the API
-              previousLabel="< previous"
-              renderOnZeroPageCount={null}
-              marginPagesDisplayed={2}
-              containerClassName="pagination justify-content-center "
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-              activeClassName="active"
-            />
-          </div>
-          {/* Form Control */}
-          <div style={{ width: '90px' }}>
-            <CFormSelect
-              aria-label="Default select example"
-              value={limit}
-              onChange={(e) => setLimit(e.target.value)}
-              options={[
-                { label: '20', value: '20' },
-                { label: '50', value: '50' },
-                { label: '100', value: '100' },
-                { label: '500', value: '500' },
-              ]}
-            />
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            {/* Pagination */}
+            <div className="me-3">
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={5}
+                pageCount={
+                  searchQuery ? Math.ceil(pageCount / limit) : Math.ceil(data.length / limit)
+                }
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                marginPagesDisplayed={2}
+                containerClassName="pagination justify-content-center"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                activeClassName="active"
+              />
+            </div>
+
+            {/* Items Per Page Selector */}
+            <div style={{ width: '100px' }}>
+              <CFormSelect
+                aria-label="Select items per page"
+                value={limit}
+                onChange={(e) => setLimit(e.target.value)}
+                options={[
+                  { label: '20', value: '20' },
+                  { label: '50', value: '50' },
+                  { label: '100', value: '100' },
+                  { label: '500', value: '500' },
+                  { label: 'All', value: data.length }, // Dynamically set "All" to total data length
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>

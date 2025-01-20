@@ -57,9 +57,18 @@ import CIcon from '@coreui/icons-react'
 import { cilSettings } from '@coreui/icons'
 import { auto, right } from '@popperjs/core'
 import '../../../../src/app.css'
-import { FaExpand, FaCompress, FaStop, FaPen, FaLocationArrow, FaLayerGroup, FaMap, FaSatellite } from 'react-icons/fa';
-import { MdGpsFixed, MdPolyline } from "react-icons/md";
-import { IoAnalyticsOutline } from "react-icons/io5";
+import {
+  FaExpand,
+  FaCompress,
+  FaStop,
+  FaPen,
+  FaLocationArrow,
+  FaLayerGroup,
+  FaMap,
+  FaSatellite,
+} from 'react-icons/fa'
+import { MdGpsFixed, MdPolyline } from 'react-icons/md'
+import { IoAnalyticsOutline } from 'react-icons/io5'
 
 const Geofences = () => {
   const [deviceData, setDeviceData] = useState()
@@ -75,7 +84,6 @@ const Geofences = () => {
   const steps = ['Select Geofence', 'Geofence Info']
   const [filteredData, setFilteredData] = useState([])
   const [centerMap, setCenterMap] = useState({ latitude: 0, longitude: 0 })
-
 
   const [selectedLocation, setSelectedLocation] = useState({ lat: 21.1458, lng: 79.0882 })
 
@@ -202,36 +210,36 @@ const Geofences = () => {
   // ############ map code #################################
 
   const [polygonCoords, setPolygonCoords] = useState([])
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [mapType, setMapType] = useState('roadmap'); // Default map type
-  const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false); // Controls the layer menu visibility
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [mapType, setMapType] = useState('roadmap') // Default map type
+  const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false) // Controls the layer menu visibility
 
-  const toggleLayerMenu = () => setIsLayerMenuOpen(!isLayerMenuOpen);
+  const toggleLayerMenu = () => setIsLayerMenuOpen(!isLayerMenuOpen)
 
   const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+    setIsFullscreen(!isFullscreen)
     if (!isFullscreen) {
-      document.documentElement.requestFullscreen();
+      document.documentElement.requestFullscreen()
     } else {
-      document.exitFullscreen();
+      document.exitFullscreen()
     }
-  };
+  }
 
   // Load Google Maps API
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAvHHoPKPwRFui0undeEUrz00-8w6qFtik', // Replace with your API key
   })
 
-  const [isDrawing, setIsDrawing] = useState(false); // To track whether the user is drawing
-  const [radius, setRadius] = useState(null); // Initial radius in meters (500 meters)
+  const [isDrawing, setIsDrawing] = useState(false) // To track whether the user is drawing
+  const [radius, setRadius] = useState(null) // Initial radius in meters (500 meters)
 
   // Handler for clicks on the map
   const onMapClick = (event) => {
     if (isDrawing) {
       // Add new point to the polygon when clicked
-      setRadius(null);
-      const newCoords = [...polygonCoords, { lat: event.latLng.lat(), lng: event.latLng.lng() }];
-      setPolygonCoords(newCoords);
+      setRadius(null)
+      const newCoords = [...polygonCoords, { lat: event.latLng.lat(), lng: event.latLng.lng() }]
+      setPolygonCoords(newCoords)
     }
     if (!isDrawing) {
       // Add new point to the polygon when clicked
@@ -243,28 +251,27 @@ const Geofences = () => {
           ...item,
           lat: event.latLng.lat(),
           lng: event.latLng.lng(),
-        }))
-      );
+        })),
+      )
       // setPolygonCoords(newCoords);
     }
     // Update the selected location with the clicked position
-    setSelectedLocation({ lat: event.latLng.lat(), lng: event.latLng.lng() });
-  };
+    setSelectedLocation({ lat: event.latLng.lat(), lng: event.latLng.lng() })
+  }
 
   const toggleDrawing = () => {
-    setIsDrawing((prev) => !prev); // Toggle between drawing and stopping
-  };
+    setIsDrawing((prev) => !prev) // Toggle between drawing and stopping
+  }
 
   // Start drawing mode
   const startDrawing = () => {
-    setIsDrawing(true); // Enable drawing mode
-  };
+    setIsDrawing(true) // Enable drawing mode
+  }
 
   // Stop drawing mode
   const stopDrawing = () => {
-    setIsDrawing(false); // Disable drawing mode
-  };
-
+    setIsDrawing(false) // Disable drawing mode
+  }
 
   // const onMapClick = (event) => {
   //   const newCoords = {
@@ -277,7 +284,7 @@ const Geofences = () => {
 
   // Handle radius input change
   const handleRadiusChange = (e) => {
-    const newRadius = e.target.value === "" ? null : Number(e.target.value); // Handle empty input
+    const newRadius = e.target.value === '' ? null : Number(e.target.value) // Handle empty input
     if (newRadius === null || newRadius >= 0) {
       if (polygonCoords.length > 1) {
         const latlong = [polygonCoords[polygonCoords.length - 1]]
@@ -285,11 +292,11 @@ const Geofences = () => {
 
         setPolygonCoords(latlong)
       }
-      setRadius(newRadius);
-      console.log("Circle ka radiusssssssssssssssss", newRadius);
-      console.log("polygonCoordsssssssssssssssssssss", polygonCoords);
+      setRadius(newRadius)
+      console.log('Circle ka radiusssssssssssssssss', newRadius)
+      console.log('polygonCoordsssssssssssssssssssss', polygonCoords)
     }
-  };
+  }
 
   if (polygonCoords) {
     console.log('this is selected points', polygonCoords)
@@ -386,7 +393,7 @@ const Geofences = () => {
 
   const handleAddGeofence = async (e) => {
     e.preventDefault()
-    console.log("formData", formData)
+    console.log('formData', formData)
     let updatedFormData
     if (polygonCoords.length == 1) {
       updatedFormData = {
@@ -427,7 +434,6 @@ const Geofences = () => {
         setIsDrawing(false)
         setRadius(null)
         // setSelectedLocation({})
-
       }
     } catch (error) {
       toast.error(error.response.data.message)
@@ -439,20 +445,21 @@ const Geofences = () => {
   // ######################  Edit Geofence ###################################
 
   const EditGeofenceSubmit = async (e) => {
-    e.preventDefault();
-    console.log("FormData before submission:", formData);
+    e.preventDefault()
+    console.log('FormData before submission:', formData)
 
     // Construct the edited data
     const editedData = {
       ...formData,
-      area: polygonCoords.length === 1
-        ? [{ circle: `Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})` }]
-        : polygonCoords, // Handle single circle or polygon coordinates
+      area:
+        polygonCoords.length === 1
+          ? [{ circle: `Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})` }]
+          : polygonCoords, // Handle single circle or polygon coordinates
       deviceIds: selectedDevices.map((device) => device.value),
-    };
+    }
 
     try {
-      const accessToken = Cookies.get('authToken');
+      const accessToken = Cookies.get('authToken')
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/Geofence/${formData._id}`,
         editedData,
@@ -461,35 +468,34 @@ const Geofences = () => {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-        }
-      );
+        },
+      )
 
       if (response.status === 200) {
-        toast.success('Geofence has been updated successfully!');
-        fetchGeofenceData(); // Refresh the geofence data
-        setFormData({});
-        setPolygonCoords([]);
-        setSelectedDevices([]);
+        toast.success('Geofence has been updated successfully!')
+        fetchGeofenceData() // Refresh the geofence data
+        setFormData({})
+        setPolygonCoords([])
+        setSelectedDevices([])
         setCurrentStep(0)
         setIsDrawing(false)
         setRadius(false)
-        setEditModalOpen(false); // Close the edit modal
+        setEditModalOpen(false) // Close the edit modal
         // setSelectedLocation({})
       }
     } catch (error) {
-      console.error("Error occurred during geofence update:", error.response || error);
-      toast.error(error.response.data.message);
+      console.error('Error occurred during geofence update:', error.response || error)
+      toast.error(error.response.data.message)
     }
-  };
+  }
 
   const handleEditGeofence = async (item) => {
-    console.log("Geofence item to edit:", item);
-    setEditModalOpen(true); // Open the edit modal
-    setFormData({ ...item }); // Populate the form with the item's data
-    setPolygonCoords(item.area || []); // Populate polygon coordinates if present
-    setSelectedDevices(item.deviceIds || []); // Populate selected devices if present
-  };
-
+    console.log('Geofence item to edit:', item)
+    setEditModalOpen(true) // Open the edit modal
+    setFormData({ ...item }) // Populate the form with the item's data
+    setPolygonCoords(item.area || []) // Populate polygon coordinates if present
+    setSelectedDevices(item.deviceIds || []) // Populate selected devices if present
+  }
 
   // #########################################################################
 
@@ -561,7 +567,6 @@ const Geofences = () => {
     doc.save('geofence_data.pdf')
   }
 
-
   // Show Co-ordinates of Polyline and circle centroid of lat lng
 
   function calculateCentroid(polygon) {
@@ -570,23 +575,22 @@ const Geofences = () => {
     const numVertices = polygon.length
 
     if (polygon.length == 1) {
-      const match = polygon[0].circle.match(/Circle\(([\d.-]+) ([\d.-]+),/);
-      console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", match)
+      const match = polygon[0].circle.match(/Circle\(([\d.-]+) ([\d.-]+),/)
+      console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', match)
       if (match) {
-        totalLatitude = parseFloat(match[1]);
-        totalLongitude = parseFloat(match[2]);
+        totalLatitude = parseFloat(match[1])
+        totalLongitude = parseFloat(match[2])
       } else {
-        return null;
+        return null
       }
     } else {
       polygon.forEach((point) => {
         totalLatitude += point.lat
         totalLongitude += point.lng
       })
-
     }
 
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAA", totalLatitude, totalLongitude)
+    console.log('AAAAAAAAAAAAAAAAAAAAAAAAA', totalLatitude, totalLongitude)
 
     return {
       latitude: totalLatitude / numVertices,
@@ -603,7 +607,6 @@ const Geofences = () => {
 
     setCenterMap(centroid)
   }
-
 
   //  ###############################################################
 
@@ -626,7 +629,7 @@ const Geofences = () => {
               <CCard>
                 <CCardHeader className="grand d-flex justify-content-between align-items-center">
                   <strong>Geofences</strong>
-                  <div className='d-flex'>
+                  <div className="d-flex">
                     <div className="me-3 d-none d-md-block">
                       <input
                         type="search"
@@ -716,10 +719,7 @@ const Geofences = () => {
                           </CTableRow>
                         ) : filteredData.length > 0 ? (
                           filteredData.map((item, index) => (
-                            <CTableRow
-                              key={index}
-                              onClick={() => handleRowClick(item.area)}
-                            >
+                            <CTableRow key={index} onClick={() => handleRowClick(item.area)}>
                               <CTableDataCell
                                 className="text-center"
                                 style={{
@@ -767,7 +767,8 @@ const Geofences = () => {
                                     ))}
                                 </CFormSelect>
                               </CTableDataCell>
-                              <CTableDataCell className="text-center d-flex justify-content-center align-items-center"
+                              <CTableDataCell
+                                className="text-center d-flex justify-content-center align-items-center"
                                 style={{
                                   backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2',
                                 }}
@@ -881,7 +882,6 @@ const Geofences = () => {
               </CDropdownMenu>
             </CDropdown>
           </div>
-
         </div>
       </div>
 
@@ -905,9 +905,16 @@ const Geofences = () => {
           }}
         >
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <Typography variant="h5" sx={{
-              color: '#2c3e50', fontWeight: 'bold', fontSize: '26px', display: 'flex', alignItems: 'center',
-            }}>
+            <Typography
+              variant="h5"
+              sx={{
+                color: '#2c3e50',
+                fontWeight: 'bold',
+                fontSize: '26px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               <span role="img" aria-label="user">
                 <AiOutlineUserAdd className="fs-2" />
               </span>{' '}
@@ -922,53 +929,54 @@ const Geofences = () => {
           <div className="mt-3">
             {/* Google Map */}
             {isLoaded ? (
-
               <div>
-                {
-                  !isDrawing ? (
-                    <div className='d-flex'>
-                      <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                        <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
-                        <input
-                          type="number"
-                          value={radius}
-                          onChange={handleRadiusChange} // Handle radius input change
-                          min="1"
-                          style={{
-                            marginLeft: '10px',
-                            padding: '8px',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                          }}
-                        />
-                      </div>
+                {!isDrawing ? (
+                  <div className="d-flex">
+                    <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                      <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
+                      <input
+                        type="number"
+                        value={radius}
+                        onChange={handleRadiusChange} // Handle radius input change
+                        min="1"
+                        style={{
+                          marginLeft: '10px',
+                          padding: '8px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                        }}
+                      />
                     </div>
-                  ) : (
-                    <div className='d-flex'>
-                      <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                        <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
-                        <input
-                          type="number"
-                          value={radius}
-                          disabled
-                          onChange={handleRadiusChange} // Handle radius input change
-                          min="1"
-                          style={{
-                            marginLeft: '10px',
-                            padding: '8px',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                          }}
-                        />
-                      </div>
+                  </div>
+                ) : (
+                  <div className="d-flex">
+                    <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                      <label style={{ fontWeight: '500', color: '#2c3e50' }}>
+                        Set Circle Radius (in meters):{' '}
+                      </label>
+                      <input
+                        type="number"
+                        value={radius}
+                        disabled
+                        onChange={handleRadiusChange} // Handle radius input change
+                        min="1"
+                        style={{
+                          marginLeft: '10px',
+                          padding: '8px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                        }}
+                      />
                     </div>
-                  )
-                }
-
+                  </div>
+                )}
 
                 <GoogleMap
                   mapContainerStyle={{
-                    width: '100%', height: isFullscreen ? '100vh' : '500px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                    width: '100%',
+                    height: isFullscreen ? '100vh' : '500px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
                   }}
                   center={selectedLocation} // Map centers on the selected location
                   zoom={13}
@@ -978,7 +986,6 @@ const Geofences = () => {
                     mapTypeId: mapType, // Dynamic map type
                   }}
                 >
-
                   {/* Fullscreen Toggle Button */}
                   <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}>
                     <div
@@ -989,10 +996,14 @@ const Geofences = () => {
                         zIndex: 1,
                         backgroundColor: 'white',
                         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                        borderRadius: '10px'
+                        borderRadius: '10px',
                       }}
                     >
-                      <IconButton onClick={toggleFullscreen} color="primary" style={{ padding: '10px' }}>
+                      <IconButton
+                        onClick={toggleFullscreen}
+                        color="primary"
+                        style={{ padding: '10px' }}
+                      >
                         {isFullscreen ? <FaCompress size={24} /> : <FaExpand size={24} />}
                       </IconButton>
                     </div>
@@ -1020,7 +1031,8 @@ const Geofences = () => {
                           padding: '10px',
                         }}
                       >
-                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />} {/* Ternary operator */}
+                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />}{' '}
+                        {/* Ternary operator */}
                       </IconButton>
                     </div>
                   </Tooltip>
@@ -1039,13 +1051,13 @@ const Geofences = () => {
                         onClick={() => {
                           navigator.geolocation.getCurrentPosition(
                             (position) => {
-                              const { latitude, longitude } = position.coords;
-                              setSelectedLocation({ lat: latitude, lng: longitude });
+                              const { latitude, longitude } = position.coords
+                              setSelectedLocation({ lat: latitude, lng: longitude })
                             },
                             (error) => {
-                              console.error('Error fetching location:', error);
-                            }
-                          );
+                              console.error('Error fetching location:', error)
+                            },
+                          )
                         }}
                         color="primary"
                         style={{
@@ -1070,7 +1082,15 @@ const Geofences = () => {
                         borderRadius: '8px',
                       }}
                     >
-                      <IconButton onClick={toggleLayerMenu} color="primary" style={{ backgroundColor: 'white', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', padding: '10px' }}>
+                      <IconButton
+                        onClick={toggleLayerMenu}
+                        color="primary"
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
                         <FaLayerGroup size={20} />
                       </IconButton>
                       {isLayerMenuOpen && (
@@ -1146,23 +1166,22 @@ const Geofences = () => {
                     }}
                   />
                 </GoogleMap>
-
               </div>
-
             ) : (
               <div>Loading Google Maps...</div>
             )}
 
             {/* Form Fields */}
-            <div className="mt-4"
+            <div
+              className="mt-4"
               style={{
                 backgroundColor: '#ffffff', // Light background
                 padding: '20px',
                 borderRadius: '10px', // Rounded corners
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow
                 border: '1px solid #e0e0e0', // Optional border
-              }}>
-
+              }}
+            >
               {/* Geofence Name Input */}
               <TextField
                 fullWidth
@@ -1297,7 +1316,9 @@ const Geofences = () => {
             {isLoaded ? (
               <div>
                 <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                  <label style={{ fontWeight: '500', color: '#2c3e50' }}>Set Circle Radius (in meters): </label>
+                  <label style={{ fontWeight: '500', color: '#2c3e50' }}>
+                    Set Circle Radius (in meters):{' '}
+                  </label>
                   <input
                     type="number"
                     value={radius}
@@ -1313,7 +1334,12 @@ const Geofences = () => {
                 </div>
 
                 <GoogleMap
-                  mapContainerStyle={{ width: '100%', height: isFullscreen ? '100vh' : '500px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', }}
+                  mapContainerStyle={{
+                    width: '100%',
+                    height: isFullscreen ? '100vh' : '500px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                  }}
                   center={selectedLocation}
                   zoom={13}
                   onClick={onMapClick}
@@ -1322,7 +1348,6 @@ const Geofences = () => {
                     mapTypeId: mapType, // Dynamic map type
                   }}
                 >
-
                   {/* Fullscreen Toggle Button */}
                   <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}>
                     <div
@@ -1335,7 +1360,11 @@ const Geofences = () => {
                         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
                       }}
                     >
-                      <IconButton onClick={toggleFullscreen} color="primary" style={{ padding: '10px' }}>
+                      <IconButton
+                        onClick={toggleFullscreen}
+                        color="primary"
+                        style={{ padding: '10px' }}
+                      >
                         {isFullscreen ? <FaCompress size={24} /> : <FaExpand size={24} />}
                       </IconButton>
                     </div>
@@ -1363,7 +1392,8 @@ const Geofences = () => {
                           padding: '10px',
                         }}
                       >
-                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />} {/* Ternary operator */}
+                        {isDrawing ? <FaStop size={20} /> : <IoAnalyticsOutline size={20} />}{' '}
+                        {/* Ternary operator */}
                       </IconButton>
                     </div>
                   </Tooltip>
@@ -1382,13 +1412,13 @@ const Geofences = () => {
                         onClick={() => {
                           navigator.geolocation.getCurrentPosition(
                             (position) => {
-                              const { latitude, longitude } = position.coords;
-                              setSelectedLocation({ lat: latitude, lng: longitude });
+                              const { latitude, longitude } = position.coords
+                              setSelectedLocation({ lat: latitude, lng: longitude })
                             },
                             (error) => {
-                              console.error('Error fetching location:', error);
-                            }
-                          );
+                              console.error('Error fetching location:', error)
+                            },
+                          )
                         }}
                         color="primary"
                         style={{
@@ -1413,7 +1443,15 @@ const Geofences = () => {
                         borderRadius: '8px',
                       }}
                     >
-                      <IconButton onClick={toggleLayerMenu} color="primary" style={{ backgroundColor: 'white', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', padding: '10px' }}>
+                      <IconButton
+                        onClick={toggleLayerMenu}
+                        color="primary"
+                        style={{
+                          backgroundColor: 'white',
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                          padding: '10px',
+                        }}
+                      >
                         <FaLayerGroup size={20} />
                       </IconButton>
                       {isLayerMenuOpen && (
@@ -1488,7 +1526,6 @@ const Geofences = () => {
                       strokeWeight: 2,
                     }}
                   />
-
                 </GoogleMap>
               </div>
             ) : (
@@ -1593,7 +1630,6 @@ const Geofences = () => {
             />
           </div>
 
-
           {/* Submit Button */}
           <div className="d-flex justify-content-end" style={{ marginTop: '20px' }}>
             <Button variant="contained" color="primary" onClick={EditGeofenceSubmit}>
@@ -1602,8 +1638,6 @@ const Geofences = () => {
           </div>
         </Box>
       </Modal>
-
-
     </div>
   )
 }

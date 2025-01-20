@@ -321,7 +321,11 @@ function Contact() {
             value={formData.ticketType}
             onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
           >
+            <option value="" disabled>
+              Ticket Types
+            </option>
             <option value="">All</option>
+
             {TICKET_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
