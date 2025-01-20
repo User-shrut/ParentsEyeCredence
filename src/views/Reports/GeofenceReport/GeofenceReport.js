@@ -667,7 +667,7 @@ const SearchGeofence = ({
   const [selectedG, setSelectedG] = useState()
 
   // For username show in pdf
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
     handlePutName(putName)
@@ -865,10 +865,22 @@ const SearchGeofence = ({
   )
 }
 
-const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, devices, searchQuery, selectedDeviceName, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, }) => {
+const ShowGeofence = ({
+  statusLoading,
+  apiData,
+  selectedColumns,
+  columns,
+  devices,
+  searchQuery,
+  selectedDeviceName,
+  selectedGroupName,
+  selectedUserName,
+  selectedFromDate,
+  selectedToDate,
+}) => {
   const [addressCache, setAddressCache] = useState({}) // Cache addresses to avoid multiple API calls
 
-  console.log("devicessssssssssasdadwssss", devices) // Devices list 
+  console.log('devicessssssssssasdadwssss', devices) // Devices list
 
   // if (!apiData) return <><Loader></>; // Show loading state
   // if (!Array.isArray(apiData) || apiData.length === 0) return <div>No Data Available</div>;
@@ -931,58 +943,60 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    const title = 'Credence Tracker';
-    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    const title = 'Credence Tracker'
+    const titleWidth =
+      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Status Reports" subtitle
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    const subtitle = 'Geofences Reports';
-    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    const subtitle = 'Geofences Reports'
+    const subtitleWidth =
+      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
 
     // Add user and device details
     const details = [
       `User Name: ${selectedUserName || '--'}`,
       `Group Name: ${selectedGroupName || '--'}`,
-      `Vehicle Name: ${devices.map(device => device.name) || '--'}`,
+      `Vehicle Name: ${devices.map((device) => device.name) || '--'}`,
       `From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ];
+    ]
 
-    let yPosition = 35;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    let yPosition = 35
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((detail) => {
-      doc.text(detail, 14, yPosition);
-      yPosition += 8; // Spacing between lines
-    });
+      doc.text(detail, 14, yPosition)
+      yPosition += 8 // Spacing between lines
+    })
 
     // Define table columns and rows
-    const tableColumns = ['SN', ...(selectedColumns.length > 0 ? selectedColumns : columns)]; // Include 'SN' column
+    const tableColumns = ['SN', ...(selectedColumns.length > 0 ? selectedColumns : columns)] // Include 'SN' column
     const tableRows = apiData.map((data, index) => {
-      const serialNumber = index + 1; // Serial number starting from 1
-      const rowData = tableColumns.slice(1).map((col) => renderColumnData(data, col)); // Map data for other columns
-      return [serialNumber, ...rowData]; // Add SN as the first column in each row
-    });
+      const serialNumber = index + 1 // Serial number starting from 1
+      const rowData = tableColumns.slice(1).map((col) => renderColumnData(data, col)) // Map data for other columns
+      return [serialNumber, ...rowData] // Add SN as the first column in each row
+    })
 
     // Generate the table with enhanced styling
     doc.autoTable({
@@ -1008,12 +1022,11 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
       tableLineWidth: 0.5, // Table border thickness
       tableLineColor: [0, 0, 0], // Table border color
       margin: { top: 10 }, // Adjust table margin
-    });
+    })
 
     // Save the PDF with a descriptive name
-    doc.save(`Geofences_Reports_${date}.pdf`);
-  };
-
+    doc.save(`Geofences_Reports_${date}.pdf`)
+  }
 
   // Export table data to Excel
   const exportToExcel = () => {
@@ -1063,21 +1076,21 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
             </CTableHeaderCell>
             {selectedColumns.length > 0
               ? selectedColumns.map((col, index) => (
-                <CTableHeaderCell
-                  key={index}
-                  style={{ backgroundColor: '#0a2d63', color: 'white' }}
-                >
-                  {col}
-                </CTableHeaderCell>
-              ))
+                  <CTableHeaderCell
+                    key={index}
+                    style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                  >
+                    {col}
+                  </CTableHeaderCell>
+                ))
               : columns.map((col, index) => (
-                <CTableHeaderCell
-                  key={index}
-                  style={{ backgroundColor: '#0a2d63', color: 'white' }}
-                >
-                  {col}
-                </CTableHeaderCell>
-              ))}
+                  <CTableHeaderCell
+                    key={index}
+                    style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                  >
+                    {col}
+                  </CTableHeaderCell>
+                ))}
           </CTableRow>
         </CTableHead>
         <CTableBody>
@@ -1117,21 +1130,21 @@ const ShowGeofence = ({ statusLoading, apiData, selectedColumns, columns, device
                 </CTableDataCell>
                 {selectedColumns.length > 0
                   ? selectedColumns.map((col, colIndex) => (
-                    <CTableDataCell
-                      key={colIndex}
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                    >
-                      {renderColumnData(data, col)}
-                    </CTableDataCell>
-                  ))
+                      <CTableDataCell
+                        key={colIndex}
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
+                        {renderColumnData(data, col)}
+                      </CTableDataCell>
+                    ))
                   : columns.map((col, colIndex) => (
-                    <CTableDataCell
-                      key={colIndex}
-                      style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
-                    >
-                      {renderColumnData(data, col)}
-                    </CTableDataCell>
-                  ))}
+                      <CTableDataCell
+                        key={colIndex}
+                        style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      >
+                        {renderColumnData(data, col)}
+                      </CTableDataCell>
+                    ))}
               </CTableRow>
             ))
           ) : (
@@ -1195,12 +1208,11 @@ const GeofenceReports = () => {
   const token = Cookies.get('authToken')
 
   const [selectedUserName, setSelectedUserName] = useState('')
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+    console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', putName)
   }, [putName])
-
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
@@ -1208,7 +1220,7 @@ const GeofenceReports = () => {
 
   const handlePutName = (name) => {
     setPutName(name)
-    console.log("putName", putName)
+    console.log('putName', putName)
   }
 
   const getDevices = async (selectedGroup) => {
@@ -1256,7 +1268,6 @@ const GeofenceReports = () => {
       const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
       const selectedGroupName = selectedGroup ? selectedGroup.name : ''
       console.log('Selected Group:', selectedGroupName)
-
     } catch (error) {
       setLoading(false)
       console.error('Error fetching data:', error)
@@ -1276,11 +1287,10 @@ const GeofenceReports = () => {
         console.log('yaha tak thik hai')
 
         // After users are set, update selectedUserName based on formData.User
-        const selectedUser = users.find((user) => user.userId === formData.User);
-        const selectedUserName = selectedUser ? selectedUser.username : '';
-        setSelectedUserName(selectedUserName);
-        console.log('Selected Userrerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr:', selectedUserName);
-
+        const selectedUser = users.find((user) => user.userId === formData.User)
+        const selectedUserName = selectedUser ? selectedUser.username : ''
+        setSelectedUserName(selectedUserName)
+        console.log('Selected Userrerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr:', selectedUserName)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -1293,7 +1303,6 @@ const GeofenceReports = () => {
     getUser()
     getGroups()
   }, [])
-
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -1329,13 +1338,13 @@ const GeofenceReports = () => {
   }
 
   // Example of extracting values similar to `selectedGroup`
-  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
-  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
-  const selectedPeriod = formData.Periods || '';
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : ''
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : ''
+  const selectedPeriod = formData.Periods || ''
 
-  console.log('Selected From Date:', selectedFromDate);
-  console.log('Selected To Date:', selectedToDate);
-  console.log('Selected Period:', selectedPeriod);
+  console.log('Selected From Date:', selectedFromDate)
+  console.log('Selected To Date:', selectedToDate)
+  console.log('Selected Period:', selectedPeriod)
 
   return (
     <div>

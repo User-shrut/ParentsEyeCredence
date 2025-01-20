@@ -267,6 +267,9 @@ function AnswerTicket() {
             value={formData.ticketType}
             onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
           >
+            <option disabled value="">
+              Ticket Types
+            </option>
             <option value="">All</option>
             {TICKET_TYPES.map((type) => (
               <option key={type} value={type}>
