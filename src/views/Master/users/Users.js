@@ -1086,7 +1086,7 @@ const Users = () => {
                               >
                                 <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                                   <RiEdit2Fill
-                                    style={{ fontSize: '20px', color: 'black', margin: '2px' }}
+                                    style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
                                   />
                                 </IconButton>
                                 <IconButton
@@ -1132,7 +1132,7 @@ const Users = () => {
                               >
                                 <IconButton aria-label="edit" onClick={() => handleEditUser(item)}>
                                   <RiEdit2Fill
-                                    style={{ fontSize: '20px', color: 'black', margin: '2px' }}
+                                    style={{ fontSize: '20px', color: 'lightBlue', margin: '2px' }}
                                   />
                                 </IconButton>
                                 <IconButton
