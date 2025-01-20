@@ -62,10 +62,17 @@ function Contact() {
     vehicle: '',
     ticketType: '',
     description: '',
-  }) 
+  })
+  const [statusCounts, setStatusCounts] = useState({
+    all: 0,
+    pending: 0,
+    answered: 0,
+    closed: 0,
+  })
   const [ticketData, setTicketData] = useState([])
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
+  const [filterStatus, setFilterStatus] = useState('all')
 
   // Fetch vehicles
   const fetchDevices = useCallback(async () => {
@@ -114,7 +121,10 @@ function Contact() {
         },
       })
       console.log('Ticket Data Response:', response.data.issues) // Check the structure
-      setTicketData(response.data.issues)
+      const filteredTicketsRaisedBy = response.data.issues.filter(
+        (ticket) => ticket.raisedBy === 'SuperAdmin',
+      )
+      setTicketData(filteredTicketsRaisedBy)
     } catch (error) {
       console.log(error.message)
     } finally {
@@ -167,12 +177,13 @@ function Contact() {
 
   const handleButtonClick = (buttonType) => {
     setActiveButton(activeButton === buttonType ? null : buttonType)
+    setFilterStatus(buttonType)
   }
 
   const handleDateRangeChange = (startDate, endDate) => {
     console.log('Date range changed:', { startDate, endDate })
-    setStartDate(startDate);
-    setEndDate(endDate);
+    setStartDate(startDate)
+    setEndDate(endDate)
   }
 
   useEffect(() => {
@@ -180,63 +191,79 @@ function Contact() {
     fetchRaiseTicketGet()
   }, [])
 
-//   const filteredTickets = ticketData.filter((ticket) => {
-//     if (!ticket) return false
+  useEffect(() => {
+    // Calculate counts for each status
+    const counts = {
+      all: ticketData.length,
+      pending: ticketData.filter((ticket) => ticket.status === 'pending').length,
+      answered: ticketData.filter((ticket) => ticket.status === 'answered').length,
+      closed: ticketData.filter((ticket) => ticket.status === 'closed').length,
+    }
+    setStatusCounts(counts)
+    console.log('counts', counts)
+    console.log('assssssssssssssssssssssss', vehicleData)
+  }, [ticketData])
 
-//     const ticketDateAdded = new Date(ticket.createdAt);
-//     const ticketDateUpdated = new Date(ticket.updatedAt);
-//     console.log("ticketDateAdded", ticketDateAdded);
-//     // console.log("ticketDateUpdated", ticketDateUpdated);
+  //   const filteredTickets = ticketData.filter((ticket) => {
+  //     if (!ticket) return false
 
-//     const matchesSearchTerm = (
-//       ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
-//     );
+  //     const ticketDateAdded = new Date(ticket.createdAt);
+  //     const ticketDateUpdated = new Date(ticket.updatedAt);
+  //     console.log("ticketDateAdded", ticketDateAdded);
+  //     // console.log("ticketDateUpdated", ticketDateUpdated);
 
-//     const matchesDateRange = (
-//       (startDate ? ticketDateAdded >= startDate : true) &&
-//       (endDate ? ticketDateAdded <= new Date(endDate.setHours(23, 59, 59, 999)) : true) &&
-//       (startDate ? ticketDateUpdated >= startDate : true) &&
-//       (endDate ? ticketDateUpdated <= new Date(endDate.setHours(23, 59, 59, 999)) : true)
-//     );
-    
-  
+  //     const matchesSearchTerm = (
+  //       ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
 
-//     return matchesSearchTerm && matchesDateRange;
-// });
+  //     const matchesDateRange = (
+  //       (startDate ? ticketDateAdded >= startDate : true) &&
+  //       (endDate ? ticketDateAdded <= new Date(endDate.setHours(23, 59, 59, 999)) : true) &&
+  //       (startDate ? ticketDateUpdated >= startDate : true) &&
+  //       (endDate ? ticketDateUpdated <= new Date(endDate.setHours(23, 59, 59, 999)) : true)
+  //     );
+
+  //     return matchesSearchTerm && matchesDateRange;
+  // });
 
   // Helper function to format the date
- 
- // Preprocess startDate and endDate
 
-const filteredTickets = ticketData.filter((ticket) => {
-  if (!ticket) return false;
+  // Preprocess startDate and endDate
 
-  const processedStartDate = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : null; // Start of the day
-const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : null; // End of the day
+  const filteredTickets = ticketData.filter((ticket) => {
+    if (!ticket) return false
 
+    // Ticket type filter
+    const matchesTicketType = formData.ticketType ? ticket.ticketType === formData.ticketType : true
 
-  const ticketDateAdded = new Date(ticket.createdAt);
-  const ticketDateUpdated = new Date(ticket.updatedAt);
+    // Status filter
+    const matchesStatus = filterStatus === 'all' ? true : ticket.status === filterStatus
 
-  const matchesSearchTerm = (
-    ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    // Search term filter
+    const matchesSearchTerm = searchTerm
+      ? ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+      : true
 
-  const matchesDateRange = (
-    (processedStartDate ? ticketDateAdded >= processedStartDate : true) &&
-    (processedEndDate ? ticketDateAdded <= processedEndDate : true) &&
-    (processedStartDate ? ticketDateUpdated >= processedStartDate : true) &&
-    (processedEndDate ? ticketDateUpdated <= processedEndDate : true)
-  );
+    // Date range filter
+    const processedStartDate = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : null
+    const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : null
+    const ticketDateAdded = new Date(ticket.createdAt)
+    const ticketDateUpdated = new Date(ticket.updatedAt)
 
-  return matchesSearchTerm && matchesDateRange;
-});
+    const matchesDateRange =
+      (processedStartDate ? ticketDateAdded >= processedStartDate : true) &&
+      (processedEndDate ? ticketDateAdded <= processedEndDate : true) &&
+      (processedStartDate ? ticketDateUpdated >= processedStartDate : true) &&
+      (processedEndDate ? ticketDateUpdated <= processedEndDate : true)
 
- 
+    // Combine all filters
+    return matchesTicketType && matchesStatus && matchesSearchTerm && matchesDateRange
+  })
+
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
@@ -275,7 +302,7 @@ const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) :
                 }`}
                 onClick={() => handleButtonClick(type)}
               >
-                {type.toUpperCase()} :
+                {type.toUpperCase()} : {statusCounts[type] || 0}
               </button>
             ))}
           </div>
@@ -294,7 +321,7 @@ const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) :
             value={formData.ticketType}
             onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
           >
-            <option value="">Ticket Type</option>
+            <option value="">All</option>
             {TICKET_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -386,11 +413,11 @@ const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) :
                             <span
                               className={`badge ${
                                 ticket.status === 'pending'
-                                  ? 'bg-warning'
+                                  ? 'bg-danger'
                                   : ticket.status === 'answered'
-                                    ? 'bg-success'
+                                    ? 'bg-warning'
                                     : ticket.status === 'closed'
-                                      ? 'bg-secondary'
+                                      ? 'bg-success'
                                       : 'bg-info'
                               }`}
                             >
@@ -484,9 +511,11 @@ const processedEndDate = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) :
             <CCol md={6}>
               <CFormLabel htmlFor="vehicle">Vehicle (optional)</CFormLabel>
               <Select
-                id="vehicle"
-                value={vehicleData.find((vehicle) => vehicle.value === vehicleId)}
-                onChange={handleDeviceChange}
+                id="vehicle-type"
+                value={vehicleData.find((option) => option.value === formData.vehicle)}
+                onChange={(selectedOption) =>
+                  setFormData((prev) => ({ ...prev, vehicle: selectedOption?.label || '' }))
+                }
                 options={vehicleData}
                 placeholder="Search for Vehicle"
               />

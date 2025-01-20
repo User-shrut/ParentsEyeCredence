@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import './login.css'
+import './login.css' // Optional: If you want to keep custom styles
 import Logo from '../../../assets/brand/logo.png'
 import toast, { Toaster } from 'react-hot-toast'
 import { FaUserAlt } from 'react-icons/fa'
 import { RiLockPasswordFill } from 'react-icons/ri'
+import { styled } from '@mui/material'
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -16,7 +17,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault()
 
-    // Ensure username and password are provided before sending the request
     if (!credentials.username || !credentials.password) {
       toast.error('Please enter both username and password')
       return
@@ -27,16 +27,12 @@ const Login = () => {
 
       const response = await axios.post(apiUrl, credentials)
 
-      // Assuming the token is returned in response.data.token
       const { token } = response.data
 
-      // Store the token and navigate on success
       if (token) {
-        // Store the JWT token in a cookie
         Cookies.set('crdntl', JSON.stringify(credentials))
         const cookieOptions = {
-          secure: false, // Only allow cookies over HTTPS , so turn true
-          // sameSite: 'Strict', // Strictly same-site cookie
+          secure: false, // Change to true if using HTTPS
         }
 
         if (rememberMe) {
@@ -53,128 +49,99 @@ const Login = () => {
       toast.error('Invalid credentials')
     }
   }
+
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="loginContainer bg-white">
-        <div className="row" style={{ height: '100vh', width: '100%', overflow: 'hidden' }}>
-          <div className="d-none d-lg-block col-md-6 p-0">
+      <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
+        <div className="row w-100">
+          <div className="col-12 col-lg-6 p-0 d-none d-lg-block">
             <div className="video-container">
-              <video autoPlay muted loop className="w-100 overflow-hidden">
+              <video autoPlay muted loop className="w-100 h-100">
                 <source src="login-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
           </div>
 
-          <div
-            className="col-12 col-md-6 d-flex justify-content-center position-relative"
-            style={{ paddingTop: '35px' }}
-          >
+          <div className="col-12 col-lg-6 d-flex justify-content-center align-items-center">
             <div
-              className="card border-2 shadow-lg"
-              style={{
-                maxWidth: '500px', // Reduced width for smaller card
-                borderRadius: '15px',
-                maxHeight: '600px', // Reduced height for smaller card
-                backgroundColor: '#f7f6e7',
-                width: '100%', // Ensures the card stays responsive
-                height: '100%',
-                padding: '1rem', // Added padding for better spacing inside the card
-              }}
+              className="card shadow-lg  rounded-4"
+              style={{ maxWidth: '500px', width: '100%', backgroundColor: '#f7f6e7' }}
             >
-              <div className="card-body d-flex flex-column h-100 p-3">
-                {' '}
-                {/* Reduced padding for smaller form */}
-                <div className="text-center mt-3 mb-4">
-                  <img
-                    src="CR-LOGO.png"
-                    alt="Logo"
-                    width="120px" // Smaller logo size
-                    className="loginLogo"
-                  />
-                  <h2 className="slogan mt-3 text-muted">
+              <div className="card-body">
+                <div className="text-center mb-4">
+                  <img src="CR-LOGO.png" alt="Logo" width="120" className="mb-3" />
+                  <h5 style={{ colog: '#575a59' }}>
                     <strong>Navigating Towards a Secured Future</strong>
-                  </h2>
+                  </h5>
                 </div>
                 <h2
                   className="card-title text-center mb-3"
                   style={{ fontWeight: 'bold', color: '#333' }}
                 >
-                  Welcome Back
+                  Welcome Back!
                 </h2>
                 <p className="text-center text-secondary">
                   <strong>Please enter your details</strong>
                 </p>
                 <form onSubmit={handleLogin}>
                   <div className="mb-3">
-                    {' '}
-                    {/* Reduced bottom margin for inputs */}
-                    <label htmlFor="username" className="form-label text-black username-label">
-                      <strong>
-                        <b>UserName</b>
-                      </strong>
+                    <label htmlFor="username" className="form-label text-black">
+                      <strong>UserName</strong>
                     </label>
-                    <div
-                      className="input-group"
-                      style={{ borderRadius: '10px', border: '1px solid orange' }}
-                    >
+                    <div className="input-group">
                       <span className="input-group-text" id="basic-addon1">
                         <FaUserAlt />
                       </span>
                       <input
                         type="text"
-                        className="form-control form-control-lg username-input"
+                        className="form-control"
                         id="username"
                         placeholder="Username"
                         value={credentials.username}
                         onChange={(e) =>
                           setCredentials({ ...credentials, username: e.target.value })
                         }
+                        style={{ border: '1px solid #ff7a00' }}
                         required
                       />
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    {' '}
-                    {/* Reduced bottom margin for inputs */}
-                    <label htmlFor="password" className="form-label text-black password-label">
-                      <strong>
-                        <b>Password</b>
-                      </strong>
+                    <label htmlFor="password" className="form-label text-black">
+                      <strong>Password</strong>
                     </label>
-                    <div
-                      className="input-group"
-                      style={{ borderRadius: '10px', border: '1px solid orange' }}
-                    >
+                    <div className="input-group">
                       <span className="input-group-text" id="basic-addon1">
                         <RiLockPasswordFill />
                       </span>
                       <input
                         type="password"
-                        className="form-control form-control-lg password-input"
+                        className="form-control"
                         id="password"
                         placeholder="Password"
                         value={credentials.password}
                         onChange={(e) =>
                           setCredentials({ ...credentials, password: e.target.value })
                         }
+                        style={{ border: '1px solid #ff7a00' }}
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="mb-3 form-check d-flex align-items-center">
+                  <div className="mb-3 form-check">
                     <input
                       type="checkbox"
-                      className="form-check-input remember-checkbox"
+                      className="form-check-input"
                       id="remember"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
                     <label
-                      className="form-check-label ms-2 remember-label"
+                      className="form-check-label ms-2"
                       htmlFor="remember"
                       style={{ fontSize: '0.8rem' }}
                     >
@@ -184,8 +151,8 @@ const Login = () => {
 
                   <button
                     type="submit"
-                    className="btn btn-lg w-100 fw-bold hover-button"
-                    style={{ padding: '0.5rem' }}
+                    className="btn w-100 fw-bold text-white"
+                    style={{ backgroundColor: '#ff7a00' }}
                   >
                     Log In
                   </button>
