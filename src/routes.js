@@ -40,6 +40,7 @@ const HelpSupport = React.lazy(() => import('./views/forms/help-support/HelpSupp
 const GettingStarted = React.lazy(
   () => import('./components/articles/gettingStarted/GettingStarted.js'),
 )
+const Faq = React.lazy(() => import('./components/articles/faq/Faq.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -83,5 +84,6 @@ const routes = [
   { path: '/h&s', name: 'Help & Support', element: HelpSupport },
   { path: '/HelpSupp/getting-started', name: 'Getting Started', element: GettingStarted },
   { path: '/answer-ticket', name: 'Answer Ticket', element: AnswerTicket },
+  { path: '/HelpSupp/faq', name: 'FAQ', element: Faq },
 ]
 export default routes

@@ -49,7 +49,7 @@ const AppHeaderDropdown = () => {
   }
 
   const handleHelpSupportClick = () => {
-    navigate('/HelpSupp') // Navigates to the HelpSupp page
+    navigate('/HelpSupp/Raise-Ticket') // Navigates to the HelpSupp page
     window.location.reload()
   }
 

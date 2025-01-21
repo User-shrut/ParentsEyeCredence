@@ -18,6 +18,7 @@ import {
   CFormLabel,
   CTableRow,
 } from '@coreui/react'
+import { Pagination } from 'react-bootstrap'
 import Select from 'react-select'
 import {
   Paper,
@@ -568,51 +569,62 @@ const Alerts = () => {
       </CRow>
 
       {/* Pagination */}
-      <div className="d-flex flex-column justify-content-between mt-1 mb-4">
+      <div className="mt-3 d-flex flex-column align-items-center justify-content-center">
         {/* Top: Page Navigation Buttons */}
-        <div className="d-flex justify-content-center align-items-center mb-3">
-          <div className="d-flex align-items-center">
-            {/* First Button */}
-            <button
-              onClick={() => handlePageChange(1)} // Go to the first page
-              disabled={currentPage === 1}
-              className="btn btn-sm btn-outline-secondary mx-1"
-            >
-              First
-            </button>
-            {/* Previous Button */}
-            <button
-              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn btn-sm btn-outline-secondary mx-1"
-            >
-              Prev
-            </button>
-            {/* Current Page */}
-            <p className="mb-0 mx-2">{currentPage}</p>
-            {/* Next Button */}
-            <button
-              onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn btn-sm btn-outline-secondary mx-1"
-            >
-              Next
-            </button>
-            {/* Last Button */}
-            <button
-              onClick={() => handlePageChange(totalPages)} // Go to the last page
-              disabled={currentPage === totalPages}
-              className="btn btn-sm btn-outline-secondary mx-1"
-            >
-              Last
-            </button>
-          </div>
-        </div>
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => handlePageChange((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            aria-label="Previous page"
+          />
+
+          {/* Add "First" and ellipsis if current page is far from the first page */}
+          {currentPage > 3 && (
+            <>
+              <Pagination.Item onClick={() => handlePageChange(1)}>1</Pagination.Item>
+              {currentPage > 4 && <Pagination.Ellipsis disabled />}
+            </>
+          )}
+
+          {/* Display pages around the current page */}
+          {Array.from({ length: 5 }, (_, i) => {
+            const page = currentPage - 2 + i
+            if (page > 0 && page <= totalPages) {
+              return (
+                <Pagination.Item
+                  key={page}
+                  active={page === currentPage}
+                  onClick={() => handlePageChange(page)}
+                  aria-current={page === currentPage ? 'page' : undefined}
+                >
+                  {page}
+                </Pagination.Item>
+              )
+            }
+            return null
+          })}
+
+          {/* Add ellipsis and "Last" if current page is far from the last page */}
+          {currentPage < totalPages - 2 && (
+            <>
+              {currentPage < totalPages - 3 && <Pagination.Ellipsis disabled />}
+              <Pagination.Item onClick={() => handlePageChange(totalPages)}>
+                {totalPages}
+              </Pagination.Item>
+            </>
+          )}
+
+          <Pagination.Next
+            onClick={() => handlePageChange((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            aria-label="Next page"
+          />
+        </Pagination>
 
         {/* Bottom: Showing Entries */}
         <div className="d-flex justify-content-center align-items-center ">
           <div>
-            <p className="mb-0">
+            <p className="mb-3">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{' '}
               {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length}{' '}
               entries

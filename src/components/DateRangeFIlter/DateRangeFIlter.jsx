@@ -169,7 +169,7 @@ const DateRangeFilter = ({ onDateRangeChange, title }) => {
   ]
 
   return (
-    <div className="position-relative bg-white">
+    <div className="position-relative">
       <button
         onClick={() => setIsCalendarOpen(!isCalendarOpen)}
         className="btn btn-outline-secondary"

@@ -31,27 +31,6 @@ function HelpSupp() {
               <h1 className="h3 fw-bold text-dark">
                 <strong> How can we help?</strong>
               </h1>
-              <div className="position-relative">
-                <i
-                  className="bi bi-search"
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#adb5bd',
-                    fontSize: '1.25rem',
-                  }}
-                >
-                  <Search />
-                </i>
-                <input
-                  type="text"
-                  placeholder="Search for help..."
-                  className="form-control ps-5 py-2 rounded"
-                  style={{ borderColor: '#ced4da' }}
-                />
-              </div>
             </div>
           </div>
         </div>

@@ -31,65 +31,11 @@ function GettingStarted() {
         <div className="ms-5 pt-2">
           <img src={logo} style={{ width: '180px' }} />
         </div>
-        <div className="container py-4">
-          <div className="d-flex flex-column gap-3 text-center">
-            <h1 className="h3 fw-bold text-dark">
-              <strong> How can we help?</strong>
-            </h1>
-            <div className="position-relative">
-              <i
-                className="bi bi-search"
-                style={{
-                  position: 'absolute',
-                  left: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#adb5bd',
-                  fontSize: '1.25rem',
-                }}
-              >
-                <Search />
-              </i>
-              <input
-                type="text"
-                placeholder="Search for help..."
-                className="form-control ps-5 py-2 rounded"
-                style={{ borderColor: '#ced4da' }}
-              />
-            </div>
-          </div>
-        </div>
       </div>
       <div className="text-center d-flex flex-column" style={{ fontWeight: '800' }}>
         <h4 style={{ fontWeight: '800' }}>Getting Started</h4>
-        <div className="d-flex justify-content-center mt-2 mb-5">
+        <div className="d-flex justify-content-center mt-2">
           <div className="bg-warning rounded-5" style={{ height: '4px', width: '80px' }}></div>
-        </div>
-        <div>
-          <span
-            className="btn"
-            style={{ color: '#126dfb', border: 'none' }}
-            onClick={handleGettingStartedForAcc}
-          >
-            Getting Started for Account Owners & Admins
-          </span>{' '}
-          <span style={{ color: '#6c757d', opacity: '0.5' }}>|</span>
-          <span
-            className="btn"
-            style={{ color: '#126dfb', border: 'none' }}
-            onClick={handleGettingStartedForUser}
-          >
-            {' '}
-            Getting Started for Users
-          </span>{' '}
-          <span style={{ color: '#6c757d', opacity: '0.5' }}>|</span>{' '}
-          <span
-            className="btn"
-            style={{ color: '#126dfb', border: 'none' }}
-            onClick={handleTheBasicsOfCredence}
-          >
-            The Basics of Credence Tracker
-          </span>
         </div>
       </div>
       {/**Articles Nav Bar */}

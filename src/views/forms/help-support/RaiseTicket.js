@@ -34,6 +34,7 @@ import {
 import './index.css'
 import DateRangeFilter from '../../../components/DateRangeFIlter/DateRangeFIlter'
 import { Pagination } from 'react-bootstrap'
+import { jwtDecode } from 'jwt-decode'
 
 const TICKET_TYPES = [
   'Vehicle Offline',
@@ -49,6 +50,11 @@ function Contact() {
   const { deviceId: urlDeviceId } = useParams()
   const navigate = useNavigate()
   const token = Cookies.get('authToken')
+  let decodedToken
+  if (token) {
+    decodedToken = jwtDecode(token)
+  }
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', decodedToken)
 
   // State
   const [activeButton, setActiveButton] = useState(null)
@@ -122,7 +128,7 @@ function Contact() {
       })
       console.log('Ticket Data Response:', response.data.issues) // Check the structure
       const filteredTicketsRaisedBy = response.data.issues.filter(
-        (ticket) => ticket.raisedBy === 'SuperAdmin',
+        (ticket) => ticket.raisedBy === decodedToken.username,
       )
       setTicketData(filteredTicketsRaisedBy)
     } catch (error) {
@@ -202,6 +208,7 @@ function Contact() {
     setStatusCounts(counts)
     console.log('counts', counts)
     console.log('assssssssssssssssssssssss', vehicleData)
+    console.log('lllllllllllllllllllllllllllllllllllllllllllllll', decodedToken.username)
   }, [ticketData])
 
   //   const filteredTickets = ticketData.filter((ticket) => {
@@ -297,10 +304,11 @@ function Contact() {
             {['all', 'pending', 'answered', 'closed'].map((type) => (
               <button
                 key={type}
-                className={`btn button-${type}-filter fw-semibold ${
+                className={`btn button-${type}-filter fw-bold ${
                   activeButton === type ? 'active' : ''
                 }`}
                 onClick={() => handleButtonClick(type)}
+                style={{ fontSize: '14px' }}
               >
                 {type.toUpperCase()} : {statusCounts[type] || 0}
               </button>
@@ -313,55 +321,61 @@ function Contact() {
             Back to Dashboard
           </button>
         </div>
-
-        {/* Filters */}
-        <div className="d-flex gap-5 align-items-center mt-3">
-          <CFormSelect
-            style={{ width: '300px', height: '40px' }}
-            value={formData.ticketType}
-            onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
-          >
-            <option value="" disabled>
-              Ticket Types
-            </option>
-            <option value="">All</option>
-
-            {TICKET_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </CFormSelect>
-
-          <div className="d-flex gap-5">
-            <DateRangeFilter onDateRangeChange={handleDateRangeChange} title="Added Date Filter" />
-            <DateRangeFilter onDateRangeChange={handleDateRangeChange} title="Update Date Filter" />
-          </div>
-        </div>
-
         <hr />
-
         {/* Table */}
-
         <CRow>
           <CCol xs>
             <CCard className="mb-4">
               <CCardHeader className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center">
-                  <InputBase
-                    type="search"
-                    className="form-control border-end-0 rounded-0"
-                    style={{ height: '40px', width: '250px' }}
-                    placeholder="Search for Tickets"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <IconButton
-                    className="bg-white rounded-0 border disable"
-                    style={{ height: '40px' }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
+                <div className="d-flex gap-3">
+                  <div className="d-flex align-items-center">
+                    <InputBase
+                      type="search"
+                      className="form-control border-end-0 rounded-0"
+                      style={{ height: '40px', width: '250px' }}
+                      placeholder="Search for Tickets"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <IconButton
+                      className="bg-white rounded-0 border disable"
+                      style={{ height: '40px' }}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </div>
+                  {/* Filters */}
+                  <div className="d-flex gap-3 align-items-center">
+                    <CFormSelect
+                      style={{ width: '300px', height: '40px' }}
+                      value={formData.ticketType}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, ticketType: e.target.value }))
+                      }
+                    >
+                      <option value="" disabled>
+                        Ticket Types
+                      </option>
+                      <option value="">All</option>
+
+                      {TICKET_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </CFormSelect>
+
+                    <div className="d-flex gap-3">
+                      <DateRangeFilter
+                        onDateRangeChange={handleDateRangeChange}
+                        title="Added Date Filter"
+                      />
+                      <DateRangeFilter
+                        onDateRangeChange={handleDateRangeChange}
+                        title="Update Date Filter"
+                      />
+                    </div>
+                  </div>
                 </div>
                 <button className="btn add" onClick={() => setVisible(true)}>
                   <Plus size={18} /> Add
@@ -450,15 +464,42 @@ function Contact() {
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                       />
-                      {Array.from({ length: totalPages }, (_, index) => (
-                        <Pagination.Item
-                          key={index}
-                          active={index + 1 === currentPage}
-                          onClick={() => setCurrentPage(index + 1)}
-                        >
-                          {index + 1}
-                        </Pagination.Item>
-                      ))}
+
+                      {/* Add "First" and ellipsis if needed */}
+                      {currentPage > 3 && (
+                        <>
+                          <Pagination.Item onClick={() => setCurrentPage(1)}>1</Pagination.Item>
+                          {currentPage > 4 && <Pagination.Ellipsis />}
+                        </>
+                      )}
+
+                      {/* Generate pages around the current page */}
+                      {Array.from({ length: 5 }, (_, i) => {
+                        const page = currentPage - 2 + i
+                        if (page > 0 && page <= totalPages) {
+                          return (
+                            <Pagination.Item
+                              key={page}
+                              active={page === currentPage}
+                              onClick={() => setCurrentPage(page)}
+                            >
+                              {page}
+                            </Pagination.Item>
+                          )
+                        }
+                        return null
+                      })}
+
+                      {/* Add ellipsis and "Last" if needed */}
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          {currentPage < totalPages - 3 && <Pagination.Ellipsis />}
+                          <Pagination.Item onClick={() => setCurrentPage(totalPages)}>
+                            {totalPages}
+                          </Pagination.Item>
+                        </>
+                      )}
+
                       <Pagination.Next
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
@@ -467,7 +508,7 @@ function Contact() {
                   </div>
                 )}
                 {/* Rows Per Page Selector */}
-                <div className="mb-3 d-flex justify-content-center gap-3 align-items-center">
+                <div className="mb-3 mt-3 d-flex justify-content-center gap-3 align-items-center">
                   <span>
                     Showing {paginatedTickets.length} of {filteredTickets.length} tickets
                   </span>

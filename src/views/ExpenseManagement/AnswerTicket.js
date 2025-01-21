@@ -71,7 +71,16 @@ function AnswerTicket() {
     answered: 0,
     closed: 0,
   })
-
+  const column = [
+    'ticketId',
+    'raisedBy',
+    'vehicleNo',
+    'ticketType',
+    'status',
+    'added',
+    'updated',
+    'description',
+  ]
   useEffect(() => {
     // Calculate counts for each status
     const counts = {
@@ -113,12 +122,15 @@ function AnswerTicket() {
   const fetchRaiseTicketGet = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/help-and-support/get`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/help-and-support/get-issues-for-answer-ticket`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
       console.log('Ticket Data Response:', response.data.issues) // Check the structure
       setTicketData(response.data.issues)
     } catch (error) {
@@ -241,7 +253,7 @@ function AnswerTicket() {
       ? filteredTickets
       : filteredTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen">
       <div className="px-3 mt-2">
         {/* Button Filters */}
         <div className="d-flex justify-content-between mb-3">
@@ -249,48 +261,24 @@ function AnswerTicket() {
             {['all', 'pending', 'answered', 'closed'].map((type) => (
               <button
                 key={type}
-                className={`btn button-${type}-filter fw-semibold ${
+                className={`btn button-${type}-filter fw-bold ${
                   activeButton === type ? 'active' : ''
                 }`}
                 onClick={() => handleButtonClick(type)}
+                style={{ fontSize: '14px' }}
               >
                 {type.toUpperCase()} : {statusCounts[type] || 0}
               </button>
             ))}
           </div>
         </div>
-
-        {/* Filters */}
-        <div className="d-flex gap-5 align-items-center mt-3">
-          <CFormSelect
-            style={{ width: '300px', height: '40px' }}
-            value={formData.ticketType}
-            onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
-          >
-            <option disabled value="">
-              Ticket Types
-            </option>
-            <option value="">All</option>
-            {TICKET_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </CFormSelect>
-
-          <div className="d-flex gap-5">
-            <DateRangeFilter onDateRangeChange={handleDateRangeChange} title="Added Date Filter" />
-            <DateRangeFilter onDateRangeChange={handleDateRangeChange} title="Update Date Filter" />
-          </div>
-        </div>
-
         <hr />
-
         {/* Table */}
         <CRow>
           <CCol xs>
             <CCard className="mb-4">
-              <CCardHeader className="d-flex justify-content-between align-items-center">
+              <CCardHeader className="d-flex gap-3 align-items-center">
+                {/* Filters */}
                 <div className="d-flex align-items-center">
                   <InputBase
                     type="search"
@@ -306,6 +294,33 @@ function AnswerTicket() {
                   >
                     <SearchIcon />
                   </IconButton>
+                </div>
+
+                <CFormSelect
+                  style={{ width: '300px', height: '40px' }}
+                  value={formData.ticketType}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, ticketType: e.target.value }))}
+                >
+                  <option disabled value="">
+                    Ticket Types
+                  </option>
+                  <option value="">All</option>
+                  {TICKET_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </CFormSelect>
+
+                <div className="d-flex gap-3">
+                  <DateRangeFilter
+                    onDateRangeChange={handleDateRangeChange}
+                    title="Added Date Filter"
+                  />
+                  <DateRangeFilter
+                    onDateRangeChange={handleDateRangeChange}
+                    title="Update Date Filter"
+                  />
                 </div>
               </CCardHeader>
 
@@ -391,15 +406,42 @@ function AnswerTicket() {
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                       />
-                      {Array.from({ length: totalPages }, (_, index) => (
-                        <Pagination.Item
-                          key={index}
-                          active={index + 1 === currentPage}
-                          onClick={() => setCurrentPage(index + 1)}
-                        >
-                          {index + 1}
-                        </Pagination.Item>
-                      ))}
+
+                      {/* Add "First" and ellipsis if needed */}
+                      {currentPage > 3 && (
+                        <>
+                          <Pagination.Item onClick={() => setCurrentPage(1)}>1</Pagination.Item>
+                          {currentPage > 4 && <Pagination.Ellipsis />}
+                        </>
+                      )}
+
+                      {/* Display pages around the current page */}
+                      {Array.from({ length: 5 }, (_, i) => {
+                        const page = currentPage - 2 + i
+                        if (page > 0 && page <= totalPages) {
+                          return (
+                            <Pagination.Item
+                              key={page}
+                              active={page === currentPage}
+                              onClick={() => setCurrentPage(page)}
+                            >
+                              {page}
+                            </Pagination.Item>
+                          )
+                        }
+                        return null
+                      })}
+
+                      {/* Add ellipsis and "Last" if needed */}
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          {currentPage < totalPages - 3 && <Pagination.Ellipsis />}
+                          <Pagination.Item onClick={() => setCurrentPage(totalPages)}>
+                            {totalPages}
+                          </Pagination.Item>
+                        </>
+                      )}
+
                       <Pagination.Next
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
@@ -408,7 +450,7 @@ function AnswerTicket() {
                   </div>
                 )}
                 {/* Rows Per Page Selector */}
-                <div className="mb-3 d-flex justify-content-center gap-3 align-items-center">
+                <div className="mb-3 mt-3 d-flex justify-content-center gap-3 align-items-center">
                   <span>
                     Showing {paginatedTickets.length} of {filteredTickets.length} tickets
                   </span>
