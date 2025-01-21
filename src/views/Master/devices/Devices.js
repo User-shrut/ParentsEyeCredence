@@ -99,6 +99,10 @@ const Devices = () => {
   const [open, setOpen] = useState(false)
   const [customExtendDate, setCustomExtendDate] = useState('')
 
+  const [selectedUsername, setSelectedUsername] = useState(''); // State for username
+  const [selectedGroupName, setSelectedGroupName] = useState(''); // State for group name
+
+
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
   const handleModalClose = () => {
@@ -631,6 +635,7 @@ const Devices = () => {
         // Checking if response contains the expected structure
         if (response.data && Array.isArray(response.data.users)) {
           setUsers(response.data.users) // Correct mapping
+
         } else {
           console.error('Unexpected response structure:', response.data)
         }
@@ -893,49 +898,107 @@ const Devices = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    })
+      unit: 'mm',
+      format: 'a4',
+    });
 
-    // Define the table headers from the columns prop (skip the first one as per the UI logic)
-    const tableColumn = ['SN', ...columns.slice(1).map((column) => column.Header)]
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
 
-    // Build the table rows using the filteredData array
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Devices Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Devices Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Add user and group details
+    const details = [
+      `User Name: ${selectedUsername || 'N/A'}`,
+      `Group Name: ${selectedGroupName || 'N/A'}`,
+    ];
+    details.forEach((detail, index) => {
+      doc.text(detail, 10, 35 + index * 6); // Adjust vertical spacing
+    });
+
+    // Define the table headers and rows
+    const tableColumn = ['SN', ...columns.slice(1).map((column) => column.Header)];
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).map((column) => {
-        const accessor = column.accessor
-
-        // Handle specific columns and their logic
+        const accessor = column.accessor;
         if (accessor === 'groups') {
-          return item.groups && item.groups.length > 0
-            ? item.groups.map((group) => group.name).join(', ') // Join group names if there are multiple
-            : 'N/A' // Return '0' if no groups are present
+          return item.groups?.map((group) => group.name).join(', ') || 'N/A';
         } else if (accessor === 'geofences') {
-          return item.geofences && item.geofences.length > 0
-            ? item.geofences.map((geofence) => geofence.name).join(', ') // Join geofence names if there are multiple
-            : 'N/A' // Return '0' if no geofences are present
+          return item.geofences?.map((geofence) => geofence.name).join(', ') || 'N/A';
         } else if (accessor === 'users') {
-          return item.users && item.users.length > 0
-            ? item.users.map((user) => user.username).join(', ') // Join usernames if there are multiple
-            : 'N/A' // Return '0' if no users are present
+          return item.users?.map((user) => user.username).join(', ') || 'N/A';
         } else if (accessor === 'Driver') {
-          return item.Driver?.name || 'N/A'
+          return item.Driver?.name || 'N/A';
         } else if (accessor === 'device') {
-          return item.device?.name || 'N/A'
+          return item.device?.name || 'N/A';
         } else {
-          return item[accessor] || 'N/A' // Fallback for other columns
+          return item[accessor] || 'N/A';
         }
-      })
-      return [rowIndex + 1, ...rowData] // Include row index as the first element
-    })
+      });
+      return [rowIndex + 1, ...rowData];
+    });
 
-    // Generate the PDF using the autoTable plugin
+    // Generate the table with autoTable
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
-      autoSize: true, // Automatically adjust column width based on content
-    })
-    doc.save('Devices_data.pdf')
-  }
+      startY: 50, // Start below the details
+      theme: 'grid', // Clean grid style
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue header background
+        textColor: [255, 255, 255], // White text
+        fontStyle: 'bold',
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+    });
+
+    // Footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Save the PDF
+    doc.save(`Devices_Reports_${date}.pdf`);
+  };
+
+
 
   // console.log("pageCountttttttttttt",pageCount)
   console.log('data.lengthhhhhhhhhhhhhh', data)
@@ -998,6 +1061,7 @@ const Devices = () => {
         </div> */}
         {/* HERE WE WILL ADD FILTER */}
         <div className="fiterDevices d-flex gap-3">
+
           <Sselect
             id="user-select"
             options={fillUsers.map((user) => ({
@@ -1013,7 +1077,18 @@ const Devices = () => {
                 }
                 : null
             }
-            onChange={(selectedOption) => setSelectedUser(selectedOption?.value || null)}
+            onChange={(selectedOption) => {
+              const selectedUserId = selectedOption?.value || null;
+              const selectedUsernameValue =
+                selectedOption?.label || // Use label if available
+                users?.find((user) => user._id === selectedUserId)?.username || ''; // Fallback to finding in users array
+
+              setSelectedUser(selectedUserId); // Update selected user ID
+              setSelectedUsername(selectedUsernameValue); // Update selected username state
+
+              console.log("Selected User ID:", selectedUserId);
+              console.log("Selected Username:", selectedUsernameValue);
+            }}
             isLoading={fillLoading}
           />
 
@@ -1023,6 +1098,7 @@ const Devices = () => {
               minWidth: '10rem',
             }}
             id="group-select"
+            placeholder="Select a Group"
             options={fillGroups?.map((group) => ({
               value: group._id,
               label: group.name,
@@ -1035,9 +1111,22 @@ const Devices = () => {
                 }
                 : null
             }
-            onChange={(selectedOption) => setSelectedGroup(selectedOption?.value || null)}
+            onChange={(selectedOption) => {
+              const selectedGroupId = selectedOption?.value || null; // Extract selected group ID
+              const selectedGroupNameValue =
+                selectedOption?.label || // Use label if available
+                groups.find((group) => group._id === selectedGroupId)?.name || ''; // Fallback to finding in groups array
+
+              setSelectedGroup(selectedGroupId); // Update selected group ID
+              setSelectedGroupName(selectedGroupNameValue); // Update selected group name state
+
+              console.log("Selected Group ID:", selectedGroupId);
+              console.log("Selected Group Name:", selectedGroupNameValue);
+            }}
             isLoading={fillLoading}
           />
+
+
         </div>
         <Selector
           className="particularFilter"
@@ -1384,6 +1473,7 @@ const Devices = () => {
           handleBack={handleBack}
           handleYearSelection={handleYearSelection}
           setShowExpirationDropdown={setShowExpirationDropdown}
+          selectedUsername={selectedUsername}
         />
       )}
       <EditDeviceModal

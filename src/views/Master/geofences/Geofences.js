@@ -549,23 +549,89 @@ const Geofences = () => {
   }
 
   const exportToPDF = () => {
-    const doc = new jsPDF()
-    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles']
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
 
-    // Extracting the relevant data for PDF export
-    const tableRows = filteredData.map((item, index) => {
-      const vehicleCount = item.deviceIds.length || '0' // Count of vehicles
-      return [
-        index + 1, // Serial Number
-        item.name, // Geofence Name
-        item.type, // Type
-        item.deviceIds.map((device) => device.name).join() || 'N/A',
-      ]
-    })
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
 
-    doc.autoTable(tableColumn, tableRows, { startY: 20 })
-    doc.save('geofence_data.pdf')
-  }
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Geofences Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Geofences Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Define the table headers
+    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles'];
+
+    // Extracting the relevant data for the table
+    const tableRows = filteredData.map((item, index) => [
+      index + 1, // Serial Number
+      item.name || '--', // Geofence Name
+      item.type || '--', // Type
+      item.deviceIds.map((device) => device.name).join(', ') || 'N/A', // Vehicles
+    ]);
+
+    // Create the table with autoTable
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40, // Start below headings
+      theme: 'grid', // Clean grid theme
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue header background
+        textColor: [255, 255, 255], // White text
+        fontStyle: 'bold',
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      columnStyles: {
+        3: { cellWidth: 60 }, // Adjust width for the "Vehicles" column
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+    });
+
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Save the PDF
+    doc.save(`geofence_data_${date}.pdf`);
+  };
 
   // Show Co-ordinates of Polyline and circle centroid of lat lng
 

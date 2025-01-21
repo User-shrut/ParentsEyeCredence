@@ -336,6 +336,10 @@ const Driver = () => {
 
     fetchDevices()
   }, [])
+
+
+  // EXCEL DOWNLOAD
+
   const exportToExcel = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
@@ -365,10 +369,41 @@ const Driver = () => {
     XLSX.writeFile(workbook, 'drivers_data.xlsx')
   }
 
+  // pdf download
+
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    })
+    });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Devices Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Drivers Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Define the table headers
     const tableColumn = [
       'SN',
       'Driver Name',
@@ -378,26 +413,64 @@ const Driver = () => {
       'Lic. No.',
       'Aadhar No.',
       'Address',
-      'Actions',
-    ]
+    ];
 
-    const tableRows = filteredData.map((item, index) => {
-      return [
-        index + 1,
-        item.name || '--',
-        item.phone || '--',
-        item.email || '--',
-        item.device || '--',
-        item.licenseNumber || '--',
-        item.aadharNumber || '--',
-        item.address || '--',
-        '', // Actions column is usually empty in PDF
-      ]
-    })
+    // Map through the filtered data and prepare table rows
+    const tableRows = filteredData.map((item, index) => [
+      index + 1, // Serial Number
+      item.name || '--', // Driver Name
+      item.phone || '--', // Mobile No.
+      item.email || '--', // Email
+      item.device || '--', // Vehicle No.
+      item.licenseNumber || '--', // License No.
+      item.aadharNumber || '--', // Aadhar No.
+      item.address || '--', // Address
+      '', // Actions column is empty in PDF
+    ]);
 
-    doc.autoTable(tableColumn, tableRows, { startY: 15 })
-    doc.save('drivers_data.pdf')
-  }
+    // Create table with autoTable
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40, // Table starts below the headings
+      theme: 'grid', // Adds a grid for cleaner presentation
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue background for header
+        textColor: [255, 255, 255], // White text in header
+        fontStyle: 'bold',
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 5, // Increased padding for better readability
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      columnStyles: {
+        0: { cellWidth: 15 }, // Adjust width for Serial Number column
+        8: { cellWidth: 30 }, // Adjust width for Actions column
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 }, // Add margins for neatness
+    });
+
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Save the PDF
+    doc.save(`Drivers_Reports_${date}.pdf`);
+  };
+
 
   //  ###############################################################
 
@@ -854,7 +927,6 @@ const Driver = () => {
                   name="lic"
                   value={formData.licenseNumber !== undefined ? formData.licenseNumber : ''}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -868,7 +940,6 @@ const Driver = () => {
                   name="aadhar"
                   value={formData.aadharNumber !== undefined ? formData.aadharNumber : ''}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
-                  required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -1019,14 +1090,12 @@ const Driver = () => {
                   name="lic"
                   value={formData.licenseNumber !== undefined ? formData.licenseNumber : ''}
                   onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                  required
                 />
                 <TextField
                   label="Aadhar No."
                   name="aadhar"
                   value={formData.aadharNumber !== undefined ? formData.aadharNumber : ''}
                   onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
-                  required
                 />
                 <TextField
                   label="Address"

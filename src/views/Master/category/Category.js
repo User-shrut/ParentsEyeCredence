@@ -237,6 +237,9 @@ const Category = () => {
       throw error.response ? error.response.data : new Error('An error occurred')
     }
   }
+
+  // /Excel download 
+
   const exportToExcel = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
@@ -260,24 +263,95 @@ const Category = () => {
     XLSX.writeFile(workbook, 'category_data.xlsx')
   }
 
+  // PDF download 
+
   const exportToPDF = () => {
-    const doc = new jsPDF()
-    // Define the columns based on the CTableHeaderCell names
-    const tableColumn = ['SN', 'Category Name'] // Adjust columns based on your table
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Devices Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Categorys Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Define the table columns
+    const tableColumn = ['SN', 'Category Name']; // Define the headers
     const tableRows = filteredData.map((item, index) => {
-      // Each row will include the index, category name, and action placeholders
+      // Add rows with category name and serial number
       return [
         index + 1, // Serial Number
-        item.categoryName, // Category Name
-        // 'Edit, Delete'                   // Actions placeholder (could be detailed if necessary)
-      ]
-    })
+        item.categoryName || '--', // Category Name with fallback
+      ];
+    });
 
-    // Create the PDF table with the defined columns and rows
-    doc.autoTable(tableColumn, tableRows, { startY: 20 })
+    // Styling for the table
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30, // Table starts a bit below the headings
+      theme: 'grid', // Adds grid theme for table borders
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue background for header
+        textColor: [255, 255, 255], // White text
+        fontStyle: 'bold',
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 5, // Add more padding for readability
+        valign: 'middle',
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' }, // Serial Number should adjust to content
+        1: { cellWidth: 'auto' }, // Category Name should adjust to content
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 }, // Adjust margins
+      width: pageWidth - 20, // Ensure the table spans the full width
+    });
+
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
     // Save the generated PDF
-    doc.save('category_data.pdf')
-  }
+    doc.save(`Category_Reports_${date}.pdf`);
+  };
+
 
   //  ###############################################################
 

@@ -346,37 +346,114 @@ const Notification = () => {
     }
   }
 
-  //  ###############################################################
-
   useEffect(() => {
     console.log('this is form data...', formData)
   }, [formData])
 
-  const exportToPDF = () => {
-    const doc = new jsPDF()
+  //  ###############################################################
 
-    // Define the columns based on the CTable structure
-    const tableColumn = ['SN', 'Device Name', 'Notifications']
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Devices Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Devices Notifications Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Define table headers
+    const tableColumn = ['SN', 'Device Name', 'Notifications'];
 
     // Generate rows of data for the PDF
     const tableRows = filteredData.map((item, index) => {
-      // Define how to extract the data for each column
       const rowData = [
         index + 1, // Serial Number
         item.deviceId?.name || '--', // Device Name
         item.type.length || '--', // Notifications (assuming type length is what you want here)
-        // 'Actions' // Placeholder for Actions, you might want to define specific actions here
-      ]
+      ];
 
-      return rowData
-    })
+      return rowData;
+    });
+
+    // Calculate the total width of the table based on the number of columns
+    const columnWidths = [20, 100, 40]; // Adjust column widths based on content
+    const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0);
+    const marginLeft = 10; // Left margin
+    const marginRight = 10; // Right margin
+    const remainingWidth = pageWidth - marginLeft - marginRight;
+
+    // Calculate scaling factor to make the table fit the full width
+    const scaleFactor = remainingWidth / totalWidth;
 
     // Use autoTable to create the table in the PDF
-    doc.autoTable(tableColumn, tableRows, { startY: 20 })
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40, // Table starts below the headings
+      theme: 'grid', // Adds a clean grid style
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue background for header
+        textColor: [255, 255, 255], // White text
+        fontStyle: 'bold',
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 5, // Add more padding for readability
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      columnStyles: {
+        0: { cellWidth: columnWidths[0] * scaleFactor }, // Scale serial number column
+        1: { cellWidth: columnWidths[1] * scaleFactor }, // Scale device name column
+        2: { cellWidth: columnWidths[2] * scaleFactor }, // Scale notifications column
+      },
+      margin: { top: 10, right: marginRight, bottom: 10, left: marginLeft }, // Adjust margins
+    });
+
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
 
     // Save the generated PDF
-    doc.save('Notification_data.pdf')
-  }
+    doc.save(`Notifications_Reports_${date}.pdf`);
+  };
+
+
+  // Excel download
 
   const exportToExcel = () => {
     // Map filtered data into the format required for export
@@ -848,7 +925,7 @@ const Notification = () => {
                   renderOption={(props, option, { selected }) => {
                     const isDisabled = devicesAlreadyAdded.includes(option.name)
                     {
-                      ;(() =>
+                      ; (() =>
                         console.log(
                           'Logging inside JSX:',
                           devicesAlreadyAdded,
@@ -859,19 +936,19 @@ const Notification = () => {
                     return (
                       <li
                         {...props}
-                        // aria-disabled={isDisabled}
+                      // aria-disabled={isDisabled}
                       >
                         <Checkbox
                           style={{ marginRight: 8 }}
                           checked={selected}
-                          //disabled={isDisabled} // Disable the checkbox if condition is met
+                        //disabled={isDisabled} // Disable the checkbox if condition is met
                         />
                         <ListItemText
                           primary={option.name}
-                          // style={{
-                          //   textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
-                          //   color: isDisabled ? "gray" : "inherit",
-                          // }}
+                        // style={{
+                        //   textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
+                        //   color: isDisabled ? "gray" : "inherit",
+                        // }}
                         />
                       </li>
                     )

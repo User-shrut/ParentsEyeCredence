@@ -268,31 +268,88 @@ const Group = () => {
     XLSX.writeFile(workbook, 'group_data.xlsx')
   }
 
+  // PDF CODE
+
   const exportToPDF = () => {
-    const doc = new jsPDF()
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
+
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Devices Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Groups Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
 
     // Define the table headers
-    const tableColumn = ['SN', 'Group Name']
+    const tableColumn = ['SN', 'Group Name'];
 
     // Map over your filteredData to create rows
-    const tableRows = filteredData.map((item, rowIndex) => {
-      const rowData = [
-        rowIndex + 1, // Serial Number
-        item.name || '--', // Group Name
-      ]
-      return rowData
-    })
+    const tableRows = filteredData.map((item, rowIndex) => [
+      rowIndex + 1, // Serial Number
+      item.name || '--', // Group Name
+    ]);
 
     // Create table using autoTable
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
-    })
+      startY: 40, // Start below the headings
+      theme: 'grid', // Apply a clean grid style
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue header background
+        textColor: [255, 255, 255], // White text
+        fontStyle: 'bold',
+        fontSize: 12,
+      },
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternating rows
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+    });
+
+    // Add footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
 
     // Save the PDF
-    doc.save('group_data.pdf')
-  }
+    doc.save(`group_data_${date}.pdf`);
+  };
+
 
   //  ###############################################################
 

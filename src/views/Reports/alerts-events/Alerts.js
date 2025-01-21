@@ -190,15 +190,59 @@ const Alerts = () => {
   //  Download pdf file
 
   const downloadPDF = () => {
-    const doc = new jsPDF()
-    doc.text('Alerts/Events', 10, 10)
+    const doc = new jsPDF({
+      orientation: 'landscape',
+    });
 
+    // Add current date
+    const today = new Date();
+    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+
+    // Add "Credence Tracker" heading
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    const title = 'Credence Tracker';
+    const pageWidth = doc.internal.pageSize.width;
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 15);
+
+    // Add "Alerts Reports" heading
+    doc.setFontSize(16);
+    const subtitle = 'Alerts Reports';
+    const subtitleWidth = doc.getTextWidth(subtitle);
+    const subtitleX = (pageWidth - subtitleWidth) / 2;
+    doc.text(subtitle, subtitleX, 25);
+
+    // Add current date at the top-right corner
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+
+    // Section title for Alerts/Events
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Alert Details', 10, 40);
+
+    // Additional Details (Devices name or other info)
+    const details = [
+      `Devices Name: ${devices || 'N/A'}`
+    ];
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    details.forEach((text, idx) => {
+      doc.text(text, 10, 50 + (idx * 10));
+    });
+
+    // Prepare table data
     const tableData = filteredData.map((item, index) => [
-      index + 1,
-      item.name,
-      item.type,
-      item.address || 'Fetching...',
-      item.message,
+      index + 1,  // Serial number
+      item.name || '--', // Device Name
+      item.type || '--', // Notification Type
+      item.address || 'Fetching...', // Location
+      item.message || '--', // Message
       new Date(item.createdAt).toLocaleString('en-IN', {
         timeZone: 'Asia/Kolkata',
         hour12: false,
@@ -208,22 +252,55 @@ const Alerts = () => {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-      }),
-    ])
+      }), // Time
+    ]);
 
+    // Define table columns
+    const tableColumns = ['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time'];
+
+    // Set the width of the table to span across the entire page
+    const tableWidth = pageWidth - 20;  // Leaving 10px padding on each side
+
+    // Create the table in the PDF with styling
     doc.autoTable({
-      head: [['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time']],
+      head: [tableColumns],
       body: tableData,
-      styles: {
-        lineWidth: 0.5, // Border thickness
-        lineColor: [0, 0, 0], // Black border color
+      startY: 60, // Start the table just below the section title
+      theme: 'grid', // Use a grid theme for the table
+      headStyles: {
+        fillColor: [100, 100, 255], // Blue header background
+        textColor: [255, 255, 255], // White text color
+        fontSize: 12,
+        fontStyle: 'bold',
+        halign: 'center', // Center align header text
       },
-      tableLineWidth: 0.5, // Border around the table
-      tableLineColor: [0, 0, 0], // Table border color
-    })
+      bodyStyles: {
+        fontSize: 10,
+        cellPadding: 5, // Add padding inside cells
+        valign: 'middle', // Center align vertical content
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240], // Light gray for alternate rows
+      },
+      tableLineWidth: 0.5, // Table borders
+      tableLineColor: [0, 0, 0], // Black border color for the table
+      columnStyles: {
+        0: { cellWidth: tableWidth * 0.05 }, // 5% width for serial number column
+        1: { cellWidth: tableWidth * 0.25 }, // 25% width for the device name column
+        2: { cellWidth: tableWidth * 0.20 }, // 20% for notification column
+        3: { cellWidth: tableWidth * 0.20 }, // 20% for location column
+        4: { cellWidth: tableWidth * 0.20 }, // 20% for message column
+        5: { cellWidth: tableWidth * 0.10 }, // 10% for time column
+      },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      width: tableWidth, // Full width of the table
+    });
 
-    doc.save('alerts.pdf')
-  }
+    // Save the PDF document
+    doc.save(`Alerts_Reports_${date}.pdf`);
+  };
+
+
 
   // Download Excel file
 
