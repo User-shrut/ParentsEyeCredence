@@ -77,6 +77,7 @@ import jsPDF from 'jspdf' // For PDF export
 import 'jspdf-autotable' // For table formatting in PDF
 import '../../../../src/app.css'
 import SearchIcon from '@mui/icons-material/Search'
+import { Eye, EyeOff } from 'lucide-react'
 
 const Users = () => {
   // somthing for testing
@@ -105,6 +106,14 @@ const Users = () => {
   // const handleBack = () => {
   //   setCurrentStep((prev) => Math.max(prev - 1, 0))
   // }
+
+  // Passwords Visibility
+  const [visiblePassword, setVisiblePassword] = useState(null); // Track the ID of the user whose password is visible
+
+  // Toggle password visibility for a specific user
+  const togglePasswordVisibility = (index) => {
+    setVisiblePassword(visiblePassword === index ? null : index); // Show password if it's hidden, hide if it's visible
+  };
 
   const handleModalClose = () => {
     // setFormData({})
@@ -1007,6 +1016,15 @@ const Users = () => {
                       >
                         <strong>Reports Permissions</strong>
                       </CTableHeaderCell>
+
+                      <CTableHeaderCell
+                        className="text-center table-cell"
+                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                      >
+                        <strong>Password</strong>
+                      </CTableHeaderCell>
+
+
                       <CTableHeaderCell
                         className=" text-center table-cell"
                         style={{ backgroundColor: '#0a2d63', color: 'white' }}
@@ -1137,6 +1155,29 @@ const Users = () => {
                               )}
                             </CFormSelect>
                           </CTableDataCell>
+
+                          <CTableDataCell
+                            className="text-center p-0"
+                            style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                          >
+                            {/* Conditionally render the password */}
+                            {visiblePassword === index ? item.password : '••••••••••'} {/* Show password or placeholder */}
+
+                            {/* Button to toggle visibility of a particular user's password */}
+                            <button
+                              onClick={() => togglePasswordVisibility(index)}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '5px',
+                              }}
+                            >
+                              {/* Eye icon - You can use any icon library like Font Awesome or Material Icons */}
+                              {visiblePassword === index ? <Eye size={16} /> : <EyeOff size={16} />}
+                            </button>
+                          </CTableDataCell>
+
                           <CTableDataCell
                             className="text-center d-flex "
                             style={{

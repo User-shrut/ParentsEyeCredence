@@ -652,7 +652,7 @@ const Driver = () => {
                             className="text-center"
                             style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
                           >
-                            {item.device}
+                            {item.vehicleName}
                           </CTableDataCell>
                           <CTableDataCell
                             className="text-center"
