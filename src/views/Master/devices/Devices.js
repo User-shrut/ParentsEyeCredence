@@ -99,9 +99,8 @@ const Devices = () => {
   const [open, setOpen] = useState(false)
   const [customExtendDate, setCustomExtendDate] = useState('')
 
-  const [selectedUsername, setSelectedUsername] = useState(''); // State for username
-  const [selectedGroupName, setSelectedGroupName] = useState(''); // State for group name
-
+  const [selectedUsername, setSelectedUsername] = useState('') // State for username
+  const [selectedGroupName, setSelectedGroupName] = useState('') // State for group name
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -635,7 +634,6 @@ const Devices = () => {
         // Checking if response contains the expected structure
         if (response.data && Array.isArray(response.data.users)) {
           setUsers(response.data.users) // Correct mapping
-
         } else {
           console.error('Unexpected response structure:', response.data)
         }
@@ -900,65 +898,65 @@ const Devices = () => {
       orientation: 'landscape',
       unit: 'mm',
       format: 'a4',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Devices Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Devices Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Devices Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Add user and group details
     const details = [
       `User Name: ${selectedUsername || 'N/A'}`,
       `Group Name: ${selectedGroupName || 'N/A'}`,
-    ];
+    ]
     details.forEach((detail, index) => {
-      doc.text(detail, 10, 35 + index * 6); // Adjust vertical spacing
-    });
+      doc.text(detail, 10, 35 + index * 6) // Adjust vertical spacing
+    })
 
     // Define the table headers and rows
-    const tableColumn = ['SN', ...columns.slice(1).map((column) => column.Header)];
+    const tableColumn = ['SN', ...columns.slice(1).map((column) => column.Header)]
     const tableRows = filteredData.map((item, rowIndex) => {
       const rowData = columns.slice(1).map((column) => {
-        const accessor = column.accessor;
+        const accessor = column.accessor
         if (accessor === 'groups') {
-          return item.groups?.map((group) => group.name).join(', ') || 'N/A';
+          return item.groups?.map((group) => group.name).join(', ') || 'N/A'
         } else if (accessor === 'geofences') {
-          return item.geofences?.map((geofence) => geofence.name).join(', ') || 'N/A';
+          return item.geofences?.map((geofence) => geofence.name).join(', ') || 'N/A'
         } else if (accessor === 'users') {
-          return item.users?.map((user) => user.username).join(', ') || 'N/A';
+          return item.users?.map((user) => user.username).join(', ') || 'N/A'
         } else if (accessor === 'Driver') {
-          return item.Driver?.name || 'N/A';
+          return item.Driver?.name || 'N/A'
         } else if (accessor === 'device') {
-          return item.device?.name || 'N/A';
+          return item.device?.name || 'N/A'
         } else {
-          return item[accessor] || 'N/A';
+          return item[accessor] || 'N/A'
         }
-      });
-      return [rowIndex + 1, ...rowData];
-    });
+      })
+      return [rowIndex + 1, ...rowData]
+    })
 
     // Generate the table with autoTable
     doc.autoTable({
@@ -979,26 +977,21 @@ const Devices = () => {
         fillColor: [240, 240, 240], // Light gray for alternating rows
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    });
+    })
 
     // Footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF
-    doc.save(`Devices_Reports_${date}.pdf`);
-  };
-
-
+    doc.save(`Devices_Reports_${date}.pdf`)
+  }
 
   // console.log("pageCountttttttttttt",pageCount)
   console.log('data.lengthhhhhhhhhhhhhh', data)
@@ -1061,7 +1054,6 @@ const Devices = () => {
         </div> */}
         {/* HERE WE WILL ADD FILTER */}
         <div className="fiterDevices d-flex gap-3">
-
           <Sselect
             id="user-select"
             options={fillUsers.map((user) => ({
@@ -1072,22 +1064,23 @@ const Devices = () => {
             value={
               selectedUser
                 ? {
-                  value: selectedUser,
-                  label: users?.find((user) => user._id === selectedUser)?.username || '',
-                }
+                    value: selectedUser,
+                    label: users?.find((user) => user._id === selectedUser)?.username || '',
+                  }
                 : null
             }
             onChange={(selectedOption) => {
-              const selectedUserId = selectedOption?.value || null;
+              const selectedUserId = selectedOption?.value || null
               const selectedUsernameValue =
                 selectedOption?.label || // Use label if available
-                users?.find((user) => user._id === selectedUserId)?.username || ''; // Fallback to finding in users array
+                users?.find((user) => user._id === selectedUserId)?.username ||
+                '' // Fallback to finding in users array
 
-              setSelectedUser(selectedUserId); // Update selected user ID
-              setSelectedUsername(selectedUsernameValue); // Update selected username state
+              setSelectedUser(selectedUserId) // Update selected user ID
+              setSelectedUsername(selectedUsernameValue) // Update selected username state
 
-              console.log("Selected User ID:", selectedUserId);
-              console.log("Selected Username:", selectedUsernameValue);
+              console.log('Selected User ID:', selectedUserId)
+              console.log('Selected Username:', selectedUsernameValue)
             }}
             isLoading={fillLoading}
           />
@@ -1106,27 +1099,26 @@ const Devices = () => {
             value={
               selectedGroup
                 ? {
-                  value: selectedGroup,
-                  label: groups.find((group) => group._id === selectedGroup)?.name,
-                }
+                    value: selectedGroup,
+                    label: groups.find((group) => group._id === selectedGroup)?.name,
+                  }
                 : null
             }
             onChange={(selectedOption) => {
-              const selectedGroupId = selectedOption?.value || null; // Extract selected group ID
+              const selectedGroupId = selectedOption?.value || null // Extract selected group ID
               const selectedGroupNameValue =
                 selectedOption?.label || // Use label if available
-                groups.find((group) => group._id === selectedGroupId)?.name || ''; // Fallback to finding in groups array
+                groups.find((group) => group._id === selectedGroupId)?.name ||
+                '' // Fallback to finding in groups array
 
-              setSelectedGroup(selectedGroupId); // Update selected group ID
-              setSelectedGroupName(selectedGroupNameValue); // Update selected group name state
+              setSelectedGroup(selectedGroupId) // Update selected group ID
+              setSelectedGroupName(selectedGroupNameValue) // Update selected group name state
 
-              console.log("Selected Group ID:", selectedGroupId);
-              console.log("Selected Group Name:", selectedGroupNameValue);
+              console.log('Selected Group ID:', selectedGroupId)
+              console.log('Selected Group Name:', selectedGroupNameValue)
             }}
             isLoading={fillLoading}
           />
-
-
         </div>
         <Selector
           className="particularFilter"

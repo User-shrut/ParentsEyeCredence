@@ -1,3 +1,7 @@
 .gutter-0 {
     --bs-gutter-x: 0 !important;
 }
+
+.gutter-0::-webkit-scrollbar {
+    height: 4px
+}

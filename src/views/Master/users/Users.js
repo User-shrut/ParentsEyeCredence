@@ -108,12 +108,12 @@ const Users = () => {
   // }
 
   // Passwords Visibility
-  const [visiblePassword, setVisiblePassword] = useState(null); // Track the ID of the user whose password is visible
+  const [visiblePassword, setVisiblePassword] = useState(null) // Track the ID of the user whose password is visible
 
   // Toggle password visibility for a specific user
   const togglePasswordVisibility = (index) => {
-    setVisiblePassword(visiblePassword === index ? null : index); // Show password if it's hidden, hide if it's visible
-  };
+    setVisiblePassword(visiblePassword === index ? null : index) // Show password if it's hidden, hide if it's visible
+  }
 
   const handleModalClose = () => {
     // setFormData({})
@@ -668,34 +668,34 @@ const Users = () => {
   const exportToPDF = async () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Users Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Users Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Users Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define table headers
     const tableColumn = [
@@ -705,36 +705,30 @@ const Users = () => {
       'Mobile No.',
       'Master Permissions',
       'Reports Permissions',
-    ];
+    ]
 
     // Define table rows
     const tableRows = filteredData?.map((row, rowIndex) => {
-      const masterPermissions = [
-        'users',
-        'groups',
-        'devices',
-        'geofence',
-        'driver',
-        'notification',
-        'maintenance',
-      ]
-        .filter((permission) => row[permission])
-        .join(', ') || 'N/A';
+      const masterPermissions =
+        ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+          .filter((permission) => row[permission])
+          .join(', ') || 'N/A'
 
-      const reportsPermissions = [
-        'history',
-        'stop',
-        'travel',
-        'status',
-        'distance',
-        'idle',
-        'sensor',
-        'alerts',
-        'vehicle',
-        'geofenceReport',
-      ]
-        .filter((permission) => row[permission])
-        .join(', ') || 'N/A';
+      const reportsPermissions =
+        [
+          'history',
+          'stop',
+          'travel',
+          'status',
+          'distance',
+          'idle',
+          'sensor',
+          'alerts',
+          'vehicle',
+          'geofenceReport',
+        ]
+          .filter((permission) => row[permission])
+          .join(', ') || 'N/A'
 
       const rowData = [
         rowIndex + 1,
@@ -743,10 +737,10 @@ const Users = () => {
         row.mobile || 'N/A',
         masterPermissions,
         reportsPermissions,
-      ];
+      ]
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Define column styles for better layout
     const columnStyles = {
@@ -755,7 +749,7 @@ const Users = () => {
       3: { cellWidth: 30 }, // Mobile No.
       4: { cellWidth: 60 }, // Master Permissions
       5: { cellWidth: 60 }, // Reports Permissions
-    };
+    }
 
     // Add table using autoTable
     doc.autoTable({
@@ -777,25 +771,21 @@ const Users = () => {
       },
       columnStyles,
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF
-    doc.save(`Users_Reports_${date}.pdf`);
-  };
-
+    doc.save(`Users_Reports_${date}.pdf`)
+  }
 
   // add group
 
@@ -1024,7 +1014,6 @@ const Users = () => {
                         <strong>Password</strong>
                       </CTableHeaderCell>
 
-
                       <CTableHeaderCell
                         className=" text-center table-cell"
                         style={{ backgroundColor: '#0a2d63', color: 'white' }}
@@ -1161,8 +1150,8 @@ const Users = () => {
                             style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
                           >
                             {/* Conditionally render the password */}
-                            {visiblePassword === index ? item.password : '••••••••••'} {/* Show password or placeholder */}
-
+                            {visiblePassword === index ? item.password : '••••••••••'}{' '}
+                            {/* Show password or placeholder */}
                             {/* Button to toggle visibility of a particular user's password */}
                             <button
                               onClick={() => togglePasswordVisibility(index)}

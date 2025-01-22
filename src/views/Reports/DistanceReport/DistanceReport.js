@@ -52,7 +52,7 @@ const SearchDistance = ({
   columns,
   showMap,
   setShowMap,
-  handlePutName
+  handlePutName,
 }) => {
   const [validated, setValidated] = useState(false)
   const [showDateInputs, setShowDateInputs] = useState(false) // State to manage button text
@@ -62,12 +62,11 @@ const SearchDistance = ({
   const [selectedG, setSelectedG] = useState()
 
   // For username show in pdf
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
     handlePutName(putName)
   }, [putName])
-
 
   const allDevicesOption = { value: 'all', label: 'All Devices' } // Define an option for "All Devices"
   const convertToDesiredFormat = (inputDate) => {
@@ -279,12 +278,15 @@ const ShowDistance = ({
   allDates,
   devices,
   searchQuery,
-  selectedGroupName, selectedUserName, selectedFromDate, selectedToDate,
+  selectedGroupName,
+  selectedUserName,
+  selectedFromDate,
+  selectedToDate,
 }) => {
   const [addressData, setAddressData] = useState({})
   const [newAddressData, setnewAddressData] = useState()
 
-  console.log("devicessssssssssasdadwssss", devices) // Devices Lists
+  console.log('devicessssssssssasdadwssss', devices) // Devices Lists
 
   // Function to get address based on latitude and longitude using Nominatim API
   const getAddress = async (latitude, longitude) => {
@@ -365,34 +367,36 @@ const ShowDistance = ({
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" title
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    const title = 'Credence Tracker';
-    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    const title = 'Credence Tracker'
+    const titleWidth =
+      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Geofences Reports" subtitle
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    const subtitle = 'Distances Reports';
-    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    const subtitle = 'Distances Reports'
+    const subtitleWidth =
+      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
 
     // Add user and device details
     const details = [
@@ -400,24 +404,24 @@ const ShowDistance = ({
       `Group Name: ${selectedGroupName || '--'}`,
       `Vehicle Name: ${devices.map((device) => device.name).join(', ') || '--'}`,
       `From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ];
+    ]
 
-    let yPosition = 35;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    let yPosition = 35
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((detail) => {
-      doc.text(detail, 14, yPosition);
-      yPosition += 8; // Spacing between lines
-    });
+      doc.text(detail, 14, yPosition)
+      yPosition += 8 // Spacing between lines
+    })
 
     // Define table columns and rows
     const tableData = apiData.data.map((row) => [
       findDeviceName(row.deviceId),
       ...allDates.map((date) => (row[date] !== undefined ? `${row[date]} km` : '0 km')),
       `${calculateTotalDistance(row).toFixed(2)} km`,
-    ]);
+    ])
 
-    const headers = ['Vehicle', ...allDates, 'Total Distance (km)'];
+    const headers = ['Vehicle', ...allDates, 'Total Distance (km)']
 
     // Generate the table
     autoTable(doc, {
@@ -443,11 +447,11 @@ const ShowDistance = ({
       margin: { top: 10 },
       tableLineWidth: 0.5,
       tableLineColor: [0, 0, 0], // Black border color
-    });
+    })
 
     // Save the PDF with a meaningful name
-    doc.save(`Distances_Reports_${date}.pdf`);
-  };
+    doc.save(`Distances_Reports_${date}.pdf`)
+  }
 
   // Export to Excel function
   const exportToExcel = () => {
@@ -483,7 +487,7 @@ const ShowDistance = ({
 
   return (
     <>
-      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }} className="gutter-0">
         <CTable bordered className="custom-table">
           <CTableHead>
             <CTableRow>
@@ -679,12 +683,11 @@ const Distance = () => {
   }, [formData.FromDate, formData.ToDate])
 
   const [selectedUserName, setSelectedUserName] = useState('')
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+    console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', putName)
   }, [putName])
-
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
@@ -692,7 +695,7 @@ const Distance = () => {
 
   const handlePutName = (name) => {
     setPutName(name)
-    console.log("putName", putName)
+    console.log('putName', putName)
   }
 
   const getDevices = async (selectedGroup) => {
@@ -743,7 +746,6 @@ const Distance = () => {
       const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
       const selectedGroupName = selectedGroup ? selectedGroup.name : ''
       console.log('Selected Group:', selectedGroupName)
-
     } catch (error) {
       setLoading(false)
       console.error('Error fetching data:', error)
@@ -752,31 +754,31 @@ const Distance = () => {
   }
 
   const getUser = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
           Authorization: 'Bearer ' + accessToken,
         },
-      });
+      })
 
       if (response.data) {
-        const fetchedUsers = response.data.users;
-        setUsers(fetchedUsers); // Update the state with fetched users
+        const fetchedUsers = response.data.users
+        setUsers(fetchedUsers) // Update the state with fetched users
 
         // Use fetchedUsers directly to find the selected user
-        const selectedUser = fetchedUsers.find((user) => user.userId === formData.User);
-        const selectedUserName = selectedUser ? selectedUser.username : '';
-        setSelectedUserName(selectedUserName);
+        const selectedUser = fetchedUsers.find((user) => user.userId === formData.User)
+        const selectedUserName = selectedUser ? selectedUser.username : ''
+        setSelectedUserName(selectedUserName)
 
-        console.log('Selected User:', selectedUserName);
+        console.log('Selected User:', selectedUserName)
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error)
     } finally {
-      setLoading(false); // Ensure loading state is reset in case of success or failure
+      setLoading(false) // Ensure loading state is reset in case of success or failure
     }
-  };
+  }
 
   useEffect(() => {
     getUser()
@@ -824,13 +826,13 @@ const Distance = () => {
   }
 
   // Example of extracting values similar to `selectedGroup`
-  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
-  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
-  const selectedPeriod = formData.Periods || '';
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : ''
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : ''
+  const selectedPeriod = formData.Periods || ''
 
-  console.log('Selected From Date:', selectedFromDate);
-  console.log('Selected To Date:', selectedToDate);
-  console.log('Selected Period:', selectedPeriod);
+  console.log('Selected From Date:', selectedFromDate)
+  console.log('Selected To Date:', selectedToDate)
+  console.log('Selected Period:', selectedPeriod)
 
   return (
     <>
