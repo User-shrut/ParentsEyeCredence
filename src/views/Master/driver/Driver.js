@@ -275,6 +275,9 @@ const Driver = () => {
     setFormData({ ...item })
     console.log('this is before edit', formData)
   }
+  useEffect(() => {
+    console.log('Updated formData:', formData)
+  }, [formData]) // This runs whenever `formData` changes.
 
   // ###################################################################
 
@@ -337,7 +340,6 @@ const Driver = () => {
     fetchDevices()
   }, [])
 
-
   // EXCEL DOWNLOAD
 
   const exportToExcel = () => {
@@ -374,34 +376,34 @@ const Driver = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Devices Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Drivers Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Drivers Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define the table headers
     const tableColumn = [
@@ -413,7 +415,7 @@ const Driver = () => {
       'Lic. No.',
       'Aadhar No.',
       'Address',
-    ];
+    ]
 
     // Map through the filtered data and prepare table rows
     const tableRows = filteredData.map((item, index) => [
@@ -426,7 +428,7 @@ const Driver = () => {
       item.aadharNumber || '--', // Aadhar No.
       item.address || '--', // Address
       '', // Actions column is empty in PDF
-    ]);
+    ])
 
     // Create table with autoTable
     doc.autoTable({
@@ -452,25 +454,21 @@ const Driver = () => {
         8: { cellWidth: 30 }, // Adjust width for Actions column
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 }, // Add margins for neatness
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF
-    doc.save(`Drivers_Reports_${date}.pdf`);
-  };
-
+    doc.save(`Drivers_Reports_${date}.pdf`)
+  }
 
   //  ###############################################################
 
@@ -1054,8 +1052,9 @@ const Driver = () => {
                 </TextField> */}
                 <Autocomplete
                   options={devices} // List of devices
-                  getOptionLabel={(option) => option.name} // Defines the label for each option
-                  //onChange={(event, value) => setSelectedDevice(value)}
+                  getOptionLabel={(option) => option.name}
+                  // Defines the label for each option
+                  value={devices.find((device) => device.name == formData.vehicleName) || null}
                   onChange={(event, value) =>
                     setFormData({ ...formData, deviceId: value.deviceId })
                   } // Handle selection
