@@ -726,7 +726,7 @@ const Dashboard = () => {
                 >
                   <div
                     className="vehicle-card new-vehicles"
-                  // onClick={() => dispatch(filterInactiveVehicles())}
+                    // onClick={() => dispatch(filterInactiveVehicles())}
                   >
                     <div className="vehicle-info">
                       <div className="vehicle-type text-muted">
@@ -831,10 +831,10 @@ const Dashboard = () => {
                               value={
                                 selectedUser
                                   ? {
-                                    value: selectedUser,
-                                    label: users.find((user) => user._id === selectedUser)
-                                      ?.username,
-                                  }
+                                      value: selectedUser,
+                                      label: users.find((user) => user._id === selectedUser)
+                                        ?.username,
+                                    }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
@@ -854,10 +854,10 @@ const Dashboard = () => {
                               value={
                                 selectedGroup
                                   ? {
-                                    value: selectedGroup,
-                                    label: groups.find((group) => group._id === selectedGroup)
-                                      ?.name,
-                                  }
+                                      value: selectedGroup,
+                                      label: groups.find((group) => group._id === selectedGroup)
+                                        ?.name,
+                                    }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}
@@ -1484,7 +1484,7 @@ const Dashboard = () => {
                                       className="text-center power table-cell"
                                     >
                                       {(() => {
-                                        const power = item.attributes.battery
+                                        const power = item.attributes.charge
 
                                         let iconColor = 'gray' // Default color
                                         let iconText = 'N/A' // Default text

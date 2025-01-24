@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState, useEffect, useMemo } from 'react'
 import Select, { components } from 'react-select'
 import Cookies from 'js-cookie'
@@ -118,13 +119,13 @@ export function getTimeDifference(timestamp) {
   // Format the difference in a human-readable format
   let timeDifference = ''
   if (days >= 0) {
-    timeDifference += `${days} d/ `
+    timeDifference += `${days}D `
   }
   if (hours >= 0) {
-    timeDifference += `${hours} hrs/ `
+    timeDifference += `${hours}H `
   }
   if (minutes >= 0) {
-    timeDifference += `${minutes} min`
+    timeDifference += `${minutes}M`
   }
 
   return timeDifference.trim() || 'Just now'
