@@ -32,9 +32,9 @@ const Maintenance = () => {
     <div className="maintenance">
       <h1>Under Maintenance</h1>
       <p>Sorry, our website is currently undergoing maintenance. Please check back later.</p>
-      <button className="btn btn-primary" onClick={handleRedirectToMaintenance}>
+      {/* <button className="btn btn-primary" onClick={handleRedirectToMaintenance}>
         Go To Maintenance
-      </button>
+      </button> */}
     </div>
   )
 }
