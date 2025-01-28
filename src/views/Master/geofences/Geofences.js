@@ -86,8 +86,44 @@ const Geofences = () => {
   const steps = ['Select Geofence', 'Geofence Info']
   const [filteredData, setFilteredData] = useState([])
   const [centerMap, setCenterMap] = useState({ latitude: 0, longitude: 0 })
-
+  const [area, setArea] = useState(''); // Area format for geofence
   const [selectedLocation, setSelectedLocation] = useState({ lat: 21.1458, lng: 79.0882 })
+
+  // Google map search map code 
+  const [searchQuery1, setSearchQuery1] = useState(''); // Search query state
+  const handleSearch = async () => {
+    if (!searchQuery1) return;
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          searchQuery1
+        )}&format=json&limit=1`
+      );
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const { lat, lon } = data[0];
+        const location = { lat: parseFloat(lat), lng: parseFloat(lon) };
+
+        // Set location and polygon coordinates
+        setSelectedLocation(location);
+        setPolygonCoords([{ lat: location.lat, lng: location.lng }]);
+
+        // Generate the area logic
+        const generatedArea = `Circle(${location.lat} ${location.lng}, ${radius})`;
+        setArea(generatedArea);
+
+        console.log('Generated Area:', generatedArea);
+        alert('Location and area successfully set!');
+
+      } else {
+        alert("Location not found!  please Enter a valid location");
+      }
+    } catch (error) {
+      console.error("Error fetching location:", error);
+    }
+  };
+
 
   const handleEditModalClose = () => {
     setCurrentStep(0)
@@ -302,6 +338,7 @@ const Geofences = () => {
 
   if (polygonCoords) {
     console.log('this is selected points', polygonCoords)
+    console.log("Radiusssssssscc", radius);
   }
 
   // ######################### get geofences ##############################################
@@ -447,57 +484,109 @@ const Geofences = () => {
   // ######################  Edit Geofence ###################################
 
   const EditGeofenceSubmit = async (e) => {
-    e.preventDefault()
-    console.log('FormData before submission:', formData)
+    e.preventDefault();
+    console.log("FormData before submission:", formData);
 
-    // Construct the edited data
+    // Construct the edited data - extract device IDs correctly
     const editedData = {
       ...formData,
       area:
-        polygonCoords.length === 1
-          ? [{ circle: `Circle(${polygonCoords[0].lat} ${polygonCoords[0].lng}, ${radius})` }]
-          : polygonCoords, // Handle single circle or polygon coordinates
-      deviceIds: selectedDevices.map((device) => device.value),
-    }
+        selectedLocation?.lat && selectedLocation?.lng
+          ? [{ circle: `Circle(${selectedLocation.lat} ${selectedLocation.lng}, ${radius})` }]
+          : polygonCoords,
+      deviceIds: selectedDevices.map((device) =>
+        // Handle both string and object device.value formats
+        typeof device.value === "object" ? device.value.id : device.value
+      ),
+    };
+
+    console.log("Formatted Geofence Data:", editedData);
 
     try {
-      const accessToken = Cookies.get('authToken')
+      const accessToken = Cookies.get("authToken");
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/Geofence/${formData._id}`,
         editedData,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        },
-      )
+        }
+      );
 
       if (response.status === 200) {
-        toast.success('Geofence has been updated successfully!')
-        fetchGeofenceData() // Refresh the geofence data
-        setFormData({})
-        setPolygonCoords([])
-        setSelectedDevices([])
-        setCurrentStep(0)
-        setIsDrawing(false)
-        setRadius(false)
-        setEditModalOpen(false) // Close the edit modal
-        // setSelectedLocation({})
+        toast.success("Geofence updated successfully!");
+        fetchGeofenceData();
+        // Reset states
+        setFormData({});
+        setPolygonCoords([]);
+        setSelectedDevices([]);
+        setSelectedLocation(null);
+        setCurrentStep(0);
+        setArea("");
+        setIsDrawing(false);
+        setRadius(500);
+        setEditModalOpen(false);
       }
     } catch (error) {
-      console.error('Error occurred during geofence update:', error.response || error)
-      toast.error(error.response.data.message)
+      console.error("Update error:", error.response || error);
+      toast.error(error.response?.data?.message || "Update failed");
     }
-  }
+  };
 
   const handleEditGeofence = async (item) => {
-    console.log('Geofence item to edit:', item)
-    setEditModalOpen(true) // Open the edit modal
-    setFormData({ ...item }) // Populate the form with the item's data
+    console.log('Geofence item to edit:', item);
+
+    // Open the edit modal
+    setEditModalOpen(true);
+
+    // Set form data with the existing item
+    setFormData({ ...item });
+
+    setSelectedLocation({ lat: item.area[0].lat, lng: item.area[0].lng });
     setPolygonCoords(item.area || []) // Populate polygon coordinates if present
-    setSelectedDevices(item.deviceIds || []) // Populate selected devices if present
-  }
+
+    // Handle polygon coordinates and area extraction
+    if (item.area?.length > 0) {
+      const area = item.area[0];
+      setArea(area.circle || '');
+
+      // Extract lat, lng, and radius from the 'circle' string
+      const circleMatch = area.circle.match(/Circle\(([\d.-]+) ([\d.-]+), ([\d.-]+)\)/);
+
+      if (circleMatch) {
+        const [_, lat, lng, radius] = circleMatch;
+        const parsedLat = parseFloat(lat);
+        const parsedLng = parseFloat(lng);
+        const parsedRadius = parseFloat(radius);
+
+        // Set selected location and radius
+        setSelectedLocation({ lat: parsedLat, lng: parsedLng, radius: parsedRadius });
+        setRadius(parsedRadius);
+        setPolygonCoords([{ lat: parsedLat, lng: parsedLng }]); // If needed for display
+      } else {
+        console.error('Invalid circle format:', area.circle);
+        setSelectedLocation({});
+        setRadius(null);
+        setPolygonCoords([]);
+      }
+    } else {
+      setArea('');
+      setSelectedLocation({});
+      setRadius(null);
+      setPolygonCoords([]);
+    }
+
+    // Map device IDs to react-select format
+    const formattedDevices = (item.deviceIds || []).map((deviceId) => {
+      const matchingDevice = deviceOptions.find((device) => device.value === deviceId);
+      return matchingDevice || { value: deviceId, label: deviceId.name || deviceId };
+    });
+
+    setSelectedDevices(formattedDevices);
+    console.log("Formatted devices:", formattedDevices);
+  };
 
   // #########################################################################
 
@@ -505,7 +594,6 @@ const Geofences = () => {
 
   const deleteGeofenceSubmit = async (item) => {
     const confirmed = confirm('Do you want to delete this Geofence?')
-    // If the user cancels, do nothing
     if (!confirmed) return
 
     try {
@@ -518,13 +606,22 @@ const Geofences = () => {
 
       if (response.status === 200) {
         toast.error('Geofence is deleted successfully')
+
+        // Optimistic update
+        setData((prev) => prev.filter((geo) => geo._id !== item._id))
+
+        // Fetch updated data
         fetchGeofenceData()
       }
     } catch (error) {
-      toast.error('An error occured')
-      throw error.response ? error.response.data : new Error('An error occurred')
+      const errorMessage = error.response?.data?.message || 'An error occurred'
+      toast.error(errorMessage)
     }
   }
+
+
+  // Export data to Excel
+
   const exportToExcel = () => {
     // Map filtered data into the format required for export
     const dataToExport = filteredData.map((item, rowIndex) => {
@@ -1063,23 +1160,55 @@ const Geofences = () => {
             {isLoaded ? (
               <div>
                 {!isDrawing ? (
-                  <div className="d-flex">
-                    <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                      <label style={{ fontWeight: '500' }}>Set Circle Radius (in meters): </label>
-                      <input
-                        type="number"
-                        value={radius}
-                        onChange={handleRadiusChange} // Handle radius input change
-                        min="1"
-                        style={{
-                          marginLeft: '10px',
-                          padding: '8px',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                        }}
-                      />
+                  <div className="d-flex flex-row gap-3 ms-3">
+                    {/* Set Circle Radius Section */}
+                    <div className="d-flex flex-column mb-3">
+                      <label className="fw-medium text-dark">
+                        Set Circle Radius (in meters)
+                      </label>
+                      <div className="d-flex align-items-center gap-2">
+                        <input
+                          type="number"
+                          value={radius}
+                          onChange={handleRadiusChange}
+                          min="1"
+                          max="500"
+                          className="form-control w-100"
+                        />
+                        <input
+                          type="range"
+                          value={radius}
+                          onChange={handleRadiusChange}
+                          min="1"
+                          max="500"
+                          className="form-range w-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Search Location Section */}
+                    <div className="d-flex flex-column mb-3 ms-3">
+                      <label className="fw-medium">Search Location name</label>
+                      <div className="d-flex align-items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter location name"
+                          value={searchQuery1}
+                          onChange={(e) => setSearchQuery1(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSearch();
+                            }
+                          }}
+                          className="form-control w-100"
+                        />
+                        <button onClick={handleSearch} className="btn btn-primary">
+                          Search
+                        </button>
+                      </div>
                     </div>
                   </div>
+
                 ) : (
                   <div className="d-flex">
                     <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
@@ -1447,22 +1576,53 @@ const Geofences = () => {
           <div className="mt-3">
             {isLoaded ? (
               <div>
-                <div style={{ marginBottom: '10px', marginLeft: '15px' }}>
-                  <label style={{ fontWeight: '500', color: '#2c3e50' }}>
-                    Set Circle Radius (in meters):{' '}
-                  </label>
-                  <input
-                    type="number"
-                    value={radius}
-                    onChange={handleRadiusChange} // Handle radius input change
-                    min="1"
-                    style={{
-                      marginLeft: '10px',
-                      padding: '8px',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                    }}
-                  />
+                <div className="d-flex flex-row gap-3 ms-3">
+                  {/* Set Circle Radius Section */}
+                  <div className="d-flex flex-column mb-3">
+                    <label className="fw-medium text-dark">
+                      Set Circle Radius (in meters)
+                    </label>
+                    <div className="d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        value={radius}
+                        onChange={handleRadiusChange}
+                        min="1"
+                        max="500"
+                        className="form-control w-100"
+                      />
+                      <input
+                        type="range"
+                        value={radius}
+                        onChange={handleRadiusChange}
+                        min="1"
+                        max="500"
+                        className="form-range w-100"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Search Location Section */}
+                  <div className="d-flex flex-column mb-3 ms-3">
+                    <label className="fw-medium">Search Location name</label>
+                    <div className="d-flex align-items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Enter location name"
+                        value={searchQuery1}
+                        onChange={(e) => setSearchQuery1(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch();
+                          }
+                        }}
+                        className="form-control w-100"
+                      />
+                      <button onClick={handleSearch} className="btn btn-primary">
+                        Search
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <GoogleMap
