@@ -1,0 +1,36 @@
+/* Add to your CSS file */
+.CPagination {
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.CPaginationItem {
+    cursor: pointer;
+    margin: 0 3px;
+    padding: 5px 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.CPaginationItem.active {
+    background-color: #0a2d63;
+    color: white;
+    border-color: #0a2d63;
+}
+
+.table-container::-webkit-scrollbar {
+    scrollbar-width: 2px;
+    /* Hides scrollbar for Chrome, Safari, and Edge */
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 4px !important;
+    /* Make the scrollbar height thin */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #0a2d63 !important;
+    /* Scrollbar color */
+    border-radius: 2px !important;
+    /* Rounded edges */
+}

@@ -80,6 +80,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { Eye, EyeOff } from 'lucide-react'
 
 const Users = () => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   // somthing for testing
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -596,36 +597,34 @@ const Users = () => {
   // Excel and pdf download
 
   const exportToExcel = async () => {
-    // Create a new workbook and add a worksheet
+    // Create a new workbook and worksheet
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('User Data')
+    const worksheet = workbook.addWorksheet('Users Report')
 
-    // Define the headers
-    worksheet.columns = [
-      { header: 'SN', key: 'sn', width: 5 },
-      { header: 'Name', key: 'name', width: 20 },
-      { header: 'Email', key: 'email', width: 30 },
-      { header: 'Mobile No.', key: 'mobile', width: 15 },
-      { header: 'Master Permissions', key: 'masterPermissions', width: 40 },
-      { header: 'Reports Permissions', key: 'reportsPermissions', width: 40 },
+    // Add title rows
+    const titleRow = ['Credence Tracker']
+    const subtitleRow = ['Users Report']
+    const dateRow = [`Date: ${new Date().toLocaleDateString()}`]
+    const emptyRow = []
+
+    // Add headers
+    const headerRow = [
+      'SN',
+      'Name',
+      'Email',
+      'Mobile No.',
+      'Master Permissions',
+      'Reports Permissions',
     ]
 
-    // Add custom styles to headers
-    worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } } // White font
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FF6C757D' }, // Background color set to #6C757D
-      }
-      cell.alignment = { horizontal: 'center', vertical: 'middle' }
-    })
+    // Add all rows to the worksheet
+    worksheet.addRows([titleRow, subtitleRow, dateRow, emptyRow, headerRow])
 
-    // Map filtered data into the format required for export
-    filteredData?.forEach((item, rowIndex) => {
+    // Add data rows
+    filteredData?.forEach((item, index) => {
       const masterPermissions =
         ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-          .filter((permission) => item[permission])
+          .filter((p) => item[p])
           .join(', ') || 'N/A'
 
       const reportsPermissions =
@@ -641,26 +640,82 @@ const Users = () => {
           'vehicle',
           'geofenceReport',
         ]
-          .filter((permission) => item[permission])
+          .filter((p) => item[p])
           .join(', ') || 'N/A'
 
-      // Add rows with mapped data
-      worksheet.addRow({
-        sn: rowIndex + 1,
-        name: item.username || 'N/A',
-        email: item.email || 'N/A',
-        mobile: item.mobile || 'N/A',
+      worksheet.addRow([
+        index + 1,
+        item.username || '--',
+        item.email || '--',
+        item.mobile || 'N/A',
         masterPermissions,
         reportsPermissions,
-      })
+      ])
     })
 
-    // Write the Excel file to a Blob and save it
+    // Styling
+    const titleFont = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } }
+    const headerFont = { bold: true, color: { argb: 'FFFFFFFF' } }
+
+    // Title styling
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = titleFont
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0A2D63' }, // Dark blue
+      }
+    })
+
+    // Subtitle styling
+    worksheet.getRow(2).eachCell((cell) => {
+      cell.font = { ...titleFont, size: 14 }
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF6C757D' }, // Gray
+      }
+    })
+
+    // Header styling
+    worksheet.getRow(5).eachCell((cell) => {
+      cell.font = headerFont
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0A2D63' }, // Dark blue
+      }
+      cell.alignment = { vertical: 'middle', horizontal: 'center' }
+    })
+
+    // Column widths
+    worksheet.columns = [
+      { key: 'sn', width: 8 }, // SN
+      { key: 'name', width: 25 }, // Name
+      { key: 'email', width: 35 }, // Email
+      { key: 'mobile', width: 15 }, // Mobile
+      { key: 'master', width: 35 }, // Master Permissions
+      { key: 'reports', width: 35 }, // Reports Permissions
+    ]
+
+    // Add borders to data rows
+    const lastRow = worksheet.rowCount
+    for (let i = 6; i <= lastRow; i++) {
+      worksheet.getRow(i).border = {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+      }
+    }
+
+    // Save the file
     const buffer = await workbook.xlsx.writeBuffer()
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
-    saveAs(blob, 'user_data.xlsx')
+    saveAs(blob, `Users_Report_${new Date().toISOString().split('T')[0]}.xlsx`)
+    toast.success('Excel file downloaded successfully!')
   }
 
   // PDF CODE
@@ -668,36 +723,31 @@ const Users = () => {
   const exportToPDF = async () => {
     const doc = new jsPDF({
       orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
     })
 
-    // Add current date
+    // Main content
     const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
       .padStart(2, '0')}-${today.getFullYear().toString()}`
 
-    // Add "Credence Tracker" heading
+    // Title
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(22)
-    const title = 'Credence Tracker'
-    const pageWidth = doc.internal.pageSize.width
-    const titleWidth = doc.getTextWidth(title)
-    const titleX = (pageWidth - titleWidth) / 2
-    doc.text(title, titleX, 15)
+    doc.text('Credence Tracker', 15, 20)
 
-    // Add "Users Reports" heading
+    // Subtitle
     doc.setFontSize(16)
-    const subtitle = 'Users Reports'
-    const subtitleWidth = doc.getTextWidth(subtitle)
-    const subtitleX = (pageWidth - subtitleWidth) / 2
-    doc.text(subtitle, subtitleX, 25)
+    doc.text('Users Report', 15, 28)
 
-    // Add current date at the top-right corner
-    doc.setFontSize(12)
+    // Metadata
+    doc.setFontSize(10)
     doc.setFont('helvetica', 'normal')
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
+    doc.text(`Date: ${date}`, 250, 20)
 
-    // Define table headers
+    // Table data
     const tableColumn = [
       'SN',
       'Name',
@@ -707,84 +757,66 @@ const Users = () => {
       'Reports Permissions',
     ]
 
-    // Define table rows
-    const tableRows = filteredData?.map((row, rowIndex) => {
-      const masterPermissions =
-        ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
-          .filter((permission) => row[permission])
-          .join(', ') || 'N/A'
-
-      const reportsPermissions =
-        [
-          'history',
-          'stop',
-          'travel',
-          'status',
-          'distance',
-          'idle',
-          'sensor',
-          'alerts',
-          'vehicle',
-          'geofenceReport',
-        ]
-          .filter((permission) => row[permission])
-          .join(', ') || 'N/A'
-
-      const rowData = [
-        rowIndex + 1,
-        row.username || '--',
-        row.email || '--',
-        row.mobile || 'N/A',
-        masterPermissions,
-        reportsPermissions,
+    const tableRows = filteredData?.map((row, rowIndex) => [
+      rowIndex + 1,
+      row.username || '--',
+      row.email || '--',
+      row.mobile || 'N/A',
+      ['users', 'groups', 'devices', 'geofence', 'driver', 'notification', 'maintenance']
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A',
+      [
+        'history',
+        'stop',
+        'travel',
+        'status',
+        'distance',
+        'idle',
+        'sensor',
+        'alerts',
+        'vehicle',
+        'geofenceReport',
       ]
+        .filter((permission) => row[permission])
+        .join(', ') || 'N/A',
+    ])
 
-      return rowData
-    })
-
-    // Define column styles for better layout
-    const columnStyles = {
-      1: { cellWidth: 40 }, // Name
-      2: { cellWidth: 60 }, // Email
-      3: { cellWidth: 30 }, // Mobile No.
-      4: { cellWidth: 60 }, // Master Permissions
-      5: { cellWidth: 60 }, // Reports Permissions
-    }
-
-    // Add table using autoTable
+    // Generate table
     doc.autoTable({
+      startY: 45,
       head: [tableColumn],
       body: tableRows,
-      startY: 35, // Start below the headings
       theme: 'grid',
       headStyles: {
-        fillColor: [100, 100, 255], // Blue header background
-        textColor: [255, 255, 255], // White text
+        fillColor: [10, 45, 99], // Dark blue
+        textColor: 255,
         fontStyle: 'bold',
       },
-      bodyStyles: {
+      alternateRowStyles: {
+        fillColor: [240, 240, 240],
+      },
+      margin: { left: 20, right: 10 },
+      styles: {
         fontSize: 10,
         cellPadding: 2,
       },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240], // Light gray for alternating rows
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 60 },
+        5: { cellWidth: 60 },
       },
-      columnStyles,
-      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      didDrawPage: () => {
+        // Footer
+        doc.setFontSize(10)
+        doc.text('Page ' + doc.internal.getNumberOfPages(), 280, 200)
+      },
     })
 
-    // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages()
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      doc.setFontSize(10)
-      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
-        align: 'center',
-      })
-    }
-
-    // Save the PDF
-    doc.save(`Users_Reports_${date}.pdf`)
+    // Save PDF
+    doc.save(`Users_Report_${date}.pdf`)
   }
 
   // add group
@@ -868,6 +900,46 @@ const Users = () => {
   useEffect(() => {
     fetchGroups()
   }, [])
+
+  // SORTING LOGIC
+  const getSortValue = (item, key) => {
+    switch (key) {
+      case 'name':
+        return item.username?.toLowerCase() || ''
+      case 'email':
+        return item.email?.toLowerCase() || ''
+      case 'mobile':
+        return item.mobile || ''
+      case 'password':
+        return item.password || ''
+      default:
+        return ''
+    }
+  }
+
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig.key) return filteredData
+    const sortedItems = [...filteredData].sort((a, b) => {
+      const aValue = getSortValue(a, sortConfig.key)
+      const bValue = getSortValue(b, sortConfig.key)
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      } else {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+      }
+    })
+    return sortedItems
+  }, [filteredData, sortConfig])
+
+  const handleSort = (key) => {
+    let direction = 'asc'
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key, direction })
+  }
 
   //  ####################################################
 
@@ -978,21 +1050,30 @@ const Users = () => {
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
-                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white', cursor: 'pointer' }}
+                        onClick={() => handleSort('name')}
                       >
                         <strong>Name</strong>
+                        {sortConfig.key === 'name' &&
+                          (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className="text-center table-cell"
-                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white', cursor: 'pointer' }}
+                        onClick={() => handleSort('email')}
                       >
                         <strong>Email</strong>
+                        {sortConfig.key === 'email' &&
+                          (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className="text-center table-cell"
-                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white', cursor: 'pointer' }}
+                        onClick={() => handleSort('mobile')}
                       >
                         <strong>Mobile No.</strong>
+                        {sortConfig.key === 'mobile' &&
+                          (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
                       <CTableHeaderCell
                         className=" text-center table-cell"
@@ -1009,9 +1090,12 @@ const Users = () => {
 
                       <CTableHeaderCell
                         className="text-center table-cell"
-                        style={{ backgroundColor: '#0a2d63', color: 'white' }}
+                        style={{ backgroundColor: '#0a2d63', color: 'white', cursor: 'pointer' }}
+                        onClick={() => handleSort('password')}
                       >
                         <strong>Password</strong>
+                        {sortConfig.key === 'password' &&
+                          (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
 
                       <CTableHeaderCell
@@ -1043,8 +1127,8 @@ const Users = () => {
                           </div>
                         </CTableDataCell>
                       </CTableRow>
-                    ) : filteredData.length > 0 ? (
-                      filteredData?.map((item, index) => (
+                    ) : sortedData.length > 0 ? (
+                      sortedData.map((item, index) => (
                         <CTableRow key={index} className="p-0" style={{ fontSize: '13px' }}>
                           <CTableDataCell
                             className="text-center p-0"

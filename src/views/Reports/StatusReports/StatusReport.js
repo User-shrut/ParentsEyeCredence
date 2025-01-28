@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { Edit, Copy, Trash, Share } from 'lucide-react'
 import {
   CButton,
   CCard,
@@ -22,12 +23,14 @@ import {
   CDropdownToggle,
   CDropdownMenu,
   CDropdownItem,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import Select from 'react-select'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import CIcon from '@coreui/icons-react'
-import { cilSettings } from '@coreui/icons'
+import { cilSettings, cilChevronBottom } from '@coreui/icons'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
@@ -40,6 +43,7 @@ import ignitionOn from 'src/status/power-on.png'
 import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
 import '../../../utils.css'
+import IconDropdown from '../../../components/ButtonDropdown'
 
 const SearchStatus = ({
   formData,
@@ -64,7 +68,7 @@ const SearchStatus = ({
   const [selectedG, setSelectedG] = useState()
 
   // For username show in pdf
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
     handlePutName(putName)
@@ -136,30 +140,6 @@ const SearchStatus = ({
       </CCol>
       <CCol md={2}>
         <CFormLabel htmlFor="devices">Groups</CFormLabel>
-        {/* <CFormSelect
-          id="group"
-          required
-          value={selectedG}
-          onChange={(e) => {
-            const selectedGroup = e.target.value;
-            setSelectedG(selectedGroup);
-            console.log("Selected Group ID:", selectedGroup);
-            getDevices(selectedGroup);
-          }}
-        >
-          <option value="">Choose a group...</option>
-
-          {loading ? (<option disabled>Loading Groups...</option>) : (
-            groups?.length > 0 ? (
-              groups?.map((group) => (
-                <option key={group._id} value={group._id}>{group.name}</option>
-              ))
-            ) : (
-              <option disabled>No Groups in this User</option>
-            )
-          )
-          }
-        </CFormSelect> */}
         <Select
           id="group"
           options={
@@ -343,9 +323,23 @@ const SearchStatus = ({
   )
 }
 
-const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumns, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, selectedPeriod }) => {
+const ShowStatus = ({
+  statusLoading,
+  apiData,
+  selectedDeviceName,
+  selectedColumns,
+  selectedGroupName,
+  selectedUserName,
+  selectedFromDate,
+  selectedToDate,
+  selectedPeriod,
+}) => {
+  const [itemsPerPage, setItemsPerPage] = useState(10) // Default to 10 rows
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [addressData, setAddressData] = useState({})
-  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa", selectedUserName)
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa', selectedUserName)
   const [newAddressData, setnewAddressData] = useState()
   // Function to get address based on latitude and longitude using Nominatim API
   const getAddress = async (latitude, longitude) => {
@@ -438,10 +432,10 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           return newAddressData?.endAddress || 'Fetching...'
         } else if (column === 'Distance') {
           return row.distance
-        } else if (column === 'Total KM') {
-          return row.totalKm
+          // } else if (column === 'Total KM') {
+          //   return row.totalKm
         } else if (column === 'Maximum Speed') {
-          return row.maxSpeed
+          return row.maxSpeed + ' km'
         } else if (column === 'Total Distance') {
           return (row.totalKm / 1000).toFixed(2) + ' km'
         } else if (column === 'Driver Name') {
@@ -472,33 +466,35 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`;
+      .padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`
 
     // Add "Credence Tracker" heading centered
-    doc.setFontSize(22); // Larger font size for heading
-    doc.setFont('helvetica', 'bold'); // Bold font for title
-    const title = 'Credence Tracker';
-    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFontSize(22) // Larger font size for heading
+    doc.setFont('helvetica', 'bold') // Bold font for title
+    const title = 'Credence Tracker'
+    const titleWidth =
+      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Status Reports" heading below "Credence Tracker"
-    doc.setFontSize(16);
-    const subtitle = 'Status Reports'; // Align with the title
-    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Status Reports' // Align with the title
+    const subtitleWidth =
+      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal'); // Normal font for text
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal') // Normal font for text
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
 
     // Add device and user details
     const details = [
@@ -506,58 +502,57 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
       `Group Name: ${selectedGroupName || 'N/A'}`,
       `Vehicle Name: ${selectedDeviceName || 'N/A'}`,
       `Period: ${selectedPeriod || 'N/A'} | From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ];
+    ]
 
-    let yPosition = 35;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    let yPosition = 35
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((detail) => {
-      doc.text(detail, 14, yPosition);
-      yPosition += 8; // Spacing between lines
-    });
-
+      doc.text(detail, 14, yPosition)
+      yPosition += 8 // Spacing between lines
+    })
 
     // Define table columns and rows
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
     const tableRows = apiData.data.map((row, rowIndex) => {
       const rowData = selectedColumns.map((column) => {
         if (column === 'Vehicle Status') {
-          if (row.vehicleStatus === 'Idle') return 'Idle';
-          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off';
-          if (row.vehicleStatus === 'Ignition On') return 'Ignition On';
-          return '--';
+          if (row.vehicleStatus === 'Idle') return 'Idle'
+          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off'
+          if (row.vehicleStatus === 'Ignition On') return 'Ignition On'
+          return '--'
         } else if (column === 'Start Date Time') {
-          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
+          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`
         } else if (column === 'Start Address') {
-          return newAddressData?.startAddress || 'Fetching...';
+          return newAddressData?.startAddress || 'Fetching...'
         } else if (column === 'Start Coordinates') {
-          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`;
+          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
         } else if (column === 'Distance') {
-          return row.distance;
+          return row.distance
         } else if (column === 'Duration') {
-          return row.time;
+          return row.time
         } else if (column === 'Total Distance') {
-          return (row.distance / 1000).toFixed(2) + ' km';
+          return (row.distance / 1000).toFixed(2) + ' km'
         } else if (column === 'Maximum Speed') {
-          return row.maxSpeed;
-        } else if (column === 'Total KM') {
-          return row.totalKm;
+          return row.maxSpeed + ' km'
+          // } else if (column === 'Total KM') {
+          //   return row.totalKm
         } else if (column === 'End Date Time') {
-          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`;
+          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`
         } else if (column === 'End Address') {
-          return newAddressData?.endAddress || 'Fetching...';
+          return newAddressData?.endAddress || 'Fetching...'
         } else if (column === 'End Coordinates') {
-          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`;
+          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
         } else if (column === 'Driver Name') {
-          return row.driverInfos?.driverName || '--';
+          return row.driverInfos?.driverName || '--'
         } else if (column === 'Driver Phone No.') {
-          return row.device?.name || '--';
+          return row.device?.name || '--'
         } else {
-          return row[column] || '--'; // Fallback for other columns
+          return row[column] || '--' // Fallback for other columns
         }
-      });
-      return [rowIndex + 1, selectedDeviceName, ...rowData];
-    });
+      })
+      return [rowIndex + 1, selectedDeviceName, ...rowData]
+    })
 
     // Add autoTable with enhanced styling
     doc.autoTable({
@@ -581,30 +576,131 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
         fillColor: [240, 240, 240], // Light gray for alternating rows
       },
       margin: { top: 20 },
-    });
+    })
 
     // Save the PDF
-    doc.save(`${selectedDeviceName || 'Report'}_Status_Report_${date}.pdf`);
-  };
+    doc.save(`${selectedDeviceName || 'Report'}_Status_Report_${date}.pdf`)
+  }
 
+  const handleSort = (column) => {
+    const isAsc = sortBy === column && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortBy(column)
+  }
 
+  const sortedData = [...(apiData?.data || [])].sort((a, b) => {
+    if (!sortBy) return 0
 
+    // Extract values for comparison based on the column
+    const getValue = (row, column) => {
+      switch (column) {
+        case 'Vehicle Name':
+          return selectedDeviceName
+        case 'Vehicle Status':
+          return row.vehicleStatus
+        case 'Start Date Time':
+          return new Date(row.startDateTime)
+        case 'End Date Time':
+          return new Date(row.endDateTime)
+        case 'Distance':
+        case 'Total Distance':
+          return row.distance
+        case 'Maximum Speed':
+          return row.maxSpeed
+        // case 'Total KM':
+        //   return row.totalKm
+        case 'Duration':
+          return row.time
+        default:
+          return row[column]
+      }
+    }
+
+    const aValue = getValue(a, sortBy)
+    const bValue = getValue(b, sortBy)
+
+    // Compare values
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+    } else {
+      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue
+    }
+  })
+
+  // Calculate pagination boundaries
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage)
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem)
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage) // Update rows per page
+    setCurrentPage(1) // Reset to first page
+  }
+
+  const dropdownItems = [
+    {
+      icon: Edit,
+      onClick: () => console.log('Edit clicked'),
+    },
+    {
+      icon: Copy,
+      onClick: () => console.log('Duplicate clicked'),
+    },
+    {
+      icon: Share,
+      onClick: () => console.log('Share clicked'),
+    },
+    {
+      icon: Trash,
+      onClick: () => console.log('Delete clicked'),
+    },
+  ]
 
   return (
     <>
-      <CTable bordered className="custom-table" style={{ overflowX: auto }}>
+      {/**TABLE */}
+      <CTable
+        bordered
+        className="custom-table table-container"
+        style={{ overflowX: auto }}
+        responsive
+      >
         <CTableHead>
           <CTableRow>
-            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+            <CTableHeaderCell
+              style={{ backgroundColor: '#0a2d63', color: 'white', width: '70px' }}
+              className="text-center"
+            >
               SN
             </CTableHeaderCell>
-            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+            <CTableHeaderCell
+              style={{
+                minWidth: '170px',
+                backgroundColor: '#0a2d63',
+                color: 'white',
+                cursor: 'pointer',
+              }}
+              className="text-center"
+              onClick={() => handleSort('Vehicle Name')}
+            >
               Vehicle Name
+              {sortBy === 'Vehicle Name' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
             </CTableHeaderCell>
-            {/* Dynamically render table headers based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              <CTableHeaderCell
+                key={index}
+                style={{
+                  backgroundColor: '#0a2d63',
+                  color: 'white',
+                  cursor: 'pointer',
+                  minWidth: '170px',
+                }}
+                className="text-center"
+                onClick={() => handleSort(column)}
+              >
                 {column}
+                {sortBy === column && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
               </CTableHeaderCell>
             ))}
           </CTableRow>
@@ -636,16 +732,18 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                 </div>
               </CTableDataCell>
             </CTableRow>
-          ) : apiData?.data && apiData.data.length > 0 ? (
-            apiData.data.map((row, rowIndex) => (
+          ) : currentItems && currentItems.length > 0 ? (
+            currentItems.map((row, rowIndex) => (
               <CTableRow key={row.id} className="custom-row">
                 <CTableDataCell
                   style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                  className="text-center align-middle"
                 >
                   {rowIndex + 1}
                 </CTableDataCell>
                 <CTableDataCell
                   style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                  className="text-center align-middle"
                 >
                   {selectedDeviceName}
                 </CTableDataCell>
@@ -655,6 +753,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                     <CTableDataCell
                       key={index}
                       style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center align-middle"
                     >
                       {column === 'Vehicle Status' ? (
                         row.vehicleStatus === 'Idle' ? (
@@ -708,9 +807,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                       ) : column === 'Total Distance' ? (
                         (row.distance / 1000).toFixed(2) + ' km'
                       ) : column === 'Maximum Speed' ? (
-                        row.maxSpeed
-                      ) : column === 'Total KM' ? (
-                        row.totalKm
+                        row.maxSpeed + ' km'
                       ) : column === 'End Address' ? (
                         newAddressData?.endAddress || 'Fetching...'
                       ) : column === 'Vehicle Status' ? (
@@ -718,14 +815,14 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
                       ) : column === 'Duration' ? (
                         row.time
                       ) : // : column === 'Average Speed'
-                        //   ? row.averageSpeed
-                        column === 'Start Coordinates' ? (
-                          `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
-                        ) : column === 'End Coordinates' ? (
-                          `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-                        ) : (
-                          '--'
-                        )}
+                      //   ? row.averageSpeed
+                      column === 'Start Coordinates' ? (
+                        `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
+                      ) : column === 'End Coordinates' ? (
+                        `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
+                      ) : (
+                        '--'
+                      )}
                     </CTableDataCell>
                   </>
                 ))}
@@ -751,7 +848,72 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
         </CTableBody>
       </CTable>
 
-      <CDropdown className="position-fixed bottom-0 end-0 m-3">
+      {/* Rows Per Page Dropdown */}
+      <CRow className="mb-3">
+        <CCol xs={12} className="d-flex justify-content-end">
+          <CDropdown aria-label="Rows per page selector">
+            <CDropdownToggle color="secondary" className="d-flex align-items-center">
+              {itemsPerPage === Infinity ? 'All' : itemsPerPage}
+            </CDropdownToggle>
+            <CDropdownMenu>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(10)}>10 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(15)}>15 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(25)}>25 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(50)}>50 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(100)}>100 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(200)}>200 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(500)}>500 rows</CDropdownItem>
+              <CDropdownItem onClick={() => handleItemsPerPageChange(Infinity)}>
+                All rows
+              </CDropdownItem>
+            </CDropdownMenu>
+          </CDropdown>
+        </CCol>
+      </CRow>
+
+      {!statusLoading && (
+        <CRow className="my-3">
+          <CCol xs={6} className="d-flex align-items-center">
+            <span className="text-muted small">
+              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, sortedData.length)} of{' '}
+              {sortedData.length} entries
+            </span>
+          </CCol>
+          <CCol xs={6}>
+            {/* Existing pagination code */}
+            {sortedData.length > itemsPerPage && (
+              <CPagination align="end" aria-label="Table pagination">
+                <CPaginationItem
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                >
+                  Previous
+                </CPaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <CPaginationItem
+                    key={page}
+                    active={page === currentPage}
+                    onClick={() => setCurrentPage(page)}
+                    aria-current={page === currentPage ? 'page' : undefined}
+                  >
+                    {page}
+                  </CPaginationItem>
+                ))}
+                <CPaginationItem
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                >
+                  Next
+                </CPaginationItem>
+              </CPagination>
+            )}
+          </CCol>
+        </CRow>
+      )}
+
+      <IconDropdown items={dropdownItems} />
+
+      {/* <CDropdown className="position-fixed bottom-0 end-0 m-3">
         <CDropdownToggle
           color="secondary"
           style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
@@ -762,7 +924,7 @@ const ShowStatus = ({ statusLoading, apiData, selectedDeviceName, selectedColumn
           <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
           <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
         </CDropdownMenu>
-      </CDropdown>
+      </CDropdown> */}
     </>
   )
 }
@@ -789,23 +951,23 @@ const Status = () => {
     'Start Date Time',
     'Start Address',
     'Start Coordinates',
-    'Total Distance',
-    'Total KM',
-    'Maximum Speed',
     'End Date Time',
     'End Address',
     'End Coordinates',
+    'Total Distance',
     'Duration',
+    // 'Total KM',
+    'Maximum Speed',
     // 'Distance',
   ])
   const [selectedColumns, setSelectedColumns] = useState([])
   const token = Cookies.get('authToken') //
   const [apiData, setApiData] = useState() //data from api
   const [statusLoading, setStatusLoading] = useState(false)
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+    console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', putName)
   }, [putName])
 
   // Get the selected device name from the device list based on formData.Devices
@@ -814,7 +976,7 @@ const Status = () => {
 
   const handlePutName = (name) => {
     setPutName(name)
-    console.log("putName", putName)
+    console.log('putName', putName)
   }
   const getDevices = async (selectedGroup) => {
     const accessToken = Cookies.get('authToken')
@@ -865,7 +1027,6 @@ const Status = () => {
       const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
       const selectedGroupName = selectedGroup ? selectedGroup.name : ''
       console.log('Selected Group:', selectedGroupName)
-
     } catch (error) {
       setLoading(false)
       console.error('Error fetching data:', error)
@@ -874,29 +1035,29 @@ const Status = () => {
   }
 
   const getUser = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
           Authorization: 'Bearer ' + accessToken,
         },
-      });
+      })
       if (response.data) {
-        setUsers(response.data.users);
-        setLoading(false);
-        console.log('Users fetched successfully.');
+        setUsers(response.data.users)
+        setLoading(false)
+        console.log('Users fetched successfully.')
 
         // After users are set, update selectedUserName based on formData.User
-        const selectedUser = users.find((user) => user.userId === formData.User);
-        const selectedUserName = selectedUser ? selectedUser.username : '';
-        setSelectedUserName(selectedUserName);
-        console.log('Selected Userrerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr:', selectedUserName);
+        const selectedUser = users.find((user) => user.userId === formData.User)
+        const selectedUserName = selectedUser ? selectedUser.username : ''
+        setSelectedUserName(selectedUserName)
+        console.log('Selected Userrerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr:', selectedUserName)
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
+      console.error('Error fetching data:', error)
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     getUser()
@@ -951,13 +1112,13 @@ const Status = () => {
   }
 
   // Example of extracting values similar to `selectedGroup`
-  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
-  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
-  const selectedPeriod = formData.Periods || '';
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : ''
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : ''
+  const selectedPeriod = formData.Periods || ''
 
-  console.log('Selected From Date:', selectedFromDate);
-  console.log('Selected To Date:', selectedToDate);
-  console.log('Selected Period:', selectedPeriod);
+  console.log('Selected From Date:', selectedFromDate)
+  console.log('Selected To Date:', selectedToDate)
+  console.log('Selected Period:', selectedPeriod)
 
   return (
     <>

@@ -57,6 +57,7 @@ import '../../../../src/app.css'
 import SearchIcon from '@mui/icons-material/Search'
 
 const Group = () => {
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' })
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -273,43 +274,43 @@ const Group = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Devices Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Groups Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Groups Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define the table headers
-    const tableColumn = ['SN', 'Group Name'];
+    const tableColumn = ['SN', 'Group Name']
 
     // Map over your filteredData to create rows
     const tableRows = filteredData.map((item, rowIndex) => [
       rowIndex + 1, // Serial Number
       item.name || '--', // Group Name
-    ]);
+    ])
 
     // Create table using autoTable
     doc.autoTable({
@@ -331,26 +332,45 @@ const Group = () => {
         fillColor: [240, 240, 240], // Light gray for alternating rows
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF
-    doc.save(`group_data_${date}.pdf`);
-  };
+    doc.save(`group_data_${date}.pdf`)
+  }
 
+  // Add this before the return statement
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig.key) return filteredData
 
+    return [...filteredData].sort((a, b) => {
+      const aValue = a[sortConfig.key]?.toLowerCase() || ''
+      const bValue = b[sortConfig.key]?.toLowerCase() || ''
+
+      if (sortConfig.direction === 'asc') {
+        return aValue.localeCompare(bValue)
+      } else {
+        return bValue.localeCompare(aValue)
+      }
+    })
+  }, [filteredData, sortConfig])
+
+  // Add this function with other handlers
+  const handleHeaderClick = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
   //  ###############################################################
 
   return (
@@ -449,14 +469,26 @@ const Group = () => {
 
                       <CTableHeaderCell
                         className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        style={{
+                          backgroundColor: '#0a2d63',
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                        }}
+                        onClick={() => handleHeaderClick('name')}
                       >
                         <strong>Group Name</strong>
+                        {sortConfig.key === 'name' &&
+                          (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
 
                       <CTableHeaderCell
                         className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        style={{
+                          backgroundColor: '#0a2d63',
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                        }}
+                        onClick={() => handleHeaderClick('action')}
                       >
                         <strong>Actions</strong>
                       </CTableHeaderCell>
@@ -485,7 +517,7 @@ const Group = () => {
                         </CTableRow>
                       </>
                     ) : filteredData.length > 0 ? (
-                      filteredData?.map((item, index) => (
+                      sortedData?.map((item, index) => (
                         <CTableRow key={index}>
                           <CTableDataCell
                             className="text-center p-0"

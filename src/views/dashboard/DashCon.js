@@ -125,6 +125,7 @@ const Dashboard = () => {
   const { devices: deviceList } = useSelector((state) => state.devices)
 
   const { newAddress } = useSelector((state) => state.address)
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   const [filter, setFilter] = useState('all')
   const [address, setAddress] = useState({})
   const mapRef = useRef(null)
@@ -134,11 +135,6 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 10
   const pageCount = Math.ceil(filteredVehicles.length / itemsPerPage)
-
-  const currentVehicles = filteredVehicles.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage,
-  )
 
   const handlePageClick = (event) => {
     setCurrentPage(event.selected)
@@ -577,6 +573,70 @@ const Dashboard = () => {
     findDevicesWithoutPositions()
   }, [filteredVehicles])
 
+  // sorting login
+  const getSortValue = (item, key) => {
+    switch (key) {
+      case 'vehicle':
+        return item.category
+      case 'deviceName':
+        return item.name
+      case 'address':
+        return address[item.deviceId] || ''
+      case 'lastUpdate':
+        return new Date(item.lastUpdate)
+      case 'cd':
+        return getTimeDifference(item.lastUpdate)
+      case 'sp':
+        return item.speed
+      case 'distance':
+        return item.attributes.distance
+      case 'td':
+        return item.TD
+      case 'sat':
+        return item.attributes.sat
+      case 'ig':
+        return item.attributes.ignition ? 1 : 0
+      case 'gps':
+        return item.valid ? 1 : 0
+      case 'power':
+        return item.attributes.charge ? 1 : 0
+      default:
+        return ''
+    }
+  }
+
+  const sortedVehicles = React.useMemo(() => {
+    if (!sortConfig.key) return filteredVehicles
+    const sortableItems = [...filteredVehicles]
+    sortableItems.sort((a, b) => {
+      const aValue = getSortValue(a, sortConfig.key)
+      const bValue = getSortValue(b, sortConfig.key)
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      } else {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+      }
+    })
+    return sortableItems
+  }, [filteredVehicles, sortConfig])
+
+  // Update currentVehicles to use sortedVehicles
+  const currentVehicles = sortedVehicles.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage,
+  )
+
+  // Add handleSort function
+  const handleSort = (key) => {
+    let direction = 'asc'
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key, direction })
+  }
+
   return (
     <>
       {/* <WidgetsDropdown className="mb-4" /> */}
@@ -1006,20 +1066,26 @@ const Dashboard = () => {
                               {visibleColumns.vehicle && (
                                 <CTableHeaderCell
                                   className="text-center vehicle table-cell"
+                                  onClick={() => handleSort('vehicle')}
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
                                     color: 'white',
                                   }}
                                 >
-                                  Vehicle
+                                  Vehicle{' '}
+                                  {sortConfig.key === 'vehicle' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.deviceName && (
                                 <CTableHeaderCell
                                   className="text-center device-name table-cell"
+                                  onClick={() => handleSort('deviceName')}
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1027,12 +1093,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Device Name
+                                  {sortConfig.key === 'deviceName' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.address && (
                                 <CTableHeaderCell
                                   className="text-center address table-cell"
+                                  onClick={() => handleSort('address')}
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     width: '25%',
@@ -1044,12 +1114,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Address
+                                  {sortConfig.key === 'address' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.lastUpdate && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('lastUpdate')}
                                   className="text-center last-update table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     width: '25%',
@@ -1061,12 +1135,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   &nbsp;&nbsp;Last Update&nbsp;&nbsp;
+                                  {sortConfig.key === 'lastUpdate' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.cd && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('cd')}
                                   className="text-center current-delay table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1075,12 +1153,16 @@ const Dashboard = () => {
                                 >
                                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C/D
                                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  {sortConfig.key === 'cd' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.sp && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('sp')}
                                   className="text-center speed table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1088,12 +1170,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Sp
+                                  {sortConfig.key === 'sp' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.distance && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('distance')}
                                   className="text-center distance table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1101,12 +1187,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Distance
+                                  {sortConfig.key === 'distance' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.td && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('td')}
                                   className="text-center total-distance table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1114,12 +1204,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   T/D
+                                  {sortConfig.key === 'td' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.sat && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('sat')}
                                   className="text-center satellite table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1127,12 +1221,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   GPS
+                                  {sortConfig.key === 'sat' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.ig && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('ig')}
                                   className="text-center ignition table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1140,12 +1238,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Ig
+                                  {sortConfig.key === 'ig' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.gps && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('gps')}
                                   className="text-center gps table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1153,12 +1255,16 @@ const Dashboard = () => {
                                   }}
                                 >
                                   GSM
+                                  {sortConfig.key === 'gps' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               {visibleColumns.power && (
                                 <CTableHeaderCell
+                                  onClick={() => handleSort('power')}
                                   className="text-center power table-cell"
                                   style={{
+                                    cursor: 'pointer',
                                     position: 'sticky',
                                     top: 0,
                                     background: '#0a2d63',
@@ -1166,6 +1272,8 @@ const Dashboard = () => {
                                   }}
                                 >
                                   Power
+                                  {sortConfig.key === 'power' &&
+                                    (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </CTableHeaderCell>
                               )}
                               <CTableHeaderCell

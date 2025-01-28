@@ -153,25 +153,6 @@ function Contact() {
   const handleSort = (key) => {
     const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
     setSortConfig({ key, direction })
-
-    const sortedData = [...ticketData].sort((a, b) => {
-      const aValue = a[key] ?? '' // Handle null/undefined
-      const bValue = b[key] ?? ''
-
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return direction === 'asc' ? aValue - bValue : bValue - aValue
-      } else if (aValue instanceof Date && bValue instanceof Date) {
-        return direction === 'asc' ? aValue - bValue : bValue - aValue
-      } else {
-        return direction === 'asc'
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue))
-      }
-    })
-
-    setTicketData(sortedData)
   }
 
   const getSortIcon = (key) => {
@@ -211,34 +192,6 @@ function Contact() {
     console.log('lllllllllllllllllllllllllllllllllllllllllllllll', decodedToken.username)
   }, [ticketData])
 
-  //   const filteredTickets = ticketData.filter((ticket) => {
-  //     if (!ticket) return false
-
-  //     const ticketDateAdded = new Date(ticket.createdAt);
-  //     const ticketDateUpdated = new Date(ticket.updatedAt);
-  //     console.log("ticketDateAdded", ticketDateAdded);
-  //     // console.log("ticketDateUpdated", ticketDateUpdated);
-
-  //     const matchesSearchTerm = (
-  //       ticket.ticketId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       ticket.ticketType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
-  //     );
-
-  //     const matchesDateRange = (
-  //       (startDate ? ticketDateAdded >= startDate : true) &&
-  //       (endDate ? ticketDateAdded <= new Date(endDate.setHours(23, 59, 59, 999)) : true) &&
-  //       (startDate ? ticketDateUpdated >= startDate : true) &&
-  //       (endDate ? ticketDateUpdated <= new Date(endDate.setHours(23, 59, 59, 999)) : true)
-  //     );
-
-  //     return matchesSearchTerm && matchesDateRange;
-  // });
-
-  // Helper function to format the date
-
-  // Preprocess startDate and endDate
-
   const filteredTickets = ticketData.filter((ticket) => {
     if (!ticket) return false
 
@@ -271,6 +224,40 @@ function Contact() {
     return matchesTicketType && matchesStatus && matchesSearchTerm && matchesDateRange
   })
 
+  const sortedTickets = [...filteredTickets].sort((a, b) => {
+    const { key, direction } = sortConfig
+    if (!key) return 0
+
+    let aValue = a[key]
+    let bValue = b[key]
+
+    // Handle null/undefined values
+    aValue = aValue ?? ''
+    bValue = bValue ?? ''
+
+    // Special handling for date fields
+    if (key === 'createdAt' || key === 'updatedAt') {
+      const aDate = new Date(aValue)
+      const bDate = new Date(bValue)
+      return direction === 'asc' ? aDate - bDate : bDate - aDate
+    }
+
+    // String comparison
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+    }
+
+    // Numeric comparison
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return direction === 'asc' ? aValue - bValue : bValue - aValue
+    }
+
+    // Fallback to string comparison
+    return direction === 'asc'
+      ? String(aValue).localeCompare(String(bValue))
+      : String(bValue).localeCompare(String(aValue))
+  })
+
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
@@ -281,11 +268,11 @@ function Contact() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8 // Change as needed
-  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(filteredTickets.length / rowsPerPage)
+  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(sortedTickets.length / rowsPerPage)
   const paginatedTickets =
     rowsPerPage === 'All'
-      ? filteredTickets
-      : filteredTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+      ? sortedTickets
+      : sortedTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -392,8 +379,8 @@ function Contact() {
                         'vehicleNo',
                         'ticketType',
                         'status',
-                        'added',
-                        'updated',
+                        'createdAt', // Changed from 'added'
+                        'updatedAt', // Changed from 'updated'
                         'description',
                       ].map((key) => (
                         <CTableHeaderCell
@@ -402,11 +389,18 @@ function Contact() {
                           onClick={() => handleSort(key)}
                           className="text-center text-white cursor-pointer"
                         >
-                          {key.charAt(0).toUpperCase() + key.slice(1)} {getSortIcon(key)}
+                          {/* Update display text for date columns */}
+                          {key === 'createdAt'
+                            ? 'Added'
+                            : key === 'updatedAt'
+                              ? 'Updated'
+                              : key.charAt(0).toUpperCase() + key.slice(1)}
+                          {getSortIcon(key)}
                         </CTableHeaderCell>
                       ))}
                     </CTableRow>
                   </CTableHead>
+
                   <CTableBody style={{ fontSize: '14px' }}>
                     {loading ? (
                       <CTableRow>

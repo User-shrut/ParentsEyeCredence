@@ -283,6 +283,8 @@ const ShowDistance = ({
   selectedFromDate,
   selectedToDate,
 }) => {
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [addressData, setAddressData] = useState({})
   const [newAddressData, setnewAddressData] = useState()
 
@@ -485,6 +487,38 @@ const ShowDistance = ({
       return deviceName.includes(searchTerm)
     }) || []
 
+  const handleSort = (column) => {
+    const isAsc = sortBy === column && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortBy(column)
+  }
+
+  // Add this sorting logic after the filteredData declaration
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortBy) return 0
+
+    // Helper function to get comparable values
+    const getValue = (row) => {
+      switch (sortBy) {
+        case 'Vehicle':
+          return findDeviceName(row.deviceId).toLowerCase()
+        case 'Total Distance':
+          return calculateTotalDistance(row)
+        default:
+          return 0
+      }
+    }
+
+    const aValue = getValue(a)
+    const bValue = getValue(b)
+
+    // Handle string or number comparison
+    if (typeof aValue === 'string') {
+      return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+    } else {
+      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue
+    }
+  })
   return (
     <>
       <div style={{ overflowX: 'auto', maxWidth: '100%' }} className="gutter-0">
@@ -498,11 +532,21 @@ const ShowDistance = ({
                   backgroundColor: '#0a2d63',
                   color: 'white',
                 }}
+                className="text-center"
               >
                 Sr No.
               </CTableHeaderCell>
-              <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              <CTableHeaderCell
+                style={{
+                  backgroundColor: '#0a2d63',
+                  color: 'white',
+                  cursor: 'pointer', // Add pointer cursor
+                }}
+                className="text-center"
+                onClick={() => handleSort('Vehicle')} // Add click handler
+              >
                 Vehicle
+                {sortBy === 'Vehicle' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
               </CTableHeaderCell>
               {/* Dynamically render table headers based on selected columns */}
 
@@ -515,12 +559,24 @@ const ShowDistance = ({
                     backgroundColor: '#0a2d63',
                     color: 'white',
                   }}
+                  className="text-center"
                 >
                   {date}
                 </CTableHeaderCell>
               ))}
-              <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              <CTableHeaderCell
+                style={{
+                  width: '70px',
+                  minWidth: '150px',
+                  backgroundColor: '#0a2d63',
+                  color: 'white',
+                  cursor: 'pointer', // Add pointer cursor
+                }}
+                onClick={() => handleSort('TotalDistance')} // Add click handler
+                className="text-center"
+              >
                 Total Distance
+                {sortBy === 'TotalDistance' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -551,16 +607,18 @@ const ShowDistance = ({
                   </div>
                 </CTableDataCell>
               </CTableRow>
-            ) : filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
+            ) : sortedData.length > 0 ? (
+              sortedData.map((row, rowIndex) => (
                 <CTableRow key={row.deviceId} className="custom-row">
                   <CTableDataCell
                     style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                    className="text-center"
                   >
                     {rowIndex + 1}
                   </CTableDataCell>
                   <CTableDataCell
                     style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                    className="text-center"
                   >
                     {findDeviceName(row.deviceId)}
                   </CTableDataCell>
@@ -570,6 +628,7 @@ const ShowDistance = ({
                     <CTableDataCell
                       key={index}
                       style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                      className="text-center"
                     >
                       {/* Check if the date exists in the row, otherwise print '0' */}
                       {row[date] !== undefined ? `${row[date]} km` : '0 km'}
@@ -577,6 +636,7 @@ const ShowDistance = ({
                   ))}
                   <CTableDataCell
                     style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+                    className="text-center"
                   >
                     {calculateTotalDistance(row).toFixed(2)}
                     <span> km</span>

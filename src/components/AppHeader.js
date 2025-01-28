@@ -310,12 +310,12 @@ const AppHeader = () => {
             <CTab onClick={handleReports} className="text-white" itemKey={3}>
               <FaChartBar className="me-2" /> Reports
             </CTab>
-            <div className="vr mx-3 bg-white"></div>
-            {role === 'superadmin' && (
+
+            {/* {role === 'superadmin' && (
               <CTab onClick={handleExpense} className="text-white" itemKey={4}>
                 <TbReportSearch className="me-2" /> Supports
               </CTab>
-            )}
+            )} */}
           </CTabList>
         </CTabs>
         {/* <CHeaderNav className="ms-auto">

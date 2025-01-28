@@ -48,6 +48,8 @@ import '../../../../src/app.css'
 import SearchIcon from '@mui/icons-material/Search'
 
 const Model = () => {
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -233,45 +235,45 @@ const Model = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Models Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Models Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Models Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define the table columns based on the CTable structure
-    const tableColumn = ['SN', 'Model Name'];
+    const tableColumn = ['SN', 'Model Name']
 
     // Map through the filteredData (assuming it contains the data to be exported)
     const tableRows = filteredData.map((item, rowIndex) => {
       return [
         rowIndex + 1, // Serial Number
         item.modelName || '--', // Model Name
-      ];
-    });
+      ]
+    })
 
     // Create the table in the PDF with full width and custom styling
     doc.autoTable({
@@ -299,27 +301,23 @@ const Model = () => {
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 }, // Set margins for better layout
       width: pageWidth - 20, // Set the table width to fill the page
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF document
-    doc.save(`Model_Reports_${date}.pdf`);
-  };
+    doc.save(`Model_Reports_${date}.pdf`)
+  }
 
-
-  // Excel Download 
+  // Excel Download
 
   const exportToExcel = () => {
     // Prepare the data for Excel
@@ -342,6 +340,24 @@ const Model = () => {
     // Write the workbook to a file
     XLSX.writeFile(workbook, fileName)
   }
+
+  // SORTING LOGIC
+
+  const handleSort = (column) => {
+    const isAsc = sortBy === column && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortBy(column)
+  }
+
+  // Add after filterData function
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortBy === 'modelName') {
+      const nameA = a.modelName?.toLowerCase() || ''
+      const nameB = b.modelName?.toLowerCase() || ''
+      return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+    }
+    return 0
+  })
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -413,19 +429,23 @@ const Model = () => {
                   <CTableHead className="text-nowrap">
                     <CTableRow>
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white sr-no table-cell"
                         style={{ backgroundColor: '#0a2d63' }}
                       >
                         <strong>SN</strong>
                       </CTableHeaderCell>
+
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        className="text-center text-white sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('modelName')}
                       >
                         <strong>Model Name</strong>
+                        {sortBy === 'modelName' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
+
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white sr-no table-cell"
                         style={{ backgroundColor: '#0a2d63' }}
                       >
                         <strong>Actions</strong>
@@ -453,7 +473,7 @@ const Model = () => {
                         </CTableDataCell>
                       </CTableRow>
                     ) : filteredData.length > 0 ? (
-                      filteredData.map((item, index) => (
+                      sortedData.map((item, index) => (
                         <CTableRow key={item._id}>
                           <CTableDataCell
                             className="text-center  p-0"

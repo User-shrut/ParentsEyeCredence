@@ -71,6 +71,8 @@ import { MdGpsFixed, MdPolyline } from 'react-icons/md'
 import { IoAnalyticsOutline } from 'react-icons/io5'
 
 const Geofences = () => {
+  const [sortBy, setSortBy] = useState(null)
+  const [sortOrder, setSortOrder] = useState('asc')
   const [deviceData, setDeviceData] = useState()
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -551,37 +553,37 @@ const Geofences = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Geofences Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Geofences Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Geofences Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define the table headers
-    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles'];
+    const tableColumn = ['SN', 'Geofence Name', 'Type', 'Vehicles']
 
     // Extracting the relevant data for the table
     const tableRows = filteredData.map((item, index) => [
@@ -589,7 +591,7 @@ const Geofences = () => {
       item.name || '--', // Geofence Name
       item.type || '--', // Type
       item.deviceIds.map((device) => device.name).join(', ') || 'N/A', // Vehicles
-    ]);
+    ])
 
     // Create the table with autoTable
     doc.autoTable({
@@ -614,24 +616,21 @@ const Geofences = () => {
         3: { cellWidth: 60 }, // Adjust width for the "Vehicles" column
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the PDF
-    doc.save(`geofence_data_${date}.pdf`);
-  };
+    doc.save(`geofence_data_${date}.pdf`)
+  }
 
   // Show Co-ordinates of Polyline and circle centroid of lat lng
 
@@ -672,6 +671,52 @@ const Geofences = () => {
     console.log('this is centroid', centroid)
 
     setCenterMap(centroid)
+  }
+
+  // Add this after the filterGeofences function
+  const sortedData = React.useMemo(() => {
+    const dataToSort = [...filteredData]
+    if (!sortBy) return dataToSort
+
+    return dataToSort.sort((a, b) => {
+      let valueA, valueB
+
+      switch (sortBy) {
+        case 'name':
+          valueA = a.name?.toLowerCase() || ''
+          valueB = b.name?.toLowerCase() || ''
+          break
+        case 'type':
+          valueA = a.type?.toLowerCase() || ''
+          valueB = b.type?.toLowerCase() || ''
+          break
+        case 'vehicles':
+          valueA = a.deviceIds?.length || 0
+          valueB = b.deviceIds?.length || 0
+          break
+        default:
+          return 0
+      }
+
+      if (typeof valueA === 'string') {
+        return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
+      } else {
+        return sortOrder === 'asc' ? valueA - valueB : valueB - valueA
+      }
+    })
+  }, [filteredData, sortBy, sortOrder])
+
+  // Replace the existing filteredData.map with sortedData.slice
+  const currentItems = sortedData.slice((currentPage - 1) * limit, currentPage * limit)
+
+  // Add this function near other handler functions
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(column)
+      setSortOrder('asc')
+    }
   }
 
   //  ###############################################################
@@ -738,30 +783,51 @@ const Geofences = () => {
                     >
                       <CTableHead className="text-nowrap">
                         <CTableRow className="bg-body-tertiary">
+                          {/* SN (non-sortable) */}
                           <CTableHeaderCell
                             className="text-center text-white"
                             style={{ background: '#0a2d63' }}
                           >
                             <strong>SN</strong>
                           </CTableHeaderCell>
+
+                          {/* Geofence Name */}
                           <CTableHeaderCell
                             className="text-center text-white"
-                            style={{ background: '#0a2d63' }}
+                            style={{ background: '#0a2d63', cursor: 'pointer' }}
+                            onClick={() => handleSort('name')}
                           >
-                            <strong>Geofence Name</strong>
+                            <strong>
+                              Geofence Name
+                              {sortBy === 'name' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                            </strong>
                           </CTableHeaderCell>
+
+                          {/* Type */}
                           <CTableHeaderCell
                             className="text-center text-white"
-                            style={{ background: '#0a2d63' }}
+                            style={{ background: '#0a2d63', cursor: 'pointer' }}
+                            onClick={() => handleSort('type')}
                           >
-                            <strong>Type</strong>
+                            <strong>
+                              Type
+                              {sortBy === 'type' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                            </strong>
                           </CTableHeaderCell>
+
+                          {/* Vehicles */}
                           <CTableHeaderCell
                             className="text-center text-white"
-                            style={{ background: '#0a2d63' }}
+                            style={{ background: '#0a2d63', cursor: 'pointer' }}
+                            onClick={() => handleSort('vehicles')}
                           >
-                            <strong>Vehicles</strong>
+                            <strong>
+                              Vehicles
+                              {sortBy === 'vehicles' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                            </strong>
                           </CTableHeaderCell>
+
+                          {/* Actions (non-sortable) */}
                           <CTableHeaderCell
                             className="text-center text-white"
                             style={{ background: '#0a2d63' }}
@@ -783,8 +849,8 @@ const Geofences = () => {
                               </div>
                             </CTableDataCell>
                           </CTableRow>
-                        ) : filteredData.length > 0 ? (
-                          filteredData.map((item, index) => (
+                        ) : currentItems.length > 0 ? (
+                          currentItems.map((item, index) => (
                             <CTableRow key={index} onClick={() => handleRowClick(item.area)}>
                               <CTableDataCell
                                 className="text-center"
@@ -901,7 +967,7 @@ const Geofences = () => {
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={pageCount} // Set based on the total pages from the API
+              pageCount={Math.ceil(sortedData.length / limit)} // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}

@@ -54,6 +54,9 @@ import '../../../../src/app.css'
 import SearchIcon from '@mui/icons-material/Search'
 
 const Category = () => {
+  // Add these state variables at the top of the component
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -238,7 +241,7 @@ const Category = () => {
     }
   }
 
-  // /Excel download 
+  // /Excel download
 
   const exportToExcel = () => {
     // Map filtered data into the format required for export
@@ -263,49 +266,49 @@ const Category = () => {
     XLSX.writeFile(workbook, 'category_data.xlsx')
   }
 
-  // PDF download 
+  // PDF download
 
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Devices Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Categorys Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Categorys Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define the table columns
-    const tableColumn = ['SN', 'Category Name']; // Define the headers
+    const tableColumn = ['SN', 'Category Name'] // Define the headers
     const tableRows = filteredData.map((item, index) => {
       // Add rows with category name and serial number
       return [
         index + 1, // Serial Number
         item.categoryName || '--', // Category Name with fallback
-      ];
-    });
+      ]
+    })
 
     // Styling for the table
     doc.autoTable({
@@ -333,26 +336,38 @@ const Category = () => {
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 }, // Adjust margins
       width: pageWidth - 20, // Ensure the table spans the full width
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the generated PDF
-    doc.save(`Category_Reports_${date}.pdf`);
-  };
+    doc.save(`Category_Reports_${date}.pdf`)
+  }
 
+  // Add this function after the state declarations
+  const handleSort = (column) => {
+    const isAsc = sortBy === column && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortBy(column)
+  }
 
+  // Add this computed value after the filter logic
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortBy === 'categoryName') {
+      const nameA = a.categoryName?.toLowerCase() || ''
+      const nameB = b.categoryName?.toLowerCase() || ''
+      return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+    }
+    return 0
+  })
   //  ###############################################################
 
   return (
@@ -373,15 +388,6 @@ const Category = () => {
             <CCardHeader className="grand d-flex justify-content-between align-items-center">
               <strong>Category</strong>
               <div className="d-flex gap-3">
-                {/* <div className="me-3 d-none d-md-block">
-                  <input
-                    type="search"
-                    className="form-control"
-                    placeholder="Search for Category"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div> */}
                 <div className="input-group">
                   <InputBase
                     type="search"
@@ -433,27 +439,30 @@ const Category = () => {
                   <CTableHead className="text-nowrap">
                     <CTableRow>
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white sr-no table-cell"
                         style={{ backgroundColor: '#0a2d63' }}
                       >
                         SN
                       </CTableHeaderCell>
 
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        className="text-center text-white sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('categoryName')}
                       >
                         Category Name
+                        {sortBy === 'categoryName' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
 
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white sr-no table-cell"
                         style={{ backgroundColor: '#0a2d63' }}
                       >
                         Actions
                       </CTableHeaderCell>
                     </CTableRow>
                   </CTableHead>
+
                   <CTableBody>
                     {loading ? (
                       <>
@@ -477,7 +486,7 @@ const Category = () => {
                         </CTableRow>
                       </>
                     ) : filteredData.length > 0 ? (
-                      filteredData?.map((item, index) => (
+                      sortedData?.map((item, index) => (
                         <CTableRow key={index}>
                           <CTableDataCell
                             className="text-center p-0"

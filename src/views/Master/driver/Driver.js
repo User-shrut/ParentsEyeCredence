@@ -60,6 +60,9 @@ import '../../../../src/app.css'
 import SearchIcon from '@mui/icons-material/Search'
 
 const Driver = () => {
+  // Add these state variables at the top of the component
+  const [sortBy, setSortBy] = useState(null)
+  const [sortOrder, setSortOrder] = useState('asc')
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -470,6 +473,37 @@ const Driver = () => {
     doc.save(`Drivers_Reports_${date}.pdf`)
   }
 
+  // Add sorting handler function
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(column)
+      setSortOrder('asc')
+    }
+  }
+
+  // Add sorted data calculation
+  const sortedData = React.useMemo(() => {
+    const dataToSort = [...filteredData]
+    if (!sortBy) return dataToSort
+
+    return dataToSort.sort((a, b) => {
+      const valueA = a[sortBy]?.toString().toLowerCase() || ''
+      const valueB = b[sortBy]?.toString().toLowerCase() || ''
+
+      if (sortBy === 'phone' || sortBy === 'aadharNumber') {
+        // Numeric comparison
+        return sortOrder === 'asc'
+          ? Number(valueA) - Number(valueB)
+          : Number(valueB) - Number(valueA)
+      }
+
+      // String comparison
+      return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
+    })
+  }, [filteredData, sortBy, sortOrder])
+
   //  ###############################################################
 
   return (
@@ -543,56 +577,101 @@ const Driver = () => {
                 <CTable bordered align="middle" className="mb-0 border" hover responsive>
                   <CTableHead className="text-nowrap">
                     <CTableRow className="bg-body-tertiary">
+                      {/* SN (non-sortable) */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white"
                         style={{ background: '#0a2d63' }}
                       >
                         <strong>SN</strong>
                       </CTableHeaderCell>
+
+                      {/* Driver Name */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('name')}
                       >
-                        <strong>Driver Name</strong>
+                        <strong>
+                          Driver Name
+                          {sortBy === 'name' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Mobile No. */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('phone')}
                       >
-                        <strong>Mobile No.</strong>
+                        <strong>
+                          Mobile No.
+                          {sortBy === 'phone' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Email */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('email')}
                       >
-                        <strong>Email</strong>
+                        <strong>
+                          Email
+                          {sortBy === 'email' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Vehicle no. */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('vehicleName')}
                       >
-                        <strong>Vehicle no.</strong>
+                        <strong>
+                          Vehicle no.
+                          {sortBy === 'vehicleName' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Lic. No. */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('licenseNumber')}
                       >
-                        <strong>Lic. No.</strong>
+                        <strong>
+                          Lic. No.
+                          {sortBy === 'licenseNumber' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Aadhar No. */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('aadharNumber')}
                       >
-                        <strong>Aadhar No.</strong>
+                        <strong>
+                          Aadhar No.
+                          {sortBy === 'aadharNumber' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Address */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ background: '#0a2d63' }}
+                        className="text-center text-white"
+                        style={{ background: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('address')}
                       >
-                        <strong>Address</strong>
+                        <strong>
+                          Address
+                          {sortBy === 'address' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+                        </strong>
                       </CTableHeaderCell>
+
+                      {/* Actions (non-sortable) */}
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
+                        className="text-center text-white"
                         style={{ background: '#0a2d63' }}
                       >
                         <strong>Actions</strong>
@@ -619,8 +698,8 @@ const Driver = () => {
                           </div>
                         </CTableDataCell>
                       </CTableRow>
-                    ) : filteredData.length > 0 ? (
-                      filteredData?.map((item, index) => (
+                    ) : sortedData.length > 0 ? (
+                      sortedData.map((item, index) => (
                         <CTableRow key={index}>
                           <CTableDataCell
                             className="text-center"
@@ -752,7 +831,7 @@ const Driver = () => {
               nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
-              pageCount={pageCount} // Set based on the total pages from the API
+              pageCount={Math.ceil(sortedData.length / limit)} // Set based on the total pages from the API
               previousLabel="< previous"
               renderOnZeroPageCount={null}
               marginPagesDisplayed={2}
@@ -776,7 +855,7 @@ const Driver = () => {
                 { label: '10', value: '10' },
                 { label: '50', value: '50' },
                 { label: '500', value: '500' },
-                { label: 'ALL', value: '' },
+                { label: 'ALL', value: sortedData.length },
               ]}
             />
           </div>

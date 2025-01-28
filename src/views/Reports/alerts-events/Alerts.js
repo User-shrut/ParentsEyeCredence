@@ -42,6 +42,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { useParams } from 'react-router-dom'
 
 const Alerts = () => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   const { deviceId: urlDeviceId, category, name } = useParams() // Retrieve params from URL
   const [deviceId, setDeviceId] = useState(urlDeviceId || '')
   const [searchQuery, setSearchQuery] = useState('')
@@ -192,53 +193,51 @@ const Alerts = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Alerts Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Alerts Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Alerts Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Section title for Alerts/Events
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Alert Details', 10, 40);
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Alert Details', 10, 40)
 
     // Additional Details (Devices name or other info)
-    const details = [
-      `Devices Name: ${devices || 'N/A'}`
-    ];
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    const details = [`Devices Name: ${devices || 'N/A'}`]
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((text, idx) => {
-      doc.text(text, 10, 50 + (idx * 10));
-    });
+      doc.text(text, 10, 50 + idx * 10)
+    })
 
     // Prepare table data
-    const tableData = filteredData.map((item, index) => [
-      index + 1,  // Serial number
+    const tableData = sortedData.map((item, index) => [
+      index + 1, // Serial number
       item.name || '--', // Device Name
       item.type || '--', // Notification Type
       item.address || 'Fetching...', // Location
@@ -253,13 +252,13 @@ const Alerts = () => {
         minute: '2-digit',
         second: '2-digit',
       }), // Time
-    ]);
+    ])
 
     // Define table columns
-    const tableColumns = ['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time'];
+    const tableColumns = ['SN', 'Device Name', 'Notification', 'Location', 'Message', 'Time']
 
     // Set the width of the table to span across the entire page
-    const tableWidth = pageWidth - 20;  // Leaving 10px padding on each side
+    const tableWidth = pageWidth - 20 // Leaving 10px padding on each side
 
     // Create the table in the PDF with styling
     doc.autoTable({
@@ -287,26 +286,24 @@ const Alerts = () => {
       columnStyles: {
         0: { cellWidth: tableWidth * 0.05 }, // 5% width for serial number column
         1: { cellWidth: tableWidth * 0.25 }, // 25% width for the device name column
-        2: { cellWidth: tableWidth * 0.20 }, // 20% for notification column
-        3: { cellWidth: tableWidth * 0.20 }, // 20% for location column
-        4: { cellWidth: tableWidth * 0.20 }, // 20% for message column
-        5: { cellWidth: tableWidth * 0.10 }, // 10% for time column
+        2: { cellWidth: tableWidth * 0.2 }, // 20% for notification column
+        3: { cellWidth: tableWidth * 0.2 }, // 20% for location column
+        4: { cellWidth: tableWidth * 0.2 }, // 20% for message column
+        5: { cellWidth: tableWidth * 0.1 }, // 10% for time column
       },
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
       width: tableWidth, // Full width of the table
-    });
+    })
 
     // Save the PDF document
-    doc.save(`Alerts_Reports_${date}.pdf`);
-  };
-
-
+    doc.save(`Alerts_Reports_${date}.pdf`)
+  }
 
   // Download Excel file
 
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
-      filteredData.map((item, index) => ({
+      sortedData.map((item, index) => ({
         SN: index + 1,
         'Device Name': item.name,
         Notification: item.type,
@@ -346,13 +343,56 @@ const Alerts = () => {
     setFilterDevice(selectedOption)
   }
 
-  // Calculate paginated data
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage,
-  )
-
   console.log(devices)
+
+  const columnKeyMap = {
+    'Device Name': 'name',
+    Notification: 'type',
+    Location: 'address',
+    Message: 'message',
+    'Date/Time': 'createdAt',
+  }
+
+  // Sorting handler
+  const handleSort = (columnLabel) => {
+    const sortKey = columnKeyMap[columnLabel]
+    if (!sortKey) return
+
+    let direction = 'asc'
+    if (sortConfig.key === sortKey && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key: sortKey, direction })
+  }
+
+  // Sorted data
+  const sortedData = React.useMemo(() => {
+    const data = [...filteredData]
+    if (sortConfig.key) {
+      data.sort((a, b) => {
+        const aValue = a[sortConfig.key]
+        const bValue = b[sortConfig.key]
+
+        if (sortConfig.key === 'createdAt') {
+          return sortConfig.direction === 'asc'
+            ? new Date(aValue) - new Date(bValue)
+            : new Date(bValue) - new Date(aValue)
+        }
+
+        if (typeof aValue === 'string') {
+          return sortConfig.direction === 'asc'
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue)
+        }
+
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+      })
+    }
+    return data
+  }, [filteredData, sortConfig])
+
+  // Calculate paginated data
+  const paginatedData = sortedData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -499,36 +539,24 @@ const Alerts = () => {
                       >
                         SN
                       </CTableHeaderCell>
-                      <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
-                      >
-                        Device Name
-                      </CTableHeaderCell>
-                      <CTableHeaderCell
-                        className="text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
-                      >
-                        Notification
-                      </CTableHeaderCell>
-                      <CTableHeaderCell
-                        className="text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
-                      >
-                        Location
-                      </CTableHeaderCell>
-                      <CTableHeaderCell
-                        className="text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
-                      >
-                        Message
-                      </CTableHeaderCell>
-                      <CTableHeaderCell
-                        className="text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
-                      >
-                        Date/Time
-                      </CTableHeaderCell>
+                      {['Device Name', 'Notification', 'Location', 'Message', 'Date/Time'].map(
+                        (column) => (
+                          <CTableHeaderCell
+                            key={column}
+                            className="text-center text-white text-center sr-no table-cell"
+                            style={{
+                              backgroundColor: '#0a2d63',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => handleSort(column)}
+                          >
+                            {column}
+                            {sortConfig.key === columnKeyMap[column] && (
+                              <span> {sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                            )}
+                          </CTableHeaderCell>
+                        ),
+                      )}
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>

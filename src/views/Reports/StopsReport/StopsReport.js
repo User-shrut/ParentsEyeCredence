@@ -62,7 +62,7 @@ const SearchStop = ({
   const [selectedG, setSelectedG] = useState()
 
   // For username show in pdf
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
     handlePutName(putName)
@@ -231,9 +231,9 @@ const SearchStop = ({
           value={
             formData.Devices
               ? {
-                value: formData.Devices,
-                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-              }
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -313,7 +313,18 @@ const SearchStop = ({
   )
 }
 
-const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, selectedPeriod, }) => {
+const StopTable = ({
+  apiData,
+  selectedDeviceName,
+  selectedColumns,
+  statusLoading,
+  selectedGroupName,
+  selectedUserName,
+  selectedFromDate,
+  selectedToDate,
+  selectedPeriod,
+}) => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   const [locationData, setLocationData] = useState({})
 
   // Function to convert latitude and longitude into a location name
@@ -335,9 +346,9 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
   // Fetch location for each row when apiData is loaded
   useEffect(() => {
     if (apiData?.finalDeviceDataByStopage?.length > 0) {
-      apiData.finalDeviceDataByStopage.forEach((row, index) => {
+      apiData.finalDeviceDataByStopage.forEach((row) => {
         if (row.latitude && row.longitude) {
-          fetchLocationName(row.latitude, row.longitude, index)
+          fetchLocationName(row.latitude, row.longitude, row.id)
         }
       })
     }
@@ -347,33 +358,35 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
   const downloadPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`;
+      .padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`
 
     // Add "Credence Tracker" heading centered
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    const title = 'Credence Tracker';
-    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    const title = 'Credence Tracker'
+    const titleWidth =
+      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Status Reports" heading below "Credence Tracker"
-    doc.setFontSize(18);
-    const subtitle = 'Stops Reports'; // Align with the title
-    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(18)
+    const subtitle = 'Stops Reports' // Align with the title
+    const subtitleWidth =
+      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
 
     // Add device and user details with clear styling
     const details = [
@@ -381,47 +394,47 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
       `Group Name: ${selectedGroupName || 'N/A'}`,
       `Vehicle Name: ${selectedDeviceName || 'N/A'}`,
       `From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ];
+    ]
 
-    let yPosition = 35;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    let yPosition = 35
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((detail) => {
-      doc.text(detail, 14, yPosition);
-      yPosition += 8; // Adjusted spacing for better readability
-    });
+      doc.text(detail, 14, yPosition)
+      yPosition += 8 // Adjusted spacing for better readability
+    })
 
     // Define table columns and rows
-    const tableColumn = ['SN', 'Device Name', ...selectedColumns];
-    const tableRows = [];
+    const tableColumn = ['SN', 'Device Name', ...selectedColumns]
+    const tableRows = []
 
-    apiData.finalDeviceDataByStopage.forEach((row, rowIndex) => {
+    sortedData.forEach((row, rowIndex) => {
       const tableRow = [
         rowIndex + 1,
         row.device?.name || selectedDeviceName || '--',
         ...selectedColumns.map((column) => {
           switch (column) {
             case 'Speed':
-              return `${(row.speed * 3.6).toFixed(2)} km/h`;
+              return `${(row.speed * 3.6).toFixed(2)} km/h`
             case 'Ignition':
-              return row.ignition ? 'ON' : 'OFF';
+              return row.ignition ? 'ON' : 'OFF'
             case 'Direction':
-              if (row.course < 90 && row.course > 0) return 'North East';
-              if (row.course > 90 && row.course < 180) return 'North West';
-              if (row.course > 180 && row.course < 270) return 'South West';
-              return 'South East';
+              if (row.course < 90 && row.course > 0) return 'North East'
+              if (row.course > 90 && row.course < 180) return 'North West'
+              if (row.course > 180 && row.course < 270) return 'South West'
+              return 'South East'
             case 'Location':
-              return locationData[rowIndex] || 'Fetching location...';
+              return locationData[rowIndex] || 'Fetching location...'
             case 'Co-ordinates':
               return row.latitude && row.longitude
                 ? `${row.latitude}, ${row.longitude}`
-                : 'Fetching location...';
+                : 'Fetching location...'
             case 'Start Time':
               return new Date(
                 new Date(row.arrivalTime).setHours(
                   new Date(row.arrivalTime).getHours() - 5,
-                  new Date(row.arrivalTime).getMinutes() - 30
-                )
+                  new Date(row.arrivalTime).getMinutes() - 30,
+                ),
               ).toLocaleString([], {
                 year: 'numeric',
                 month: '2-digit',
@@ -429,13 +442,13 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             case 'End Time':
               return new Date(
                 new Date(row.departureTime).setHours(
                   new Date(row.departureTime).getHours() - 5,
-                  new Date(row.departureTime).getMinutes() - 30
-                )
+                  new Date(row.departureTime).getMinutes() - 30,
+                ),
               ).toLocaleString([], {
                 year: 'numeric',
                 month: '2-digit',
@@ -443,14 +456,14 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             default:
-              return '--';
+              return '--'
           }
         }),
-      ];
-      tableRows.push(tableRow);
-    });
+      ]
+      tableRows.push(tableRow)
+    })
 
     // Add autoTable with enhanced styling
     autoTable(doc, {
@@ -474,21 +487,19 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
         fillColor: [240, 240, 240], // Light gray for alternating rows
       },
       margin: { top: 20 },
-    });
+    })
 
     // Save the PDF with a descriptive name
     const fileName = selectedDeviceName
       ? `${selectedDeviceName.replace(/ /g, '_')}_Stops_Report_${date}.pdf`
-      : 'Stops_Report_.pdf';
-    doc.save(fileName);
-  };
-
-
+      : 'Stops_Report_.pdf'
+    doc.save(fileName)
+  }
 
   // Function to generate and download Excel without using file-saver
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
-      apiData.finalDeviceDataByStopage.map((row, rowIndex) => {
+      sortedData.map((row, rowIndex) => {
         const rowData = {
           SN: rowIndex + 1, // Serial Number
           'Device Name': row.device?.name || selectedDeviceName || '--', // Add Device Name
@@ -561,6 +572,61 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
     link.remove()
   }
 
+  const columnKeyMap = {
+    'Start Time': 'arrivalTime',
+    'End Time': 'departureTime',
+    Speed: 'speed',
+    Ignition: 'ignition',
+    Direction: 'course',
+  }
+
+  // Handle sorting when a header is clicked
+  const handleSort = (columnLabel) => {
+    const columnKey = columnKeyMap[columnLabel]
+    if (!columnKey) return
+
+    let direction = 'asc'
+    if (sortConfig.key === columnKey && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key: columnKey, direction })
+  }
+
+  // Sort the data based on sortConfig
+  const sortedData = React.useMemo(() => {
+    if (!apiData?.finalDeviceDataByStopage) return []
+    const data = [...apiData.finalDeviceDataByStopage]
+
+    if (sortConfig.key) {
+      data.sort((a, b) => {
+        const aValue = a[sortConfig.key]
+        const bValue = b[sortConfig.key]
+
+        switch (sortConfig.key) {
+          case 'arrivalTime':
+          case 'departureTime': {
+            const aDate = new Date(aValue)
+            const bDate = new Date(bValue)
+            return sortConfig.direction === 'asc' ? aDate - bDate : bDate - aDate
+          }
+          case 'speed':
+          case 'course':
+            return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+          case 'ignition': {
+            const aBool = aValue ? 1 : 0
+            const bBool = bValue ? 1 : 0
+            return sortConfig.direction === 'asc' ? aBool - bBool : bBool - aBool
+          }
+          default:
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+            return 0
+        }
+      })
+    }
+    return data
+  }, [apiData, sortConfig])
+
   return (
     <>
       <CTable bordered className="custom-table">
@@ -572,10 +638,20 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
             <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
               Vehicle Name
             </CTableHeaderCell>
-            {/* Dynamically render table headers based on selected columns */}
             {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+              <CTableHeaderCell
+                key={index}
+                style={{
+                  backgroundColor: '#0a2d63',
+                  color: 'white',
+                  cursor: columnKeyMap[column] ? 'pointer' : 'default',
+                }}
+                onClick={() => handleSort(column)}
+              >
                 {column}
+                {sortConfig.key === columnKeyMap[column] && (
+                  <span> {sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                )}
               </CTableHeaderCell>
             ))}
           </CTableRow>
@@ -608,8 +684,8 @@ const StopTable = ({ apiData, selectedDeviceName, selectedColumns, statusLoading
                 </div>
               </CTableDataCell>
             </CTableRow>
-          ) : apiData?.finalDeviceDataByStopage?.length > 0 ? (
-            apiData?.finalDeviceDataByStopage.map((row, rowIndex) => (
+          ) : sortedData.length > 0 ? (
+            sortedData.map((row, rowIndex) => (
               <CTableRow key={row.id} className="custom-row">
                 <CTableDataCell
                   style={{ backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
@@ -788,12 +864,11 @@ const Stops = () => {
   const [apiData, setApiData] = useState() //data from api
 
   const [selectedUserName, setSelectedUserName] = useState('')
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+    console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', putName)
   }, [putName])
-
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
@@ -801,7 +876,7 @@ const Stops = () => {
 
   const handlePutName = (name) => {
     setPutName(name)
-    console.log("putName", putName)
+    console.log('putName', putName)
   }
 
   const getDevices = async (selectedGroup) => {
@@ -856,33 +931,32 @@ const Stops = () => {
   }
 
   const getUser = async () => {
-    setLoading(true);
-    setGroups([]);
-    setDevices([]);
+    setLoading(true)
+    setGroups([])
+    setDevices([])
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/user`, {
         headers: {
           Authorization: 'Bearer ' + accessToken,
         },
-      });
+      })
       if (response.data) {
-        const usersData = response.data.users; // Get the users from response
-        setUsers(usersData); // Update the state with users
-        setLoading(false);
-        console.log('Users fetched successfully.');
+        const usersData = response.data.users // Get the users from response
+        setUsers(usersData) // Update the state with users
+        setLoading(false)
+        console.log('Users fetched successfully.')
 
         // After setting the users, find the selected user based on formData.User
-        const selectedUser = usersData.find((user) => user.userId === formData.User);
-        const selectedUserName = selectedUser ? selectedUser.username : '';
-        setSelectedUserName(selectedUserName);
-        console.log('Selected User:', selectedUserName);
+        const selectedUser = usersData.find((user) => user.userId === formData.User)
+        const selectedUserName = selectedUser ? selectedUser.username : ''
+        setSelectedUserName(selectedUserName)
+        console.log('Selected User:', selectedUserName)
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
+      console.error('Error fetching data:', error)
+      setLoading(false)
     }
-  };
-
+  }
 
   useEffect(() => {
     getUser()
@@ -936,14 +1010,13 @@ const Stops = () => {
   }
 
   // Example of extracting values similar to `selectedGroup`
-  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
-  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
-  const selectedPeriod = formData.Periods || '';
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : ''
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : ''
+  const selectedPeriod = formData.Periods || ''
 
-  console.log('Selected From Date:', selectedFromDate);
-  console.log('Selected To Date:', selectedToDate);
-  console.log('Selected Period:', selectedPeriod);
-
+  console.log('Selected From Date:', selectedFromDate)
+  console.log('Selected To Date:', selectedToDate)
+  console.log('Selected Period:', selectedPeriod)
 
   return (
     <div>

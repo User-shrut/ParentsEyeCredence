@@ -62,12 +62,11 @@ const SearchIdeal = ({
   const [isDropdownOpen, setDropdownOpen] = useState(false) // State to manage dropdown visibility
 
   // For username show in pdf
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
     handlePutName(putName)
   }, [putName])
-
 
   const handleFormSubmit = (event) => {
     const form = event.currentTarget
@@ -218,9 +217,9 @@ const SearchIdeal = ({
           value={
             formData.Devices
               ? {
-                value: formData.Devices,
-                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-              }
+                  value: formData.Devices,
+                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+                }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -342,9 +341,20 @@ const SearchIdeal = ({
   )
 }
 
-const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading, selectedGroupName, selectedUserName, selectedFromDate, selectedToDate, selectedPeriod, }) => {
+const ShowIdeal = ({
+  apiData,
+  selectedColumns,
+  selectedDeviceName,
+  statusLoading,
+  selectedGroupName,
+  selectedUserName,
+  selectedFromDate,
+  selectedToDate,
+  selectedPeriod,
+}) => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   const [dataWithAddresses, setDataWithAddresses] = useState([])
-  console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa", selectedUserName)
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa', selectedUserName)
 
   // Function to get address from latitude and longitude
   const getAddressFromLatLng = async (latitude, longitude) => {
@@ -399,33 +409,35 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
   const downloadPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading centered
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    const title = 'Credence Tracker';
-    const titleWidth = (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFontSize(22)
+    doc.setFont('helvetica', 'bold')
+    const title = 'Credence Tracker'
+    const titleWidth =
+      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Idle Reports" heading
-    doc.setFontSize(18);
-    const subtitle = 'Idle Reports';
-    const subtitleWidth = (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor;
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(18)
+    const subtitle = 'Idle Reports'
+    const subtitleWidth =
+      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
+    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
 
     // Add user and device details
     const details = [
@@ -433,18 +445,18 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
       `Group Name: ${selectedGroupName || 'N/A'}`,
       `Vehicle Name: ${selectedDeviceName || 'N/A'}`,
       `Period: ${selectedPeriod || 'N/A'} | From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ];
-    let yPosition = 35;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    ]
+    let yPosition = 35
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
     details.forEach((detail) => {
-      doc.text(detail, 14, yPosition);
-      yPosition += 8;
-    });
+      doc.text(detail, 14, yPosition)
+      yPosition += 8
+    })
 
     // Define table columns and rows
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns];
-    const tableRows = [];
+    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
+    const tableRows = []
 
     dataWithAddresses.forEach((row, rowIndex) => {
       row.data.forEach((nestedRow) => {
@@ -452,11 +464,11 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
           rowIndex + 1,
           row.device?.name || selectedDeviceName || '--',
           ...selectedColumns.map((column) => {
-            if (column === 'Vehicle Status') return nestedRow.vehicleStatus || '--';
+            if (column === 'Vehicle Status') return nestedRow.vehicleStatus || '--'
             if (column === 'Duration')
-              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8);
-            if (column === 'Location') return nestedRow.address || nestedRow.location || '--';
-            if (column === 'Co-ordinates') return nestedRow.location || "--";
+              return new Date(nestedRow.durationSeconds * 1000).toISOString().substr(11, 8)
+            if (column === 'Location') return nestedRow.address || nestedRow.location || '--'
+            if (column === 'Co-ordinates') return nestedRow.location || '--'
             if (column === 'Start Time')
               return new Date(
                 new Date(nestedRow.arrivalTime).setHours(
@@ -470,7 +482,7 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'End Time')
               return new Date(
                 new Date(nestedRow.departureTime).setHours(
@@ -484,15 +496,15 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              });
+              })
             if (column === 'Total Duration')
-              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8);
-            return '--';
+              return new Date(row.totalDurationSeconds * 1000).toISOString().substr(11, 8)
+            return '--'
           }),
-        ];
-        tableRows.push(rowData);
-      });
-    });
+        ]
+        tableRows.push(rowData)
+      })
+    })
 
     // Generate the table with improved styling
     autoTable(doc, {
@@ -518,13 +530,11 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
       tableLineWidth: 0.5,
       tableLineColor: [0, 0, 0],
       margin: { top: 10 },
-    });
+    })
 
     // Save the PDF with a descriptive name
-    doc.save(`${selectedDeviceName || 'Idle_Report'}_Idle_Reports_${date}.pdf`);
-  };
-
-
+    doc.save(`${selectedDeviceName || 'Idle_Report'}_Idle_Reports_${date}.pdf`)
+  }
 
   // Excel Download Function
   const downloadExcel = () => {
@@ -599,221 +609,253 @@ const ShowIdeal = ({ apiData, selectedColumns, selectedDeviceName, statusLoading
     document.body.removeChild(link)
   }
 
+  const columnKeyMap = {
+    'Vehicle Status': 'vehicleStatus',
+    'Start Time': 'arrivalTime',
+    Duration: 'durationSeconds',
+    Location: 'address',
+    'Co-ordinates': 'location',
+    'End Time': 'departureTime',
+    'Total Duration': 'totalDurationSeconds',
+  }
+
+  // Create enhanced flattened data with parent row information
+  const enhancedFlattenedData = React.useMemo(() => {
+    if (!dataWithAddresses) return []
+    return dataWithAddresses.flatMap(
+      (row, rowIndex) =>
+        row.data?.map((nestedRow) => ({
+          ...nestedRow,
+          parentRow: row, // Preserve parent row reference
+          vehicleName: row.device?.name || selectedDeviceName || '--',
+          rowIndex: rowIndex + 1, // Add row index for SN
+        })) || [],
+    )
+  }, [dataWithAddresses, selectedDeviceName])
+
+  // Sorting handler
+  const handleSort = (columnLabel) => {
+    const sortKey = columnKeyMap[columnLabel]
+    if (!sortKey) return
+
+    setSortConfig((prev) => ({
+      key: sortKey,
+      direction: prev.key === sortKey && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
+
+  // Sorted data
+  const sortedFlattenedData = React.useMemo(() => {
+    const data = [...enhancedFlattenedData]
+    if (!sortConfig.key) return data
+
+    return data.sort((a, b) => {
+      const aValue = a[sortConfig.key]
+      const bValue = b[sortConfig.key]
+
+      // Handle different data types
+      switch (sortConfig.key) {
+        case 'arrivalTime':
+        case 'departureTime':
+          return sortConfig.direction === 'asc'
+            ? new Date(aValue) - new Date(bValue)
+            : new Date(bValue) - new Date(aValue)
+
+        case 'durationSeconds':
+        case 'totalDurationSeconds':
+          return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+
+        default:
+          if (typeof aValue === 'string') {
+            return sortConfig.direction === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue)
+          }
+          return 0
+      }
+    })
+  }, [enhancedFlattenedData, sortConfig])
+
   return (
-    <>
-      <CTable bordered className="custom-table">
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
-              SN
+    <CTable bordered className="custom-table">
+      <CTableHead>
+        <CTableRow>
+          <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+            SN
+          </CTableHeaderCell>
+          <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
+            Vehicle Name
+          </CTableHeaderCell>
+          {selectedColumns.map((column, index) => (
+            <CTableHeaderCell
+              key={index}
+              style={{
+                backgroundColor: '#0a2d63',
+                color: 'white',
+                cursor: columnKeyMap[column] ? 'pointer' : 'default',
+              }}
+              onClick={() => handleSort(column)}
+            >
+              {column}
+              {sortConfig.key === columnKeyMap[column] && (
+                <span> {sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+              )}
             </CTableHeaderCell>
-            <CTableHeaderCell style={{ backgroundColor: '#0a2d63', color: 'white' }}>
-              Vehicle Name
-            </CTableHeaderCell>
-            {selectedColumns.map((column, index) => (
-              <CTableHeaderCell key={index} style={{ backgroundColor: '#0a2d63', color: 'white' }}>
-                {column}
-              </CTableHeaderCell>
-            ))}
+          ))}
+        </CTableRow>
+      </CTableHead>
+
+      <CTableBody>
+        {statusLoading ? (
+          <CTableRow style={{ position: 'relative' }}>
+            <CTableDataCell
+              colSpan={selectedColumns.length + 2}
+              style={{
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontStyle: 'italic',
+                padding: '16px',
+                textAlign: 'center',
+                border: '1px dashed #dee2e6',
+                height: '100px',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <Loader />
+              </div>
+            </CTableDataCell>
           </CTableRow>
-        </CTableHead>
-
-        <CTableBody>
-          {/* Condition for Loading State */}
-          {statusLoading ? (
-            <CTableRow style={{ position: 'relative' }}>
+        ) : sortedFlattenedData.length > 0 ? (
+          sortedFlattenedData.map((item, index) => (
+            <CTableRow key={`${item.parentRow?.deviceId}-${index}`} className="custom-row">
               <CTableDataCell
-                colSpan={selectedColumns.length + 2}
-                style={{
-                  backgroundColor: '#f8f9fa',
-                  color: '#6c757d',
-                  fontStyle: 'italic',
-                  padding: '16px',
-                  textAlign: 'center',
-                  border: '1px dashed #dee2e6',
-                  height: '100px',
-                }}
+                style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
               >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                  }}
+                {index + 1}
+              </CTableDataCell>
+              <CTableDataCell
+                style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
+              >
+                {item.vehicleName}
+              </CTableDataCell>
+
+              {selectedColumns.map((column, colIndex) => (
+                <CTableDataCell
+                  key={colIndex}
+                  style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#eeeeefc2' }}
                 >
-                  <Loader />
-                </div>
-              </CTableDataCell>
+                  {(() => {
+                    switch (column) {
+                      case 'Vehicle Status':
+                        return item.vehicleStatus === 'Idle' ? (
+                          <CTooltip content="Idle">
+                            <img
+                              src={idel}
+                              alt="idle"
+                              width="40"
+                              height="40"
+                              style={{ marginRight: '10px' }}
+                            />
+                          </CTooltip>
+                        ) : item.vehicleStatus === 'Ignition Off' ? (
+                          <CTooltip content="Ignition Off">
+                            <img
+                              src={ignitionOff}
+                              alt="off"
+                              width="40"
+                              height="40"
+                              style={{ marginRight: '10px' }}
+                            />
+                          </CTooltip>
+                        ) : item.vehicleStatus === 'Ignition On' ? (
+                          <CTooltip content="Ignition On">
+                            <img
+                              src={ignitionOn}
+                              alt="on"
+                              width="40"
+                              height="40"
+                              style={{ marginRight: '10px' }}
+                            />
+                          </CTooltip>
+                        ) : null
+
+                      case 'Duration':
+                        return new Date(item.durationSeconds * 1000).toISOString().substr(11, 8)
+
+                      case 'Location':
+                        return item.address || item.location
+
+                      case 'Co-ordinates':
+                        return item.location
+
+                      case 'Start Time':
+                        return new Date(
+                          new Date(item.arrivalTime).setHours(
+                            new Date(item.arrivalTime).getHours() - 5,
+                            new Date(item.arrivalTime).getMinutes() - 30,
+                          ),
+                        ).toLocaleString([], {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })
+
+                      case 'End Time':
+                        return new Date(
+                          new Date(item.departureTime).setHours(
+                            new Date(item.departureTime).getHours() - 5,
+                            new Date(item.departureTime).getMinutes() - 30,
+                          ),
+                        ).toLocaleString([], {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })
+
+                      case 'Total Duration':
+                        return new Date(item.parentRow.totalDurationSeconds * 1000)
+                          .toISOString()
+                          .substr(11, 8)
+
+                      default:
+                        return '--'
+                    }
+                  })()}
+                </CTableDataCell>
+              ))}
             </CTableRow>
-          ) : dataWithAddresses?.length > 0 ? (
-            // Condition for dataWithAddresses
-            dataWithAddresses.map((row, rowIndex) =>
-              row.data?.length > 0 ? (
-                row.data.map((nestedRow, nestedIndex) => (
-                  <CTableRow key={`${row.deviceId}-${nestedIndex}`} className="custom-row">
-                    <CTableDataCell
-                      style={{
-                        backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                      }}
-                    >
-                      {rowIndex + 1}
-                    </CTableDataCell>
-                    <CTableDataCell
-                      style={{
-                        backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                      }}
-                    >
-                      {selectedDeviceName}
-                    </CTableDataCell>
-
-                    {/* Dynamically render table cells based on selected columns */}
-                    {selectedColumns.map((column, index) => (
-                      <CTableDataCell
-                        key={index}
-                        style={{
-                          backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#eeeeefc2',
-                        }}
-                      >
-                        {(() => {
-                          switch (column) {
-                            case 'Vehicle Status':
-                              return nestedRow.vehicleStatus === 'Idle' ? (
-                                <CTooltip content="Idle">
-                                  <img
-                                    src={idel}
-                                    alt="idle"
-                                    width="40"
-                                    height="40"
-                                    style={{ marginRight: '10px' }}
-                                  />
-                                </CTooltip>
-                              ) : nestedRow.vehicleStatus === 'Ignition Off' ? (
-                                <CTooltip content="Ignition Off">
-                                  <img
-                                    src={ignitionOff}
-                                    alt="off"
-                                    width="40"
-                                    height="40"
-                                    style={{ marginRight: '10px' }}
-                                  />
-                                </CTooltip>
-                              ) : nestedRow.vehicleStatus === 'Ignition On' ? (
-                                <CTooltip content="Ignition On">
-                                  <img
-                                    src={ignitionOn}
-                                    alt="on"
-                                    width="40"
-                                    height="40"
-                                    style={{ marginRight: '10px' }}
-                                  />
-                                </CTooltip>
-                              ) : null
-
-                            case 'Duration':
-                              return new Date(nestedRow.durationSeconds * 1000)
-                                .toISOString()
-                                .substr(11, 8)
-
-                            case 'Location':
-                              return nestedRow.address || nestedRow.location
-                            case 'Co-ordinates':
-                              return nestedRow.location
-
-                            case 'Start Time':
-                              return new Date(
-                                new Date(nestedRow.arrivalTime).setHours(
-                                  new Date(nestedRow.arrivalTime).getHours() - 5,
-                                  new Date(nestedRow.arrivalTime).getMinutes() - 30,
-                                ),
-                              ).toLocaleString([], {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                              })
-
-                            case 'End Time':
-                              return new Date(
-                                new Date(nestedRow.departureTime).setHours(
-                                  new Date(nestedRow.departureTime).getHours() - 5,
-                                  new Date(nestedRow.departureTime).getMinutes() - 30,
-                                ),
-                              ).toLocaleString([], {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                              })
-
-                            case 'Total Duration':
-                              return new Date(row.totalDurationSeconds * 1000)
-                                .toISOString()
-                                .substr(11, 8)
-
-                            default:
-                              return '--'
-                          }
-                        })()}
-                      </CTableDataCell>
-                    ))}
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow key={`${row.deviceId}-empty`}>
-                  <CTableDataCell
-                    colSpan={selectedColumns.length + 2}
-                    style={{
-                      backgroundColor: '#f8f9fa',
-                      color: '#6c757d',
-                      fontStyle: 'italic',
-                      padding: '16px',
-                      textAlign: 'center',
-                      border: '1px dashed #dee2e6',
-                    }}
-                  >
-                    No data available for {selectedDeviceName}
-                  </CTableDataCell>
-                </CTableRow>
-              ),
-            )
-          ) : (
-            // Condition when no data is available
-            <CTableRow>
-              <CTableDataCell
-                colSpan={selectedColumns.length + 2}
-                style={{
-                  backgroundColor: '#f8f9fa',
-                  color: '#6c757d',
-                  fontStyle: 'italic',
-                  padding: '16px',
-                  textAlign: 'center',
-                }}
-              >
-                No data available
-              </CTableDataCell>
-            </CTableRow>
-          )}
-        </CTableBody>
-      </CTable>
-
-      <CDropdown className="position-fixed bottom-0 end-0 m-3">
-        <CDropdownToggle
-          color="secondary"
-          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
-        >
-          <CIcon icon={cilSettings} />
-        </CDropdownToggle>
-        <CDropdownMenu>
-          <CDropdownItem onClick={downloadPDF}>PDF</CDropdownItem>
-          <CDropdownItem onClick={downloadExcel}>Excel</CDropdownItem>
-        </CDropdownMenu>
-      </CDropdown>
-    </>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell
+              colSpan={selectedColumns.length + 2}
+              style={{
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontStyle: 'italic',
+                padding: '16px',
+                textAlign: 'center',
+              }}
+            >
+              No data available
+            </CTableDataCell>
+          </CTableRow>
+        )}
+      </CTableBody>
+    </CTable>
   )
 }
 
@@ -851,12 +893,11 @@ const Ideal = () => {
   const [apiData, setApiData] = useState() //data from api
 
   const [selectedUserName, setSelectedUserName] = useState('')
-  const [putName, setPutName] = useState("")
+  const [putName, setPutName] = useState('')
 
   useEffect(() => {
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", putName)
+    console.log('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ', putName)
   }, [putName])
-
 
   // Get the selected device name from the device list based on formData.Devices
   const selectedDevice = devices.find((device) => device.deviceId === formData.Devices)
@@ -864,7 +905,7 @@ const Ideal = () => {
 
   const handlePutName = (name) => {
     setPutName(name)
-    console.log("putName", putName)
+    console.log('putName', putName)
   }
 
   const getDevices = async (selectedGroup) => {
@@ -916,8 +957,6 @@ const Ideal = () => {
       const selectedGroup = groups.find((group) => group.groupId === formData.Groups)
       const selectedGroupName = selectedGroup ? selectedGroup.name : ''
       console.log('Selected Group:', selectedGroupName)
-
-
     } catch (error) {
       setLoading(false)
       console.error('Error fetching data:', error)
@@ -940,11 +979,10 @@ const Ideal = () => {
         console.log('yaha tak thik hai')
 
         // After setting the users, find the selected user based on formData.User
-        const selectedUser = usersData.find((user) => user.userId === formData.User);
-        const selectedUserName = selectedUser ? selectedUser.username : '';
-        setSelectedUserName(selectedUserName);
-        console.log('Selected User:', selectedUserName);
-
+        const selectedUser = usersData.find((user) => user.userId === formData.User)
+        const selectedUserName = selectedUser ? selectedUser.username : ''
+        setSelectedUserName(selectedUserName)
+        console.log('Selected User:', selectedUserName)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -1019,14 +1057,13 @@ const Ideal = () => {
   }
 
   // Example of extracting values similar to `selectedGroup`
-  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : '';
-  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : '';
-  const selectedPeriod = formData.Periods || '';
+  const selectedFromDate = formData.FromDate ? new Date(formData.FromDate).toLocaleDateString() : ''
+  const selectedToDate = formData.ToDate ? new Date(formData.ToDate).toLocaleDateString() : ''
+  const selectedPeriod = formData.Periods || ''
 
-  console.log('Selected From Date:', selectedFromDate);
-  console.log('Selected To Date:', selectedToDate);
-  console.log('Selected Period:', selectedPeriod);
-
+  console.log('Selected From Date:', selectedFromDate)
+  console.log('Selected To Date:', selectedToDate)
+  console.log('Selected Period:', selectedPeriod)
 
   return (
     <>

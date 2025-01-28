@@ -155,25 +155,6 @@ function AnswerTicket() {
   const handleSort = (key) => {
     const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
     setSortConfig({ key, direction })
-
-    const sortedData = [...ticketData].sort((a, b) => {
-      const aValue = a[key] ?? '' // Handle null/undefined
-      const bValue = b[key] ?? ''
-
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return direction === 'asc' ? aValue - bValue : bValue - aValue
-      } else if (aValue instanceof Date && bValue instanceof Date) {
-        return direction === 'asc' ? aValue - bValue : bValue - aValue
-      } else {
-        return direction === 'asc'
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue))
-      }
-    })
-
-    setTicketData(sortedData)
   }
 
   const getSortIcon = (key) => {
@@ -235,6 +216,40 @@ function AnswerTicket() {
     return matchesTicketType && matchesStatus && matchesSearchTerm && matchesDateRange
   })
 
+  const sortedTickets = [...filteredTickets].sort((a, b) => {
+    const { key, direction } = sortConfig
+    if (!key) return 0
+
+    let aValue = a[key]
+    let bValue = b[key]
+
+    // Handle null/undefined
+    aValue = aValue ?? ''
+    bValue = bValue ?? ''
+
+    // Special handling for date fields
+    if (key === 'createdAt' || key === 'updatedAt') {
+      const aDate = new Date(aValue)
+      const bDate = new Date(bValue)
+      return direction === 'asc' ? aDate - bDate : bDate - aDate
+    }
+
+    // Handle string comparison
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+    }
+
+    // Numeric comparison
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return direction === 'asc' ? aValue - bValue : bValue - aValue
+    }
+
+    // Fallback to string comparison
+    return direction === 'asc'
+      ? String(aValue).localeCompare(String(bValue))
+      : String(bValue).localeCompare(String(aValue))
+  })
+
   // Helper function to format the date
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -247,11 +262,12 @@ function AnswerTicket() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8 // Change as needed
-  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(filteredTickets.length / rowsPerPage)
+  const totalPages = rowsPerPage === 'All' ? 1 : Math.ceil(sortedTickets.length / rowsPerPage)
   const paginatedTickets =
     rowsPerPage === 'All'
-      ? filteredTickets
-      : filteredTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+      ? sortedTickets
+      : sortedTickets.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+
   return (
     <div className="min-h-screen">
       <div className="px-3 mt-2">
@@ -334,8 +350,8 @@ function AnswerTicket() {
                         'vehicleNo',
                         'ticketType',
                         'status',
-                        'added',
-                        'updated',
+                        'createdAt', // Changed from 'added'
+                        'updatedAt', // Changed from 'updated'
                         'description',
                       ].map((key) => (
                         <CTableHeaderCell
@@ -344,7 +360,13 @@ function AnswerTicket() {
                           onClick={() => handleSort(key)}
                           className="text-center text-white cursor-pointer"
                         >
-                          {key.charAt(0).toUpperCase() + key.slice(1)} {getSortIcon(key)}
+                          {/* Adjust labels for 'createdAt' and 'updatedAt' */}
+                          {key === 'createdAt'
+                            ? 'Added'
+                            : key === 'updatedAt'
+                              ? 'Updated'
+                              : key.charAt(0).toUpperCase() + key.slice(1)}
+                          {getSortIcon(key)}
                         </CTableHeaderCell>
                       ))}
                     </CTableRow>

@@ -83,6 +83,8 @@ const notificationTypes = [
 ]
 
 const Notification = () => {
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [formData, setFormData] = useState({})
@@ -355,37 +357,37 @@ const Notification = () => {
   const exportToPDF = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
-    });
+    })
 
     // Add current date
-    const today = new Date();
+    const today = new Date()
     const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString()}`;
+      .padStart(2, '0')}-${today.getFullYear().toString()}`
 
     // Add "Credence Tracker" heading
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    const title = 'Credence Tracker';
-    const pageWidth = doc.internal.pageSize.width;
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (pageWidth - titleWidth) / 2;
-    doc.text(title, titleX, 15);
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(22)
+    const title = 'Credence Tracker'
+    const pageWidth = doc.internal.pageSize.width
+    const titleWidth = doc.getTextWidth(title)
+    const titleX = (pageWidth - titleWidth) / 2
+    doc.text(title, titleX, 15)
 
     // Add "Devices Reports" heading
-    doc.setFontSize(16);
-    const subtitle = 'Devices Notifications Reports';
-    const subtitleWidth = doc.getTextWidth(subtitle);
-    const subtitleX = (pageWidth - subtitleWidth) / 2;
-    doc.text(subtitle, subtitleX, 25);
+    doc.setFontSize(16)
+    const subtitle = 'Devices Notifications Reports'
+    const subtitleWidth = doc.getTextWidth(subtitle)
+    const subtitleX = (pageWidth - subtitleWidth) / 2
+    doc.text(subtitle, subtitleX, 25)
 
     // Add current date at the top-right corner
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' });
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Date: ${date}`, pageWidth - 20, 15, { align: 'right' })
 
     // Define table headers
-    const tableColumn = ['SN', 'Device Name', 'Notifications'];
+    const tableColumn = ['SN', 'Device Name', 'Notifications']
 
     // Generate rows of data for the PDF
     const tableRows = filteredData.map((item, index) => {
@@ -393,20 +395,20 @@ const Notification = () => {
         index + 1, // Serial Number
         item.deviceId?.name || '--', // Device Name
         item.type.length || '--', // Notifications (assuming type length is what you want here)
-      ];
+      ]
 
-      return rowData;
-    });
+      return rowData
+    })
 
     // Calculate the total width of the table based on the number of columns
-    const columnWidths = [20, 100, 40]; // Adjust column widths based on content
-    const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0);
-    const marginLeft = 10; // Left margin
-    const marginRight = 10; // Right margin
-    const remainingWidth = pageWidth - marginLeft - marginRight;
+    const columnWidths = [20, 100, 40] // Adjust column widths based on content
+    const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0)
+    const marginLeft = 10 // Left margin
+    const marginRight = 10 // Right margin
+    const remainingWidth = pageWidth - marginLeft - marginRight
 
     // Calculate scaling factor to make the table fit the full width
-    const scaleFactor = remainingWidth / totalWidth;
+    const scaleFactor = remainingWidth / totalWidth
 
     // Use autoTable to create the table in the PDF
     doc.autoTable({
@@ -433,25 +435,21 @@ const Notification = () => {
         2: { cellWidth: columnWidths[2] * scaleFactor }, // Scale notifications column
       },
       margin: { top: 10, right: marginRight, bottom: 10, left: marginLeft }, // Adjust margins
-    });
+    })
 
     // Add footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
+        align: 'center',
+      })
     }
 
     // Save the generated PDF
-    doc.save(`Notifications_Reports_${date}.pdf`);
-  };
-
+    doc.save(`Notifications_Reports_${date}.pdf`)
+  }
 
   // Excel download
 
@@ -478,6 +476,28 @@ const Notification = () => {
     // Write the Excel file
     XLSX.writeFile(workbook, 'Notification_data.xlsx')
   }
+
+  // SORTING LOGIC
+  const handleSort = (column) => {
+    const isAsc = sortBy === column && sortOrder === 'asc'
+    setSortOrder(isAsc ? 'desc' : 'asc')
+    setSortBy(column)
+  }
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortBy) return 0
+
+    if (sortBy === 'deviceName') {
+      const nameA = a.deviceId?.name?.toLowerCase() || ''
+      const nameB = b.deviceId?.name?.toLowerCase() || ''
+      return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+    } else if (sortBy === 'notificationCount') {
+      const countA = a.type?.length || 0
+      const countB = b.type?.length || 0
+      return sortOrder === 'asc' ? countA - countB : countB - countA
+    }
+    return 0
+  })
 
   return (
     <div className="d-flex flex-column mx-md-3 mt-3 h-auto">
@@ -564,19 +584,21 @@ const Notification = () => {
                         <strong>SN</strong>
                       </CTableHeaderCell>
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        className="text-center text-white sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('deviceName')}
                       >
                         <strong>Device Name</strong>
+                        {sortBy === 'deviceName' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
-                      {/* <CTableHeaderCell className=" text-center text-white bg-secondary">
-                Chennel
-              </CTableHeaderCell> */}
+
                       <CTableHeaderCell
-                        className=" text-center text-white text-center sr-no table-cell"
-                        style={{ backgroundColor: '#0a2d63' }}
+                        className="text-center text-white sr-no table-cell"
+                        style={{ backgroundColor: '#0a2d63', cursor: 'pointer' }}
+                        onClick={() => handleSort('notificationCount')}
                       >
                         <strong>Notification</strong>
+                        {sortBy === 'notificationCount' && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
                       </CTableHeaderCell>
 
                       <CTableHeaderCell
@@ -610,7 +632,7 @@ const Notification = () => {
                         </CTableRow>
                       </>
                     ) : filteredData.length > 0 ? (
-                      filteredData?.map((item, index) => (
+                      sortedData?.map((item, index) => (
                         <CTableRow key={index}>
                           <CTableDataCell
                             className="text-center p-0"
@@ -925,7 +947,7 @@ const Notification = () => {
                   renderOption={(props, option, { selected }) => {
                     const isDisabled = devicesAlreadyAdded.includes(option.name)
                     {
-                      ; (() =>
+                      ;(() =>
                         console.log(
                           'Logging inside JSX:',
                           devicesAlreadyAdded,
@@ -936,19 +958,19 @@ const Notification = () => {
                     return (
                       <li
                         {...props}
-                      // aria-disabled={isDisabled}
+                        // aria-disabled={isDisabled}
                       >
                         <Checkbox
                           style={{ marginRight: 8 }}
                           checked={selected}
-                        //disabled={isDisabled} // Disable the checkbox if condition is met
+                          //disabled={isDisabled} // Disable the checkbox if condition is met
                         />
                         <ListItemText
                           primary={option.name}
-                        // style={{
-                        //   textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
-                        //   color: isDisabled ? "gray" : "inherit",
-                        // }}
+                          // style={{
+                          //   textDecoration: isDisabled ? "line-through" : "none", // Optional: Style disabled options
+                          //   color: isDisabled ? "gray" : "inherit",
+                          // }}
                         />
                       </li>
                     )
