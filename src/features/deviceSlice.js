@@ -11,12 +11,12 @@ export const fetchDevices = createAsyncThunk(
     }
 
     try {
-      const response = await axios.get('http://63.142.251.13:9000/device', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/device`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       })
-      console.log("devicessssssss", response.data.devices)
+      console.log('devicessssssss', response.data.devices)
       return response.data.devices
     } catch (error) {
       return rejectWithValue(error.message)
