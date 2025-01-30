@@ -12,7 +12,7 @@ const useVehicleTracker = (deviceId) => {
     const fetchVehicleData = async () => {
       try {
         setLoading(true) // Set loading state to true before fetching
-        const positionsAPI = `http://63.142.251.13:8082/api/positions?deviceId=${deviceId}`
+        const positionsAPI = `${import.meta.env.VITE_API_POSITION}/api/positions?deviceId=${deviceId}`
         const auth = {
           username: 'hbtrack',
           password: '123456@',
@@ -39,7 +39,7 @@ const useVehicleTracker = (deviceId) => {
     return () => clearInterval(intervalId)
   }, [deviceId])
 
-  return { vehicleData, loading, error } 
+  return { vehicleData, loading, error }
 }
 
 export default useVehicleTracker

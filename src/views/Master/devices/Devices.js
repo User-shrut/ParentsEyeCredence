@@ -279,7 +279,7 @@ const Devices = () => {
         const authtoken = btoa(`${username}:${password}`)
 
         const [oldApiResponse, newApiResponse] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/devices`, {
+          axios.get(`${import.meta.env.VITE_API_POSITION}/api/devices`, {
             headers: {
               Authorization: `Basic ${authtoken}`,
             },
@@ -456,9 +456,9 @@ const Devices = () => {
       const username = 'hbtrack'
       const password = '123456@'
       const token1 = btoa(`${username}:${password}`)
-      const oldPutApi = `http://63.142.251.13:8082/api/devices`
+      const oldPutApi = `${import.meta.env.VITE_API_POSITION}/api/devices`
       const newPutApi = `${import.meta.env.VITE_API_URL}/device`
-      const oldPostApi = `http://63.142.251.13:8082/api/devices`
+      const oldPostApi = `${import.meta.env.VITE_API_POSITION}/api/devices`
       const newPostApi = `${import.meta.env.VITE_API_URL}/device`
       let response1
       let response2
@@ -561,7 +561,7 @@ const Devices = () => {
     const username = 'hbtrack'
     const password = '123456@'
     const token1 = btoa(`${username}:${password}`)
-    const oldDeleteApi = `http://63.142.251.13:8082/api/devices`
+    const oldDeleteApi = `${import.meta.env.VITE_API_POSITION}/api/devices`
     const newDeleteApi = `${import.meta.env.VITE_API_URL}/device`
     let response1
     let response2

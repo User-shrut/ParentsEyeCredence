@@ -19,7 +19,7 @@ import { AiOutlinePlus } from 'react-icons/ai'
 import CloseIcon from '@mui/icons-material/Close'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
-import { MdDevicesOther } from "react-icons/md";
+import { MdDevicesOther } from 'react-icons/md'
 
 const AddDeviceModal = ({
   open,
@@ -44,7 +44,7 @@ const AddDeviceModal = ({
   setShowExpirationDropdown,
 }) => {
   const handleAddSubmit = async () => {
-    const oldapiUrl = `http://63.142.251.13:8082/api/devices`
+    const oldapiUrl = `${import.meta.env.VITE_API_POSITION}/api/devices`
     const apiUrl = `${import.meta.env.VITE_API_URL}/device`
 
     const oldRow = {

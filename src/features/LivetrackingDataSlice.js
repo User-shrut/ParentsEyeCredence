@@ -14,7 +14,7 @@ const initialState = {
 }
 
 // WebSocket connection logic
-export const socket = io(`${import.meta.env.VITE_API_URL}`, {
+export const socket = io(`${import.meta.env.VITE_API_POSITION}`, {
   transports: ['websocket', 'polling'], // Specify transports (optional)
 })
 
