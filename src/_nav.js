@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { IoLocationOutline } from 'react-icons/io5'
 import { BsFillSignStopFill, BsWindowFullscreen } from 'react-icons/bs'
 import { BsChatDots } from 'react-icons/bs'
-import { FaAddressCard, FaCar, FaHistory, FaRegEdit, FaStopwatch, FaUserAlt } from 'react-icons/fa'
+import { FaAddressCard, FaCar, FaHistory, FaRegEdit, FaRoute, FaStopwatch, FaUserAlt } from 'react-icons/fa'
 import { LiaFileInvoiceDollarSolid } from 'react-icons/lia'
 import { TbReport } from 'react-icons/tb'
 import { BiLogOutCircle } from 'react-icons/bi'
@@ -269,8 +269,19 @@ const _nav = (role, decodedToken) => {
             },
             {
               component: CNavItem,
-              name: 'Travels Report',
+              name: 'Travel Summary',
               to: '/travelsreport',
+
+              icon: (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <FaRoute style={{ marginRight: '15px', fontSize: '25px' }} />
+                </div >
+              ),
+            },
+            {
+              component: CNavItem,
+              name: 'Trips Report',
+              to: '/tripsreport',
 
               icon: (
                 <div style={{ display: 'flex', alignItems: 'center' }}>

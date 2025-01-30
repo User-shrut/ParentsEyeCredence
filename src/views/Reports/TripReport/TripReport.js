@@ -235,9 +235,9 @@ const SearchTrip = ({
           value={
             formData.Devices
               ? {
-                  value: formData.Devices,
-                  label: devices.find((device) => device.deviceId === formData.Devices)?.name,
-                }
+                value: formData.Devices,
+                label: devices.find((device) => device.deviceId === formData.Devices)?.name,
+              }
               : null
           }
           onChange={(selectedOption) => handleInputChange('Devices', selectedOption?.value)}
@@ -1054,7 +1054,7 @@ const Trips = () => {
               className="d-flex justify-content-between align-items-center text-white"
               style={{ backgroundColor: '#0a2d63' }}
             >
-              <strong>Travel Report</strong>
+              <strong>Trips Report</strong>
             </CCardHeader>
             <CCardBody>
               <SearchTrip

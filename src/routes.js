@@ -1,4 +1,5 @@
 import { Colors } from 'chart.js'
+import { element } from 'prop-types'
 import React from 'react'
 const DashBoard = React.lazy(() => import('./views/theme/dashboard/DashBoard'))
 const LiveTrack = React.lazy(() => import('./views/theme/livetrack/LiveTrack'))
@@ -19,7 +20,8 @@ const Combine = React.lazy(() => import('./views/Reports/StatusReports/StatusRep
 const Custom = React.lazy(() => import('./views/Reports/DistanceReport/DistanceReport.js'))
 const History = React.lazy(() => import('./views/Reports/HistoryReport/HistoryReport.js'))
 const Stops = React.lazy(() => import('./views/Reports/StopsReport/StopsReport.js'))
-const Trips = React.lazy(() => import('./views/Reports/TravelReport/TravelReport.js'))
+const Travel = React.lazy(() => import('./views/Reports/TravelSummary/TravelReport.js'))
+const Trips = React.lazy(() => import('./views/Reports/TripReport/TripReport.js'))
 const IdleReport = React.lazy(() => import('./views/Reports/IdleReport/IdleReport.js'))
 const Schedules = React.lazy(() => import('./views/Reports/SensorReport/SensorReport.js'))
 const Alerts = React.lazy(() => import('./views/Reports/alerts-events/Alerts.js'))
@@ -74,7 +76,8 @@ const routes = [
     element: History,
   },
   { path: '/stops', name: 'Stops', element: Stops },
-  { path: '/travelsreport', name: 'Trips', element: Trips },
+  { path: '/travelsreport', name: 'Travel', element: Travel },
+  { path: '/tripsreport', name: 'Trips', element: Trips },
   { path: '/idlereport', name: 'Idle', element: IdleReport },
   { path: '/sensorreports', name: 'Schedule', element: Schedules },
   { path: '/alerts-events', name: 'Alerts', element: Alerts },
