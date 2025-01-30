@@ -343,11 +343,11 @@ const Dashboard = () => {
 
   const fetchAddress = async (vehicleId, longitude, latitude) => {
     try {
-      const apiKey = 'DG2zGt0KduHmgSi2kifd' // Replace with your actual MapTiler API key
-      const response = await axios
-        .get
-        // `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`,
-        ()
+      const apiKey = 'huWGT6bXG3aRcdvLhkca' // Replace with your actual MapTiler API key
+      const response = await axios.get(
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${apiKey}`
+      );
+
       // console.log(response)
       const address =
         response.data.features.length <= 5
@@ -786,7 +786,7 @@ const Dashboard = () => {
                 >
                   <div
                     className="vehicle-card new-vehicles"
-                    // onClick={() => dispatch(filterInactiveVehicles())}
+                  // onClick={() => dispatch(filterInactiveVehicles())}
                   >
                     <div className="vehicle-info">
                       <div className="vehicle-type text-muted">
@@ -891,10 +891,10 @@ const Dashboard = () => {
                               value={
                                 selectedUser
                                   ? {
-                                      value: selectedUser,
-                                      label: users.find((user) => user._id === selectedUser)
-                                        ?.username,
-                                    }
+                                    value: selectedUser,
+                                    label: users.find((user) => user._id === selectedUser)
+                                      ?.username,
+                                  }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedUser(selectedOption?.value)}
@@ -914,10 +914,10 @@ const Dashboard = () => {
                               value={
                                 selectedGroup
                                   ? {
-                                      value: selectedGroup,
-                                      label: groups.find((group) => group._id === selectedGroup)
-                                        ?.name,
-                                    }
+                                    value: selectedGroup,
+                                    label: groups.find((group) => group._id === selectedGroup)
+                                      ?.name,
+                                  }
                                   : null
                               }
                               onChange={(selectedOption) => setSelectedGroup(selectedOption?.value)}

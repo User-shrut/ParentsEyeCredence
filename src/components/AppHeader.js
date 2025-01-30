@@ -299,7 +299,7 @@ const AppHeader = () => {
         {/**CURRENT */}
         <CTabs className="ms-auto">
           <CTabList variant="underline">
-            <CTab onClick={handleHome} className="text-white" itemKey={1}>
+            {/* <CTab onClick={handleHome} className="text-white" itemKey={1}>
               <FaHome className="me-2" /> Home
             </CTab>
             <div className="vr mx-3 bg-white"></div>
@@ -309,7 +309,7 @@ const AppHeader = () => {
             <div className="vr mx-3 bg-white"></div>
             <CTab onClick={handleReports} className="text-white" itemKey={3}>
               <FaChartBar className="me-2" /> Reports
-            </CTab>
+            </CTab> */}
 
             {/* {role === 'superadmin' && (
               <CTab onClick={handleExpense} className="text-white" itemKey={4}>

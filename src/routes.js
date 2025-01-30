@@ -34,6 +34,9 @@ const InventoryManagment = React.lazy(() => import('./views/ExpenseManagement/In
 // answer tickets
 const AnswerTicket = React.lazy(() => import('./views/ExpenseManagement/AnswerTicket.js'))
 
+// Raise Ticket
+const RaiseTicket = React.lazy(() => import('./views/forms/help-support/RaiseTicket.js'))
+
 // additional
 const ChatBot = React.lazy(() => import('./views/theme/chatbot/ChatBot'))
 const HelpSupport = React.lazy(() => import('./views/forms/help-support/HelpSupp.js'))
@@ -85,5 +88,6 @@ const routes = [
   { path: '/HelpSupp/getting-started', name: 'Getting Started', element: GettingStarted },
   { path: '/answer-ticket', name: 'Answer Ticket', element: AnswerTicket },
   { path: '/HelpSupp/faq', name: 'FAQ', element: Faq },
+  { path: '/raise-ticket', name: 'Raise Ticket', element: RaiseTicket },
 ]
 export default routes

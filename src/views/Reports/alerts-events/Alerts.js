@@ -242,7 +242,7 @@ const Alerts = () => {
       item.type || '--', // Notification Type
       item.address || 'Fetching...', // Location
       item.message || '--', // Message
-      new Date(item.createdAt).toLocaleString('en-IN', {
+      new Date(item.eventTime).toLocaleString('en-IN', {
         timeZone: 'Asia/Kolkata',
         hour12: false,
         year: 'numeric',
@@ -309,7 +309,7 @@ const Alerts = () => {
         Notification: item.type,
         Location: item.address || 'Fetching...',
         Message: item.message,
-        Time: new Date(item.createdAt).toLocaleString('en-IN', {
+        Time: new Date(item.eventTime).toLocaleString('en-IN', {
           timeZone: 'Asia/Kolkata',
           hour12: false,
           year: 'numeric',
@@ -350,7 +350,7 @@ const Alerts = () => {
     Notification: 'type',
     Location: 'address',
     Message: 'message',
-    'Date/Time': 'createdAt',
+    'Date/Time': 'eventTime',
   }
 
   // Sorting handler
@@ -373,7 +373,7 @@ const Alerts = () => {
         const aValue = a[sortConfig.key]
         const bValue = b[sortConfig.key]
 
-        if (sortConfig.key === 'createdAt') {
+        if (sortConfig.key === 'eventTime') {
           return sortConfig.direction === 'asc'
             ? new Date(aValue) - new Date(bValue)
             : new Date(bValue) - new Date(aValue)
@@ -627,7 +627,7 @@ const Alerts = () => {
                               className="text-center pe-4"
                             >
                               {' '}
-                              {new Date(item.createdAt).toLocaleString('en-IN', {
+                              {new Date(item.eventTime).toLocaleString('en-IN', {
                                 timeZone: 'Asia/Kolkata',
                                 hour12: false, // Use 24-hour format
                                 year: 'numeric',
