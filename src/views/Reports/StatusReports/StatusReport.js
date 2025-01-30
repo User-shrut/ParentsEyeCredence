@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Edit, Copy, Trash, Share } from 'lucide-react'
+// import { Edit, Copy, Trash, Share } from 'lucide-react'
 import {
   CButton,
   CCard,
@@ -44,7 +44,17 @@ import Loader from '../../../components/Loader/Loader'
 import '../style/remove-gutter.css'
 import '../../../utils.css'
 import IconDropdown from '../../../components/ButtonDropdown'
+import { color } from 'framer-motion'
+import { FaRegFilePdf, FaPrint } from 'react-icons/fa6'
+import { PiMicrosoftExcelLogo } from 'react-icons/pi'
+import { HiOutlineLogout } from 'react-icons/hi'
+import { FaArrowUp } from 'react-icons/fa'
+import toast, { Toaster } from 'react-hot-toast'
+import { jwtDecode } from 'jwt-decode'
+import { ContentPasteOffOutlined } from '@mui/icons-material'
+const accessToken = Cookies.get('authToken')
 
+const decodedToken = jwtDecode(accessToken)
 const SearchStatus = ({
   formData,
   handleInputChange,
@@ -406,182 +416,6 @@ const ShowStatus = ({
     console.log(newAddressData)
   }
 
-  // Function to export table data to Excel
-
-  const exportToExcel = () => {
-    const workbook = XLSX.utils.book_new() // Create a new workbook
-
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
-    const tableRows = apiData.data.map((row, rowIndex) => {
-      const rowData = selectedColumns.map((column) => {
-        if (column === 'Vehicle Name') {
-          return row.selectedDeviceName
-        }
-        if (column === 'Vehicle Status') {
-          if (row.vehicleStatus === 'Idle') return 'Idle'
-          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off'
-          if (row.vehicleStatus === 'Ignition On') return 'Ignition On'
-          return '--'
-        } else if (column === 'Start Date Time') {
-          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`
-        } else if (column === 'End Date Time') {
-          return `${row.endDateTime.slice(0, 10)} ${row.endDateTime.slice(11, 16)}`
-        } else if (column === 'Start Address') {
-          return newAddressData?.startAddress || 'Fetching...'
-        } else if (column === 'End Address') {
-          return newAddressData?.endAddress || 'Fetching...'
-        } else if (column === 'Distance') {
-          return row.distance
-          // } else if (column === 'Total KM') {
-          //   return row.totalKm
-        } else if (column === 'Maximum Speed') {
-          return row.maxSpeed + ' km'
-        } else if (column === 'Total Distance') {
-          return (row.totalKm / 1000).toFixed(2) + ' km'
-        } else if (column === 'Driver Name') {
-          return row.driverInfos?.driverName || '--'
-        } else if (column === 'Driver Phone No.') {
-          return row.device?.name || '--'
-        } else if (column === 'Duration') {
-          return row.time
-        } else if (column === 'Start Coordinates') {
-          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
-        } else if (column === 'End Coordinates') {
-          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-        } else {
-          return row[column] || '--' // Fallback for other columns
-        }
-      })
-      return [rowIndex + 1, selectedDeviceName, ...rowData]
-    })
-
-    const worksheetData = [tableColumn, ...tableRows]
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-    XLSX.writeFile(workbook, `${selectedDeviceName}.xlsx`)
-  }
-
-  // Function to export table data to PDF
-
-  const exportToPDF = () => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-    })
-
-    // Add current date
-    const today = new Date()
-    const date = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1)
-      .toString()
-      .padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`
-
-    // Add "Credence Tracker" heading centered
-    doc.setFontSize(22) // Larger font size for heading
-    doc.setFont('helvetica', 'bold') // Bold font for title
-    const title = 'Credence Tracker'
-    const titleWidth =
-      (doc.getStringUnitWidth(title) * doc.internal.getFontSize()) / doc.internal.scaleFactor
-    const titleX = (doc.internal.pageSize.width - titleWidth) / 2
-    doc.text(title, titleX, 15)
-
-    // Add "Status Reports" heading below "Credence Tracker"
-    doc.setFontSize(16)
-    const subtitle = 'Status Reports' // Align with the title
-    const subtitleWidth =
-      (doc.getStringUnitWidth(subtitle) * doc.internal.getFontSize()) / doc.internal.scaleFactor
-    const subtitleX = (doc.internal.pageSize.width - subtitleWidth) / 2
-    doc.text(subtitle, subtitleX, 25)
-
-    // Add current date at the top-right corner
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'normal') // Normal font for text
-    doc.text(`Date: ${date}`, doc.internal.pageSize.width - 20, 15, { align: 'right' })
-
-    // Add device and user details
-    const details = [
-      `User Name: ${selectedUserName || 'N/A'}`,
-      `Group Name: ${selectedGroupName || 'N/A'}`,
-      `Vehicle Name: ${selectedDeviceName || 'N/A'}`,
-      `Period: ${selectedPeriod || 'N/A'} | From Date: ${selectedFromDate || 'N/A'} , To Date: ${selectedToDate || 'N/A'}`,
-    ]
-
-    let yPosition = 35
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'normal')
-    details.forEach((detail) => {
-      doc.text(detail, 14, yPosition)
-      yPosition += 8 // Spacing between lines
-    })
-
-    // Define table columns and rows
-    const tableColumn = ['SN', 'Vehicle Name', ...selectedColumns]
-    const tableRows = apiData.data.map((row, rowIndex) => {
-      const rowData = selectedColumns.map((column) => {
-        if (column === 'Vehicle Status') {
-          if (row.vehicleStatus === 'Idle') return 'Idle'
-          if (row.vehicleStatus === 'Ignition Off') return 'Ignition Off'
-          if (row.vehicleStatus === 'Ignition On') return 'Ignition On'
-          return '--'
-        } else if (column === 'Start Date Time') {
-          return `${row.startDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`
-        } else if (column === 'Start Address') {
-          return newAddressData?.startAddress || 'Fetching...'
-        } else if (column === 'Start Coordinates') {
-          return `${parseFloat(row.startLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.startLocation.split(',')[1]).toFixed(5)}`
-        } else if (column === 'Distance') {
-          return row.distance
-        } else if (column === 'Duration') {
-          return row.time
-        } else if (column === 'Total Distance') {
-          return (row.distance / 1000).toFixed(2) + ' km'
-        } else if (column === 'Maximum Speed') {
-          return row.maxSpeed + ' km'
-          // } else if (column === 'Total KM') {
-          //   return row.totalKm
-        } else if (column === 'End Date Time') {
-          return `${row.endDateTime.slice(0, 10)} ${row.startDateTime.slice(11, 16)}`
-        } else if (column === 'End Address') {
-          return newAddressData?.endAddress || 'Fetching...'
-        } else if (column === 'End Coordinates') {
-          return `${parseFloat(row.endLocation.split(',')[0]).toFixed(5)}, ${parseFloat(row.endLocation.split(',')[1]).toFixed(5)}`
-        } else if (column === 'Driver Name') {
-          return row.driverInfos?.driverName || '--'
-        } else if (column === 'Driver Phone No.') {
-          return row.device?.name || '--'
-        } else {
-          return row[column] || '--' // Fallback for other columns
-        }
-      })
-      return [rowIndex + 1, selectedDeviceName, ...rowData]
-    })
-
-    // Add autoTable with enhanced styling
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: yPosition + 1, // Start below details
-      styles: {
-        fontSize: 10,
-        halign: 'center',
-        valign: 'middle',
-        lineColor: [0, 0, 0],
-        lineWidth: 0.5,
-      },
-      headStyles: {
-        fillColor: [100, 100, 255], // Light blue header
-        textColor: [255, 255, 255],
-        fontSize: 12,
-        fontStyle: 'bold',
-      },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240], // Light gray for alternating rows
-      },
-      margin: { top: 20 },
-    })
-
-    // Save the PDF
-    doc.save(`${selectedDeviceName || 'Report'}_Status_Report_${date}.pdf`)
-  }
-
   const handleSort = (column) => {
     const isAsc = sortBy === column && sortOrder === 'asc'
     setSortOrder(isAsc ? 'desc' : 'asc')
@@ -633,33 +467,581 @@ const ShowStatus = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem)
 
+  // Function to get date range based on selectedPeriod
+  const getDateRangeFromPeriod = (selectedPeriod) => {
+    const today = new Date()
+    let fromDate, toDate
+
+    switch (selectedPeriod) {
+      case 'Today':
+        fromDate = new Date()
+        toDate = new Date()
+        break
+      case 'Yesterday':
+        fromDate = new Date()
+        fromDate.setDate(today.getDate() - 1)
+        toDate = new Date(fromDate)
+        break
+      case 'This Week':
+        fromDate = new Date(today)
+        const dayOfWeek = today.getDay() // 0 (Sunday) to 6 (Saturday)
+        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Convert Sunday to previous Monday
+        fromDate.setDate(today.getDate() - daysSinceMonday) // Start from Monday of this week
+        toDate = new Date() // Ends at today's date
+        break
+      case 'Previous Week':
+        fromDate = new Date(today)
+        const prevWeekDayOfWeek = today.getDay()
+        const daysSinceLastMonday = prevWeekDayOfWeek === 0 ? 7 : prevWeekDayOfWeek // Ensure previous Monday calculation
+        fromDate.setDate(today.getDate() - daysSinceLastMonday - 6) // Start of previous week (Monday)
+        toDate = new Date(fromDate)
+        toDate.setDate(fromDate.getDate() + 6) // End of previous week (Sunday)
+        break
+      case 'This Month':
+        fromDate = new Date(today.getFullYear(), today.getMonth(), 1)
+        toDate = new Date()
+        break
+      case 'Previous Month':
+        fromDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        toDate = new Date(today.getFullYear(), today.getMonth(), 0)
+        break
+      default:
+        return 'N/A'
+    }
+
+    // Format dates as DD-MM-YYYY
+    const formattedFromDate = `${fromDate.getDate().toString().padStart(2, '0')}-${(fromDate.getMonth() + 1).toString().padStart(2, '0')}-${fromDate.getFullYear()}`
+    const formattedToDate = `${toDate.getDate().toString().padStart(2, '0')}-${(toDate.getMonth() + 1).toString().padStart(2, '0')}-${toDate.getFullYear()}`
+
+    return ` ${formattedFromDate} To ${formattedToDate}`
+  }
+
+  // Function to export table data to Excel
+  const exportToExcel = async () => {
+    try {
+      // Validate data before proceeding
+      if (!Array.isArray(sortedData) || sortedData.length === 0) {
+        throw new Error('No data available for Excel export')
+      }
+
+      // Configuration constants
+      const CONFIG = {
+        styles: {
+          primaryColor: 'FF0A2D63', // Company blue
+          secondaryColor: 'FF6C757D', // Gray for secondary headers
+          textColor: 'FFFFFFFF', // White text for headers
+          borderStyle: 'thin',
+          titleFont: { bold: true, size: 16 },
+          headerFont: { bold: true, size: 12 },
+          dataFont: { size: 11 },
+        },
+        columns: [
+          { header: 'SN', width: 8 },
+          { header: 'Vehicle Name', width: 25 },
+          { header: 'Vehicle Status', width: 20 },
+          { header: 'Start Date Time', width: 25 },
+          { header: 'Start Address', width: 35 },
+          { header: 'Start Coordinates', width: 25 },
+          { header: 'End Date Time', width: 25 },
+          { header: 'End Address', width: 35 },
+          { header: 'End Coordinates', width: 25 },
+          { header: 'Total Distance', width: 20 },
+          { header: 'Duration', width: 20 },
+          { header: 'Maximum Speed', width: 20 },
+        ],
+        company: {
+          name: 'Credence Tracker',
+          copyright: `© ${new Date().getFullYear()} Credence Tracker`,
+        },
+      }
+
+      // Helper functions
+      const formatExcelDate = (dateString) => {
+        if (!dateString) return '--'
+        const date = new Date(dateString)
+        return isNaN(date) ? '--' : date.toLocaleString('en-GB')
+      }
+
+      const formatCoordinates = (coords) => {
+        if (!coords) return '--'
+        const [lat, lon] = coords.split(',').map((coord) => parseFloat(coord.trim()).toFixed(5))
+        return lat && lon ? `${lat}, ${lon}` : '--'
+      }
+
+      // Initialize workbook and worksheet
+      const workbook = new ExcelJS.Workbook()
+      const worksheet = workbook.addWorksheet('Status Report')
+
+      // Add title and metadata
+      const addHeaderSection = () => {
+        // Company title
+        const titleRow = worksheet.addRow([CONFIG.company.name])
+        titleRow.font = { ...CONFIG.styles.titleFont, color: { argb: 'FFFFFFFF' } }
+        titleRow.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: CONFIG.styles.primaryColor },
+        }
+        titleRow.alignment = { horizontal: 'center' }
+        worksheet.mergeCells('A1:L1')
+
+        // Report title
+        const subtitleRow = worksheet.addRow(['Status Report'])
+        subtitleRow.font = {
+          ...CONFIG.styles.titleFont,
+          size: 14,
+          color: { argb: CONFIG.styles.textColor },
+        }
+        subtitleRow.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: CONFIG.styles.secondaryColor },
+        }
+        subtitleRow.alignment = { horizontal: 'center' }
+        worksheet.mergeCells('A2:L2')
+
+        // Metadata
+        worksheet.addRow([`Generated by: ${decodedToken.username || 'N/A'}`])
+        worksheet.addRow([
+          `User: ${selectedUserName || 'N/A'}`,
+          `Group: ${selectedGroupName || 'N/A'}`,
+        ])
+        worksheet.addRow([
+          `Date Range: ${
+            selectedFromDate && selectedToDate
+              ? `${selectedFromDate} - ${selectedToDate}`
+              : getDateRangeFromPeriod(selectedPeriod)
+          }`,
+          `Selected Vehicle: ${selectedDeviceName || '--'}`,
+        ])
+        worksheet.addRow([`Generated: ${new Date().toLocaleString()}`])
+        worksheet.addRow([]) // Spacer
+      }
+
+      // Add data table
+      const addDataTable = () => {
+        // Add column headers
+        const headerRow = worksheet.addRow(CONFIG.columns.map((c) => c.header))
+        headerRow.eachCell((cell) => {
+          cell.font = { ...CONFIG.styles.headerFont, color: { argb: CONFIG.styles.textColor } }
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: CONFIG.styles.primaryColor },
+          }
+          cell.alignment = { vertical: 'middle', horizontal: 'center' }
+          cell.border = {
+            top: { style: CONFIG.styles.borderStyle },
+            bottom: { style: CONFIG.styles.borderStyle },
+            left: { style: CONFIG.styles.borderStyle },
+            right: { style: CONFIG.styles.borderStyle },
+          }
+        })
+
+        // Add data rows
+        sortedData.forEach((item, index) => {
+          const rowData = [
+            index + 1,
+            selectedDeviceName || '--',
+            item.vehicleStatus?.toString() ?? '--',
+            formatExcelDate(item.startDateTime),
+            newAddressData?.startAddress || '--',
+            formatCoordinates(item.startLocation),
+            formatExcelDate(item.endDateTime),
+            newAddressData?.endAddress || '--',
+            formatCoordinates(item.endLocation),
+            typeof item.distance === 'number' ? `${(item.distance / 1000).toFixed(2)} km` : '--',
+            item.time?.toString() ?? '--',
+            typeof item.maxSpeed === 'number' ? `${item.maxSpeed} km/h` : '--',
+          ]
+
+          const dataRow = worksheet.addRow(rowData)
+          dataRow.eachCell((cell) => {
+            cell.font = CONFIG.styles.dataFont
+            cell.border = {
+              top: { style: CONFIG.styles.borderStyle },
+              bottom: { style: CONFIG.styles.borderStyle },
+              left: { style: CONFIG.styles.borderStyle },
+              right: { style: CONFIG.styles.borderStyle },
+            }
+          })
+        })
+
+        // Set column widths
+        worksheet.columns = CONFIG.columns.map((col) => ({
+          width: col.width,
+          style: { alignment: { horizontal: 'left' } },
+        }))
+      }
+
+      // Add footer
+      const addFooter = () => {
+        worksheet.addRow([]) // Spacer
+        const footerRow = worksheet.addRow([CONFIG.company.copyright])
+        footerRow.font = { italic: true }
+        worksheet.mergeCells(`A${footerRow.number}:L${footerRow.number}`)
+      }
+
+      // Build the document
+      addHeaderSection()
+      addDataTable()
+      addFooter()
+
+      // Generate and save file
+      const buffer = await workbook.xlsx.writeBuffer()
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+      const filename = `Status_Report_${new Date().toISOString().split('T')[0]}.xlsx`
+      saveAs(blob, filename)
+      toast.success('Excel file downloaded successfully')
+    } catch (error) {
+      console.error('Excel Export Error:', error)
+      toast.error(error.message || 'Failed to export Excel file')
+    }
+  }
+
+  // Function to export table data to PDF
+  const exportToPDF = () => {
+    try {
+      // Validate data before proceeding
+      if (!Array.isArray(sortedData) || sortedData.length === 0) {
+        throw new Error('No data available for PDF export')
+      }
+
+      // Constants and configuration
+      const CONFIG = {
+        colors: {
+          primary: [10, 45, 99],
+          secondary: [70, 70, 70],
+          accent: [0, 112, 201],
+          border: [220, 220, 220],
+          background: [249, 250, 251],
+        },
+        company: {
+          name: 'Credence Tracker',
+          logo: { x: 15, y: 15, size: 8 },
+        },
+        layout: {
+          margin: 15,
+          pagePadding: 15,
+          lineHeight: 6,
+        },
+        fonts: {
+          primary: 'helvetica',
+          secondary: 'courier',
+        },
+      }
+
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      })
+
+      // Helper functions
+      const applyPrimaryColor = () => {
+        doc.setFillColor(...CONFIG.colors.primary)
+        doc.setTextColor(...CONFIG.colors.primary)
+      }
+
+      const applySecondaryColor = () => {
+        doc.setTextColor(...CONFIG.colors.secondary)
+      }
+
+      const addHeader = () => {
+        // Company logo and name
+        doc.setFillColor(...CONFIG.colors.primary)
+        doc.rect(
+          CONFIG.company.logo.x,
+          CONFIG.company.logo.y,
+          CONFIG.company.logo.size,
+          CONFIG.company.logo.size,
+          'F',
+        )
+        doc.setFont(CONFIG.fonts.primary, 'bold')
+        doc.setFontSize(16)
+        doc.text(CONFIG.company.name, 28, 21)
+
+        // Header line
+        doc.setDrawColor(...CONFIG.colors.primary)
+        doc.setLineWidth(0.5)
+        doc.line(CONFIG.layout.margin, 25, doc.internal.pageSize.width - CONFIG.layout.margin, 25)
+      }
+
+      const addMetadata = () => {
+        const metadata = [
+          { label: 'User:', value: decodedToken.username || 'N/A', x: 15 },
+          { label: 'Selected User:', value: selectedUserName || 'N/A', x: 15 },
+          {
+            label: 'Group:',
+            value: selectedGroupName || 'N/A',
+            x: doc.internal.pageSize.width / 2,
+          },
+          {
+            label: 'Date Range:',
+            value:
+              selectedFromDate && selectedToDate
+                ? `${selectedFromDate} To ${selectedToDate}`
+                : getDateRangeFromPeriod(selectedPeriod),
+            x: doc.internal.pageSize.width / 2,
+          },
+          {
+            label: 'Vehicle:',
+            value: selectedDeviceName || 'N/A',
+            x: 80,
+          },
+        ]
+
+        doc.setFontSize(10)
+        let yPosition = 45
+
+        metadata.forEach((item, index) => {
+          doc.setFont(CONFIG.fonts.primary, 'bold')
+          doc.text(item.label, item.x, yPosition + (index % 2) * 6)
+
+          doc.setFont(CONFIG.fonts.primary, 'normal')
+          doc.text(item.value.toString(), item.x + 25, yPosition + (index % 2) * 6)
+        })
+      }
+
+      const addFooter = () => {
+        const pageCount = doc.getNumberOfPages()
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i)
+
+          // Footer line
+          doc.setDrawColor(...CONFIG.colors.border)
+          doc.setLineWidth(0.5)
+          doc.line(
+            CONFIG.layout.margin,
+            doc.internal.pageSize.height - 15,
+            doc.internal.pageSize.width - CONFIG.layout.margin,
+            doc.internal.pageSize.height - 15,
+          )
+
+          // Copyright text
+          doc.setFontSize(9)
+          applySecondaryColor()
+          doc.text(
+            `© ${CONFIG.company.name}`,
+            CONFIG.layout.margin,
+            doc.internal.pageSize.height - 10,
+          )
+
+          // Page number
+          const pageNumber = `Page ${i} of ${pageCount}`
+          const pageNumberWidth = doc.getTextWidth(pageNumber)
+          doc.text(
+            pageNumber,
+            doc.internal.pageSize.width - CONFIG.layout.margin - pageNumberWidth,
+            doc.internal.pageSize.height - 10,
+          )
+        }
+      }
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '--'
+        const date = new Date(dateString)
+        return isNaN(date)
+          ? '--'
+          : date
+              .toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+              .replace(',', '')
+      }
+
+      const formatCoordinates = (coords) => {
+        if (!coords) return '--'
+        const [lat, lon] = coords.split(',').map((coord) => parseFloat(coord.trim()))
+        return `${lat?.toFixed(5) ?? '--'}, ${lon?.toFixed(5) ?? '--'}`
+      }
+
+      // Main document creation
+      addHeader()
+
+      // Title and date
+      doc.setFontSize(24)
+      doc.setFont(CONFIG.fonts.primary, 'bold')
+      doc.text('Status Report', CONFIG.layout.margin, 35)
+
+      const currentDate = new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+      const dateText = `Generated: ${currentDate}`
+      applySecondaryColor()
+      doc.setFontSize(10)
+      doc.text(
+        dateText,
+        doc.internal.pageSize.width - CONFIG.layout.margin - doc.getTextWidth(dateText),
+        21,
+      )
+
+      addMetadata()
+
+      // Table data preparation
+      const tableColumns = [
+        'SN',
+        'Vehicle Name',
+        'Vehicle Status',
+        'Start Date Time',
+        'Start Address',
+        'Start Coordinates',
+        'End Date Time',
+        'End Address',
+        'End Coordinates',
+        'Total Distance',
+        'Duration',
+        'Maximum Speed',
+      ]
+
+      const tableRows = sortedData.map((item, index) => [
+        index + 1,
+        selectedDeviceName || '--',
+        item.vehicleStatus?.toString() || '--',
+        formatDate(item.startDateTime),
+        newAddressData?.startAddress || '--',
+        formatCoordinates(item.startLocation),
+        formatDate(item.endDateTime),
+        newAddressData?.endAddress || '--',
+        formatCoordinates(item.endLocation),
+        typeof item.distance === 'number' ? `${(item.distance / 1000).toFixed(2)} km` : '--',
+        item.time?.toString() || '--',
+        typeof item.maxSpeed === 'number' ? `${item.maxSpeed} km/h` : '--',
+      ])
+
+      // Generate table
+      doc.autoTable({
+        startY: 65,
+        head: [tableColumns],
+        body: tableRows,
+        theme: 'grid',
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+          halign: 'center',
+          lineColor: CONFIG.colors.border,
+          lineWidth: 0.1,
+        },
+        headStyles: {
+          fillColor: CONFIG.colors.primary,
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: CONFIG.colors.background,
+        },
+        columnStyles: {
+          0: { cellWidth: 10 },
+          1: { cellWidth: 22 },
+          2: { cellWidth: 22 },
+          4: { cellWidth: 35 },
+          5: { cellWidth: 25 },
+          7: { cellWidth: 35 },
+          9: { cellWidth: 20 },
+          10: { cellWidth: 20 },
+          11: { cellWidth: 20 },
+        },
+        margin: { left: CONFIG.layout.margin, right: CONFIG.layout.margin },
+        didDrawPage: (data) => {
+          // Add header on subsequent pages
+          if (doc.getCurrentPageInfo().pageNumber > 1) {
+            doc.setFontSize(15)
+            doc.setFont(CONFIG.fonts.primary, 'bold')
+            doc.text('Status Report', CONFIG.layout.margin, 10)
+          }
+        },
+      })
+
+      addFooter()
+
+      // Save PDF
+      const filename = `Status_Report_${new Date().toISOString().split('T')[0]}.pdf`
+      doc.save(filename)
+      toast.success('PDF downloaded successfully')
+    } catch (error) {
+      console.error('PDF Export Error:', error)
+      toast.error(error.message || 'Failed to export PDF')
+    }
+  }
+
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage) // Update rows per page
     setCurrentPage(1) // Reset to first page
   }
 
+  const handleLogout = () => {
+    Cookies.remove('authToken')
+    window.location.href = '/login'
+  }
+
+  const handlePageUp = () => {
+    window.scrollTo({
+      top: 0, // Scroll up by one viewport height
+      behavior: 'smooth', // Smooth scrolling effect
+    })
+  }
+
+  const handlePrintPage = () => {
+    // Add the landscape style to the page temporarily
+    const style = document.createElement('style')
+    style.innerHTML = `
+    @page {
+      size: landscape;
+    }
+  `
+    document.head.appendChild(style)
+
+    // Zoom out for full content
+    document.body.style.zoom = '50%'
+
+    // Print the page
+    window.print()
+
+    // Remove the landscape style and reset zoom after printing
+    document.head.removeChild(style)
+    document.body.style.zoom = '100%'
+  }
+
   const dropdownItems = [
     {
-      icon: Edit,
-      onClick: () => console.log('Edit clicked'),
+      icon: FaRegFilePdf,
+      label: 'Download PDF',
+      onClick: () => exportToPDF(),
     },
     {
-      icon: Copy,
-      onClick: () => console.log('Duplicate clicked'),
+      icon: PiMicrosoftExcelLogo,
+      label: 'Download Excel',
+      onClick: () => exportToExcel(),
     },
     {
-      icon: Share,
-      onClick: () => console.log('Share clicked'),
+      icon: FaPrint,
+      label: 'Print Page',
+      onClick: () => handlePrintPage(),
     },
     {
-      icon: Trash,
-      onClick: () => console.log('Delete clicked'),
+      icon: HiOutlineLogout,
+      label: 'Logout',
+      onClick: () => handleLogout(),
+    },
+    {
+      icon: FaArrowUp,
+      label: 'Scroll To Top',
+      onClick: () => handlePageUp(),
     },
   ]
 
   return (
     <>
       {/**TABLE */}
+      <Toaster />
       <CTable
         bordered
         className="custom-table table-container"
@@ -849,7 +1231,7 @@ const ShowStatus = ({
       </CTable>
 
       {/* Rows Per Page Dropdown */}
-      <CRow className="mb-3">
+      <CRow className="my-3">
         <CCol xs={12} className="d-flex justify-content-end">
           <CDropdown aria-label="Rows per page selector">
             <CDropdownToggle color="secondary" className="d-flex align-items-center">
@@ -875,17 +1257,18 @@ const ShowStatus = ({
         <CRow className="my-3">
           <CCol xs={6} className="d-flex align-items-center">
             <span className="text-muted small">
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, sortedData.length)} of{' '}
-              {sortedData.length} entries
+              Showing {indexOfFirstItem + 1 || ''} to {Math.min(indexOfLastItem, sortedData.length)}{' '}
+              of {sortedData.length} entries
             </span>
           </CCol>
-          <CCol xs={6}>
+          <div className="d-flex justify-content-center">
             {/* Existing pagination code */}
             {sortedData.length > itemsPerPage && (
               <CPagination align="end" aria-label="Table pagination">
                 <CPaginationItem
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
+                  style={{ cursor: 'pointer' }}
                 >
                   Previous
                 </CPaginationItem>
@@ -895,6 +1278,7 @@ const ShowStatus = ({
                     active={page === currentPage}
                     onClick={() => setCurrentPage(page)}
                     aria-current={page === currentPage ? 'page' : undefined}
+                    style={{ cursor: 'pointer' }}
                   >
                     {page}
                   </CPaginationItem>
@@ -902,29 +1286,19 @@ const ShowStatus = ({
                 <CPaginationItem
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
+                  style={{ cursor: 'pointer' }}
                 >
                   Next
                 </CPaginationItem>
               </CPagination>
             )}
-          </CCol>
+          </div>
         </CRow>
       )}
 
-      <IconDropdown items={dropdownItems} />
-
-      {/* <CDropdown className="position-fixed bottom-0 end-0 m-3">
-        <CDropdownToggle
-          color="secondary"
-          style={{ borderRadius: '50%', padding: '10px', height: '48px', width: '48px' }}
-        >
-          <CIcon icon={cilSettings} />
-        </CDropdownToggle>
-        <CDropdownMenu>
-          <CDropdownItem onClick={exportToPDF}>PDF</CDropdownItem>
-          <CDropdownItem onClick={exportToExcel}>Excel</CDropdownItem>
-        </CDropdownMenu>
-      </CDropdown> */}
+      <div className="position-fixed bottom-0 end-0 mb-5 m-3 z-5">
+        <IconDropdown items={dropdownItems} />
+      </div>
     </>
   )
 }
@@ -944,7 +1318,6 @@ const Status = () => {
   const [groups, setGroups] = useState([])
   const [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(false)
-  const accessToken = Cookies.get('authToken')
   const [showMap, setShowMap] = useState(false) //show mapping data
   const [columns] = useState([
     'Vehicle Status',
@@ -1171,6 +1544,7 @@ const Status = () => {
                 </CCardHeader>
                 <CCardBody>
                   <ShowStatus
+                    formData={formData}
                     apiData={apiData}
                     statusLoading={statusLoading}
                     selectedDeviceName={selectedDeviceName}

@@ -279,7 +279,7 @@ const Devices = () => {
         const authtoken = btoa(`${username}:${password}`)
 
         const [oldApiResponse, newApiResponse] = await Promise.all([
-          axios.get(`http://63.142.251.13:8082/api/devices`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/api/devices`, {
             headers: {
               Authorization: `Basic ${authtoken}`,
             },
