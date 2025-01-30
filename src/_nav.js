@@ -38,6 +38,7 @@ const _nav = (role, decodedToken) => {
     stop,
     travel,
     idle,
+    trips,
     sensor,
     alerts,
     // vehicle,
@@ -60,6 +61,7 @@ const _nav = (role, decodedToken) => {
       history,
       stop,
       travel,
+      trips,
       idle,
       // sensor,
       alerts,
@@ -485,7 +487,7 @@ const _nav = (role, decodedToken) => {
           stop ||
           travel ||
           idle ||
-          // sensor ||
+          trips ||
           alerts ||
           dayreport ||
           vehicle ||
@@ -548,9 +550,20 @@ const _nav = (role, decodedToken) => {
             },
             travel && {
               component: CNavItem,
-              name: 'Travels Report',
+              name: 'Travels Summary',
               to: '/travelsreport',
               visible: true, // This can be a boolean or controlled by a state.
+              icon: (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <RiPinDistanceFill style={{ marginRight: '15px', fontSize: '25px' }} />
+                </div>
+              ),
+            },
+            trips && {
+              component: CNavItem,
+              name: 'Trips Report',
+              to: '/tripsreport',
+
               icon: (
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <RiPinDistanceFill style={{ marginRight: '15px', fontSize: '25px' }} />
@@ -568,17 +581,6 @@ const _nav = (role, decodedToken) => {
                 </div>
               ),
             },
-            // sensor && {
-            //   component: CNavItem,
-            //   name: 'Sensor Reports',
-            //   to: '/sensorreports',
-            //   visible: true, // This can be a boolean or controlled by a state.
-            //   icon: (
-            //     <div style={{ display: 'flex', alignItems: 'center' }}>
-            //       <MdSensors style={{ marginRight: '15px', fontSize: '25px' }} />
-            //     </div>
-            //   ),
-            // },
             alerts && {
               component: CNavItem,
               name: 'Alerts/Events',
@@ -590,17 +592,6 @@ const _nav = (role, decodedToken) => {
                 </div>
               ),
             },
-            // vehicle && {
-            //   component: CNavItem,
-            //   name: 'Vehicle Reports',
-            //   to: '/vehiclereport',
-            //   visible: true,  // This can be a boolean or controlled by a state.
-            //   icon: (
-            //     <div style={{ display: 'flex', alignItems: 'center' }}>
-            //       <FaCarOn style={{ marginRight: '15px', fontSize: '25px' }} />
-            //     </div>
-            //   ),
-            // },
             geofenceReport && {
               component: CNavItem,
               name: 'Geofence Report',
